@@ -34,7 +34,7 @@ bindKeys =
       , ("M-S-n",       windows W.swapDown)
       , ("M-<Print>",   spawn "scrot")
       , ("M-<F2>",      spawn "gmrun")
-      , ("M-;",         spawn "xprop | grep WM_CLASS | xmessage -file -")
+      , ("M-;",         spawn "xprop | grep -E \"^WM_CLASS|^WM_ICON\" | xmessage -file -")
       , ("M-s",         refresh)
     ]
 
