@@ -1,0 +1,1 @@
+/home/shurane/.bash_aliases
