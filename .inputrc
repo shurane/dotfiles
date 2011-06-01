@@ -1,1 +1,17 @@
-/home/shurane/.inputrc
+# tab completion like vim's
+#“\t”: menu-complete
+
+# completion is case-insensitive, could be useful
+set completion-ignore-case on
+set completion-query-items 100
+set visible-stats on
+
+#special option for readline characters?
+set bind-tty-special-chars off      
+
+# PageUp goes to top of history, PageDown goes to bottom of history
+"\e[5~": beginning-of-history
+"\e[6~": end-of-history
+
+# Use '/' for word boundaries for Ctrl-w
+"\C-w": unix-filename-rubout
