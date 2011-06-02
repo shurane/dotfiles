@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# extract ##########################################
+extract () {
+    if [ -f "$1" ]; then
+        case "$1" in
+            *.tar.bz2)   tar xjf "$@" --directory "$PWD";;
+            *.tar.gz)    tar xzf "$@" --directory "$PWD";;
+            *.bz2)       bunzip2 "$@";;
+            *.rar)       unrar e "$@";;
+            *.cbr)       unrar e "$@";;
+            *.gz)        gunzip "$@";;
+            *.tar)       tar xf "$@";;
+            *.tbz2)      tar xjf "$@"; --directory "$PWD";
+            *.tgz)       tar xzf "$@"; --directory "$PWD";
+            *.zip)       unzip "$@";;
+            *.cbz)       unzip "$@";;
+            *.Z)         uncompress "$@";;
+            *.7z)        7z x "$@";;
+            *)           echo "'"$1"' cannot be extracted via extract()" ;;
+        esac
+    else
+        echo "'"$1"' is not a valid file"
+    fi
+}
+
+extract "$@"
+
