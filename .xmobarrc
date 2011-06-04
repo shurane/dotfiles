@@ -1,5 +1,5 @@
 Config { 
-    font = "-*-terminus-*-*-*-*-12-*-*-*-*-*-*-u"
+    font = "xft:Sans-9:bold"
   , bgColor = "#000000"
   , fgColor = "#C9A34E"
   , position = Top
@@ -7,11 +7,12 @@ Config {
   , commands = [ Run Weather "KLGA" ["-t","LGA: <tempC>F","-L","50","-H","75","--normal","green","--high","red","--low","lightblue"] 36000
                , Run Network "eth0" ["-L","0","-H","32","--normal","green","--high","red"] 10
                , Run Network "wlan0" ["-L","0","-H","32","--normal","green","--high","red"] 10
-          --   , Run Com "uname" ["-s","-r"] "" 36000
                , Run Date "%a %b %_d %Y %H:%M:%S" "date" 10
                , Run StdinReader
                , Run Battery ["-L","50","-H","75","--high","green","--normal","yellow", "--low", "red"] 10
-                   ]
-      , template = "%StdinReader% }{ %memory% | %wlan0% | <fc=#ee9a00>%date%</fc> | %KLGA% | %battery% "
+               ]
+  , sepChar = "%"
+  , alignSep = "}{"
+  , template = "%StdinReader% }{ %memory% | %wlan0% | <fc=#ee9a00>%date%</fc> | %KLGA% | %battery% "
       }
 
