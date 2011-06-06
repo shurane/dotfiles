@@ -7,12 +7,11 @@ HISTSIZE=20000
 HISTFILESIZE=20000
 shopt -s checkwinsize               # update the values of LINES and COLUMNS after each command
 
-export XDG_DATA_HOME="$HOME/.local/share"
-export EDITOR=vim
+export XDG_DATA_HOME=$HOME/.local/share
+export EDITOR="vim"
 export ECLIPSE_HOME=~/cs/eclipse
-export PATH="~/bin:$PATH:/usr/games"
-export JAVA_HOME="/usr/lib/jvm/java-6-openjdk/"
-export INPUTRC="~/.inputrc"
+export JAVA_HOME=/usr/lib/jvm/java-6-openjdk/
+export INPUTRC=~/.inputrc
 export PAGER=less
 export LESS="-R"
 

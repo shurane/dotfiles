@@ -69,6 +69,7 @@ bindKeys =
       -- bind M-(S)-(-/=) to resize window a variety of ways -- maybe I'll get aspect ratio preserving later
       ("M-S-;",       spawn "exe=$(dmenu_path | dmenu -i) && eval \"exec $exe\"")
     , ("M-q",         spawn "xmonad --recompile && xmonad --restart")
+    , ("M-S-b",       sendMessage ToggleStruts) 
     , ("M-p",         windows W.focusUp)
     , ("M-n",         windows W.focusDown)
     , ("M-S-p",       windows W.swapUp)
@@ -134,7 +135,7 @@ myLayoutHook = avoidStrutsOn [] $ tall ||| wide ||| tab ||| full
         rt      = ResizableTall 1 (2/100) (1/2) []
         tall    = named "[T]=" $ smartBorders rt
         wide    = named "[W]=" $ smartBorders $ Mirror rt
-        tab     = named "+" $ noBorders $ tabbed shrinkText tabTheme1
+        tab     = named "[+]" $ noBorders $ tabbed shrinkText tabTheme1
         full    = named "[F]" $ noBorders Full
 
 myConfig = gnomeConfig 
@@ -150,7 +151,8 @@ myConfig = gnomeConfig
     , focusedBorderColor = colorUrg
     } `additionalKeysP` bindKeys `removeKeysP` unbindKeys
 
-main = xmonad =<< statusBar myBar myPP toggleStrutsKey myConfig
+-- main = xmonad =<< statusBar myBar myPP toggleStrutsKey myConfig
+main = xmonad myConfig
 
 --gathered from:
 -- - https://github.com/MrElendig/dotfiles-alice/blob/master/.xmonad/xmonad.hs
