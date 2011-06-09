@@ -1,0 +1,22 @@
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --human-readable --group-directories-first --sort=extension --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+alias info='info --vi-keys'
+alias gopen='gnome-open'
+alias df='df -h'
+alias grep='grep -i'
+alias ack='ack-grep'
+alias po='popd'
+alias pu='pushd'
+# alias pgrep='ps -ef | grep --color=auto'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+
