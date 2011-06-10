@@ -54,7 +54,7 @@ set shiftwidth=4            " indent width for autoindent
 "set foldmethod=marker      " for explicit folds
 filetype indent on          " indent depends on filetype
 filetype plugin on          " enable plugins 
-syntax on                   " Syntax highlighting
+syntax enable               " Syntax highlighting
 
 if has('persistent_undo')
     set undofile            " Enable persistent undo
@@ -62,24 +62,8 @@ if has('persistent_undo')
 endif
 
 set cpoptions=yraABceFq
-"             |||||||||
-"             ||||||||+-- When joining lines, leave the cursor
-"             ||||||||      between joined line
-"             ||||||||
-"             ||||||||
-"             ||||||||+-- Set buffer options when entering the
-"             |||||||      buffer
-"             |||||||+-- :write command updates current file name
-"             ||||||+-- Automatically add <CR> to the last line
-"             |||||      when using :@r
-"             |||||+-- Searching continues at the end of the match
-"             ||||      at the cursor position
-"             ||||+-- A backslash has no special meaning in mapping
-"             |||+-- :write updates alternative file name
-"             ||+-- :read updates alternative file name
-"             |+-- '.' can redo search ('/') commands
-"             +-- '.' can redo yank commands
-"
+set formatoptions+=tcq
+set formatoptions-=r        " don't insert comment after <Enter>
 
 " }}}
 
@@ -102,6 +86,7 @@ function! ToggleSyntax()
         syntax off
     else
         syntax enable
+
     endif
 endfunction
 
