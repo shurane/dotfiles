@@ -5,15 +5,15 @@ if [ "$TERM" != "dumb" ]; then
     eval "`dircolors -b $DIR_COLORS`"
 fi
 
-
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 
+alias po='popd'
+alias pu='pushd'
 alias ack='ack-grep'
-alias attach='screen -RaAD'
-alias df='df -h'
+alias df='df -ch'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias gopen='gnome-open'

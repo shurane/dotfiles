@@ -100,6 +100,10 @@ inoremap jj <Esc>
 nnoremap <Leader>m "+p
 nnoremap <Leader>n "+y
 vnoremap <Leader>n "+y
+" do :ls before switching buffers -- might forget when I merge this with other
+" vimrc
+ map <leader>l :ls<CR>:b<space>
+
 " split vertically
 "nnoremap <Leader>v :vsp<Enter>
 " toggle syntax on and off -- also an ugly function
