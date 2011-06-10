@@ -7,12 +7,12 @@ HISTSIZE=20000
 HISTFILESIZE=20000
 shopt -s checkwinsize               # update the values of LINES and COLUMNS after each command
 
-export XDG_DATA_HOME=$HOME/.local/share
+export XDG_DATA_HOME="$HOME/.local/share"
 export EDITOR="vim"
-export ECLIPSE_HOME=~/cs/eclipse
-export JAVA_HOME=/usr/lib/jvm/java-6-openjdk/
-export INPUTRC=~/.inputrc
-export PAGER=less
+export ECLIPSE_HOME="~/cs/eclipse"
+#export JAVA_HOME=/usr/lib/jvm/java-6-openjdk/
+export INPUTRC="$HOME/.inputrc"
+export PAGER="less"
 export LESS="-R"
 
 # make less more friendly for non-text input files, see lesspipe(1)
@@ -54,3 +54,6 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
+if command -v "bash_completion_tmux.sh" >/dev/null; then
+    . "bash_completion_tmux.sh"
+fi
