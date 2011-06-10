@@ -140,12 +140,11 @@ nnoremap <CR> o<Esc>
 
 " copy and paste using leader key
 nnoremap <Leader>m "+p
-nnoremap <Leader>n "+y
 vnoremap <Leader>m "+p
 vnoremap <Leader>n "+y
 
 " do :ls before switching buffers
- map <leader>l :ls<CR>:b<space>
+nnoremap <leader>l :ls<CR>:b<space>
 
 " split vertically
 nnoremap <Leader>v :vsp<CR>
