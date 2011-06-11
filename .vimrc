@@ -86,8 +86,11 @@ function! ToggleSyntax()
         syntax off
     else
         syntax enable
-
     endif
+endfunction
+
+function! Timestamp()
+    return "Last Modified: " . strftime("%d %b %Y %X")
 endfunction
 
 " Tmux integration
@@ -114,7 +117,7 @@ endfunction
 
 " }}}
 
-" Normal Maps {{{
+" Vim Maps {{{
 
 let mapleader = ","
 
@@ -124,6 +127,9 @@ nnoremap ` '
 
 " save a file as root
 cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>
+
+" insert timestamp in place
+iabbrev YTS <C-R>=Timestamp()<CR>
 
 " reload .vimrc
 nnoremap <Leader>r :source $MYVIMRC<CR>
@@ -144,7 +150,7 @@ vnoremap <Leader>m "+p
 vnoremap <Leader>n "+y
 
 " do :ls before switching buffers
-nnoremap <leader>l :ls<CR>:b<space>
+nnoremap <leader>b :ls<CR>:b<space>
 
 " split vertically
 nnoremap <Leader>v :vsp<CR>
@@ -152,7 +158,7 @@ nnoremap <Leader>v :vsp<CR>
 " toggle syntax/wrap/listchars/highlight/spelling on and off
 nnoremap <Leader>s :call ToggleSyntax()<CR>
 nnoremap <Leader>w :set wrap!<CR>
-nnoremap <Leader>v :set list!<CR>
+nnoremap <Leader>l :set list!<CR>
 nnoremap <C-l> :set hlsearch!<CR>
 " TODO kind of incomplete?
 nnoremap <Leader>c :setlocal invspell spellang=en_us<CR>

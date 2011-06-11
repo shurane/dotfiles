@@ -26,9 +26,9 @@ import Data.Ratio
 
 myManageHook = (composeAll . concat $
     [ [ isFullscreen                          --> myDoFullFloat ]
-    , [ className =? float                    --> doFloat                             | float  <- myFloats  ]
-    , [ className =? center                   --> doF W.shiftMaster <+> doCenterFloat | center <- myCenterClasses ]
-    , [     title =? center                   --> doF W.shiftMaster <+> doCenterFloat | center <- myCenterTitles ]
+    , [ className =? float                    --> doFloat           | float  <- myFloats ]
+    , [ className =? center                   --> doCenterFloat | center <- myCenterClasses ]
+    , [     title =? center                   --> doCenterFloat | center <- myCenterTitles ]
     , [     title =? "Buddy List"             --> doFloat ]
     ]) <+> manageTypes <+> manageDocks
 
