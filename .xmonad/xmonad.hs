@@ -16,26 +16,40 @@ import XMonad.Layout.NoBorders
 import XMonad.Layout.ResizableTile
 import XMonad.Layout.Named
 import XMonad.Layout.Tabbed
+import XMonad.Layout.IM
 
 import XMonad.Config.Gnome
 
 import System.IO
-import Data.Ratio
+import Data.Ratio((%))
 
 -- spaghetti xmonad.hs!
 
+myWorkspaces = ["1:term","2:web","3:docs","4:chat","5:full"] ++ [show i | i <- [6..9]]
+
 myManageHook = (composeAll . concat $
-    [ [ isFullscreen                          --> myDoFullFloat ]
-    , [ className =? float                    --> doFloat           | float  <- myFloats ]
-    , [ className =? center                   --> doCenterFloat | center <- myCenterClasses ]
-    , [     title =? center                   --> doCenterFloat | center <- myCenterTitles ]
-    , [     title =? "Buddy List"             --> doFloat ]
+    [ [ isFullscreen                  --> myDoFullFloat ]
+    , [ className =? w                --> doShift "1:term" | w  <- term]
+    , [ className =? w                --> doShift "2:web"  | w  <- web]
+    , [ className =? w                --> doShift "4:docs" | w  <- docs]
+    , [ className =? w                --> doShift "4:chat" | w  <- chat]
+    , [ className =? w                --> doShift "5:full" | w  <- full]
+    , [ className =? w                --> doFloat          | w  <- myFloats ]
+    , [ className =? w                --> doCenterFloat    | w  <- myCenterClasses ]
+    , [     title =? w                --> doCenterFloat    | w  <- myCenterTitles ]
+    , [     title =? "Buddy List"     --> doFloat ]
     ]) <+> manageTypes <+> manageDocks
 
     where 
+        term = [ "Gnome-terminal", "urxvt" ]
+        web  = [ "Firefox", "Google-chrome" ]
+        docs = [ "Sumatra PDF" ]
+        chat = [ "Pidgin", "Xchat" ]
+        full = [ "SMPlayer", "MPlayer" ]
+
         myFloats  = [ "Pidgin","SMPlayer", "Do", "Gnome-panel" ]
         myCenterClasses = [ "Xmessage", "Gmrun" ]
-        myCenterTitles =  [ "Downloads", "Firefox Preferences", "Xchat: Network List" ]
+        myCenterTitles =  [ "Downloads", "Xchat: Network List" ]
 
 -- a trick for fullscreen but stil allow focusing of other WSs
 myDoFullFloat :: ManageHook
@@ -60,16 +74,16 @@ myModMask = mod4Mask
 
 bindKeys = 
     [
-      -- bind M-S-; to dmenu
-      -- bind M-; to xprops for current window
+      -- bind M-; to dmenu
+      -- bind M-S-; to xprops for current window
       -- bind M-Print to take a snapshot
       -- bind M-p to previous window
       -- bind M-n to next window
       -- bind M-g to gridselect
       -- bind M-(S)-(-/=) to resize window a variety of ways -- maybe I'll get aspect ratio preserving later
-      ("M-S-;",       spawn "exe=$(dmenu_path | dmenu -i) && eval \"exec $exe\"")
+      ("M-;",         spawn "exe=$(dmenu_path | dmenu -i) && eval \"exec $exe\"")
     , ("M-q",         spawn "xmonad --recompile && xmonad --restart")
-    , ("M-S-b",       sendMessage ToggleStruts) 
+--     , ("M-S-b",       sendMessage ToggleStruts) 
     , ("M-p",         windows W.focusUp)
     , ("M-n",         windows W.focusDown)
     , ("M-S-p",       windows W.swapUp)
@@ -77,7 +91,7 @@ bindKeys =
     , ("M-g",         goToSelected myGSConfig) 
     , ("M-<Print>",   spawn "scrot -e 'mv $f ~/Pictures/screenshots/'")
     , ("M-<F2>",      spawn "gmrun")
-    , ("M-;",         spawn "xprop | grep -E \"^WM_CLASS|^WM_NAME\" | xmessage -file -")
+    , ("M-S-;",         spawn "xprop | grep -E \"^WM_CLASS|^WM_NAME\" | xmessage -file -")
     , ("M-s",         refresh)
     , ("M-=",         withFocused (keysResizeWindow ( 10,  10) (1/2, 1/2))) 
     , ("M--",         withFocused (keysResizeWindow (-10, -10) (1/2, 1/2)))
@@ -132,6 +146,7 @@ tabTheme1 = defaultTheme
 
 myLayoutHook = avoidStrutsOn [] $ tall ||| wide ||| tab ||| full
     where
+--         im      = withIM (1%7) (Title "Buddy List") (tall)
         rt      = ResizableTall 1 (2/100) (1/2) []
         tall    = named "[T]=" $ smartBorders rt
         wide    = named "[W]=" $ smartBorders $ Mirror rt
@@ -142,6 +157,7 @@ myConfig = gnomeConfig
     {
       modMask = myModMask
     , focusFollowsMouse = False
+    , workspaces = myWorkspaces
     , terminal = "gnome-terminal"
     , manageHook = myManageHook 
                <+> manageHook gnomeConfig
