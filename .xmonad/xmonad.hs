@@ -43,7 +43,7 @@ myManageHook = (composeAll . concat $
     where 
         term = [ "Gnome-terminal", "urxvt" ]
         web  = [ "Firefox", "Google-chrome" ]
-        docs = [ "Sumatra PDF" ]
+        docs = [ "Sumatra PDF", "djview4", "djview" ]
         chat = [ "Pidgin", "Xchat" ]
         full = [ "SMPlayer", "MPlayer" ]
 
