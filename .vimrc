@@ -58,17 +58,31 @@ syntax enable               " Syntax highlighting
 
 if has('persistent_undo')
     set undofile            " Enable persistent undo
-    set undodir=~/.vim/undo/ " Store undofiles in a tmp dir
+    set undodir=~/.vim/undo " Store undofiles in a tmp dir
 endif
 
 set cpoptions=yraABceFq
 set formatoptions+=tcq
-set formatoptions-=r        " don't insert comment after <Enter>
+" this formatoption isn't working, it seems
+set formatoptions-=r        " don't insert comment after <CR>
+
+" }}}
+
+" GVim Settings {{{
+if has('gui_running')
+    autocmd GUIEnter * set visualbell t_vb=
+    colorscheme wombat
+    " Win32 Settings {{{
+    if has('win32')
+        set guifont=Consolas:h10:cANSI
+    endif
+    " }}}
+endif
 
 " }}}
 
 " Syntax Setup {{{
-"
+
 autocmd BufRead,BufNewFile *.txt setfiletype text
 autocmd FileType text set wrap
 autocmd FileType cpp set makeprg=clang\ -g\ %\ -o\ %<.out
@@ -178,3 +192,5 @@ nnoremap <silent> <C-w>k :call TmuxWindowMotion('k')<cr>
 nnoremap <silent> <C-w>l :call TmuxWindowMotion('l')<cr>
 
 " }}}
+
+" vim:fdm=marker
