@@ -15,6 +15,7 @@ highlight CursorLine cterm=bold
 "highlight SpecialKey ctermbg=brown
 
 set t_Co=256                " sets Vim to use 256 terminal colors
+colorscheme wombat256mod    " nice dark theme
 set ruler                   " show the cursor position all the time
 set nowrap                  " don't wrap long lines
 set textwidth=0             " don't wrap lines on inserts
@@ -136,7 +137,15 @@ cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>
 iabbrev YTS <C-R>=Timestamp()<CR>
 
 " reload .vimrc
-nnoremap <Leader>r :source $MYVIMRC<CR>
+nnoremap <Leader>rr :source $MYVIMRC<CR>
+nnoremap <Leader>rg :source $MYGVIMRC<CR>
+
+" zl is less folds, zm is more folds
+" z(j/k) navigates between next/prev fold
+nnoremap zl zr
+nnoremap zL zR
+" to not throw me off with scrolling
+nnoremap zh ""
 
 " mappings during insert mode
 " when using C-u/C-w in insert mode, create a new change instead of appending
@@ -166,6 +175,10 @@ nnoremap <Leader>l :set list!<CR>
 nnoremap <C-l> :set hlsearch!<CR>
 " TODO kind of incomplete?
 nnoremap <Leader>c :setlocal invspell spellang=en_us<CR>
+
+" }}}
+
+" Plugin Setup {{{
 
 " }}}
 
