@@ -137,8 +137,7 @@ cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>
 iabbrev YTS <C-R>=Timestamp()<CR>
 
 " reload .vimrc
-nnoremap <Leader>rr :source $MYVIMRC<CR>
-nnoremap <Leader>rg :source $MYGVIMRC<CR>
+nnoremap <Leader>r :source $MYVIMRC<CR>
 
 " zl is less folds, zm is more folds
 " z(j/k) navigates between next/prev fold
@@ -196,4 +195,4 @@ nnoremap <silent> <C-w>l :call TmuxWindowMotion('l')<cr>
 
 " }}}
 
-" vim:fdm=marker
+" vim:fdm=marker:fdl=1
