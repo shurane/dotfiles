@@ -34,10 +34,13 @@ set clipboard+=unnamed      " yanks go onto the global clipboard as well -- this
 set statusline=%F%m%r%h%w\ [TYPE=%Y\ %{&ff}]\ [%l/%L\ (%p%%)]
 
 set autochdir               " always switch to the current file directory
-set autowrite               " write on make/shell, and other commands
+set modeline                " allow vim options to be embedded in files
+set modelines=5             " found either in first n lines or last n lines
+set noautowrite             " don't write on make/shell, and other commands
 set autoread                " reload changed files
 set hidden                  " look this up -- something about efficient writing
 set backup                  " simple backup
+set backupext=~             " backup for 'file' is 'file~'
 set backupdir=~/.vim/backup " stores all backups here
 set directory=~/.vim/swap   " stores all swap files here
 
@@ -65,19 +68,6 @@ set cpoptions=yraABceFq
 set formatoptions+=tcq
 " this formatoption isn't working, it seems
 set formatoptions-=r        " don't insert comment after <CR>
-
-" }}}
-
-" GVim Settings {{{
-if has('gui_running')
-    autocmd GUIEnter * set visualbell t_vb=
-    colorscheme wombat
-    " Win32 Settings {{{
-    if has('win32')
-        set guifont=Consolas:h10:cANSI
-    endif
-    " }}}
-endif
 
 " }}}
 
