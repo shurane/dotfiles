@@ -164,8 +164,9 @@ vnoremap <Leader>n "+y
 " do :ls before switching buffers
 nnoremap <leader>b :ls<CR>:b<space>
 
-" split vertically
+" split vertically and horizontally
 nnoremap <Leader>v :vsp<CR>
+nnoremap <Leader>h :sp<CR>
 
 " toggle syntax/wrap/listchars/highlight/spelling on and off
 nnoremap <Leader>s :call ToggleSyntax()<CR>

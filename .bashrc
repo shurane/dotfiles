@@ -10,6 +10,7 @@ shopt -s checkwinsize               # update the values of LINES and COLUMNS aft
 export XDG_DATA_HOME="$HOME/.local/share"
 export EDITOR="vim"
 export ECLIPSE_HOME="~/cs/eclipse"
+export WORKON_HOME="~/projects/envs"
 #export JAVA_HOME=/usr/lib/jvm/java-6-openjdk/
 export INPUTRC="$HOME/.inputrc"
 export PAGER="less"
