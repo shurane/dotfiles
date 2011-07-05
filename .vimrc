@@ -15,6 +15,7 @@ highlight CursorLine cterm=bold
 "highlight SpecialKey ctermbg=brown
 
 set t_Co=256                " sets Vim to use 256 terminal colors
+colorscheme wombat256mod    " nice dark theme
 set ruler                   " show the cursor position all the time
 set nowrap                  " don't wrap long lines
 set textwidth=0             " don't wrap lines on inserts
@@ -34,10 +35,13 @@ set clipboard+=unnamed      " yanks go onto the global clipboard as well -- this
 set statusline=%F%m%r%h%w\ [TYPE=%Y\ %{&ff}]\ [%l/%L\ (%p%%)]
 
 set autochdir               " always switch to the current file directory
-set autowrite               " write on make/shell, and other commands
+set modeline                " allow vim options to be embedded in files
+set modelines=5             " found either in first n lines or last n lines
+set noautowrite             " don't write on make/shell, and other commands
 set autoread                " reload changed files
 set hidden                  " look this up -- something about efficient writing
 set backup                  " simple backup
+set backupext=~             " backup for 'file' is 'file~'
 set backupdir=~/.vim/backup " stores all backups here
 set directory=~/.vim/swap   " stores all swap files here
 
@@ -58,17 +62,18 @@ syntax enable               " Syntax highlighting
 
 if has('persistent_undo')
     set undofile            " Enable persistent undo
-    set undodir=~/.vim/undo/ " Store undofiles in a tmp dir
+    set undodir=~/.vim/undo " Store undofiles in a tmp dir
 endif
 
 set cpoptions=yraABceFq
 set formatoptions+=tcq
-set formatoptions-=r        " don't insert comment after <Enter>
+" this formatoption isn't working, it seems
+set formatoptions-=r        " don't insert comment after <CR>
 
 " }}}
 
 " Syntax Setup {{{
-"
+
 autocmd BufRead,BufNewFile *.txt setfiletype text
 autocmd FileType text set wrap
 autocmd FileType cpp set makeprg=clang\ -g\ %\ -o\ %<.out
@@ -134,6 +139,13 @@ iabbrev YTS <C-R>=Timestamp()<CR>
 " reload .vimrc
 nnoremap <Leader>r :source $MYVIMRC<CR>
 
+" zl is less folds, zm is more folds
+" z(j/k) navigates between next/prev fold
+nnoremap zl zr
+nnoremap zL zR
+" to not throw me off with scrolling
+nnoremap zh ""
+
 " mappings during insert mode
 " when using C-u/C-w in insert mode, create a new change instead of appending
 inoremap <C-u> <C-g>u<C-u>
@@ -152,8 +164,9 @@ vnoremap <Leader>n "+y
 " do :ls before switching buffers
 nnoremap <leader>b :ls<CR>:b<space>
 
-" split vertically
+" split vertically and horizontally
 nnoremap <Leader>v :vsp<CR>
+nnoremap <Leader>h :sp<CR>
 
 " toggle syntax/wrap/listchars/highlight/spelling on and off
 nnoremap <Leader>s :call ToggleSyntax()<CR>
@@ -162,6 +175,10 @@ nnoremap <Leader>l :set list!<CR>
 nnoremap <C-l> :set hlsearch!<CR>
 " TODO kind of incomplete?
 nnoremap <Leader>c :setlocal invspell spellang=en_us<CR>
+
+" }}}
+
+" Plugin Setup {{{
 
 " }}}
 
@@ -178,3 +195,5 @@ nnoremap <silent> <C-w>k :call TmuxWindowMotion('k')<cr>
 nnoremap <silent> <C-w>l :call TmuxWindowMotion('l')<cr>
 
 " }}}
+
+" vim:fdm=marker:fdl=1

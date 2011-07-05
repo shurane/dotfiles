@@ -10,6 +10,7 @@ shopt -s checkwinsize               # update the values of LINES and COLUMNS aft
 export XDG_DATA_HOME="$HOME/.local/share"
 export EDITOR="vim"
 export ECLIPSE_HOME="~/cs/eclipse"
+export WORKON_HOME="~/projects/envs"
 #export JAVA_HOME=/usr/lib/jvm/java-6-openjdk/
 export INPUTRC="$HOME/.inputrc"
 export PAGER="less"
@@ -45,6 +46,10 @@ unset color_prompt force_color_prompt
 # If this is an xterm set the title to user@host:dir
 # may do wonky things on other terminals, perhaps?
 PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+
+if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
+    . /usr/local/bin/virtualenvwrapper.sh
+fi
 
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
