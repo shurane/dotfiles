@@ -1,3 +1,7 @@
 [user]
-	name = Ehtesh Chou
+	name = Ehtesh Choudhury
 	email = merlockmagus@gmail.com
+
+[color]
+    diff=always
+    ui=always
