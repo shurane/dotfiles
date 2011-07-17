@@ -28,7 +28,6 @@ set vb t_vb=""              " Turn visual bell off
 set mouse=a                 " use the mouse in console vim
 
 set splitright              " vertical splits split to the right (instead of left)
-set pastetoggle=,,          " toggle paste-mode by this mapping
 set clipboard+=unnamed      " yanks go onto the global clipboard as well -- this might make a mapping unnecessary
 
 " very informative status line
@@ -84,7 +83,7 @@ set tags+=tags;$HOME
 
 " Functions {{{
 
-" Syntax toggle
+" toggle syntax
 function! ToggleSyntax()
     if exists("g:syntax_on")
         syntax off
@@ -93,12 +92,21 @@ function! ToggleSyntax()
     endif
 endfunction
 
-" Diff Toggle
+" toggle diff
 function! ToggleDiff()
     if &diff
         diffoff
     else
         diffthis
+    endif
+endfunction
+
+" toggle paste
+function! TogglePaste()
+    if &paste
+        set nopaste
+    else
+        set paste
     endif
 endfunction
 
@@ -124,23 +132,21 @@ function! TmuxWindowMotion(dir)
     call system('tmux select-pane ' . dict[a:dir])
 endfunction
 
-function! SetupVAM(features)
-    "totally ripped from vim_addon_MarcWeber.vim
-    set runtimepath+=~/vim-addons/vim-addon-manager
-    let plugins = {
-                \ 'always' : ['nerdcommenter']
-                \}
-    let activate = []
-    for [k,v] in items(plugins)
-        if k == 'always'
-                \ || (type(a:features) == type([]) && index(a:features, k) >=0)
-                \ || (type(a:features) == type('') && a:features == 'all')
-            call extend(activate,v)
-        endif
-    endfor
+" VAM for plugin management
+function! ActivateVAM()
+    let addons_base = expand('$HOME') . '/vim-addons'
+    let addons_manager = addons_base . '/vim-addon-manager'
+    execute 'set runtimepath+=' . addons_manager
 
-    call vam#ActivateAddons(activate, {'auto_install' : 1})
+    if finddir(addons_base, '') == ''
+        call mkdir(addons_base, '')
+    endif
+    if finddir(addons_manager) == ''
+        execute 'cd ' . addons_base
+        execute '!git clone git://github.com/MarcWeber/vim-addon-manager.git'
+    endif
 endfunction
+
 
 " }}}
 
@@ -152,11 +158,17 @@ let mapleader = ","
 nnoremap ' `
 nnoremap ` '
 
+" save a file while overwriting
+nnoremap \w :w!<CR>
+
 " save a file as root
 cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>
 
 " insert timestamp in place
 iabbrev YTS <C-R>=Timestamp()<CR>
+
+" open up vimrc in current window
+nnoremap \r :e $MYVIMRC<CR>
 
 " reload .vimrc
 nnoremap <Leader>r :source $MYVIMRC<CR>
@@ -192,8 +204,10 @@ nnoremap <Leader>v :vsplit<CR>
 nnoremap <Leader>h :split<CR>
 
 " toggle 
+" ,tp for paste
 nnoremap <Leader>ts :call ToggleSyntax()<CR>        " syntax
 nnoremap <Leader>td :call ToggleDiff()<CR>          " diff
+nnoremap <Leader>tp :call TogglePaste()<CR>         " paste
 nnoremap <Leader>tw :set wrap!<CR>                  " wrap
 nnoremap <Leader>tl :set list!<CR>                  " listchars
 nnoremap <C-l> :set hlsearch!<CR>                   " highlight
@@ -203,6 +217,25 @@ nnoremap <Leader>c :setlocal invspell spellang=en_us<CR>
 " }}}
 
 " Plugin Setup {{{
+
+" lots of ideas from talek
+
+call ActivateVAM()
+
+"let g:vim_addon_manager = {}
+"let g:vim_addon_manager.known_repos_activation_policy = 'never'
+"let g:vim_addon_manager.auto_install = 1
+"let g:vim_addon_manager.plugin_sources = {}
+"let g:vim_addon_manager.plugin_sources['nerd_commenter'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdcommenter.git'}
+"let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdtree.git'}
+"let g:vim_addon_manager.plugin_sources['surround'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-surround.git'}
+
+"let g:plugin_list = keys(g:vim_addon_manager.plugin_sources)
+"call remove(g:plugin_list,'vim-addon-manager-known-repositories')
+
+call vam#ActivateAddons(['nerd_commenter','nerdtree','surround'])
+"call vam#ActivateAddons(g:plugin_list)
+"call vam#install#Update([])
 
 " }}}
 
