@@ -46,7 +46,6 @@ set backupdir=~/.vim/backup " stores all backups here
 set directory=~/.vim/swap   " stores all swap files here
 
 set incsearch               " turn on incremental search
-set hlsearch                " highlights matches when searching
 set ignorecase              " ignore case for searching
 set smartcase               " exclude explicit CAPS from ignorecase
 
@@ -94,18 +93,17 @@ function! ToggleSyntax()
     endif
 endfunction
 
-function! DiffToggle()
+" Diff Toggle, seems a bit cumbersome?
+function! ToggleDiff()
     if !exists("b:diff")
         let b:diff=0
     endif
-
     if b:diff
-        let b:diff=0
         diffoff
     else
-        let b:diff=1
         diffthis
     endif
+    let b:diff=!b:diff
 endfunction
 
 function! Timestamp()
@@ -192,18 +190,15 @@ nnoremap <leader>b :ls<CR>:b<space>
 
 " split vertically and horizontally
 " C-w s/v already exist for these two cases
-nnoremap <Leader>v :vsp<CR>
-nnoremap <Leader>h :sp<CR>
+nnoremap <Leader>v :vsplit<CR>
+nnoremap <Leader>h :split<CR>
 
-" shortcuts for diffing
-nnoremap <Leader>dt :diffthis<CR>
-nnoremap <Leader>do :diffoff<CR>
-
-" toggle syntax/wrap/listchars/highlight/spelling on and off
-nnoremap <Leader>s :call ToggleSyntax()<CR>
-nnoremap <Leader>w :set wrap!<CR>
-nnoremap <Leader>l :set list!<CR>
-nnoremap <C-l> :set hlsearch!<CR>
+" toggle 
+nnoremap <Leader>ts :call ToggleSyntax()<CR>        " syntax
+nnoremap <Leader>td :call ToggleDiff()<CR>          " diff
+nnoremap <Leader>tw :set wrap!<CR>                  " wrap
+nnoremap <Leader>tl :set list!<CR>                  " listchars
+nnoremap <C-l> :set hlsearch!<CR>                   " highlight
 " TODO kind of incomplete?
 nnoremap <Leader>c :setlocal invspell spellang=en_us<CR>
 
@@ -216,7 +211,7 @@ nnoremap <Leader>c :setlocal invspell spellang=en_us<CR>
 " Plugin Maps {{{
 
 " shortcuts for NERDTree
-nnoremap <Leader>t :NERDTreeToggle<CR>
+nnoremap <Leader>tt :NERDTreeToggle<CR>
 let NERDTreeMapActivateNode='<CR>'
 
 " shortcuts for tmux integration
