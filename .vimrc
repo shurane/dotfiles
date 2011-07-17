@@ -94,6 +94,20 @@ function! ToggleSyntax()
     endif
 endfunction
 
+function! DiffToggle()
+    if !exists("b:diff")
+        let b:diff=0
+    endif
+
+    if b:diff
+        let b:diff=0
+        diffoff
+    else
+        let b:diff=1
+        diffthis
+    endif
+endfunction
+
 function! Timestamp()
     return "Last Modified: " . strftime("%d %b %Y %X")
 endfunction
@@ -118,6 +132,18 @@ function! TmuxWindowMotion(dir)
         let dir = '-R'
     endif
     call system('tmux select-pane ' . dir)
+endfunction
+
+function! SetupVAM()
+    set runtimepath+=~/vim-addons/vim-addon-manager
+    " commenting try .. endtry because trace is lost if you use it.
+    " There should be no exception anyway
+    " try
+    call vam#ActivateAddons(['pluginA', 'pluginB'], {'auto_install' : 0})
+    " pluginA could be github:YourName see vam#install#RewriteName()
+    " catch /.*/
+    "  echoe v:exception
+    " endtry
 endfunction
 
 " }}}
@@ -156,7 +182,7 @@ inoremap jj <Esc>
 " insert newline without going into insert-mode
 nnoremap <CR> o<Esc>
 
-" copy and paste using leader key
+" copy and paste to global clipboard using leader key
 nnoremap <Leader>m "+p
 vnoremap <Leader>m "+p
 vnoremap <Leader>n "+y
@@ -165,8 +191,13 @@ vnoremap <Leader>n "+y
 nnoremap <leader>b :ls<CR>:b<space>
 
 " split vertically and horizontally
+" C-w s/v already exist for these two cases
 nnoremap <Leader>v :vsp<CR>
 nnoremap <Leader>h :sp<CR>
+
+" shortcuts for diffing
+nnoremap <Leader>dt :diffthis<CR>
+nnoremap <Leader>do :diffoff<CR>
 
 " toggle syntax/wrap/listchars/highlight/spelling on and off
 nnoremap <Leader>s :call ToggleSyntax()<CR>
@@ -185,7 +216,7 @@ nnoremap <Leader>c :setlocal invspell spellang=en_us<CR>
 " Plugin Maps {{{
 
 " shortcuts for NERDTree
-nnoremap <Leader>d :NERDTreeToggle<CR>
+nnoremap <Leader>t :NERDTreeToggle<CR>
 let NERDTreeMapActivateNode='<CR>'
 
 " shortcuts for tmux integration

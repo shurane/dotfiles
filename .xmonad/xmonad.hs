@@ -24,6 +24,7 @@ import System.IO
 import Data.Ratio((%))
 
 -- spaghetti xmonad.hs!
+-- oh dear, why don't I understand this yet?
 
 myWorkspaces = ["1:term","2:web","3:docs","4:chat","5:full"] ++ [show i | i <- [6..9]]
 
@@ -97,6 +98,11 @@ bindKeys =
     , ("M--",         withFocused (keysResizeWindow (-10, -10) (1/2, 1/2)))
     , ("M-S--",       withFocused (keysResizeWindow (  0, -10) (  0,   0)))     
     , ("M-S-=",       withFocused (keysResizeWindow (  0,  10) (  0,   0))) 
+    ]
+    ++
+    [ (mask ++ "M-" ++ [key], screenWorkspace scr >>= flip whenJust (windows . action))
+         | (key, scr)  <- zip "wer" [1,0,2] -- was [0..] *** change to match your screen order ***
+         , (action, mask) <- [ (W.view, "") , (W.shift, "S-")]
     ]
 
 unbindKeys = 
