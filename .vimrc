@@ -93,17 +93,13 @@ function! ToggleSyntax()
     endif
 endfunction
 
-" Diff Toggle, seems a bit cumbersome?
+" Diff Toggle
 function! ToggleDiff()
-    if !exists("b:diff")
-        let b:diff=0
-    endif
-    if b:diff
+    if &diff
         diffoff
     else
         diffthis
     endif
-    let b:diff=!b:diff
 endfunction
 
 function! Timestamp()
@@ -112,36 +108,38 @@ endfunction
 
 " Tmux integration
 function! TmuxWindowMotion(dir)
-    let dir = a:dir
+    let dict = { 
+               \'h' : '-L', 
+               \'j' : '-D', 
+               \'k' : '-U', 
+               \'l' : '-R' 
+               \}
 
     let old_winnr = winnr()
-    execute "wincmd " . dir
+    execute 'wincmd ' . a:dir
     if old_winnr != winnr()
         return
     endif
 
-    if dir == 'h'
-        let dir = '-L'
-    elseif dir == 'j'
-        let dir = '-D'
-    elseif dir == 'k'
-        let dir = '-U'
-    elseif dir == 'l'
-        let dir = '-R'
-    endif
-    call system('tmux select-pane ' . dir)
+    call system('tmux select-pane ' . dict[a:dir])
 endfunction
 
-function! SetupVAM()
+function! SetupVAM(features)
+    "totally ripped from vim_addon_MarcWeber.vim
     set runtimepath+=~/vim-addons/vim-addon-manager
-    " commenting try .. endtry because trace is lost if you use it.
-    " There should be no exception anyway
-    " try
-    call vam#ActivateAddons(['pluginA', 'pluginB'], {'auto_install' : 0})
-    " pluginA could be github:YourName see vam#install#RewriteName()
-    " catch /.*/
-    "  echoe v:exception
-    " endtry
+    let plugins = {
+                \ 'always' : ['nerdcommenter']
+                \}
+    let activate = []
+    for [k,v] in items(plugins)
+        if k == 'always'
+                \ || (type(a:features) == type([]) && index(a:features, k) >=0)
+                \ || (type(a:features) == type('') && a:features == 'all')
+            call extend(activate,v)
+        endif
+    endfor
+
+    call vam#ActivateAddons(activate, {'auto_install' : 1})
 endfunction
 
 " }}}
