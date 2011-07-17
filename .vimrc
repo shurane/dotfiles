@@ -212,7 +212,7 @@ nnoremap <Leader>tw :set wrap!<CR>                  " wrap
 nnoremap <Leader>tl :set list!<CR>                  " listchars
 nnoremap <C-l> :set hlsearch!<CR>                   " highlight
 " TODO kind of incomplete?
-nnoremap <Leader>c :setlocal invspell spellang=en_us<CR>
+"nnoremap <Leader>tc :setlocal invspell spellang=en_us<CR>
 
 " }}}
 
@@ -233,7 +233,7 @@ call ActivateVAM()
 "let g:plugin_list = keys(g:vim_addon_manager.plugin_sources)
 "call remove(g:plugin_list,'vim-addon-manager-known-repositories')
 
-call vam#ActivateAddons(['nerd_commenter','nerdtree','surround'])
+"call vam#ActivateAddons(['nerd_commenter','nerdtree','surround'])
 "call vam#ActivateAddons(g:plugin_list)
 "call vam#install#Update([])
 
@@ -246,10 +246,10 @@ nnoremap <Leader>tt :NERDTreeToggle<CR>
 let NERDTreeMapActivateNode='<CR>'
 
 " shortcuts for tmux integration
-nnoremap <silent> <C-w>h :call TmuxWindowMotion('h')<cr>
-nnoremap <silent> <C-w>j :call TmuxWindowMotion('j')<cr>
-nnoremap <silent> <C-w>k :call TmuxWindowMotion('k')<cr>
-nnoremap <silent> <C-w>l :call TmuxWindowMotion('l')<cr>
+nnoremap <silent> <C-w>h :call TmuxWindowMotion('h')<CR>
+nnoremap <silent> <C-w>j :call TmuxWindowMotion('j')<CR>
+nnoremap <silent> <C-w>k :call TmuxWindowMotion('k')<CR>
+nnoremap <silent> <C-w>l :call TmuxWindowMotion('l')<CR>
 
 " }}}
 
