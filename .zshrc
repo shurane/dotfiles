@@ -13,7 +13,7 @@ export PIP_RESPECT_VIRTUALENV=true
 # time that oh-my-zsh is loaded.
 
 export ZSH_THEME="unt"
-#export DISABLE_AUTO_UPDATE="true"     # Comment this out to disable weekly auto-update checks
+export DISABLE_AUTO_UPDATE="true"     # Comment this out to disable weekly auto-update checks
 export DISABLE_AUTO_TITLE="true"        # Uncomment following line if you want to disable autosetting terminal title.
 
 export HISTSIZE=20000
@@ -38,7 +38,7 @@ if [ -f $HOME/.bash_aliases ]; then
     . $HOME/.bash_aliases
 fi
 
-setopt autopushd
+#setopt autopushd
 setopt pushdignoredups
 setopt histignorealldups
 setopt incappendhistory

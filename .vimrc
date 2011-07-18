@@ -150,6 +150,29 @@ endfunction
 
 " }}}
 
+" Plugin Setup {{{
+
+" lots of ideas from talek
+
+call ActivateVAM()
+
+let g:vim_addon_manager = {}
+let g:vim_addon_manager.known_repos_activation_policy = 'never'
+let g:vim_addon_manager.auto_install = 1
+let g:vim_addon_manager.plugin_sources = {}
+let g:vim_addon_manager.plugin_sources['nerd_commenter'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdcommenter.git'}
+let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdtree.git'}
+let g:vim_addon_manager.plugin_sources['surround'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-surround.git'}
+
+"let g:plugin_list = keys(g:vim_addon_manager.plugin_sources)
+"call remove(g:plugin_list,'vim-addon-manager-known-repositories')
+
+call vam#ActivateAddons(['nerd_commenter','nerdtree','surround'])
+"call vam#ActivateAddons(g:plugin_list)
+"call vam#install#Update([])
+
+" }}}
+
 " Vim Maps {{{
 
 let mapleader = ","
@@ -158,37 +181,24 @@ let mapleader = ","
 nnoremap ' `
 nnoremap ` '
 
-" save a file while overwriting
-nnoremap \w :w!<CR>
+cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>        " save a file as root
+nnoremap \w :w!<CR>                                         " save a file while overwriting
+nnoremap \q :q!<CR>                                         " quit without confirmation
+nnoremap \r :e $MYVIMRC<CR>                                 " open up vimrc in current window
+nnoremap <Leader>r :source $MYVIMRC<CR>                     " reload .vimrc
 
-" save a file as root
-cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>
+nnoremap zl zr                                              " z(l/r) is less/reduce folds, zm is more folds
+nnoremap zL zR                                              " z(j/k) navigates between next/prev fold
+nnoremap zh <Nop>                                           " to not throw me off with scrolling, which is what z(h/l) did originally
 
-" insert timestamp in place
-iabbrev YTS <C-R>=Timestamp()<CR>
-
-" open up vimrc in current window
-nnoremap \r :e $MYVIMRC<CR>
-
-" reload .vimrc
-nnoremap <Leader>r :source $MYVIMRC<CR>
-
-" zl is less folds, zm is more folds
-" z(j/k) navigates between next/prev fold
-nnoremap zl zr
-nnoremap zL zR
-" to not throw me off with scrolling
-nnoremap zh ""
 
 " mappings during insert mode
 " when using C-u/C-w in insert mode, create a new change instead of appending
 inoremap <C-u> <C-g>u<C-u>
 inoremap <C-w> <C-g>u<C-w>
-" escape while in insert-mode
-inoremap jj <Esc>
-
-" insert newline without going into insert-mode
-nnoremap <CR> o<Esc>
+inoremap jj <Esc>                                           " escape while in insert-mode
+nnoremap <CR> o<Esc>                                        " insert newline without going into insert-mode
+iabbrev YTS <C-R>=Timestamp()<CR>                           " insert timestamp in place
 
 " copy and paste to global clipboard using leader key
 nnoremap <Leader>m "+p
@@ -214,28 +224,11 @@ nnoremap <C-l> :set hlsearch!<CR>                   " highlight
 " TODO kind of incomplete?
 "nnoremap <Leader>tc :setlocal invspell spellang=en_us<CR>
 
-" }}}
-
-" Plugin Setup {{{
-
-" lots of ideas from talek
-
-call ActivateVAM()
-
-"let g:vim_addon_manager = {}
-"let g:vim_addon_manager.known_repos_activation_policy = 'never'
-"let g:vim_addon_manager.auto_install = 1
-"let g:vim_addon_manager.plugin_sources = {}
-"let g:vim_addon_manager.plugin_sources['nerd_commenter'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdcommenter.git'}
-"let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdtree.git'}
-"let g:vim_addon_manager.plugin_sources['surround'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-surround.git'}
-
-"let g:plugin_list = keys(g:vim_addon_manager.plugin_sources)
-"call remove(g:plugin_list,'vim-addon-manager-known-repositories')
-
-"call vam#ActivateAddons(['nerd_commenter','nerdtree','surround'])
-"call vam#ActivateAddons(g:plugin_list)
-"call vam#install#Update([])
+" shortcuts for tmux integration
+nnoremap <silent> <C-w>h :call TmuxWindowMotion('h')<CR>
+nnoremap <silent> <C-w>j :call TmuxWindowMotion('j')<CR>
+nnoremap <silent> <C-w>k :call TmuxWindowMotion('k')<CR>
+nnoremap <silent> <C-w>l :call TmuxWindowMotion('l')<CR>
 
 " }}}
 
@@ -244,12 +237,6 @@ call ActivateVAM()
 " shortcuts for NERDTree
 nnoremap <Leader>tt :NERDTreeToggle<CR>
 let NERDTreeMapActivateNode='<CR>'
-
-" shortcuts for tmux integration
-nnoremap <silent> <C-w>h :call TmuxWindowMotion('h')<CR>
-nnoremap <silent> <C-w>j :call TmuxWindowMotion('j')<CR>
-nnoremap <silent> <C-w>k :call TmuxWindowMotion('k')<CR>
-nnoremap <silent> <C-w>l :call TmuxWindowMotion('l')<CR>
 
 " }}}
 
