@@ -41,6 +41,14 @@ set autoread                " reload changed files
 set hidden                  " look this up -- something about efficient writing
 set backup                  " simple backup
 set backupext=~             " backup for 'file' is 'file~'
+
+let required_dirs = ['$HOME/.vim','$HOME/.vim/backup','$HOME/.vim/swap']
+for dir in required_dirs
+    if finddir(expand(dir)) == ''
+        call mkdir(expand(dir))
+    endif
+endfor
+
 set backupdir=~/.vim/backup " stores all backups here
 set directory=~/.vim/swap   " stores all swap files here
 
