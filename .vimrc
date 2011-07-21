@@ -18,6 +18,7 @@ set t_Co=256                " sets Vim to use 256 terminal colors
 colorscheme wombat256mod    " nice dark theme
 set ruler                   " show the cursor position all the time
 set nowrap                  " don't wrap long lines
+set showbreak=>\ \ \        " for wrapped lines
 set textwidth=0             " don't wrap lines on inserts
 set linebreak               " break on sane delimiters (like space)
 set lcs=trail:-,extends:>,tab:>-,eol:$   " indicates trailing spaces by '-',  wrapped lines by '>', and tabs by '>-'
