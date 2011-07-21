@@ -131,7 +131,8 @@ function! TmuxWindowMotion(dir)
     call system('tmux select-pane ' . dict[a:dir])
 endfunction
 
-" VAM for plugin management
+" VAM for plugin management -- consider moving to gmarik/vundle -- seems easier
+" after setting this up
 function! ActivateVAM()
     let addons_base = expand('$HOME') . '/vim-addons'
     let addons_manager = addons_base . '/vim-addon-manager'
@@ -186,6 +187,8 @@ cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>
 nnoremap \w :w!<CR>                                         
 " quit without confirmation
 nnoremap \q :q!<CR>                                         
+" open new tab
+nnoremap \t :t!<CR>                                         
 " open up vimrc in current window
 nnoremap \r :e $MYVIMRC<CR>                                
 " reload .vimrc
@@ -216,7 +219,7 @@ vnoremap <Leader>m "+p
 vnoremap <Leader>n "+y
 
 " do :ls before switching buffers
-nnoremap <leader>b :ls<CR>:b<space>
+nnoremap <leader>b :ls<CR>:b
 
 " split vertically and horizontally
 " C-w s/v already exist for these two cases
