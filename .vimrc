@@ -42,7 +42,7 @@ set hidden                  " look this up -- something about efficient writing
 set backup                  " simple backup
 set backupext=~             " backup for 'file' is 'file~'
 
-let required_dirs = ['$HOME/.vim','$HOME/.vim/backup','$HOME/.vim/swap']
+let required_dirs = ['$HOME/.vim','$HOME/.vim/backup','$HOME/.vim/swap','$HOME/.vim/undo']
 for dir in required_dirs
     if finddir(expand(dir)) == ''
         call mkdir(expand(dir))
