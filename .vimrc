@@ -10,7 +10,7 @@ set numberwidth=5           " set line numbering to take up 5 lines
 set cursorline              " highlights current line
 
 " set highlight mode to bold
-highlight CursorLine cterm=bold    
+highlight CursorLine cterm=bold
 " set background of listchars to brown
 "highlight SpecialKey ctermbg=brown
 
@@ -63,7 +63,7 @@ set softtabstop=4           " n spaces are treated as tabs
 set shiftwidth=4            " indent width for autoindent
 "set foldmethod=marker      " for explicit folds
 filetype indent on          " indent depends on filetype
-filetype plugin on          " enable plugins 
+filetype plugin on          " enable plugins
 syntax enable               " Syntax highlighting
 
 if has('persistent_undo')
@@ -115,11 +115,11 @@ endfunction
 
 " Tmux integration
 function! TmuxWindowMotion(dir)
-    let dict = { 
-               \'h' : '-L', 
-               \'j' : '-D', 
-               \'k' : '-U', 
-               \'l' : '-R' 
+    let dict = {
+               \'h' : '-L',
+               \'j' : '-D',
+               \'k' : '-U',
+               \'l' : '-R'
                \}
 
     let old_winnr = winnr()
@@ -182,24 +182,24 @@ nnoremap ' `
 nnoremap ` '
 
 " save a file as root
-cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>        
+cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>
 " save a file while overwriting
-nnoremap \w :w!<CR>                                         
+nnoremap \w :w!<CR>
 " quit without confirmation
-nnoremap \q :q!<CR>                                         
+nnoremap \q :q!<CR>
 " open new tab
-nnoremap \t :t!<CR>                                         
+nnoremap \t :t!<CR>
 " open up vimrc in current window
-nnoremap \r :e $MYVIMRC<CR>                                
+nnoremap \r :e $MYVIMRC<CR>
 " reload .vimrc
-nnoremap <Leader>r :source $MYVIMRC<CR>                     
+nnoremap <Leader>r :source $MYVIMRC<CR>
 
 " z(l/r) is less/reduce folds, zm is more folds
 " z(j/k) navigates between next/prev fold
 " to not throw me off with scrolling, which is what z(h/l) did originally
-nnoremap zl zr                                             
-nnoremap zL zR                                             
-nnoremap zh <Nop>                                           
+nnoremap zl zr
+nnoremap zL zR
+nnoremap zh <Nop>
 
 
 " mappings during insert mode
@@ -207,11 +207,11 @@ nnoremap zh <Nop>
 inoremap <C-u> <C-g>u<C-u>
 inoremap <C-w> <C-g>u<C-w>
 " escape while in insert-mode
-inoremap jj <Esc>                                           
+inoremap jj <Esc>
 " insert newline without going into insert-mode
-nnoremap <CR> o<Esc>                                        
+nnoremap <CR> o<Esc>
 " insert timestamp in place
-iabbrev YTS <C-R>=Timestamp()<CR>                           
+iabbrev YTS <C-R>=Timestamp()<CR>
 
 " copy and paste to global clipboard using leader key
 nnoremap <Leader>m "+p
@@ -228,17 +228,17 @@ nnoremap <Leader>h :split<CR>
 
 " Toggle different modes
 " syntax
-nnoremap <Leader>ts :call ToggleSyntax()<CR>        
+nnoremap <Leader>ts :call ToggleSyntax()<CR>
 " diff
-nnoremap <Leader>td :call ToggleDiff()<CR>          
+nnoremap <Leader>td :call ToggleDiff()<CR>
 " paste
-set pastetoggle=,tp                                 
+set pastetoggle=,tp
 " wrap
-nnoremap <Leader>tw :set wrap!<CR>                  
+nnoremap <Leader>tw :set wrap!<CR>
 " listchars
-nnoremap <Leader>tl :set list!<CR>                  
+nnoremap <Leader>tl :set list!<CR>
 " highlight
-nnoremap <C-l> :set hlsearch!<CR>                   
+nnoremap <C-l> :set hlsearch!<CR>
 " TODO kind of incomplete?
 "nnoremap <Leader>tc :setlocal invspell spellang=en_us<CR>
 
