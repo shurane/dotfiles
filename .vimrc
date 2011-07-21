@@ -20,7 +20,7 @@ set ruler                   " show the cursor position all the time
 set nowrap                  " don't wrap long lines
 set textwidth=0             " don't wrap lines on inserts
 set linebreak               " break on sane delimiters (like space)
-set lcs=trail:·,extends:>,tab:>-   " indicates trailing spaces by '·',  wrapped lines by '>', and tabs by '>-'
+set lcs=trail:-,extends:>,tab:>-,eol:$   " indicates trailing spaces by '-',  wrapped lines by '>', and tabs by '>-'
 set scrolloff=3             " scroll up/down by n instead of 1
 set showcmd                 " display incomplete command
 set cmdheight=1             " set command bar height
@@ -30,7 +30,7 @@ set mouse=a                 " use the mouse in console vim
 set splitright              " vertical splits split to the right (instead of left)
 set clipboard+=unnamed      " yanks go onto the global clipboard as well -- this might make a mapping unnecessary
 
-" very informative status line
+" very informative status line, but should document later
 set statusline=%F%m%r%h%w\ [TYPE=%Y\ %{&ff}]\ [%l/%L\ (%p%%)]
 
 set autochdir               " always switch to the current file directory
@@ -109,15 +109,6 @@ function! ToggleDiff()
     endif
 endfunction
 
-" toggle paste
-function! TogglePaste()
-    if &paste
-        set nopaste
-    else
-        set paste
-    endif
-endfunction
-
 function! Timestamp()
     return "Last Modified: " . strftime("%d %b %Y %X")
 endfunction
@@ -189,24 +180,35 @@ let mapleader = ","
 nnoremap ' `
 nnoremap ` '
 
-cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>        " save a file as root
-nnoremap \w :w!<CR>                                         " save a file while overwriting
-nnoremap \q :q!<CR>                                         " quit without confirmation
-nnoremap \r :e $MYVIMRC<CR>                                 " open up vimrc in current window
-nnoremap <Leader>r :source $MYVIMRC<CR>                     " reload .vimrc
+" save a file as root
+cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>        
+" save a file while overwriting
+nnoremap \w :w!<CR>                                         
+" quit without confirmation
+nnoremap \q :q!<CR>                                         
+" open up vimrc in current window
+nnoremap \r :e $MYVIMRC<CR>                                
+" reload .vimrc
+nnoremap <Leader>r :source $MYVIMRC<CR>                     
 
-nnoremap zl zr                                              " z(l/r) is less/reduce folds, zm is more folds
-nnoremap zL zR                                              " z(j/k) navigates between next/prev fold
-nnoremap zh <Nop>                                           " to not throw me off with scrolling, which is what z(h/l) did originally
+" z(l/r) is less/reduce folds, zm is more folds
+" z(j/k) navigates between next/prev fold
+" to not throw me off with scrolling, which is what z(h/l) did originally
+nnoremap zl zr                                             
+nnoremap zL zR                                             
+nnoremap zh <Nop>                                           
 
 
 " mappings during insert mode
 " when using C-u/C-w in insert mode, create a new change instead of appending
 inoremap <C-u> <C-g>u<C-u>
 inoremap <C-w> <C-g>u<C-w>
-inoremap jj <Esc>                                           " escape while in insert-mode
-nnoremap <CR> o<Esc>                                        " insert newline without going into insert-mode
-iabbrev YTS <C-R>=Timestamp()<CR>                           " insert timestamp in place
+" escape while in insert-mode
+inoremap jj <Esc>                                           
+" insert newline without going into insert-mode
+nnoremap <CR> o<Esc>                                        
+" insert timestamp in place
+iabbrev YTS <C-R>=Timestamp()<CR>                           
 
 " copy and paste to global clipboard using leader key
 nnoremap <Leader>m "+p
@@ -221,14 +223,19 @@ nnoremap <leader>b :ls<CR>:b<space>
 nnoremap <Leader>v :vsplit<CR>
 nnoremap <Leader>h :split<CR>
 
-" toggle 
-" ,tp for paste
-nnoremap <Leader>ts :call ToggleSyntax()<CR>        " syntax
-nnoremap <Leader>td :call ToggleDiff()<CR>          " diff
-nnoremap <Leader>tp :call TogglePaste()<CR>         " paste
-nnoremap <Leader>tw :set wrap!<CR>                  " wrap
-nnoremap <Leader>tl :set list!<CR>                  " listchars
-nnoremap <C-l> :set hlsearch!<CR>                   " highlight
+" Toggle different modes
+" syntax
+nnoremap <Leader>ts :call ToggleSyntax()<CR>        
+" diff
+nnoremap <Leader>td :call ToggleDiff()<CR>          
+" paste
+set pastetoggle=,tp                                 
+" wrap
+nnoremap <Leader>tw :set wrap!<CR>                  
+" listchars
+nnoremap <Leader>tl :set list!<CR>                  
+" highlight
+nnoremap <C-l> :set hlsearch!<CR>                   
 " TODO kind of incomplete?
 "nnoremap <Leader>tc :setlocal invspell spellang=en_us<CR>
 
