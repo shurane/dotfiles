@@ -189,7 +189,7 @@ nnoremap \w :w!<CR>
 " quit without confirmation
 nnoremap \q :q!<CR>
 " open new tab
-nnoremap \t :t!<CR>
+nnoremap \t :tabedit<CR>
 " open up vimrc in current window
 nnoremap \r :e $MYVIMRC<CR>
 " reload .vimrc
@@ -201,7 +201,6 @@ nnoremap <Leader>r :source $MYVIMRC<CR>
 nnoremap zl zr
 nnoremap zL zR
 nnoremap zh <Nop>
-
 
 " mappings during insert mode
 " when using C-u/C-w in insert mode, create a new change instead of appending
