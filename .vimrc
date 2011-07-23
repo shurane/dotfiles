@@ -164,11 +164,12 @@ let g:vim_addon_manager.plugin_sources = {}
 let g:vim_addon_manager.plugin_sources['nerd_commenter'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdcommenter.git'}
 let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdtree.git'}
 let g:vim_addon_manager.plugin_sources['surround'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-surround.git'}
+let g:vim_addon_manager.plugin_sources['repeat'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-repeat.git'}
 
 "let g:plugin_list = keys(g:vim_addon_manager.plugin_sources)
 "call remove(g:plugin_list,'vim-addon-manager-known-repositories')
 
-call vam#ActivateAddons(['nerd_commenter','nerdtree','surround'])
+call vam#ActivateAddons(['nerd_commenter','nerdtree','surround','repeat'])
 "call vam#ActivateAddons(g:plugin_list)
 "call vam#install#Update([])
 
