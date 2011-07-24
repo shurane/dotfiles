@@ -42,3 +42,6 @@ fi
 setopt pushdignoredups
 setopt histignorealldups
 setopt incappendhistory
+setopt rmstarwait
+setopt noclobber
+setopt autocontinue
