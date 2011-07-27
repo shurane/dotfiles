@@ -157,9 +157,7 @@ endfunction
 
 call ActivateVAM()
 
-let g:vim_addon_manager = {}
-let g:vim_addon_manager.known_repos_activation_policy = 'never'
-let g:vim_addon_manager.auto_install = 1
+let g:vim_addon_manager = {'known_repos_activation_policy' : 'autoload', 'auto_install' : 1}
 let g:vim_addon_manager.plugin_sources = {}
 let g:vim_addon_manager.plugin_sources['nerd_commenter'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdcommenter.git'}
 let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdtree.git'}
