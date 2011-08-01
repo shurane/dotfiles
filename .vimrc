@@ -215,10 +215,11 @@ iabbrev YTS <C-R>=Timestamp()<CR>
 " copy and paste to global clipboard using leader key
 nnoremap <Leader>m "+p
 vnoremap <Leader>m "+p
+nnoremap <Leader>n "+yy
 vnoremap <Leader>n "+y
 
 " do :ls before switching buffers
-nnoremap <leader>b :ls<CR>:b
+nnoremap <leader>b :ls<CR>:b 
 
 " split vertically and horizontally
 " C-w s/v already exist for these two cases
@@ -258,3 +259,4 @@ let NERDTreeMapActivateNode='<CR>'
 " }}}
 
 " vim:fdm=marker:fdl=1
+"
