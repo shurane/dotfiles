@@ -72,3 +72,5 @@ _pip_completion()
 }
 complete -o default -F _pip_completion pip
 # pip bash completion end
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
