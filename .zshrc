@@ -31,7 +31,7 @@ source $HOME/.bash_aliases
 #export PATH=/home/shoerain/bin:/var/lib/gems/1.8/bin:/home/shoerain/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
 if command -v virtualenvwrapper.sh >/dev/null; then
-    . /usr/local/bin/virtualenvwrapper.sh >&/dev/null
+    . virtualenvwrapper.sh >&/dev/null
 fi
 
 if command -v $HOME/.rvm/scripts/rvm >/dev/null; then
