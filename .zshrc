@@ -38,9 +38,12 @@ if command -v $HOME/.rvm/scripts/rvm >/dev/null; then
     . $HOME/.rvm/scripts/rvm
 fi
 
+[[ -f $HOME/.pythonbrew/etc/bashrc ]] && source $HOME/.pythonbrew/etc/bashrc
+
 if [ -f $HOME/.bash_aliases ]; then
     . $HOME/.bash_aliases
 fi
+
 
 #setopt autopushd
 setopt pushdignoredups
