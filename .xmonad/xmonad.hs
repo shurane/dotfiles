@@ -89,7 +89,7 @@ bindKeys =
     , ("M-S-p",       windows W.swapUp)
     , ("M-S-n",       windows W.swapDown)
     , ("M-g",         goToSelected myGSConfig) 
-    , ("M1-<Tab>",    goToSelected myGSConfig) 
+    , ("M1-<Tab>",    windows W.focusDown) 
     -- so why aren't the M1 shortcuts working? Is it because "Alt" is seen by the windows first?
     , ("M1-w",        spawn "xdotool key Control_L+w") 
     , ("M1-t",        spawn "xdotool key ctrl+t") 
