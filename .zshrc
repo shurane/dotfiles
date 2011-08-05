@@ -28,7 +28,7 @@ source $ZSH/oh-my-zsh.sh
 source $HOME/.bash_aliases
 
 # Customize to your needs...
-#export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/home/shoerain/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
 [[ -f $HOME/.pythonbrew/etc/bashrc ]] && source $HOME/.pythonbrew/etc/bashrc
 

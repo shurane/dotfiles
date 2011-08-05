@@ -37,3 +37,13 @@ ehthumbs.db
 Icon?
 Thumbs.db
 
+# Audio #
+# It'd be great if there was an easy way to distinguish binary from ascii
+*.mp3
+*.aac
+*.ogg
+*.wav
+*.aiff
+*.flac
+*.alac
+
