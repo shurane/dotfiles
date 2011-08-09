@@ -181,8 +181,11 @@ nnoremap <Leader>tt :NERDTreeToggle<CR>
 
 " shortcuts for Taglist and Tags in general
 let Tlist_Ctags_Cmd = "/usr/local/bin/ctags"
-nnoremap <Leader>tr !/usr/local/bin/ctags --recurse --fields=+iaS --extra=+q .<CR>
+let Tlist_Exit_OnlyWindow = 1
+" idea for <Leader>do: Tlist_Show_One_File toggle
+nnoremap <Leader>dr :!/usr/local/bin/ctags --recurse --fields=+iaS --extra=+q .<CR>
 nnoremap <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
+nnoremap <Leader>dd :TlistToggle<CR>
 "nnoremap <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
 
 " }}}
