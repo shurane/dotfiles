@@ -84,12 +84,15 @@ bindKeys =
       -- bind M-(S)-(-/=) to resize window a variety of ways -- maybe I'll get aspect ratio preserving later
       ("M-;",         spawn "exe=$(dmenu_path | dmenu -i) && eval \"exec $exe\"")
     , ("M-q",         spawn "xmonad --recompile && xmonad --restart")
---     , ("M-S-b",       sendMessage ToggleStruts) 
     , ("M-p",         windows W.focusUp)
     , ("M-n",         windows W.focusDown)
     , ("M-S-p",       windows W.swapUp)
     , ("M-S-n",       windows W.swapDown)
     , ("M-g",         goToSelected myGSConfig) 
+    , ("M1-<Tab>",    windows W.focusDown) 
+    -- so why aren't the M1 shortcuts working? Is it because "Alt" is seen by the windows first?
+    , ("M1-w",        spawn "xdotool key Control_L+w") 
+    , ("M1-t",        spawn "xdotool key ctrl+t") 
     , ("M-<Print>",   spawn "scrot -e 'mv $f ~/Pictures/screenshots/'")
     , ("M-<F2>",      spawn "gmrun")
     , ("M-S-;",         spawn "xprop | grep -E \"^WM_CLASS|^WM_NAME\" | xmessage -file -")

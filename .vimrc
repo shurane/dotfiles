@@ -167,9 +167,26 @@ let g:vim_addon_manager.plugin_sources['repeat'] = {'type': 'git', 'url': 'git:/
 "let g:plugin_list = keys(g:vim_addon_manager.plugin_sources)
 "call remove(g:plugin_list,'vim-addon-manager-known-repositories')
 
-call vam#ActivateAddons(['nerd_commenter','nerdtree','surround','repeat'])
+call vam#ActivateAddons(['nerd_commenter','nerdtree','surround','repeat', 'taglist'])
 "call vam#ActivateAddons(g:plugin_list)
 "call vam#install#Update([])
+
+" }}}
+
+" Plugin Maps {{{
+
+" shortcuts for NERDTree
+let NERDTreeMapActivateNode='<CR>'
+nnoremap <Leader>tt :NERDTreeToggle<CR>
+
+" shortcuts for Taglist and Tags in general
+let Tlist_Ctags_Cmd = "/usr/local/bin/ctags"
+let Tlist_Exit_OnlyWindow = 1
+" idea for <Leader>do: Tlist_Show_One_File toggle
+nnoremap <Leader>dr :!/usr/local/bin/ctags --recurse --fields=+iaS --extra=+q .<CR>
+nnoremap <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
+nnoremap <Leader>dd :TlistToggle<CR>
+"nnoremap <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
 
 " }}}
 
@@ -219,7 +236,7 @@ nnoremap <Leader>n "+yy
 vnoremap <Leader>n "+y
 
 " do :ls before switching buffers
-nnoremap <leader>b :ls<CR>:b 
+nnoremap <Leader>b :ls<CR>:b 
 
 " split vertically and horizontally
 " C-w s/v already exist for these two cases
@@ -239,6 +256,8 @@ nnoremap <Leader>tw :set wrap!<CR>
 nnoremap <Leader>tl :set list!<CR>
 " highlight
 nnoremap <C-l> :set hlsearch!<CR>
+" scrollbind
+nnoremap <Leader>tb :set scrollbind!<CR>
 " TODO kind of incomplete?
 "nnoremap <Leader>tc :setlocal invspell spellang=en_us<CR>
 
@@ -247,14 +266,6 @@ nnoremap <silent> <C-w>h :call TmuxWindowMotion('h')<CR>
 nnoremap <silent> <C-w>j :call TmuxWindowMotion('j')<CR>
 nnoremap <silent> <C-w>k :call TmuxWindowMotion('k')<CR>
 nnoremap <silent> <C-w>l :call TmuxWindowMotion('l')<CR>
-
-" }}}
-
-" Plugin Maps {{{
-
-" shortcuts for NERDTree
-nnoremap <Leader>tt :NERDTreeToggle<CR>
-let NERDTreeMapActivateNode='<CR>'
 
 " }}}
 
