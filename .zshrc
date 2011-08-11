@@ -22,29 +22,24 @@ export HISTSIZE=20000
 # Example format: plugins=(rails git textmate ruby lighthouse)
 plugins=(git)
 
-source $ZSH/oh-my-zsh.sh
-
 # Source aliases from .bash_aliases (they work on both)
 source $HOME/.bash_aliases
 
 # Customize to your needs...
 export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
+[[ -f $HOME/.bash_aliases ]] && source $HOME/.bash_aliases
 [[ -f $HOME/.pythonbrew/etc/bashrc ]] && source $HOME/.pythonbrew/etc/bashrc
+[[ -f $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
 
 command -v virtualenvwrapper.sh >/dev/null && source virtualenvwrapper.sh >&/dev/null
 
-command -v $HOME/.rvm/scripts/rvm >/dev/null && source $HOME/.rvm/scripts/rvm
-
-if [ -f $HOME/.bash_aliases ]; then
-    . $HOME/.bash_aliases
-fi
-
-
-#setopt autopushd
+setopt autopushd
 setopt pushdignoredups
 setopt histignorealldups
 setopt incappendhistory
 setopt rmstarwait
 setopt noclobber
 setopt autocontinue
+
+source $ZSH/oh-my-zsh.sh
