@@ -85,6 +85,10 @@ autocmd BufRead,BufNewFile *.txt setfiletype text
 autocmd FileType text set wrap
 autocmd FileType cpp set makeprg=clang\ -g\ %\ -o\ %<.out
 
+highlight SpellBad term=underline gui=undercurl guisp=Orange 
+autocmd FileType python set makeprg=pylint\ --reports=n\ --output-format=parseable\ %:p
+autocmd FileType python set errorformat=%f:%l:\ %m
+
 let python_highlight_all=1
 set tags+=tags;$HOME
 
@@ -164,12 +168,7 @@ let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git
 let g:vim_addon_manager.plugin_sources['surround'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-surround.git'}
 let g:vim_addon_manager.plugin_sources['repeat'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-repeat.git'}
 
-"let g:plugin_list = keys(g:vim_addon_manager.plugin_sources)
-"call remove(g:plugin_list,'vim-addon-manager-known-repositories')
-
-call vam#ActivateAddons(['nerd_commenter','nerdtree','surround','repeat', 'taglist'])
-"call vam#ActivateAddons(g:plugin_list)
-"call vam#install#Update([])
+call vam#ActivateAddons(['nerd_commenter','nerdtree','surround','repeat', 'Gundo', 'taglist','pyflakes2441', 'pylint'])
 
 " }}}
 

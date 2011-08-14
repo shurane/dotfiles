@@ -31,15 +31,16 @@ export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/
 [[ -f $HOME/.bash_aliases ]] && source $HOME/.bash_aliases
 [[ -f $HOME/.pythonbrew/etc/bashrc ]] && source $HOME/.pythonbrew/etc/bashrc
 [[ -f $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
+[[ -f $HOME/.autojump ]] && source $HOME/.autojump
 
 command -v virtualenvwrapper.sh >/dev/null && source virtualenvwrapper.sh >&/dev/null
 
-setopt autopushd
+source $ZSH/oh-my-zsh.sh
+
+setopt noautopushd
 setopt pushdignoredups
 setopt histignorealldups
 setopt incappendhistory
 setopt rmstarwait
 setopt noclobber
 setopt autocontinue
-
-source $ZSH/oh-my-zsh.sh
