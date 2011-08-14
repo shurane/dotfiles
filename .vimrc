@@ -179,13 +179,19 @@ let NERDTreeMapActivateNode='<CR>'
 nnoremap <Leader>tt :NERDTreeToggle<CR>
 
 " shortcuts for Taglist and Tags in general
-let Tlist_Ctags_Cmd = "/usr/local/bin/ctags"
+let Tlist_Ctags_Cmd = "ctags"
 let Tlist_Exit_OnlyWindow = 1
-" idea for <Leader>do: Tlist_Show_One_File toggle
 nnoremap <Leader>dr :!/usr/local/bin/ctags --recurse --fields=+iaS --extra=+q .<CR>
 nnoremap <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
 nnoremap <Leader>dd :TlistToggle<CR>
+
+
+" idea for <Leader>do: Tlist_Show_One_File toggle
+" change this so it only opens a new split if there is a tag for the word
 "nnoremap <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
+
+" shortcuts for Gundo
+nnoremap <Leader>gg :GundoToggle<CR>
 
 " }}}
 
@@ -243,19 +249,13 @@ nnoremap <Leader>v :vsplit<CR>
 nnoremap <Leader>h :split<CR>
 
 " Toggle different modes
-" syntax
+" syntax, diff, paste, wrap, listchars, highlight, and scrollbind. Missing anything?
 nnoremap <Leader>ts :call ToggleSyntax()<CR>
-" diff
 nnoremap <Leader>td :call ToggleDiff()<CR>
-" paste
 set pastetoggle=,tp
-" wrap
 nnoremap <Leader>tw :set wrap!<CR>
-" listchars
 nnoremap <Leader>tl :set list!<CR>
-" highlight
 nnoremap <C-l> :set hlsearch!<CR>
-" scrollbind
 nnoremap <Leader>tb :set scrollbind!<CR>
 " TODO kind of incomplete?
 "nnoremap <Leader>tc :setlocal invspell spellang=en_us<CR>
