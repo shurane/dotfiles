@@ -53,6 +53,7 @@ endfor
 set backupdir=~/.vim/backup " stores all backups here
 set directory=~/.vim/swap   " stores all swap files here
 
+"set nowrapscan              " turn off search wrap
 set incsearch               " turn on incremental search
 set ignorecase              " ignore case for searching
 set smartcase               " exclude explicit CAPS from ignorecase
@@ -83,7 +84,11 @@ set formatoptions-=r        " don't insert comment after <CR>
 
 autocmd BufRead,BufNewFile *.txt setfiletype text
 autocmd FileType text set wrap
-autocmd FileType cpp set makeprg=clang\ -g\ %\ -o\ %<.out
+"autocmd FileType cpp set makeprg=clang\ -g\ %\ -o\ %<.out
+
+highlight SpellBad term=underline gui=undercurl guisp=Orange 
+autocmd FileType python set makeprg=pylint\ --reports=n\ --output-format=parseable\ %:p
+autocmd FileType python set errorformat=%f:%l:\ %m
 
 let python_highlight_all=1
 set tags+=tags;$HOME
@@ -91,6 +96,16 @@ set tags+=tags;$HOME
 " }}}
 
 " Functions {{{
+
+" trim whitespace, from http://vim.wikia.com/wiki/Remove_unwanted_spaces
+function! StripTrailingWhitespace()
+    normal mZ
+    %s/\s\+$//e
+    if line("'Z") != line(".")
+        echo "Stripped whitespace"
+    endif
+    normal `Z
+endfunction
 
 " toggle syntax
 function! ToggleSyntax()
@@ -151,45 +166,6 @@ endfunction
 
 " }}}
 
-" Plugin Setup {{{
-
-" lots of ideas from talek
-
-call ActivateVAM()
-
-let g:vim_addon_manager = {'known_repos_activation_policy' : 'autoload', 'auto_install' : 1}
-let g:vim_addon_manager.plugin_sources = {}
-let g:vim_addon_manager.plugin_sources['nerd_commenter'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdcommenter.git'}
-let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdtree.git'}
-let g:vim_addon_manager.plugin_sources['surround'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-surround.git'}
-let g:vim_addon_manager.plugin_sources['repeat'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-repeat.git'}
-
-"let g:plugin_list = keys(g:vim_addon_manager.plugin_sources)
-"call remove(g:plugin_list,'vim-addon-manager-known-repositories')
-
-call vam#ActivateAddons(['nerd_commenter','nerdtree','surround','repeat', 'taglist'])
-"call vam#ActivateAddons(g:plugin_list)
-"call vam#install#Update([])
-
-" }}}
-
-" Plugin Maps {{{
-
-" shortcuts for NERDTree
-let NERDTreeMapActivateNode='<CR>'
-nnoremap <Leader>tt :NERDTreeToggle<CR>
-
-" shortcuts for Taglist and Tags in general
-let Tlist_Ctags_Cmd = "/usr/local/bin/ctags"
-let Tlist_Exit_OnlyWindow = 1
-" idea for <Leader>do: Tlist_Show_One_File toggle
-nnoremap <Leader>dr :!/usr/local/bin/ctags --recurse --fields=+iaS --extra=+q .<CR>
-nnoremap <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
-nnoremap <Leader>dd :TlistToggle<CR>
-"nnoremap <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
-
-" }}}
-
 " Vim Maps {{{
 
 let mapleader = ","
@@ -200,10 +176,10 @@ nnoremap ` '
 
 " save a file as root
 cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>
-" save a file while overwriting
-nnoremap \w :w!<CR>
 " quit without confirmation
-nnoremap \q :q!<CR>
+nnoremap \q :q<CR>
+" wipe buffer
+nnoremap \bw :bw<CR>
 " open new tab
 nnoremap \t :tabedit<CR>
 " open up vimrc in current window
@@ -244,19 +220,13 @@ nnoremap <Leader>v :vsplit<CR>
 nnoremap <Leader>h :split<CR>
 
 " Toggle different modes
-" syntax
+" syntax, diff, paste, wrap, listchars, highlight, and scrollbind. Missing anything?
 nnoremap <Leader>ts :call ToggleSyntax()<CR>
-" diff
 nnoremap <Leader>td :call ToggleDiff()<CR>
-" paste
 set pastetoggle=,tp
-" wrap
 nnoremap <Leader>tw :set wrap!<CR>
-" listchars
 nnoremap <Leader>tl :set list!<CR>
-" highlight
 nnoremap <C-l> :set hlsearch!<CR>
-" scrollbind
 nnoremap <Leader>tb :set scrollbind!<CR>
 " TODO kind of incomplete?
 "nnoremap <Leader>tc :setlocal invspell spellang=en_us<CR>
@@ -268,6 +238,59 @@ nnoremap <silent> <C-w>k :call TmuxWindowMotion('k')<CR>
 nnoremap <silent> <C-w>l :call TmuxWindowMotion('l')<CR>
 
 " }}}
+
+" Plugin Setup {{{
+
+" lots of ideas from talek
+
+call ActivateVAM()
+
+let g:vim_addon_manager = {'known_repos_activation_policy' : 'autoload', 'auto_install' : 1}
+let g:vim_addon_manager.plugin_sources = {}
+let g:vim_addon_manager.plugin_sources['nerd_commenter'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdcommenter.git'}
+let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdtree.git'}
+let g:vim_addon_manager.plugin_sources['surround'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-surround.git'}
+let g:vim_addon_manager.plugin_sources['repeat'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-repeat.git'}
+
+let g:addons = [ 'nerd_commenter', 'nerdtree', 'surround', 'repeat', 'Gundo', 'taglist', 'pyflakes2441' ]
+", 'pylint' ]
+
+call vam#ActivateAddons(addons)
+
+" }}}
+
+" Plugin Maps {{{
+
+" shortcuts for NERDTree
+let NERDTreeMapActivateNode='<CR>'
+nnoremap <Leader>tt :NERDTreeToggle<CR>
+
+" shortcuts for Taglist and Tags in general
+let Tlist_Ctags_Cmd = "ctags"
+let Tlist_Exit_OnlyWindow = 1
+nnoremap <Leader>dr :!ctags --recurse --fields=+iaS --extra=+q .<CR>
+nnoremap <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
+nnoremap <Leader>dd :TlistToggle<CR>
+
+
+" idea for <Leader>do: Tlist_Show_One_File toggle
+" change this so it only opens a new split if there is a tag for the word
+"nnoremap <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
+
+" shortcuts for Gundo
+nnoremap <Leader>gg :GundoToggle<CR>
+
+" }}}
+
+" TODO List {{{
+    " Fix up mappings, definitely
+    " determine if switch between VAM and vundle is necessary
+    " cscope setup
+    " language-specific addons only turned on when dealing with said language
+    " error formats for makeprg would be great for C++
+
+" }}}
+
 
 " vim:fdm=marker:fdl=1
 "

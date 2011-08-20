@@ -30,10 +30,9 @@ export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/
 
 [[ -f $HOME/.bash_aliases ]] && source $HOME/.bash_aliases
 [[ -f $HOME/.pythonbrew/etc/bashrc ]] && source $HOME/.pythonbrew/etc/bashrc
-
+[[ -f $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
+[[ -f $HOME/.autojump ]] && source $HOME/.autojump
 command -v virtualenvwrapper.sh >/dev/null && source virtualenvwrapper.sh #>&/dev/null
-
-command -v $HOME/.rvm/scripts/rvm >/dev/null && source $HOME/.rvm/scripts/rvm
 
 setopt autopushd
 setopt pushdignoredups
