@@ -280,6 +280,9 @@ nnoremap <Leader>dd :TlistToggle<CR>
 " shortcuts for Gundo
 nnoremap <Leader>gg :GundoToggle<CR>
 
+" unmappings from various plugins
+nunmap \tt
+
 " }}}
 
 " TODO List {{{
