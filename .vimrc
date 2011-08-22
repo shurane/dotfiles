@@ -281,7 +281,8 @@ nnoremap <Leader>dd :TlistToggle<CR>
 nnoremap <Leader>gg :GundoToggle<CR>
 
 " unmappings from various plugins
-nunmap \tt
+silent! nunmap \tt
+silent! nunmap dd
 
 " }}}
 
