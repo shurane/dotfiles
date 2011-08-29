@@ -3,9 +3,9 @@ export ZSH=$HOME/.oh-my-zsh
 export EDITOR=vim
 
 # setup for virtualenvwrapper and pip
-export WORKON_HOME=$HOME/projects/envs
-export PIP_VIRTUALENV_BASE=$WORKON_HOME
-export PIP_RESPECT_VIRTUALENV=true
+#export WORKON_HOME=$HOME/projects/envs
+#export PIP_VIRTUALENV_BASE=$WORKON_HOME
+#export PIP_RESPECT_VIRTUALENV=true
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -32,7 +32,7 @@ export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/
 [[ -f $HOME/.pythonbrew/etc/bashrc ]] && source $HOME/.pythonbrew/etc/bashrc
 [[ -f $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
 [[ -f $HOME/.autojump ]] && source $HOME/.autojump
-command -v virtualenvwrapper.sh >/dev/null && source virtualenvwrapper.sh #>&/dev/null
+#command -v virtualenvwrapper.sh >/dev/null && source virtualenvwrapper.sh #>&/dev/null
 
 setopt autopushd
 setopt pushdignoredups
