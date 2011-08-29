@@ -12,7 +12,9 @@ alias .....="cd ../../../.."
 
 alias po="popd"
 alias pu="pushd"
-alias ack="ack-grep"
+#alias ack="ack-grep"
+alias a="ack"
+alias v="vim"
 #sd = sizedir
 alias sd="du -ch . | tail -n 1"
 alias df="df -ch"
