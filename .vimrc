@@ -175,17 +175,21 @@ nnoremap ' `
 nnoremap ` '
 
 " save a file as root
-cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>
 " quit without confirmation
-nnoremap \q :q<CR>
 " wipe buffer
-nnoremap \bw :bw<CR>
 " open new tab
-nnoremap \t :tabedit<CR>
 " open up vimrc in current window
-nnoremap \r :e $MYVIMRC<CR>
 " reload .vimrc
+cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>
+nnoremap \q :q<CR>
+nnoremap \bw :bw<CR>
+nnoremap \t :tabedit<CR>
+nnoremap \r :e $MYVIMRC<CR>
 nnoremap <Leader>r :source $MYVIMRC<CR>
+
+" switch back and forth between buffers
+nnoremap `n :bn<CR>
+nnoremap `p :bp<CR>
 
 " z(l/r) is less/reduce folds, zm is more folds
 " z(j/k) navigates between next/prev fold
