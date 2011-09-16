@@ -68,10 +68,10 @@ filetype indent on          " indent depends on filetype
 filetype plugin on          " enable plugins
 syntax enable               " Syntax highlighting
 
-if has('persistent_undo')
-    set undofile            " Enable persistent undo
-    set undodir=~/.vim/undo " Store undofiles in a tmp dir
-endif
+"if has('persistent_undo')
+    "set undofile            " Enable persistent undo
+    "set undodir=~/.vim/undo " Store undofiles in a tmp dir
+"endif
 
 set cpoptions=yraABceFq
 set formatoptions+=tcq
@@ -210,18 +210,21 @@ nnoremap <CR> o<Esc>
 iabbrev YTS <C-R>=Timestamp()<CR>
 
 " copy and paste to global clipboard using leader key
-nnoremap <Leader>m "+p
-vnoremap <Leader>m "+p
-nnoremap <Leader>n "+yy
-vnoremap <Leader>n "+y
+"nnoremap <Leader>v "+p
+"vnoremap <Leader>v "+p
+nnoremap <Leader>v ,tp"+p,tp
+vnoremap <Leader>v ,tp"+p,tp
+nnoremap <Leader>c "+yy
+vnoremap <Leader>c "+y
 
 " do :ls before switching buffers
 nnoremap <Leader>b :ls<CR>:b 
 
+
 " split vertically and horizontally
 " C-w s/v already exist for these two cases
-nnoremap <Leader>v :vsplit<CR>
-nnoremap <Leader>h :split<CR>
+"nnoremap <Leader>v :vsplit<CR>
+"nnoremap <Leader>h :split<CR>
 
 " Toggle different modes
 " syntax, diff, paste, wrap, listchars, highlight, and scrollbind. Missing anything?
