@@ -32,6 +32,7 @@ export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/
 [[ -f $HOME/.pythonbrew/etc/bashrc ]] && source $HOME/.pythonbrew/etc/bashrc
 [[ -f $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
 [[ -f $HOME/.autojump ]] && source $HOME/.autojump
+#[[ -f /etc/profile.d/autojump.zsh ]] && source /etc/profile.d/autojump.zsh
 #command -v virtualenvwrapper.sh >/dev/null && source virtualenvwrapper.sh #>&/dev/null
 
 setopt autopushd
