@@ -51,8 +51,8 @@ if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
     . /usr/local/bin/virtualenvwrapper.sh >&/dev/null
 fi
 
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
+if [ -f $HOME/.bash_aliases ]; then
+    . $HOME/.bash_aliases
 fi
 
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
@@ -62,6 +62,11 @@ fi
 if command -v "bash_completion_tmux.sh" >/dev/null; then
     . "bash_completion_tmux.sh"
 fi
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+
+# Added by autojump install.sh
+[[ -s "/etc/profile.d/autojump.bash" ]] && source /etc/profile.d/autojump.bash
 
 # pip bash completion start
 _pip_completion()
@@ -73,4 +78,3 @@ _pip_completion()
 complete -o default -F _pip_completion pip
 # pip bash completion end
 
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
