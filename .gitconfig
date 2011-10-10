@@ -1,9 +1,10 @@
 [user]
 	name = Ehtesh Choudhury
 	email = merlockmagus@gmail.com
-
 [color]
     diff=always
     ui=always
 [core]
 	autocrlf = input
+[alias]
+    hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short 
