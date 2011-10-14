@@ -84,6 +84,7 @@ bindKeys =
       -- bind M-(S)-(-/=) to resize window a variety of ways -- maybe I'll get aspect ratio preserving later
       ("M-;",         spawn "exe=$(dmenu_path | dmenu -i) && eval \"exec $exe\"")
     , ("M-q",         spawn "xmonad --recompile && xmonad --restart")
+    , ("M-t",         spawn "urxvt")
     , ("M-p",         windows W.focusUp)
     , ("M-n",         windows W.focusDown)
     , ("M-S-p",       windows W.swapUp)
@@ -162,12 +163,13 @@ myLayoutHook = avoidStrutsOn [] $ tall ||| wide ||| tab ||| full
         tab     = named "[+]" $ noBorders $ tabbed shrinkText tabTheme1
         full    = named "[F]" $ noBorders Full
 
-myConfig = gnomeConfig 
+{-myConfig = gnomeConfig -}
+myConfig = defaultConfig
     {
       modMask = myModMask
     , focusFollowsMouse = False
     , workspaces = myWorkspaces
-    , terminal = "gnome-terminal"
+    , terminal = "urxvt"
     , manageHook = myManageHook 
                <+> manageHook gnomeConfig
     , layoutHook = myLayoutHook
