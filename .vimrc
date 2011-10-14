@@ -14,7 +14,7 @@ highlight CursorLine cterm=bold
 " set background of listchars to brown
 "highlight SpecialKey ctermbg=brown
 
-" set t_Co=256                " sets Vim to use 256 terminal colors
+set t_Co=256                " sets Vim to use 256 terminal colors
 colorscheme wombat256mod    " nice dark theme
 set ruler                   " show the cursor position all the time
 set nowrap                  " don't wrap long lines
