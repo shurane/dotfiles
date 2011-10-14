@@ -26,6 +26,7 @@ alias info="info --vi-keys"
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
 alias ll="ls --human-readable --group-directories-first --sort=extension --color=auto --almost-all --format=long"
 alias tmux="tmux -2"
+alias less="less -R"
 
 nullbg(){ "$@" >&/dev/null & }
 

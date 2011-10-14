@@ -5,3 +5,5 @@
 [color]
     diff=always
     ui=always
+[core]
+	autocrlf = input
