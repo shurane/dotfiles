@@ -40,6 +40,7 @@ setopt incappendhistory
 setopt rmstarwait
 setopt noclobber
 setopt autocontinue
+stty -ixon
 
 source $ZSH/oh-my-zsh.sh
 [[ -f $HOME/.bash_aliases ]] && source $HOME/.bash_aliases
