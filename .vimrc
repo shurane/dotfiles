@@ -218,7 +218,7 @@ nnoremap <Leader>c "+yy
 vnoremap <Leader>c "+y
 
 " do :ls before switching buffers
-nnoremap <Leader>b :ls<CR>:b
+"nnoremap <Leader>b :ls<CR>:b
 
 
 " split vertically and horizontally
@@ -259,8 +259,8 @@ let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git
 let g:vim_addon_manager.plugin_sources['surround'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-surround.git'}
 let g:vim_addon_manager.plugin_sources['repeat'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-repeat.git'}
 
-let g:addons = [ 'nerd_commenter', 'nerdtree', 'surround', 'repeat', 'Gundo', 'taglist', ] " 'pyflakes2441' ]
-", 'pylint' ]
+let g:addons = [ 'nerd_commenter', 'surround', 'repeat', 'Gundo', 'taglist', 'FuzzyFinder' ] 
+"others: pylint, pyflakes2441, nerdtree
 
 call vam#ActivateAddons(addons)
 
@@ -286,6 +286,10 @@ nnoremap <Leader>dd :TlistToggle<CR>
 
 " shortcuts for Gundo
 nnoremap <Leader>gg :GundoToggle<CR>
+
+" shortcuts for FuzzyFinder
+nnoremap <Leader>f :FufFileWithCurrentBufferDir<CR>
+nnoremap <Leader>b :FufBuffer<CR>
 
 " unmappings from various plugins
 silent! nunmap \tt
