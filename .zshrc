@@ -73,6 +73,7 @@ stty -ixon
 #check zshzle for more options {{{
 bindkey -v
 bindkey -M viins 'jj' vi-cmd-mode
+bindkey -M viins '^K' kill-line
 bindkey -M viins '^U' backward-kill-line
 bindkey -M viins '^W' backward-kill-word
 bindkey -M viins '^R' history-incremental-search-backward
