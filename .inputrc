@@ -29,4 +29,6 @@ $if mode=vi
     "jj": vi-movement-mode
     "\C-w": backward-kill-word
     "\C-p": history-search-backward
+    "\C-a": beginning-of-line
+    "\C-e": end-of-line
 $endif
