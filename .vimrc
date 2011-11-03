@@ -233,6 +233,7 @@ nnoremap <Leader>td :call ToggleDiff()<CR>
 set pastetoggle=,tp
 nnoremap <Leader>tw :set wrap!<CR>
 nnoremap <Leader>tl :set list!<CR>
+" add a second <C-l> after <CR> to redraw the screen
 nnoremap <C-l> :set hlsearch!<CR>
 nnoremap <Leader>tb :set scrollbind!<CR>
 " TODO kind of incomplete?
