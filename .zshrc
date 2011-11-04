@@ -33,8 +33,8 @@ source $ZSH/oh-my-zsh.sh
 # Prompt, using oh-my-zsh colors {{{
 
 function zle-line-init zle-keymap-select {
-    MODE="${${KEYMAP/vicmd/-- NORMAL --}/(main|viins)/-- INSERT --}"
-    RPS1="$MODE %{$fg[cyan]%}%1c %{$fg_bold[green]%}% $USER@$HOST% %{$reset_color%}"
+    MODE="${${KEYMAP/vicmd/-N-}/(main|viins)/-I-}"
+    RPS1="%{$fg[cyan]%}%1c %{$reset_color%}$MODE %{$fg_bold[green]%}% $USER@$HOST% %{$reset_color%}"
     RPS2=$RPS1
     zle reset-prompt
 }
