@@ -27,8 +27,11 @@ $if mode=vi
     "G": end-of-history
     set keymap vi-insert
     "jj": vi-movement-mode
+    "\C-p": previous-history
+    "\C-n": next-history
     "\C-w": backward-kill-word
-    "\C-p": history-search-backward
+    "\C-r": history-search-backward
+    "\C-s": history-search-forward
     "\C-a": beginning-of-line
     "\C-e": end-of-line
 $endif
