@@ -32,7 +32,8 @@ set splitright              " vertical splits split to the right (instead of lef
 set clipboard+=unnamed      " yanks go onto the global clipboard as well -- this might make a mapping unnecessary
 
 " very informative status line, but should document later
-set statusline=%F%m%r%h%w\ [TYPE=%Y\ %{&ff}]\ [%l/%L\ (%p%%)]
+set statusline=%F%m%r%h%w\ [TYPE=%Y\ %{&ff}]\ [%l/%L\ (%p%%)]%=%{fugitive#statusline()}
+set laststatus=2            " always keep status line on
 
 set autochdir               " always switch to the current file directory
 set modeline                " allow vim options to be embedded in files
@@ -190,6 +191,9 @@ nnoremap <Leader>r :source $MYVIMRC<CR>
 " switch back and forth between buffers
 nnoremap `n :bn<CR>
 nnoremap `p :bp<CR>
+" switch back and forth between tabs
+nnoremap <C-n> gt<CR>
+nnoremap <C-p> gT<CR>
 
 " z(l/r) is less/reduce folds, zm is more folds
 " z(j/k) navigates between next/prev fold
@@ -260,7 +264,7 @@ let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git
 let g:vim_addon_manager.plugin_sources['surround'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-surround.git'}
 let g:vim_addon_manager.plugin_sources['repeat'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-repeat.git'}
 
-let g:addons = [ 'nerd_commenter', 'surround', 'repeat', 'Gundo', 'taglist', 'FuzzyFinder' ] 
+let g:addons = [ 'nerd_commenter', 'surround', 'repeat', 'Gundo', 'taglist', 'fugitive', 'FuzzyFinder' ] 
 "others: pylint, pyflakes2441, nerdtree
 
 call vam#ActivateAddons(addons)
