@@ -1,0 +1,54 @@
+rxvt*loginShell:true
+rxvt*transparent:true
+rxvt*shading:40
+rxvt*background:Black
+rxvt*foreground:White
+rxvt*scrollBar:false
+!rxvt*scrollBar_right:true
+!rxvt*transpscrollbar:true
+rxvt*saveLines:32767
+rxvt*font:*-*-fixed-medium-r-normal--*-110-*-*-*-*-iso8859-1
+rxvt*boldFont:*-*-fixed-bold-r-normal--*-*-110-*-*-*-*-iso8859-1
+
+! to match gnome-terminal "Linux console" scheme
+! foreground/background
+URxvt*background: #000000
+URxvt*foreground: #ffffff
+! black
+URxvt.color0  : #000000
+URxvt.color8  : #555555
+! red
+URxvt.color1  : #AA0000
+URxvt.color9  : #FF5555
+! green
+URxvt.color2  : #00AA00
+URxvt.color10 : #55FF55
+! yellow
+URxvt.color3  : #AA5500
+URxvt.color11 : #FFFF55
+! blue
+URxvt.color4  : #0000AA
+URxvt.color12 : #5555FF
+! magenta
+URxvt.color5  : #AA00AA
+URxvt.color13 : #FF55FF
+! cyan
+URxvt.color6  : #00AAAA
+URxvt.color14 : #55FFFF
+! white
+URxvt.color7  : #AAAAAA
+URxvt.color15 : #FFFFFF
+
+! run "fc-list" for a list of available fonts
+!URxvt*font: xft:DejaVu Sans Mono:size=9
+!URxvt*boldFont: xft:DejaVu Sans Mono:size=9:style=Bold
+!URxvt*font: 9x15
+!URxvt*boldFont: 9x15bold
+URxvt*font: xft:Monospace:pixelsize=11
+URxvt*boldFont: xft:Monospace:pixelsize=11:style=Bold
+
+URxvt*letterSpace: -1
+URxvt*scrollBar: False
+URxvt*scrollTtyOutput: True
+URxvt*secondaryScroll: True
+URxvt*saveLines: 16384
