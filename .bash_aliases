@@ -28,5 +28,8 @@ alias ll="ls --human-readable --group-directories-first --sort=extension --color
 alias tmux="tmux -2"
 alias less="less -R"
 
-nullbg(){ "$@" >&/dev/null & }
+#I think these are zsh functions, double check!
 
+nullbg(){ "$@" >&/dev/null & }
+findfile(){ find . -iregex ".*$1.*" -print; }
+manfind() { man "$1" | less -i -p "$2" }
