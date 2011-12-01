@@ -2,11 +2,12 @@ import XMonad
 import qualified XMonad.StackSet as W
 import qualified Data.Map as M
 
-import XMonad.Util.EZConfig(additionalKeysP,removeKeysP)
+import XMonad.Util.EZConfig (additionalKeysP,removeKeysP)
 import XMonad.Util.WindowProperties (getProp32s)
 
 import XMonad.Actions.FloatKeys
 import XMonad.Actions.GridSelect
+import XMonad.Actions.WithAll
 
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
@@ -84,7 +85,8 @@ bindKeys =
       -- bind M-(S)-(-/=) to resize window a variety of ways -- maybe I'll get aspect ratio preserving later
       ("M-;",         spawn "exe=$(dmenu_path | dmenu -i) && eval \"exec $exe\"")
     , ("M-q",         spawn "xmonad --recompile && xmonad --restart")
-    , ("M-t",         spawn "urxvt")
+    {-, ("M-t",         spawn "urxvt")-}
+    , ("M-t",         sinkAll)
     , ("M-p",         windows W.focusUp)
     , ("M-n",         windows W.focusDown)
     , ("M-S-p",       windows W.swapUp)
