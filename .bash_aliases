@@ -31,5 +31,5 @@ alias less="less -R"
 #I think these are zsh functions, double check!
 
 nullbg(){ "$@" >&/dev/null & }
-findfile(){ find . -iregex ".*$1.*" -print; }
+findfile(){ find . -iregex ".*$1.*" -type f -print; }
 manfind() { man "$1" | less -i -p "$2" }
