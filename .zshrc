@@ -6,6 +6,8 @@ export WORKON_HOME=$HOME/projects/envs
 export PIP_VIRTUALENV_BASE=$WORKON_HOME
 export PIP_RESPECT_VIRTUALENV=true
 
+ulimit -S -n 1024
+
 # Oh-My-Zsh {{{
 #
 # Path to your oh-my-zsh configuration.
@@ -72,10 +74,13 @@ stty -ixon
 #Vim-mode emulation, with some emacs-style readline to boot
 #check zshzle for more options {{{
 bindkey -v
+bindkey
 bindkey -M viins 'jj' vi-cmd-mode
 bindkey -M viins '^K' kill-line
 bindkey -M viins '^U' backward-kill-line
 bindkey -M viins '^W' backward-kill-word
+bindkey -M viins '^?' backward-delete-char
+bindkey -M viins '^h' backward-delete-char
 bindkey -M viins '^R' history-incremental-search-backward
 bindkey -M viins '^S' history-incremental-search-forward
 bindkey -M viins '^P' up-line-or-history
