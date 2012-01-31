@@ -76,6 +76,8 @@ bindkey -M viins 'jj' vi-cmd-mode
 bindkey -M viins '^K' kill-line
 bindkey -M viins '^U' backward-kill-line
 bindkey -M viins '^W' backward-kill-word
+bindkey -M viins '^?' backward-delete-char
+bindkey -M viins '^h' backward-delete-char
 bindkey -M viins '^R' history-incremental-search-backward
 bindkey -M viins '^S' history-incremental-search-forward
 bindkey -M viins '^P' up-line-or-history
