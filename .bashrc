@@ -7,14 +7,25 @@ HISTSIZE=20000
 HISTFILESIZE=20000
 shopt -s checkwinsize               # update the values of LINES and COLUMNS after each command
 
+# break on '-' and '/' properly!
+stty werase undef
+bind '"\C-w": backward-kill-word'
+
+export INPUTRC="$HOME/.inputrc"
+export PAGER="less"
+export LESS="-R"
+export USE_CCACHE=1
+export CCACHE_DIR="$HOME/.ccache"
+
+# this stuff is probably platform specific
 export XDG_DATA_HOME="$HOME/.local/share"
 export EDITOR="vim"
 export ECLIPSE_HOME="~/cs/eclipse"
 export WORKON_HOME="~/projects/envs"
 #export JAVA_HOME=/usr/lib/jvm/java-6-openjdk/
-export INPUTRC="$HOME/.inputrc"
-export PAGER="less"
-export LESS="-R"
+#for clojure
+export CLASSPATH="/usr/local/Cellar/clojure-contrib/1.2.0/clojure-contrib.jar"
+export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -67,6 +78,10 @@ fi
 
 # Added by autojump install.sh
 [[ -s "/etc/profile.d/autojump.bash" ]] && source /etc/profile.d/autojump.bash
+# For Mac OS X
+[[ -s "$(brew --prefix)/etc/autojump.bash" ]] && source "$(brew --prefix)/etc/autojump.bash"
+[[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
+
 
 # pip bash completion start
 _pip_completion()
