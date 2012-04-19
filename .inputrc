@@ -15,6 +15,7 @@ set bind-tty-special-chars off
 
 # Use '/' for word boundaries for Ctrl-w
 "\C-w": unix-filename-rubout
+"\C-w": backward-kill-word
 
 set editing-mode vi
 set keymap vi

@@ -7,9 +7,8 @@ HISTSIZE=20000
 HISTFILESIZE=20000
 shopt -s checkwinsize               # update the values of LINES and COLUMNS after each command
 
-# break on '-' and '/' properly!
+# break on '-' and '/' properly! look at .inputrc for backward-kill-word
 stty werase undef
-bind '"\C-w": backward-kill-word'
 
 export INPUTRC="$HOME/.inputrc"
 export PAGER="less"
