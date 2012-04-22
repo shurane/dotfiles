@@ -55,7 +55,13 @@ unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
 # may do wonky things on other terminals, perhaps?
-PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+case "$TERM" in
+    xterm*|rxvt*)
+        PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+        ;;
+    *)
+        ;;
+esac
 
 if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
     . /usr/local/bin/virtualenvwrapper.sh >&/dev/null
@@ -78,11 +84,13 @@ fi
 # Added by autojump install.sh
 [[ -s "/etc/profile.d/autojump.bash" ]] && source /etc/profile.d/autojump.bash
 # For Mac OS X
-[[ -s "$(brew --prefix)/etc/autojump.bash" ]] && source "$(brew --prefix)/etc/autojump.bash"
-[[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
+if command -v "brew" >/dev/null; then
+    [[ -s "$(brew --prefix)/etc/autojump.bash" ]] && source "$(brew --prefix)/etc/autojump.bash"
+    [[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
+fi
 
 
-# pip bash completion start
+# python pip bash completion start
 _pip_completion()
 {
     COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
