@@ -55,6 +55,7 @@ unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
 # may do wonky things on other terminals, perhaps?
+# TODO why have this and the color prompt above?
 case "$TERM" in
     xterm*|rxvt*)
         PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
@@ -82,11 +83,13 @@ fi
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
 # Added by autojump install.sh
-[[ -s "/etc/profile.d/autojump.bash" ]] && source /etc/profile.d/autojump.bash
+[[ -s "/etc/profile.d/autojump.bash" ]] && source "/etc/profile.d/autojump.bash"
+[[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
 # For Mac OS X
 if command -v "brew" >/dev/null; then
     [[ -s "$(brew --prefix)/etc/autojump.bash" ]] && source "$(brew --prefix)/etc/autojump.bash"
-    [[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
+    [[ -s "$(brew --prefix)/etc/bash_completion" ]] && source "$(brew --prefix)/etc/bash_completion"
+
 fi
 
 
