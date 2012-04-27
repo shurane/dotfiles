@@ -15,6 +15,7 @@ export WORKON_HOME="~/projects/envs"
 export INPUTRC="$HOME/.inputrc"
 export PAGER="less"
 export LESS="-R"
+export PATH=".cabal/bin:$PATH"
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
