@@ -7,14 +7,25 @@ HISTSIZE=20000
 HISTFILESIZE=20000
 shopt -s checkwinsize               # update the values of LINES and COLUMNS after each command
 
+# break on '-' and '/' properly! look at .inputrc for backward-kill-word
+stty werase undef
+
+export INPUTRC="$HOME/.inputrc"
+export PAGER="less"
+export LESS="-R"
+export USE_CCACHE=1
+export CCACHE_DIR="$HOME/.ccache"
+
+# this stuff is probably platform specific
 export XDG_DATA_HOME="$HOME/.local/share"
 export EDITOR="vim"
 export ECLIPSE_HOME="~/cs/eclipse"
 export WORKON_HOME="~/projects/envs"
 #export JAVA_HOME=/usr/lib/jvm/java-6-openjdk/
-export INPUTRC="$HOME/.inputrc"
-export PAGER="less"
-export LESS="-R"
+
+#for clojure on OS X
+export CLASSPATH="/usr/local/Cellar/clojure-contrib/1.2.0/clojure-contrib.jar"
+export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 export PATH=".cabal/bin:$PATH"
 
 # make less more friendly for non-text input files, see lesspipe(1)
@@ -46,7 +57,14 @@ unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
 # may do wonky things on other terminals, perhaps?
-PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+# TODO why have this and the color prompt above?
+case "$TERM" in
+    xterm*|rxvt*)
+        PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+        ;;
+    *)
+        ;;
+esac
 
 if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
     . /usr/local/bin/virtualenvwrapper.sh >&/dev/null
@@ -67,9 +85,17 @@ fi
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
 # Added by autojump install.sh
-[[ -s "/etc/profile.d/autojump.bash" ]] && source /etc/profile.d/autojump.bash
+[[ -s "/etc/profile.d/autojump.bash" ]] && source "/etc/profile.d/autojump.bash"
+[[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
+# For Mac OS X
+if command -v "brew" >/dev/null; then
+    [[ -s "$(brew --prefix)/etc/autojump.bash" ]] && source "$(brew --prefix)/etc/autojump.bash"
+    [[ -s "$(brew --prefix)/etc/bash_completion" ]] && source "$(brew --prefix)/etc/bash_completion"
 
-# pip bash completion start
+fi
+
+
+# python pip bash completion start
 _pip_completion()
 {
     COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
