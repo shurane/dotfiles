@@ -44,7 +44,7 @@ URxvt.color15 : #FFFFFF
 !URxvt*boldFont: xft:DejaVu Sans Mono:size=9:style=Bold
 !URxvt*font: 9x15
 !URxvt*boldFont: 9x15bold
-URxvt*font: xft:Monospace:pixelsize=11
+URxvt*font: xft:Monospace:pixelsize=12
 URxvt*boldFont: xft:Monospace:pixelsize=11:style=Bold
 
 URxvt*letterSpace: -1
@@ -52,3 +52,11 @@ URxvt*scrollBar: False
 URxvt*scrollTtyOutput: True
 URxvt*secondaryScroll: True
 URxvt*saveLines: 16384
+
+! copied from https://wiki.archlinux.org/index.php/Font_Configuration#Ubuntu
+Xft.autohint: 0
+Xft.lcdfilter:  lcddefault
+Xft.hintstyle:  hintfull
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb

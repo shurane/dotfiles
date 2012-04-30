@@ -7,7 +7,7 @@ set completion-query-items 100
 set visible-stats on
 
 #special option for readline characters?
-set bind-tty-special-chars off      
+#set bind-tty-special-chars off      
 
 # PageUp goes to top of history, PageDown goes to bottom of history
 "\e[5~": beginning-of-history
@@ -16,7 +16,7 @@ set bind-tty-special-chars off
 # Use '/' for word boundaries for Ctrl-w
 #"\C-w": unix-filename-rubout
 #"\C-w": backward-kill-word
-"\C-x\C-r": re-read-init-file
+#"\C-x\C-r": re-read-init-file
 
 set editing-mode vi
 set keymap vi
@@ -36,4 +36,5 @@ $if mode=vi
     "\C-w": backward-kill-word
     "\C-r": reverse-search-history
     "\C-s": forward-search-history
+    "\C-x\C-r": re-read-init-file
 $endif
