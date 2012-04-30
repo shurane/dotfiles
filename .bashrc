@@ -16,14 +16,11 @@ export LESS="-R"
 export USE_CCACHE=1
 export CCACHE_DIR="$HOME/.ccache"
 
-# this stuff is probably platform specific
 export XDG_DATA_HOME="$HOME/.local/share"
 export EDITOR="vim"
-export ECLIPSE_HOME="~/cs/eclipse"
+#export ECLIPSE_HOME="~/cs/eclipse"
 export WORKON_HOME="~/projects/envs"
-#export JAVA_HOME=/usr/lib/jvm/java-6-openjdk/
-#for clojure
-export CLASSPATH="/usr/local/Cellar/clojure-contrib/1.2.0/clojure-contrib.jar"
+
 export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
 # make less more friendly for non-text input files, see lesspipe(1)
@@ -78,17 +75,23 @@ fi
 if command -v "bash_completion_tmux.sh" >/dev/null; then
     . "bash_completion_tmux.sh"
 fi
-
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
-
 # Added by autojump install.sh
 [[ -s "/etc/profile.d/autojump.bash" ]] && source /etc/profile.d/autojump.bash
+
 # For Mac OS X
 if command -v "brew" >/dev/null; then
+    #for clojure
+    export CLASSPATH="/usr/local/Cellar/clojure-contrib/1.2.0/clojure-contrib.jar"
     [[ -s "$(brew --prefix)/etc/autojump.bash" ]] && source "$(brew --prefix)/etc/autojump.bash"
     [[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
 fi
 
+#Ubuntu specific stuff
+if [[ $(lsb_release --id) = "Ubuntu" ]]; then
+    export JAVA_HOME="/usr/lib/jvm/java-6-sun"
+    export ANDROID_JAVA_HOME="/usr/lib/jvm/java-6-sun"
+fi
 
 # python pip bash completion start
 _pip_completion()

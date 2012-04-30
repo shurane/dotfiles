@@ -12,8 +12,11 @@ alias .....="cd ../../../.."
 
 alias po="popd"
 alias pu="pushd"
-#alias ack="ack-grep"
 alias a="ack"
+#this is for ubuntu, where ack is installed as 'ack-grep'
+if command -v "ack-grep" &>/dev/null ; then
+    alias ack="ack-grep"
+fi
 alias v="vim"
 #sd = sizedir
 alias sd="du -ch . | tail -n 1"
