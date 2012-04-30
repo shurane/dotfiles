@@ -62,27 +62,26 @@ case "$TERM" in
         ;;
 esac
 
-if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
-    . /usr/local/bin/virtualenvwrapper.sh >&/dev/null
-fi
-
-if [ -f $HOME/.bash_aliases ]; then
-    . $HOME/.bash_aliases
-fi
 
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
-if command -v "bash_completion_tmux.sh" >/dev/null; then
-    . "bash_completion_tmux.sh"
+if command -v "bash_completion_tmux.sh" 2>&1 >/dev/null; then
+    source "bash_completion_tmux.sh"
 fi
+
+if command -v "virtualenvwrapper.sh" 2>&1 >/dev/null; then
+    source "/usr/local/bin/virtualenvwrapper.sh"
+fi
+
+[[ -f "$HOME/.bash_aliases" ]] && source "$HOME/.bash_aliases"
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 [[ -s "/etc/profile.d/autojump.bash" ]] && source "/etc/profile.d/autojump.bash"
 [[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
 
 # For Mac OS X
-if command -v "brew" >/dev/null; then
+if command -v "brew" 2>&1 >/dev/null; then
     #for clojure
     export CLASSPATH="/usr/local/Cellar/clojure-contrib/1.2.0/clojure-contrib.jar"
     [[ -s "$(brew --prefix)/etc/autojump.bash" ]] && source "$(brew --prefix)/etc/autojump.bash"
@@ -91,7 +90,7 @@ if command -v "brew" >/dev/null; then
 fi
 
 #Ubuntu specific stuff
-if [[ $(lsb_release --id) = "Ubuntu" ]]; then
+if [[ $(lsb_release --id --short) = "Ubuntu" ]]; then
     export JAVA_HOME="/usr/lib/jvm/java-6-sun"
     export ANDROID_JAVA_HOME="/usr/lib/jvm/java-6-sun"
 fi
