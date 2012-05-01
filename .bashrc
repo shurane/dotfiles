@@ -16,15 +16,13 @@ export LESS="-R"
 export USE_CCACHE=1
 export CCACHE_DIR="$HOME/.ccache"
 
-# this stuff is probably platform specific
 export XDG_DATA_HOME="$HOME/.local/share"
 export EDITOR="vim"
-export ECLIPSE_HOME="~/cs/eclipse"
+#export ECLIPSE_HOME="~/cs/eclipse"
 export WORKON_HOME="~/projects/envs"
-#export JAVA_HOME=/usr/lib/jvm/java-6-openjdk/
-#for clojure
-export CLASSPATH="/usr/local/Cellar/clojure-contrib/1.2.0/clojure-contrib.jar"
+
 export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+export PATH=".cabal/bin:$PATH"
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -64,34 +62,38 @@ case "$TERM" in
         ;;
 esac
 
-if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
-    . /usr/local/bin/virtualenvwrapper.sh >&/dev/null
-fi
-
-if [ -f $HOME/.bash_aliases ]; then
-    . $HOME/.bash_aliases
-fi
 
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
-if command -v "bash_completion_tmux.sh" >/dev/null; then
-    . "bash_completion_tmux.sh"
+if command -v "bash_completion_tmux.sh" 2>&1 >/dev/null; then
+    source "bash_completion_tmux.sh"
 fi
 
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+if command -v "virtualenvwrapper.sh" 2>&1 >/dev/null; then
+    source "/usr/local/bin/virtualenvwrapper.sh"
+fi
 
-# Added by autojump install.sh
+[[ -f "$HOME/.bash_aliases" ]] && source "$HOME/.bash_aliases"
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 [[ -s "/etc/profile.d/autojump.bash" ]] && source "/etc/profile.d/autojump.bash"
 [[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
+
 # For Mac OS X
-if command -v "brew" >/dev/null; then
+if command -v "brew" 2>&1 >/dev/null; then
+    #for clojure
+    export CLASSPATH="/usr/local/Cellar/clojure-contrib/1.2.0/clojure-contrib.jar"
     [[ -s "$(brew --prefix)/etc/autojump.bash" ]] && source "$(brew --prefix)/etc/autojump.bash"
     [[ -s "$(brew --prefix)/etc/bash_completion" ]] && source "$(brew --prefix)/etc/bash_completion"
 
 fi
 
+#Ubuntu specific stuff
+if [[ $(lsb_release --id --short) = "Ubuntu" ]]; then
+    export JAVA_HOME="/usr/lib/jvm/java-6-sun"
+    export ANDROID_JAVA_HOME="/usr/lib/jvm/java-6-sun"
+fi
 
 # python pip bash completion start
 _pip_completion()

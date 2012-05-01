@@ -1,7 +1,12 @@
-autoload -U promptinit &&  promptinit
-prompt suse
+autoload -U compinit promptinit colors
+compinit && promptinit && colors
+prompt adam1
+
 export EDITOR=vim
 export HISTSIZE=20000
+RUBYPATH=/var/lib/gems/1.8/bin
+CABALPATH=$HOME/.cabal/bin
+export PATH=$HOME/bin:$CABALPATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 export HISTFILE=~/.zsh_history
 
 # setup for virtualenvwrapper and pip
@@ -38,6 +43,7 @@ export PROMPT="%n@%m:%20<...<%d%<<%% "
 
 # Prompt, using oh-my-zsh colors {{{
 
+# TODO fix this so it doesn't use oh-my-zsh colors
 function zle-line-init zle-keymap-select {
     MODE="${${KEYMAP/vicmd/-N-}/(main|viins)/-I-}"
     #RPS1="%{$fg[cyan]%}%1c %{$reset_color%}$MODE %{$fg_bold[green]%}% $USER@$HOST% %{$reset_color%}"
@@ -53,11 +59,9 @@ zle -N zle-line-init
 #PROMPT='%{$fg_bold[red]%}➜%{$fg_bold[blue]%}$(git_prompt_info)%{$fg_bold[blue]%} %{$reset_color%}'
 #RPROMPT='%{$fg[cyan]%}%1c %{$fg_bold[green]%}% $USER@$HOST% %{$reset_color%}'
 
-# }}}
 
-
-# Customize to your needs...
-export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+# Load various files
+# TODO maybe make a function so it's less repetitive?
 
 [[ -f $HOME/.pythonbrew/etc/bashrc ]] && source $HOME/.pythonbrew/etc/bashrc
 [[ -f $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
@@ -65,6 +69,8 @@ export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/
 [[ -f $(brew --prefix)/etc/autojump.zsh ]] && source $(brew --prefix)/etc/autojump.zsh ]]
 [[ -f $HOME/.bash_aliases ]] && source $HOME/.bash_aliases
 #command -v virtualenvwrapper.sh >/dev/null && source virtualenvwrapper.sh #>&/dev/null
+[[ -f $HOME/.bash_aliases ]] && source $HOME/.bash_aliases
+[[ -f /etc/git-completion.bash ]] && source /etc/git-completion.bash
 
 #TODO double check these options?
 setopt autopushd

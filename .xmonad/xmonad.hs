@@ -83,7 +83,7 @@ bindKeys =
       -- bind M-n to next window
       -- bind M-g to gridselect
       -- bind M-(S)-(-/=) to resize window a variety of ways -- maybe I'll get aspect ratio preserving later
-      ("M-;",         spawn "exe=$(dmenu_path | dmenu -i) && eval \"exec $exe\"")
+      ("M-;",         spawn "exe=$(dmenu_path_c | dmenu -i) && eval \"exec $exe\"")
     , ("M-q",         spawn "xmonad --recompile && xmonad --restart")
     {-, ("M-t",         spawn "urxvt")-}
     , ("M-t",         sinkAll)
