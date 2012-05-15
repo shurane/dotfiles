@@ -1,13 +1,14 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-
 [ -z "$PS1" ] && return             # If not running interactively, don't do anything
+
 HISTCONTROL=ignoredups:ignorespace  # force ignoredups and ignorespace
+HISTSIZE=200000
+HISTFILESIZE=200000
 shopt -s histappend                 # append to the history file, don't overwrite it
-HISTSIZE=20000
-HISTFILESIZE=20000
+# Save and reload the history after each command finishes
+export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 shopt -s checkwinsize               # update the values of LINES and COLUMNS after each command
 
-# break on '-' and '/' properly! look at .inputrc for backward-kill-word
+# break on '-' and '/' for 'C-w' properly! look at .inputrc for backward-kill-word
 stty werase undef
 
 export INPUTRC="$HOME/.inputrc"
@@ -90,6 +91,7 @@ if command -v "brew" 2>&1 >/dev/null; then
 fi
 
 #Ubuntu specific stuff
+#TODO this is bad because it's locked to java-6, what if I want something else?
 if [[ $(lsb_release --id --short) = "Ubuntu" ]]; then
     export JAVA_HOME="/usr/lib/jvm/java-6-sun"
     export ANDROID_JAVA_HOME="/usr/lib/jvm/java-6-sun"

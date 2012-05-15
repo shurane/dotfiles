@@ -3,7 +3,7 @@
     set novisualbell 
     set t_vb=
     set guioptions=Aci
-    colorscheme wombat256mod
+    "colorscheme wombat256mod
     " Win32 Settings {{{
     if has('win32')
         set guifont=Consolas:h10:cANSI

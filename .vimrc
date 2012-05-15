@@ -92,7 +92,7 @@ autocmd FileType python set makeprg=pylint\ --reports=n\ --output-format=parseab
 autocmd FileType python set errorformat=%f:%l:\ %m
 
 let python_highlight_all=1
-set tags+=tags;$HOME
+"set tags+=tags
 
 " }}}
 
@@ -278,11 +278,14 @@ let NERDTreeMapActivateNode='<CR>'
 nnoremap <Leader>tt :NERDTreeToggle<CR>
 
 " shortcuts for Taglist and Tags in general
-let Tlist_Ctags_Cmd = "ctags"
+"let Tlist_Ctags_Cmd = "ctags"
+let Tlist_GainFocus_On_ToggleOpen = 1
 let Tlist_Exit_OnlyWindow = 1
 nnoremap <Leader>dr :!ctags --recurse --fields=+iaS --extra=+q .<CR>
 nnoremap <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
 nnoremap <Leader>dd :TlistToggle<CR>
+"nnoremap <Leader>dd :TlistOpen<CR>
+"nnoremap <Leader>dc :TlistClose<CR>
 
 
 " idea for <Leader>do: Tlist_Show_One_File toggle

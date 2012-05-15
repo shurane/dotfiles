@@ -12,7 +12,7 @@ set visible-stats on
 # PageUp goes to top of history, PageDown goes to bottom of history
 "\e[5~": beginning-of-history
 "\e[6~": end-of-history
-"\C-l":'clear\n'
+#"\C-l":'clear\n'
 
 # Use '/' for word boundaries for Ctrl-w
 #"\C-w": unix-filename-rubout
@@ -37,5 +37,6 @@ $if mode=vi
     "\C-w": backward-kill-word
     "\C-r": reverse-search-history
     "\C-s": forward-search-history
+    "\C-l":'clear\n'
     "\C-x\C-r": re-read-init-file
 $endif
