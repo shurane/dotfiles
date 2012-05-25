@@ -22,7 +22,7 @@
 
 
 import os, sys, re, StringIO
-import fcntl, termios, struct
+import fcntl, termios, struct, errno
 
 # unpack the current terminal width/height
 #data = fcntl.ioctl(sys.stdout.fileno(), termios.TIOCGWINSZ, '1234')
@@ -31,6 +31,11 @@ HEIGHT, WIDTH = os.popen('stty size', 'r').read().split()
 HEIGHT, WIDTH = int(HEIGHT), int(WIDTH)
 
 BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
+
+def info(a,b,c):
+    print "sys.excepthook called"
+
+sys.excepthook = info
 
 def format(fg=None, bg=None, bright=False, bold=False, dim=False, reset=False):
     # manually derived from http://en.wikipedia.org/wiki/ANSI_escape_code#Codes
@@ -144,8 +149,13 @@ while True:
         linebuf.write(message)
         line = linebuf.getvalue()
 
-    print line
-    if len(line) == 0: break
+    try:
+        print line
+        if len(line) == 0: break
+    except IOError as e:
+        if e.errno == errno.EPIPE:
+            print "gonna break out, somehow"
+            break
 
 
 
