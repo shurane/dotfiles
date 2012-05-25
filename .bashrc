@@ -9,6 +9,7 @@ export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 shopt -s checkwinsize               # update the values of LINES and COLUMNS after each command
 
 # break on '-' and '/' for 'C-w' properly! look at .inputrc for backward-kill-word
+# TODO and look at other stty options
 stty werase undef
 
 export INPUTRC="$HOME/.inputrc"
@@ -20,10 +21,13 @@ export CCACHE_DIR="$HOME/.ccache"
 export XDG_DATA_HOME="$HOME/.local/share"
 export EDITOR="vim"
 #export ECLIPSE_HOME="~/cs/eclipse"
-export WORKON_HOME="~/projects/envs"
+export WORKON_HOME="$HOME/projects/python_envs"
 
-export PATH=$HOME/bin:/var/lib/gems/1.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
-export PATH=".cabal/bin:$PATH"
+export CABAL_PATH=".cabal/bin"
+export RUBY_PATH="/var/lib/gems/1.8/bin"
+
+export PATH=$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+export PATH="$CABAL_PATH:$RUBY_PATH:$PATH"
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -63,47 +67,31 @@ case "$TERM" in
         ;;
 esac
 
+# Setting up extra commands if they exist.
+# ====
+command -v "bash_completion_tmux.sh" >/dev/null && source "bash_completion_tmux.sh"
+command -v "virtualenvwrapper.sh" >/dev/null && source "/usr/local/bin/virtualenvwrapper.sh"
+command -v "pip" >/dev/null && eval "$(pip completion --bash)"
 
-if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
-    . /etc/bash_completion
-fi
-
-if command -v "bash_completion_tmux.sh" 2>&1 >/dev/null; then
-    source "bash_completion_tmux.sh"
-fi
-
-if command -v "virtualenvwrapper.sh" 2>&1 >/dev/null; then
-    source "/usr/local/bin/virtualenvwrapper.sh"
-fi
-
-[[ -f "$HOME/.bash_aliases" ]] && source "$HOME/.bash_aliases"
+#if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+[[ -s "/etc/bash_completion" ]] && source "/etc/bash_completion"
+[[ -s "$HOME/.bash_aliases" ]] && source "$HOME/.bash_aliases"
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 [[ -s "/etc/profile.d/autojump.bash" ]] && source "/etc/profile.d/autojump.bash"
 [[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
 
 # For Mac OS X
-if command -v "brew" 2>&1 >/dev/null; then
-    #for clojure
+if command -v "brew" >/dev/null; then
+    #for clojure TODO make this version-independent
     export CLASSPATH="/usr/local/Cellar/clojure-contrib/1.2.0/clojure-contrib.jar"
     [[ -s "$(brew --prefix)/etc/autojump.bash" ]] && source "$(brew --prefix)/etc/autojump.bash"
     [[ -s "$(brew --prefix)/etc/bash_completion" ]] && source "$(brew --prefix)/etc/bash_completion"
-
 fi
 
-#Ubuntu specific stuff
-#TODO this is bad because it's locked to java-6, what if I want something else?
-if [[ $(lsb_release --id --short) = "Ubuntu" ]]; then
-    export JAVA_HOME="/usr/lib/jvm/java-6-sun"
-    export ANDROID_JAVA_HOME="/usr/lib/jvm/java-6-sun"
+# Ubuntu specific variable stuff
+# TODO this is bad because it's locked to java-6, what if I want something else?
+JAVA_6="/usr/lib/jvm/java-6-sun"
+if [[ $(lsb_release --id --short) = "Ubuntu" ]] && [[ -s "$JAVA_6/bin/java" ]]; then
+    export JAVA_HOME="$JAVA_6"
+    export ANDROID_JAVA_HOME="$JAVA_6"
 fi
-
-# python pip bash completion start
-_pip_completion()
-{
-    COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
-                   COMP_CWORD=$COMP_CWORD \
-                   PIP_AUTO_COMPLETE=1 $1 ) )
-}
-complete -o default -F _pip_completion pip
-# pip bash completion end
-

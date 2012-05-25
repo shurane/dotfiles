@@ -36,7 +36,7 @@ se_pushd()
     dirs
 }
 
-se_pushd_builtin()
+se_pushd_flip()
 {
   builtin pushd > /dev/null
   echo -n "DIRSTACK: "
@@ -55,7 +55,7 @@ alias cdd='se_pushd'
 #alias back='se_popd'
 alias baa='se_popd'
 #alias ba='se_popd'
-alias flip='se_pushd_builtin'
+alias flip='se_pushd_flip'
 alias po="se_popd"
 alias pu="se_pushd"
 
