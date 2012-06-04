@@ -15,7 +15,7 @@ highlight CursorLine cterm=bold
 "highlight SpecialKey ctermbg=brown
 
 set t_Co=256                " sets Vim to use 256 terminal colors
-"colorscheme wombat256mod    " nice dark theme
+colorscheme wombat256mod    " nice dark theme
 set ruler                   " show the cursor position all the time
 set nowrap                  " don't wrap long lines
 set showbreak=>\ \ \        " for wrapped lines
@@ -210,7 +210,7 @@ inoremap <C-w> <C-g>u<C-w>
 inoremap jj <Esc>
 " insert newline without going into insert-mode
 nnoremap <CR> o<Esc>
-" insert timestamp in place
+" insert timestamp in place; TODO what is this <C-R>?
 iabbrev YTS <C-R>=Timestamp()<CR>
 
 " copy and paste to global clipboard using leader key
@@ -263,8 +263,8 @@ let g:vim_addon_manager.plugin_sources['nerd_commenter'] = {'type': 'git', 'url'
 let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdtree.git'}
 let g:vim_addon_manager.plugin_sources['surround'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-surround.git'}
 let g:vim_addon_manager.plugin_sources['repeat'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-repeat.git'}
-
-let g:addons = [ 'nerd_commenter', 'surround', 'repeat', 'Gundo', 'taglist', 'fugitive', 'FuzzyFinder' ] 
+let g:vim_addon_manager.plugin_sources['yankstack'] = {'type': 'git', 'url': 'git://github.com/maxbrunsfeld/vim-yankstack.git'}
+let g:addons = [ 'nerd_commenter', 'surround', 'repeat', 'Gundo', 'taglist', 'fugitive', 'FuzzyFinder', 'yankstack' ] 
 "others: pylint, pyflakes2441, nerdtree
 
 call vam#ActivateAddons(addons)
@@ -311,6 +311,17 @@ silent! nunmap dd
     " cscope setup
     " language-specific addons only turned on when dealing with said language
     " error formats for makeprg would be great for C++
+    " figure out this vimscript:
+
+    "if filereadable('$HOME/.vim/colors/wombat256mod.vim')
+    "echo 'setting theme'
+    "colorscheme wombat256mod
+    "endif
+
+    "let g:colorscheme_exists = system('[[ -f \"$HOME/.vim/colors/wombat256mod.vim\" ]]')
+    "if g:colorscheme_wombat256mod == 0
+    "echo 'hello'
+    "endif
 
 " }}}
 
