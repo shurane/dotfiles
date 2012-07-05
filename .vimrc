@@ -220,6 +220,7 @@ nnoremap <Leader>v ,tp"+p,tp
 vnoremap <Leader>v ,tp"+p,tp
 nnoremap <Leader>c "+yy
 vnoremap <Leader>c "+y
+vnoremap <Leader>x "+d
 
 " do :ls before switching buffers
 "nnoremap <Leader>b :ls<CR>:b

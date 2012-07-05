@@ -5,12 +5,16 @@ HISTSIZE=200000
 HISTFILESIZE=200000
 shopt -s histappend                 # append to the history file, don't overwrite it
 # Save and reload the history after each command finishes
+# taken from http://stackoverflow.com/a/3055135/198348
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+#export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 shopt -s checkwinsize               # update the values of LINES and COLUMNS after each command
 
 # break on '-' and '/' for 'C-w' properly! look at .inputrc for backward-kill-word
 # TODO and look at other stty options
 stty werase undef
+# disable terminal flow control
+stty -ixon
 
 export INPUTRC="$HOME/.inputrc"
 export PAGER="less"
