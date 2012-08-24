@@ -79,6 +79,7 @@ command -v "pip" >/dev/null && eval "$(pip completion --bash)"
 
 #if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 [[ -s "/etc/bash_completion" ]] && source "/etc/bash_completion"
+[[ -s "$HOME/.pythonbrew/etc/bashrc" ]] && source "$HOME/.pythonbrew/etc/bashrc"
 [[ -s "$HOME/.bash_aliases" ]] && source "$HOME/.bash_aliases"
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 [[ -s "/etc/profile.d/autojump.bash" ]] && source "/etc/profile.d/autojump.bash"
