@@ -78,6 +78,7 @@ command -v "virtualenvwrapper.sh" >/dev/null && source "/usr/local/bin/virtualen
 command -v "pip" >/dev/null && eval "$(pip completion --bash)"
 
 #if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+[[ -s "/usr/share/bash-completion/bash_completion" ]] && source "/usr/share/bash-completion/bash_completion"
 [[ -s "/etc/bash_completion" ]] && source "/etc/bash_completion"
 [[ -s "$HOME/.pythonbrew/etc/bashrc" ]] && source "$HOME/.pythonbrew/etc/bashrc"
 [[ -s "$HOME/.bash_aliases" ]] && source "$HOME/.bash_aliases"
