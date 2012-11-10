@@ -77,21 +77,28 @@ esac
 command -v "virtualenvwrapper.sh" >/dev/null && source "/usr/local/bin/virtualenvwrapper.sh"
 command -v "pip" >/dev/null && eval "$(pip completion --bash)"
 
-#if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+
+# fasd setup and aliases
+# 
 eval "$(fasd --init auto)"
+alias v='f -t -e vim -b viminfo'
+alias m='f -e mplayer' # quick opening files with mplayer
+alias o='a -e xdg-open' # quick opening files with xdg-open
+
+
 [[ -s "$HOME/.bash_aliases" ]] && source "$HOME/.bash_aliases"
 [[ -s "/usr/share/bash-completion/bash_completion" ]] && source "/usr/share/bash-completion/bash_completion"
 [[ -s "/etc/bash_completion" ]] && source "/etc/bash_completion"
+
+#if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 #[[ -s "$HOME/.pythonbrew/etc/bashrc" ]] && source "$HOME/.pythonbrew/etc/bashrc"
 #[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
-# [[ -s "/etc/profile.d/autojump.bash" ]] && source "/etc/profile.d/autojump.bash"
 #[[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
 
 # For Mac OS X
 if command -v "brew" >/dev/null; then
     #for clojure TODO make this version-independent
     export CLASSPATH="/usr/local/Cellar/clojure-contrib/1.2.0/clojure-contrib.jar"
-    [[ -s "$(brew --prefix)/etc/autojump.bash" ]] && source "$(brew --prefix)/etc/autojump.bash"
     [[ -s "$(brew --prefix)/etc/bash_completion" ]] && source "$(brew --prefix)/etc/bash_completion"
 fi
 
