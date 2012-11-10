@@ -76,7 +76,7 @@ fi
 alias v="vim"
 #sd = sizedir
 alias sd="du -ch . | tail -n 1"
-alias df="df -ch"
+alias df="df -h"
 alias egrep="egrep --color=auto"
 alias fgrep="fgrep --color=auto"
 alias gopen="gnome-open"

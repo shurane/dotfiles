@@ -74,7 +74,7 @@ esac
 # Setting up extra commands if they exist.
 # ====
 command -v "bash_completion_tmux.sh" >/dev/null && source "bash_completion_tmux.sh"
-command -v "virtualenvwrapper.sh" >/dev/null && source "/usr/local/bin/virtualenvwrapper.sh"
+#command -v "virtualenvwrapper.sh" >/dev/null && virtualenvwrapper.sh
 command -v "pip" >/dev/null && eval "$(pip completion --bash)"
 
 #if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
