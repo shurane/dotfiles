@@ -73,17 +73,19 @@ esac
 
 # Setting up extra commands if they exist.
 # ====
-command -v "bash_completion_tmux.sh" >/dev/null && source "bash_completion_tmux.sh"
-#command -v "virtualenvwrapper.sh" >/dev/null && virtualenvwrapper.sh
+# TODO this should be cleaned up somehow..., so many extra commands
+command -v "virtualenvwrapper.sh" >/dev/null && source "/usr/local/bin/virtualenvwrapper.sh"
 command -v "pip" >/dev/null && eval "$(pip completion --bash)"
 
 #if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
-[[ -s "/etc/bash_completion" ]] && source "/etc/bash_completion"
-[[ -s "$HOME/.pythonbrew/etc/bashrc" ]] && source "$HOME/.pythonbrew/etc/bashrc"
+eval "$(fasd --init auto)"
 [[ -s "$HOME/.bash_aliases" ]] && source "$HOME/.bash_aliases"
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
-[[ -s "/etc/profile.d/autojump.bash" ]] && source "/etc/profile.d/autojump.bash"
-[[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
+[[ -s "/usr/share/bash-completion/bash_completion" ]] && source "/usr/share/bash-completion/bash_completion"
+[[ -s "/etc/bash_completion" ]] && source "/etc/bash_completion"
+#[[ -s "$HOME/.pythonbrew/etc/bashrc" ]] && source "$HOME/.pythonbrew/etc/bashrc"
+#[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+# [[ -s "/etc/profile.d/autojump.bash" ]] && source "/etc/profile.d/autojump.bash"
+#[[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
 
 # For Mac OS X
 if command -v "brew" >/dev/null; then
