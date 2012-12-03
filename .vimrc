@@ -84,6 +84,7 @@ set formatoptions-=r        " don't insert comment after <CR>
 " Syntax Setup {{{
 
 autocmd BufRead,BufNewFile *.txt setfiletype text
+autocmd BufRead,BufNewFile *.md setfiletype markdown
 autocmd FileType text set wrap
 "autocmd FileType cpp set makeprg=clang\ -g\ %\ -o\ %<.out
 
@@ -216,8 +217,8 @@ iabbrev YTS <C-R>=Timestamp()<CR>
 " copy and paste to global clipboard using leader key
 "nnoremap <Leader>v "+p
 "vnoremap <Leader>v "+p
-nnoremap <Leader>v ,tp"+p,tp
-vnoremap <Leader>v ,tp"+p,tp
+nnoremap <Leader>v <Leader>tp"+p<Leader>tp
+vnoremap <Leader>v <Leader>tp"+p<Leader>tp
 nnoremap <Leader>c "+yy
 vnoremap <Leader>c "+y
 vnoremap <Leader>x "+d
