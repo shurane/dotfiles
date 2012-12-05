@@ -24,7 +24,7 @@ for num, window_num in enumerate(window_nums):
         old_to_new[window_num] = num
 
 for key,val in old_to_new.iteritems():
-    print("tmux move-window -s %s -t %s" % (key,val))
+    #print("tmux move-window -s %s -t %s" % (key,val))
     output = check_output(["tmux", "move-window"
         ,"-s", str(key), "-t", str(val)], stderr=STDOUT)
     if len(output) > 0:
