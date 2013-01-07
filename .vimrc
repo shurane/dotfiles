@@ -266,7 +266,17 @@ let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git
 let g:vim_addon_manager.plugin_sources['surround'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-surround.git'}
 let g:vim_addon_manager.plugin_sources['repeat'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-repeat.git'}
 let g:vim_addon_manager.plugin_sources['yankstack'] = {'type': 'git', 'url': 'git://github.com/maxbrunsfeld/vim-yankstack.git'}
-let g:addons = [ 'nerd_commenter', 'surround', 'repeat', 'Gundo', 'taglist', 'fugitive', 'FuzzyFinder', 'yankstack' ] 
+let g:addons = [ 'nerd_commenter'
+            \  , 'surround'
+            \  , 'repeat'
+            \  , 'Gundo'
+            \  , 'taglist'
+            \  , 'fugitive'
+            \  , 'FuzzyFinder'
+            \  , 'yankstack' 
+            \  , 'Gist'
+            \  , 'ctrlp'
+            \  , 'WebAPI' ]
 "others: pylint, pyflakes2441, nerdtree
 
 call vam#ActivateAddons(addons)
@@ -289,17 +299,18 @@ nnoremap <Leader>dd :TlistToggle<CR>
 "nnoremap <Leader>dd :TlistOpen<CR>
 "nnoremap <Leader>dc :TlistClose<CR>
 
-
 " idea for <Leader>do: Tlist_Show_One_File toggle
 " change this so it only opens a new split if there is a tag for the word
 "nnoremap <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
+
+"let g:ctrlp_user_command = 'find %s -type f'
 
 " shortcuts for Gundo
 nnoremap <Leader>gg :GundoToggle<CR>
 
 " shortcuts for FuzzyFinder
-nnoremap <Leader>f :FufFileWithCurrentBufferDir<CR>
-nnoremap <Leader>b :FufBuffer<CR>
+"nnoremap <Leader>f :FufFileWithCurrentBufferDir<CR>
+"nnoremap <Leader>b :FufBuffer<CR>
 
 " unmappings from various plugins
 silent! nunmap \tt
@@ -313,6 +324,7 @@ silent! nunmap dd
     " cscope setup
     " language-specific addons only turned on when dealing with said language
     " error formats for makeprg would be great for C++
+    " cleanup extensions to only ones that I use, like nerdcommenter
     " figure out this vimscript:
 
     "if filereadable('$HOME/.vim/colors/wombat256mod.vim')
