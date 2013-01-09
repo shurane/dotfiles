@@ -132,22 +132,22 @@ function! Timestamp()
 endfunction
 
 " Tmux integration
-function! TmuxWindowMotion(dir)
-    let dict = {
-               \'h' : '-L',
-               \'j' : '-D',
-               \'k' : '-U',
-               \'l' : '-R'
-               \}
+"function! TmuxWindowMotion(dir)
+    "let dict = {
+               "\'h' : '-L',
+               "\'j' : '-D',
+               "\'k' : '-U',
+               "\'l' : '-R'
+               "\}
 
-    let old_winnr = winnr()
-    execute 'wincmd ' . a:dir
-    if old_winnr != winnr()
-        return
-    endif
+    "let old_winnr = winnr()
+    "execute 'wincmd ' . a:dir
+    "if old_winnr != winnr()
+        "return
+    "endif
 
-    call system('tmux select-pane ' . dict[a:dir])
-endfunction
+    "call system('tmux select-pane ' . dict[a:dir])
+"endfunction
 
 " VAM for plugin management -- consider moving to gmarik/vundle -- seems easier
 " after setting this up
@@ -246,10 +246,14 @@ nnoremap <Leader>tb :set scrollbind!<CR>
 "nnoremap <Leader>tc :setlocal invspell spellang=en_us<CR>
 
 " shortcuts for tmux integration
-nnoremap <silent> <C-w>h :call TmuxWindowMotion('h')<CR>
-nnoremap <silent> <C-w>j :call TmuxWindowMotion('j')<CR>
-nnoremap <silent> <C-w>k :call TmuxWindowMotion('k')<CR>
-nnoremap <silent> <C-w>l :call TmuxWindowMotion('l')<CR>
+"nnoremap <silent> <C-w>h :call TmuxWindowMotion('h')<CR>
+"nnoremap <silent> <C-w>l :call TmuxWindowMotion('l')<CR>
+"nnoremap <silent> <C-w>j :call TmuxWindowMotion('j')<CR>
+"nnoremap <silent> <C-w>k :call TmuxWindowMotion('k')<CR>
+nnoremap <silent> <C-w>j :wincmd w<CR>
+nnoremap <silent> <C-w>k :wincmd W<CR>
+nnoremap <silent> <C-w><C-j> :wincmd w<CR>
+nnoremap <silent> <C-w><C-k> :wincmd W<CR>
 
 " }}}
 

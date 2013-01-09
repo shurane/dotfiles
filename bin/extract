@@ -2,20 +2,21 @@
 
 # extract ##########################################
 extract () {
-    if [ -f "$1" ]; then
+    if [[ -f "$1" ]]; then
+        exit 1
         case "$1" in
             *.tar.bz2)   tar xjf "$@" --directory "$PWD";;
             *.tar.gz)    tar xzf "$@" --directory "$PWD";;
             *.bz2)       bunzip2 "$@";;
-            *.rar)       unrar e "$@";;
-            *.cbr)       unrar e "$@";;
             *.gz)        gunzip "$@";;
             *.tar)       tar xf "$@";;
-            *.tbz2)      tar xjf "$@"; --directory "$PWD";
-            *.tgz)       tar xzf "$@"; --directory "$PWD";
-            *.zip)       unzip "$@";;
+            *.tbz2)      tar xjf "$@"; --directory "$PWD";;
+            *.tgz)       tar xzf "$@"; --directory "$PWD";;
             *.cbz)       unzip "$@";;
             *.Z)         uncompress "$@";;
+            *.zip)       7z x "$@";;
+            *.rar)       7z x "$@";;
+            *.cbr)       7z x "$@";;
             *.7z)        7z x "$@";;
             *)           echo "'"$1"' cannot be extracted via extract()" ;;
         esac
