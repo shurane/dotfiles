@@ -26,7 +26,6 @@ export CCACHE_DIR="$HOME/.ccache"
 #export ECLIPSE_HOME="~/cs/eclipse"
 export XDG_DATA_HOME="$HOME/.local/share"
 export WORKON_HOME="$HOME/projects/python_envs"
-
 export PATH=$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
 # make less more friendly for non-text input files, see lesspipe(1)
@@ -69,6 +68,10 @@ esac
 
 # Setting up extra commands if they exist.
 # ====
+
+## for ARCH_LINUX
+#[[ $(lsb_release --id --short) = "archlinux" ]] && export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python2
+
 # TODO this should be cleaned up somehow..., so many extra commands
 #command -v "virtualenvwrapper.sh" >/dev/null && source $(which virtualenvwrapper.sh)
 #command -v "pip" >/dev/null && eval "$(pip completion --bash)"
