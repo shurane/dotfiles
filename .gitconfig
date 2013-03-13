@@ -2,10 +2,11 @@
 	name = Ehtesh Choudhury
 	email = merlockmagus@gmail.com
 [color]
-    diff=always
-    ui=always
+    diff=auto
+    ui=auto
 [core]
 	autocrlf = input
+	preloadindex = true
 [alias]
     hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short 
 
@@ -15,5 +16,3 @@
 ; git stash show -p                 ; shows the stashed version against HEAD
 ; git show branch:file.py           ; show file from other branch
 ; git difftool branch1:file.py branch2:file.py
-[github]
-	user = shurane
