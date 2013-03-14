@@ -27,6 +27,7 @@ set showcmd                 " display incomplete command
 set cmdheight=1             " set command bar height
 set vb t_vb=""              " Turn visual bell off
 set mouse=a                 " use the mouse in console vim
+set mousehide
 
 set splitright              " vertical splits split to the right (instead of left)
 set clipboard+=unnamed      " yanks go onto the global clipboard as well -- this might make a mapping unnecessary
@@ -270,16 +271,21 @@ let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git
 let g:vim_addon_manager.plugin_sources['surround'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-surround.git'}
 let g:vim_addon_manager.plugin_sources['repeat'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-repeat.git'}
 let g:vim_addon_manager.plugin_sources['yankstack'] = {'type': 'git', 'url': 'git://github.com/maxbrunsfeld/vim-yankstack.git'}
+let g:vim_addon_manager.plugin_sources['eclim'] = {'type': 'git', 'url': 'git://github.com/ervandew/eclim.git'}
+let g:vim_addon_manager.plugin_sources['zencoding-vim'] = {'type': 'git', 'url': 'git://github.com/mattn/zencoding-vim.git'}
+let g:vim_addon_manager.plugin_sources['xmledit'] = {'type': 'git', 'url': 'https://github.com/sukima/xmledit.git'}
+let g:vim_addon_manager.plugin_sources['mustache'] = {'type': 'git', 'url': 'https://github.com/juvenn/mustache.vim.git'}
 let g:addons = [ 'nerd_commenter'
             \  , 'surround'
             \  , 'repeat'
             \  , 'Gundo'
-            \  , 'taglist'
             \  , 'fugitive'
-            \  , 'FuzzyFinder'
             \  , 'yankstack' 
+            \  , 'xmledit' 
             \  , 'Gist'
             \  , 'ctrlp'
+            \  , 'matchit.zip'
+            \  , 'mustache'
             \  , 'WebAPI' ]
 "others: pylint, pyflakes2441, nerdtree
 
@@ -312,9 +318,14 @@ nnoremap <Leader>dd :TlistToggle<CR>
 " shortcuts for Gundo
 nnoremap <Leader>gg :GundoToggle<CR>
 
-" shortcuts for FuzzyFinder
-"nnoremap <Leader>f :FufFileWithCurrentBufferDir<CR>
-"nnoremap <Leader>b :FufBuffer<CR>
+" CtrlP is pretty hawsome
+let g:ctrlp_user_command = {
+    \ 'types': {
+        \ 1: ['.git', 'cd %s && git ls-files'],
+        \ 2: ['.hg', 'hg --cwd %s locate -I .'],
+        \ },
+    \ 'fallback': 'find %s -type f'
+    \ }
 
 " unmappings from various plugins
 silent! nunmap \tt

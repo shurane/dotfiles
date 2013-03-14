@@ -26,6 +26,7 @@ export CCACHE_DIR="$HOME/.ccache"
 #export ECLIPSE_HOME="~/cs/eclipse"
 export XDG_DATA_HOME="$HOME/.local/share"
 export WORKON_HOME="$HOME/projects/python_envs"
+export CLOJURESCRIPT_HOME="$HOME/projects-vanilla/clojurescript/script"
 export PATH=$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
 # make less more friendly for non-text input files, see lesspipe(1)
@@ -78,9 +79,9 @@ esac
 
 # fasd setup and aliases
 eval "$(fasd --init auto)"
-alias v='f -t -e vim -b viminfo'
-alias m='f -e mplayer' # quick opening files with mplayer
-alias o='a -e xdg-open' # quick opening files with xdg-open
+#alias v='f -t -e vim -b viminfo'
+#alias m='f -e mplayer' # quick opening files with mplayer
+#alias o='a -e xdg-open' # quick opening files with xdg-open
 
 [[ -s "$HOME/.bash_aliases" ]] && source "$HOME/.bash_aliases"
 
