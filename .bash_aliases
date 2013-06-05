@@ -25,6 +25,7 @@ alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias ......="cd ../../../../.."
 
+alias reds="redshift -l 40.85:-73.88 -m vidmode -r -t 3600:3600 &"
 alias a="ack"
 #this is for ubuntu, where ack is installed as 'ack-grep'
 if command -v "ack-grep" 2>&1 >/dev/null; then
@@ -32,7 +33,6 @@ if command -v "ack-grep" 2>&1 >/dev/null; then
 fi
 
 alias v="vim"
-#sd = sizedir
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
 alias ll="ls --human-readable --group-directories-first --sort=extension --color=auto --almost-all --format=long"
 alias tmux="tmux -2"
