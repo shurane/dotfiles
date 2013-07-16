@@ -39,3 +39,4 @@ alias tmux="tmux -2"
 alias less="less -R"
 alias t='python ~/bin/t --task-dir ~/Dropbox/tasks --list tasks'
 alias task='python ~/bin/t'
+alias chrome="google-chrome"

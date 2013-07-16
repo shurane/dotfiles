@@ -18,6 +18,9 @@ set noundofile              " no thank you, persistent_undo
 set nolist
 set nospell
 
+command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis
+ 	\ | wincmd p | diffthis
+
 " z(l/r) is less/reduce folds, zm is more folds
 " z(j/k) navigates between next/prev fold
 " to not throw me off with scrolling, which is what z(h/l) did originally

@@ -7,7 +7,7 @@ HISTFILESIZE=200000
 shopt -s histappend                 # append to the history file, don't overwrite it
 # Save and reload the history after each command finishes
 # taken from http://stackoverflow.com/a/3055135/198348
-#export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 #export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 shopt -s checkwinsize               # update the values of LINES and COLUMNS after each command
 
@@ -74,8 +74,8 @@ esac
 #[[ $(lsb_release --id --short) = "archlinux" ]] && export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python2
 
 # TODO this should be cleaned up somehow..., so many extra commands
-#command -v "virtualenvwrapper.sh" >/dev/null && source $(which virtualenvwrapper.sh)
-#command -v "pip" >/dev/null && eval "$(pip completion --bash)"
+command -v "virtualenvwrapper.sh" >/dev/null && source $(which virtualenvwrapper.sh)
+command -v "pip" >/dev/null && eval "$(pip completion --bash)"
 
 # fasd setup and aliases
 eval "$(fasd --init auto)"
@@ -88,8 +88,11 @@ eval "$(fasd --init auto)"
 ## bash completions are sloooow.
 #[[ -s "/usr/share/bash-completion/bash_completion" ]] && source "/usr/share/bash-completion/bash_completion"
 #[[ -s "/etc/bash_completion" ]] && source "/etc/bash_completion"
-#[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 #[[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
+[[ -s $HOME/.rvm/scripts/rvm ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+[[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh # This loads NVM
+[[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
+#PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 
 # Mac OS X
 if command -v "brew" >/dev/null; then
@@ -102,3 +105,4 @@ if [[ $(lsb_release --id --short) = "Ubuntu" ]] && [[ -s "$JAVA_6/bin/java" ]]; 
     export JAVA_HOME="$JAVA_6"
     export ANDROID_JAVA_HOME="$JAVA_6"
 fi
+
