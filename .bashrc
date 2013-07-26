@@ -27,7 +27,8 @@ export CCACHE_DIR="$HOME/.ccache"
 export XDG_DATA_HOME="$HOME/.local/share"
 export WORKON_HOME="$HOME/projects/python_envs"
 export CLOJURESCRIPT_HOME="$HOME/projects-vanilla/clojurescript/script"
-export PATH=$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+export VENDOR_PERL="/usr/bin/vendor_perl"
+export PATH=$HOME/bin:$VENDOR_PERL:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
