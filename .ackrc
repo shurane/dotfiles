@@ -1,4 +1,2 @@
 --ignore-case
---all-types
---nobinary
 #--pager=less -R
