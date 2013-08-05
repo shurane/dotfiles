@@ -1,7 +1,35 @@
+set nocompatible               " be iMproved
+
+filetype off                   " required!
+
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+
+" let Vundle manage Vundle
+" required!
+Bundle 'gmarik/vundle'
+
+" My Bundles here:
+"
+" original repos on github
+Bundle 'scrooloose/nerdcommenter'
+Bundle 'scrooloose/nerdtree'
+Bundle 'scrooloose/syntastic'
+Bundle 'tpope/vim-fugitive'
+Bundle 'mileszs/ack.vim'
+Bundle 'michalbachowski/vim-wombat256mod'
+Bundle 'kien/ctrlp.vim'
+Bundle 'vim-scripts/matchit.zip'
+" vim-scripts repos
+Bundle 'L9'
+" non github repos
+
+filetype plugin indent on     " required!
+syntax enable
+
 " Vim Settings {{{
 
-set nocompatible            " ignore vi-compatibility
-
+colorscheme wombat256mod
 set history=10000           " keep n lines of history
 set bs=2                    " set backspace to wrap around to previous line
 set whichwrap=~,[,]         " Wrap around lines with ~, left-arrow key, and right-arrow key
@@ -9,13 +37,7 @@ set number                  " enable line numbering
 set numberwidth=5           " set line numbering to take up 5 lines
 set cursorline              " highlights current line
 
-" set highlight mode to bold
-highlight CursorLine cterm=bold
-" set background of listchars to brown
-"highlight SpecialKey ctermbg=brown
-
-set t_Co=256                " sets Vim to use 256 terminal colors
-colorscheme wombat256mod    " nice dark theme
+"set t_Co=256                " colors!
 set ruler                   " show the cursor position all the time
 set nowrap                  " don't wrap long lines
 set showbreak=>\ \ \        " for wrapped lines
@@ -66,35 +88,11 @@ set expandtab               " turn tabs into whitespace
 set softtabstop=4           " n spaces are treated as tabs
 set shiftwidth=4            " indent width for autoindent
 "set foldmethod=marker      " for explicit folds
-filetype indent on          " indent depends on filetype
-filetype plugin on          " enable plugins
-syntax enable               " Syntax highlighting
-
-"if has('persistent_undo')
-    "set undofile            " Enable persistent undo
-    "set undodir=~/.vim/undo " Store undofiles in a tmp dir
-"endif
 
 set cpoptions=yraABceFq
 set formatoptions+=tcq
 " this formatoption isn't working, it seems
 set formatoptions-=r        " don't insert comment after <CR>
-
-" }}}
-
-" Syntax Setup {{{
-
-autocmd BufRead,BufNewFile *.txt setfiletype text
-autocmd BufRead,BufNewFile *.md setfiletype markdown
-autocmd FileType text set wrap
-"autocmd FileType cpp set makeprg=clang\ -g\ %\ -o\ %<.out
-
-highlight SpellBad term=underline gui=undercurl guisp=Orange 
-autocmd FileType python set makeprg=pylint\ --reports=n\ --output-format=parseable\ %:p
-autocmd FileType python set errorformat=%f:%l:\ %m
-
-let python_highlight_all=1
-"set tags+=tags
 
 " }}}
 
@@ -128,54 +126,11 @@ function! ToggleDiff()
     endif
 endfunction
 
-function! Timestamp()
-    return "Last Modified: " . strftime("%d %b %Y %X")
-endfunction
-
-" Tmux integration
-"function! TmuxWindowMotion(dir)
-    "let dict = {
-               "\'h' : '-L',
-               "\'j' : '-D',
-               "\'k' : '-U',
-               "\'l' : '-R'
-               "\}
-
-    "let old_winnr = winnr()
-    "execute 'wincmd ' . a:dir
-    "if old_winnr != winnr()
-        "return
-    "endif
-
-    "call system('tmux select-pane ' . dict[a:dir])
-"endfunction
-
-" VAM for plugin management -- consider moving to gmarik/vundle -- seems easier
-" after setting this up
-function! ActivateVAM()
-    let addons_base = expand('$HOME') . '/vim-addons'
-    let addons_manager = addons_base . '/vim-addon-manager'
-    execute 'set runtimepath+=' . addons_manager
-
-    if finddir(addons_base, '') == ''
-        call mkdir(addons_base, '')
-    endif
-    if finddir(addons_manager) == ''
-        execute 'cd ' . addons_base
-        execute '!git clone git://github.com/MarcWeber/vim-addon-manager.git'
-    endif
-endfunction
-
-
 " }}}
 
 " Vim Maps {{{
 
 let mapleader = ","
-
-" swap keys TODO what is this?
-nnoremap ' `
-nnoremap ` '
 
 " save a file as root
 " quit without confirmation
@@ -227,7 +182,6 @@ vnoremap <Leader>x "+d
 " do :ls before switching buffers
 "nnoremap <Leader>b :ls<CR>:b
 
-
 " split vertically and horizontally
 " C-w s/v already exist for these two cases
 "nnoremap <Leader>v :vsplit<CR>
@@ -245,78 +199,9 @@ nnoremap <C-l> :set hlsearch!<CR>
 nnoremap <Leader>tb :set scrollbind!<CR>
 " TODO kind of incomplete?
 "nnoremap <Leader>tc :setlocal invspell spellang=en_us<CR>
-
-" shortcuts for tmux integration
-"nnoremap <silent> <C-w>h :call TmuxWindowMotion('h')<CR>
-"nnoremap <silent> <C-w>l :call TmuxWindowMotion('l')<CR>
-"nnoremap <silent> <C-w>j :call TmuxWindowMotion('j')<CR>
-"nnoremap <silent> <C-w>k :call TmuxWindowMotion('k')<CR>
-nnoremap <silent> <C-w>j :wincmd w<CR>
-nnoremap <silent> <C-w>k :wincmd W<CR>
-nnoremap <silent> <C-w><C-j> :wincmd w<CR>
-nnoremap <silent> <C-w><C-k> :wincmd W<CR>
-
-" }}}
-
-" Plugin Setup {{{
-
-" lots of ideas from talek
-
-call ActivateVAM()
-
-let g:vim_addon_manager = {'known_repos_activation_policy' : 'autoload', 'auto_install' : 1}
-let g:vim_addon_manager.plugin_sources = {}
-let g:vim_addon_manager.plugin_sources['nerd_commenter'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdcommenter.git'}
-let g:vim_addon_manager.plugin_sources['nerdtree'] = {'type': 'git', 'url': 'git://github.com/scrooloose/nerdtree.git'}
-let g:vim_addon_manager.plugin_sources['surround'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-surround.git'}
-let g:vim_addon_manager.plugin_sources['repeat'] = {'type': 'git', 'url': 'git://github.com/tpope/vim-repeat.git'}
-let g:vim_addon_manager.plugin_sources['yankstack'] = {'type': 'git', 'url': 'git://github.com/maxbrunsfeld/vim-yankstack.git'}
-let g:vim_addon_manager.plugin_sources['eclim'] = {'type': 'git', 'url': 'git://github.com/ervandew/eclim.git'}
-let g:vim_addon_manager.plugin_sources['zencoding-vim'] = {'type': 'git', 'url': 'git://github.com/mattn/zencoding-vim.git'}
-let g:vim_addon_manager.plugin_sources['xmledit'] = {'type': 'git', 'url': 'https://github.com/sukima/xmledit.git'}
-let g:vim_addon_manager.plugin_sources['mustache'] = {'type': 'git', 'url': 'https://github.com/juvenn/mustache.vim.git'}
-let g:addons = [ 'nerd_commenter'
-            \  , 'surround'
-            \  , 'repeat'
-            \  , 'Gundo'
-            \  , 'fugitive'
-            \  , 'yankstack' 
-            \  , 'xmledit' 
-            \  , 'Gist'
-            \  , 'ctrlp'
-            \  , 'matchit.zip'
-            \  , 'mustache'
-            \  , 'WebAPI' ]
-"others: pylint, pyflakes2441, nerdtree
-
-call vam#ActivateAddons(addons)
-
 " }}}
 
 " Plugin Maps {{{
-
-" shortcuts for NERDTree
-let NERDTreeMapActivateNode='<CR>'
-nnoremap <Leader>tt :NERDTreeToggle<CR>
-
-" shortcuts for Taglist and Tags in general
-"let Tlist_Ctags_Cmd = "ctags"
-let Tlist_GainFocus_On_ToggleOpen = 1
-let Tlist_Exit_OnlyWindow = 1
-nnoremap <Leader>dr :!ctags --recurse --fields=+iaS --extra=+q .<CR>
-nnoremap <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
-nnoremap <Leader>dd :TlistToggle<CR>
-"nnoremap <Leader>dd :TlistOpen<CR>
-"nnoremap <Leader>dc :TlistClose<CR>
-
-" idea for <Leader>do: Tlist_Show_One_File toggle
-" change this so it only opens a new split if there is a tag for the word
-"nnoremap <A-]> :vsp <CR>:exec("tag ".expand("<cword>"))<CR>
-
-"let g:ctrlp_user_command = 'find %s -type f'
-
-" shortcuts for Gundo
-nnoremap <Leader>gg :GundoToggle<CR>
 
 " CtrlP is pretty hawsome
 let g:ctrlp_user_command = {
@@ -327,33 +212,5 @@ let g:ctrlp_user_command = {
     \ 'fallback': 'find %s -type f'
     \ }
 
-" unmappings from various plugins
-silent! nunmap \tt
-silent! nunmap dd
-
 " }}}
-
-" TODO List {{{
-    " Fix up mappings, definitely
-    " determine if switch between VAM and vundle is necessary
-    " cscope setup
-    " language-specific addons only turned on when dealing with said language
-    " error formats for makeprg would be great for C++
-    " cleanup extensions to only ones that I use, like nerdcommenter
-    " figure out this vimscript:
-
-    "if filereadable('$HOME/.vim/colors/wombat256mod.vim')
-    "echo 'setting theme'
-    "colorscheme wombat256mod
-    "endif
-
-    "let g:colorscheme_exists = system('[[ -f \"$HOME/.vim/colors/wombat256mod.vim\" ]]')
-    "if g:colorscheme_wombat256mod == 0
-    "echo 'hello'
-    "endif
-
-" }}}
-
-
 " vim:fdm=marker:fdl=1
-"
