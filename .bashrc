@@ -28,7 +28,19 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export WORKON_HOME="$HOME/projects/python_envs"
 export CLOJURESCRIPT_HOME="$HOME/projects-vanilla/clojurescript/script"
 export VENDOR_PERL="/usr/bin/vendor_perl"
-export PATH=$HOME/bin:$VENDOR_PERL:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+
+PATHS_TO_ADD=( 
+               "$HOME/bin"
+               "$VENDOR_PERL"
+               "/usr/local/sbin"
+               "/usr/local/bin"
+               "/usr/sbin"
+               "/usr/bin"
+               "/bin"
+             )
+http://stackoverflow.com/a/5905019/198348
+export PATH=$(set -- ${PATHS_TO_ADD[@]}; IFS=:; echo "$*")
+
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
