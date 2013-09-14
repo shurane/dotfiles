@@ -38,9 +38,11 @@ PATHS_TO_ADD=(
                "/usr/bin"
                "/bin"
              )
+
+[[ -n "$JAVA_HOME" ]] && PATHS_TO_ADD+=("$JAVA_HOME/bin")
+
 # http://stackoverflow.com/a/5905019/198348
 export PATH=$(set -- ${PATHS_TO_ADD[@]}; IFS=:; echo "$*")
-
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
