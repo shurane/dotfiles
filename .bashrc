@@ -38,7 +38,7 @@ PATHS_TO_ADD=(
                "/usr/bin"
                "/bin"
              )
-http://stackoverflow.com/a/5905019/198348
+# http://stackoverflow.com/a/5905019/198348
 export PATH=$(set -- ${PATHS_TO_ADD[@]}; IFS=:; echo "$*")
 
 
