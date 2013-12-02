@@ -7,8 +7,7 @@ HISTFILESIZE=200000
 shopt -s histappend                 # append to the history file, don't overwrite it
 # Save and reload the history after each command finishes
 # taken from http://stackoverflow.com/a/3055135/198348
-export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
-#export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+#export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 shopt -s checkwinsize               # update the values of LINES and COLUMNS after each command
 
 # break on '-' and '/' for 'C-w' properly! look at .inputrc for backward-kill-word
@@ -25,13 +24,15 @@ export USE_CCACHE=1
 export CCACHE_DIR="$HOME/.ccache"
 #export ECLIPSE_HOME="~/cs/eclipse"
 export XDG_DATA_HOME="$HOME/.local/share"
-export WORKON_HOME="$HOME/projects/python_envs"
-export CLOJURESCRIPT_HOME="$HOME/projects-vanilla/clojurescript/script"
-export VENDOR_PERL="/usr/bin/vendor_perl"
+
+               #"$HOME/.pyenv/bin"
+               #"$HOME/.rbenv/bin"
 
 PATHS_TO_ADD=( 
                "$HOME/bin"
-               "$VENDOR_PERL"
+               "/usr/bin/site_perl"
+               "/usr/bin/vendor_perl"
+               "/usr/bin/core_perl"
                "/usr/local/sbin"
                "/usr/local/bin"
                "/usr/sbin"
@@ -85,13 +86,6 @@ esac
 # Setting up extra commands if they exist.
 # ====
 
-## for ARCH_LINUX
-#[[ $(lsb_release --id --short) = "archlinux" ]] && export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python2
-
-# TODO this should be cleaned up somehow..., so many extra commands
-command -v "virtualenvwrapper.sh" >/dev/null && source $(which virtualenvwrapper.sh)
-command -v "pip" >/dev/null && eval "$(pip completion --bash)"
-
 # fasd setup and aliases
 eval "$(fasd --init auto)"
 #alias v='f -t -e vim -b viminfo'
@@ -99,25 +93,15 @@ eval "$(fasd --init auto)"
 #alias o='a -e xdg-open' # quick opening files with xdg-open
 
 [[ -s "$HOME/.bash_aliases" ]] && source "$HOME/.bash_aliases"
-
 ## bash completions are sloooow.
 #[[ -s "/usr/share/bash-completion/bash_completion" ]] && source "/usr/share/bash-completion/bash_completion"
 #[[ -s "/etc/bash_completion" ]] && source "/etc/bash_completion"
 #[[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
-[[ -s $HOME/.rvm/scripts/rvm ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 [[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh # This loads NVM
 [[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
-#PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
-
-# Mac OS X
-if command -v "brew" >/dev/null; then
-    true
-fi
-
-# Ubuntu 
-if [[ $(lsb_release --id --short) = "Ubuntu" ]] && [[ -s "$JAVA_6/bin/java" ]]; then
-    JAVA_6="/usr/lib/jvm/java-6-sun"
-    export JAVA_HOME="$JAVA_6"
-    export ANDROID_JAVA_HOME="$JAVA_6"
-fi
-
+#eval "$(pyenv init -)"
+#eval "$(rbenv init -)"
+#eval $(ssh-agent)
+VIRTUALENVWRAPPER_PYTHON=/usr/sbin/python2 source virtualenvwrapper.sh
+workon scratch
+nvm use 0.10.21
