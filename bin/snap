@@ -1,0 +1,31 @@
+#!/usr/bin/bash
+#http://www.commandlinefu.com/commands/view/4772/get-current-xorg-resolution-via-xrandr
+#RESOLUTION=$(xrandr -q | awk -F'current' -F',' 'NR==1 {gsub("( |current)","");print $2}')
+# http://stackoverflow.com/a/5257398
+#ARRAY_RES=(${RESOLUTION//x/ })
+#WIDTH=${ARRAY_RES[0]}
+#HEIGHT=${ARRAY_RES[1]}
+
+# more info on https://gist.github.com/shurane/7572710
+
+# ah, but the height is cut off a little bit, as shown by maximized windows
+# may be a better way to grab the info?
+WIDTH=1280
+HEIGHT=800
+HEIGHT=$((HEIGHT - 41))
+
+# originally taken from http://th0th.me/log/aero-snap-feature-for-gnulinux-with-wmctrl/
+
+case $1 in
+    left)
+        wmctrl -r :ACTIVE: -b remove,maximized_vert,maximized_horz
+        wmctrl -r :ACTIVE: -e 1,0,0,$((WIDTH / 2)),$((HEIGHT))
+        ;;
+    right)
+        wmctrl -r :ACTIVE: -b remove,maximized_vert,maximized_horz
+        wmctrl -r :ACTIVE: -e 0,$((WIDTH / 2)),0,$((WIDTH / 2)),$((HEIGHT))
+        ;;
+    max*)
+        wmctrl -r :ACTIVE: -b add,maximized_vert,maximized_horz
+        ;;
+esac
