@@ -21,15 +21,13 @@ export PAGER="less"
 export EDITOR="vim"
 export LESS="-R"
 export USE_CCACHE=1
+export WORKON_HOME="$HOME/.virtualenvs"
 export CCACHE_DIR="$HOME/.ccache"
-#export ECLIPSE_HOME="~/cs/eclipse"
-export XDG_DATA_HOME="$HOME/.local/share"
-
-               #"$HOME/.pyenv/bin"
-               #"$HOME/.rbenv/bin"
 
 PATHS_TO_ADD=( 
                "$HOME/bin"
+               #"$HOME/.pyenv/bin"
+               #"$HOME/.rbenv/bin"
                "/usr/bin/site_perl"
                "/usr/bin/vendor_perl"
                "/usr/bin/core_perl"
@@ -86,6 +84,12 @@ esac
 # Setting up extra commands if they exist.
 # ====
 
+## for ARCH_LINUX
+[[ $(lsb_release --id --short) = "Arch" ]] && export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python2
+# TODO this should be cleaned up somehow..., so many extra commands
+command -v "virtualenvwrapper_lazy.sh" >/dev/null && source $(which virtualenvwrapper_lazy.sh)
+command -v "pip" >/dev/null && eval "$(pip completion --bash)"
+
 # fasd setup and aliases
 eval "$(fasd --init auto)"
 #alias v='f -t -e vim -b viminfo'
@@ -102,6 +106,5 @@ eval "$(fasd --init auto)"
 #eval "$(pyenv init -)"
 #eval "$(rbenv init -)"
 #eval $(ssh-agent)
-VIRTUALENVWRAPPER_PYTHON=/usr/sbin/python2 source virtualenvwrapper.sh
 workon scratch
 nvm use 0.10.21
