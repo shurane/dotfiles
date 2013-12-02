@@ -16,12 +16,15 @@ Bundle 'scrooloose/nerdcommenter'
 Bundle 'scrooloose/nerdtree'
 Bundle 'scrooloose/syntastic'
 Bundle 'tpope/vim-fugitive'
+Bundle 'tpope/vim-markdown'
 Bundle 'mileszs/ack.vim'
 Bundle 'michalbachowski/vim-wombat256mod'
 Bundle 'kien/ctrlp.vim'
 Bundle 'vim-scripts/matchit.zip'
+
 " vim-scripts repos
 Bundle 'L9'
+Bundle 'surround.vim'
 " non github repos
 
 filetype plugin indent on     " required!
@@ -94,6 +97,8 @@ set formatoptions+=tcq
 " this formatoption isn't working, it seems
 set formatoptions-=r        " don't insert comment after <CR>
 
+au BufWritePost,BufNewFile,BufRead *.md,*.markdown,*.mdown,*.mkd,*.mkdn set filetype=markdown
+
 " }}}
 
 " Functions {{{
@@ -145,12 +150,17 @@ nnoremap \t :tabedit<CR>
 nnoremap \r :e $MYVIMRC<CR>
 nnoremap <Leader>r :source $MYVIMRC<CR>
 
+nnoremap <C-w>j <C-w>w
+nnoremap <C-w>k <C-w>W
+nnoremap <C-w><C-j> <C-w>w
+nnoremap <C-w><C-k> <C-w>W
+
 " switch back and forth between buffers
 nnoremap `n :bn<CR>
 nnoremap `p :bp<CR>
 " switch back and forth between tabs
-nnoremap <C-n> gt<CR>
-nnoremap <C-p> gT<CR>
+noremap <S-H> gT
+noremap <S-L> gt
 
 " z(l/r) is less/reduce folds, zm is more folds
 " z(j/k) navigates between next/prev fold
@@ -180,7 +190,7 @@ vnoremap <Leader>c "+y
 vnoremap <Leader>x "+d
 
 " do :ls before switching buffers
-"nnoremap <Leader>b :ls<CR>:b
+nnoremap <Leader>b :ls<CR>:b
 
 " split vertically and horizontally
 " C-w s/v already exist for these two cases
@@ -213,4 +223,11 @@ let g:ctrlp_user_command = {
     \ }
 
 " }}}
+
+" TODO {{{
+" http://stackoverflow.com/questions/63104/smarter-vim-recovery
+" or some better recovery method.
+
+" }}}
+
 " vim:fdm=marker:fdl=1
