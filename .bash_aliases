@@ -32,6 +32,7 @@ if command -v "ack-grep" 2>&1 >/dev/null; then
     alias ack="ack-grep"
 fi
 
+alias grep="grep --color=auto --ignore-case"
 alias v="vim"
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
 alias ll="ls --human-readable --group-directories-first --sort=extension --color=auto --almost-all --format=long"
@@ -40,3 +41,6 @@ alias less="less -R"
 alias t='python ~/bin/t --task-dir ~/Dropbox/tasks --list tasks'
 alias task='python ~/bin/t'
 alias chrome="google-chrome"
+alias startx='ssh-agent startx'
+# let's try this out. http://superuser.com/a/333740/45927
+alias ssh='ssh-add -l || ssh-add && ssh'
