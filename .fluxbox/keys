@@ -59,19 +59,21 @@ Mod4 Shift Tab :PrevTab
 
 # open a terminal
 Mod4 t :Exec xterm
+Mod4 d :ToggleDecor
 
 # http://darkshed.net/files/rcs/fluxbox/keys.html
+# reloads
 Control Mod4 Delete       :Reconfigure
 Control Mod4 Shift Delete :Restart
-
+Mod4 m :Maximize
 # open a dialog to run programs
 Mod4 r :Exec dmenu_run -i  -fn 10x20
 
 # volume settings, using common keycodes
 # if these don't work, use xev to find out your real keycodes
-123 :Exec amixer sset Master,0 1+
-122 :Exec amixer sset Master,0 1-
-160 :Exec amixer sset Master,0 toggle
+123 :Exec ponymix increase 3
+122 :Exec ponymix decrease 3
+160 :Exec ponymix toggle
 
 # current window commands
 Mod1 F4 :Close
@@ -86,13 +88,15 @@ Mod1 space :WindowMenu
 # exit fluxbox
 Control Mod1 Delete :Exit
 
-k change to previous/next workspace
+# change to previous/next workspace
 Control Mod1 Left :PrevWorkspace
 Control Mod1 Right :NextWorkspace
+Mod4 Left :Exec snap left
+Mod4 Right :Exec snap right
 
 # send the current window to previous/next workspace
-Mod4 Left :SendToPrevWorkspace
-Mod4 Right :SendToNextWorkspace
+#Control Shift Mod1 Left :SendToPrevWorkspace
+#Control Shift Mod1 Right :SendToNextWorkspace
 
 # send the current window and follow it to previous/next workspace
 Control Mod1 Shift Left :TakeToPrevWorkspace
