@@ -161,6 +161,8 @@ nnoremap `p :bp<CR>
 " switch back and forth between tabs
 noremap <S-H> gT
 noremap <S-L> gt
+noremap j gj
+noremap k gk
 
 " z(l/r) is less/reduce folds, zm is more folds
 " z(j/k) navigates between next/prev fold
