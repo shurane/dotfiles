@@ -41,6 +41,6 @@ alias less="less -R"
 alias t='python ~/bin/t --task-dir ~/Dropbox/tasks --list tasks'
 alias task='python ~/bin/t'
 alias chrome="google-chrome"
-alias startx='ssh-agent startx'
+alias startx='startx'
 # let's try this out. http://superuser.com/a/333740/45927
-alias ssh='ssh-add -l || ssh-add && ssh'
+alias ssh='ssh'

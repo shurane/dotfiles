@@ -1,0 +1,21 @@
+#!/bin/bash
+
+PATHS_TO_ADD=( 
+               "$HOME/bin"
+               #"$HOME/.pyenv/bin"
+               #"$HOME/.rbenv/bin"
+               "$HOME/.cabal/bin"
+               "/usr/bin/site_perl"
+               "/usr/bin/vendor_perl"
+               "/usr/bin/core_perl"
+               "/usr/local/sbin"
+               "/usr/local/bin"
+               "/usr/sbin"
+               "/usr/bin"
+               "/bin"
+             )
+
+[[ -n "$JAVA_HOME" ]] && PATHS_TO_ADD+=("$JAVA_HOME/bin")
+
+# http://stackoverflow.com/a/5905019/198348
+export PATH=$(set -- ${PATHS_TO_ADD[@]}; IFS=:; echo "$*")

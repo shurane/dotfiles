@@ -1,82 +1,28 @@
-autoload -U compinit promptinit colors
-compinit && promptinit && colors
-prompt adam1
-
-export EDITOR=vim
-export HISTSIZE=20000
-RUBYPATH=/var/lib/gems/1.8/bin
-CABALPATH=$HOME/.cabal/bin
-export PATH=$HOME/bin:$CABALPATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
-export HISTFILE=~/.zsh_history
-
-# setup for virtualenvwrapper and pip
-export WORKON_HOME=$HOME/projects/envs
-export PIP_VIRTUALENV_BASE=$WORKON_HOME
-export PIP_RESPECT_VIRTUALENV=true
-
-ulimit -S -n 1024
-
-# Oh-My-Zsh {{{
-#
-# Path to your oh-my-zsh configuration.
-#export ZSH=$HOME/.oh-my-zsh
-# Set name of the theme to load.
-# Look in ~/.oh-my-zsh/themes/
-# Optionally, if you set this to "random", it'll load a random theme each
-# time that oh-my-zsh is loaded.
-#export ZSH_THEME="unt"
-
-export DISABLE_AUTO_UPDATE="true"     # Comment this out to disable weekly auto-update checks
-export DISABLE_AUTO_TITLE="true"        # Uncomment following line if you want to disable autosetting terminal title.
+# Lines configured by zsh-newuser-install
+export HISTFILE=~/.histfile
+export HISTSIZE=100000
+export SAVEHIST=100000
+export PATH=$HOME/bin:$PATH
 export PROMPT="%n@%m:%20<...<%d%<<%% "
+export EDITOR=vim
+# End of lines configured by zsh-newuser-install
+# The following lines were added by compinstall
+zstyle :compinstall filename '/home/ehtesh/.zshrc'
 
-# zsh-syntax highlighting.. maybe
-#ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
-#
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Example format: plugins=(rails git textmate ruby lighthouse)
-#plugins=(git) #zsh-syntax-highlighting)
+source $HOME/.pathrc
 
-#source $ZSH/oh-my-zsh.sh
+autoload -Uz compinit
+compinit
+# End of lines added by compinstall
 
-#}}}
-
-# Prompt, using oh-my-zsh colors {{{
-
-# TODO fix this so it doesn't use oh-my-zsh colors
-function zle-line-init zle-keymap-select {
-    MODE="${${KEYMAP/vicmd/-N-}/(main|viins)/-I-}"
-    #RPS1="%{$fg[cyan]%}%1c %{$reset_color%}$MODE %{$fg_bold[green]%}% $USER@$HOST% %{$reset_color%}"
-    #RPS2=$RPS1
-    zle reset-prompt
-}
-
-zle -N zle-keymap-select
-zle -N zle-line-init
-
-# this stuff is way more confusing than it needs be
-#[ -n "$TMUX" ] && tmux setenv TMUXPWD_$(tmux display -p "#I") $PWD
-#PROMPT='%{$fg_bold[red]%}➜%{$fg_bold[blue]%}$(git_prompt_info)%{$fg_bold[blue]%} %{$reset_color%}'
-#RPROMPT='%{$fg[cyan]%}%1c %{$fg_bold[green]%}% $USER@$HOST% %{$reset_color%}'
-
-
-# Load various files
-# TODO maybe make a function so it's less repetitive?
-
-[[ -f $HOME/.pythonbrew/etc/bashrc ]] && source $HOME/.pythonbrew/etc/bashrc
-[[ -f $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
-[[ -f /etc/profile.d/autojump.zsh ]] && source /etc/profile.d/autojump.zsh
-[[ -f $(brew --prefix)/etc/autojump.zsh ]] && source $(brew --prefix)/etc/autojump.zsh ]]
-[[ -f $HOME/.bash_aliases ]] && source $HOME/.bash_aliases
-#command -v virtualenvwrapper.sh >/dev/null && source virtualenvwrapper.sh #>&/dev/null
-[[ -f $HOME/.bash_aliases ]] && source $HOME/.bash_aliases
-[[ -f /etc/git-completion.bash ]] && source /etc/git-completion.bash
 
 #TODO double check these options?
+unsetopt beep
 setopt autopushd
 setopt pushdignoredups
 setopt histignorealldups
-setopt incappendhistory
+setopt inc_append_history
+setopt share_history
 setopt rmstarwait
 setopt noclobber
 setopt autocontinue
@@ -101,3 +47,29 @@ bindkey -M viins 'b' vi-backward-word
 bindkey -M viins 'f' vi-forward-word
 
 # }}}
+
+# antigen.zsh stuff: https://github.com/zsh-users/antigen
+
+source $HOME/projects-vanilla/antigen/antigen.zsh
+
+antigen use oh-my-zsh
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle zsh-users/zsh-completions src
+antigen bundle git
+#antigen bundle pip
+#antigen bundle lein
+#antigen bundle command-not-found
+#antigen bundle rsync
+antigen bundle python
+#antigen bundle virtualenvwrapper
+#antigen bundle node
+#antigen bundle npm
+#antigen bundle history
+#antigen bundle tmux
+#antigen bundle vundle
+#antigen bundle sprunge
+antigen theme alanpeabody
+
+antigen apply
+
+source ~/.loadrc

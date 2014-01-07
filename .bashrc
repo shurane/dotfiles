@@ -24,51 +24,13 @@ export USE_CCACHE=1
 export WORKON_HOME="$HOME/.virtualenvs"
 export CCACHE_DIR="$HOME/.ccache"
 
-PATHS_TO_ADD=( 
-               "$HOME/bin"
-               #"$HOME/.pyenv/bin"
-               #"$HOME/.rbenv/bin"
-               "/usr/bin/site_perl"
-               "/usr/bin/vendor_perl"
-               "/usr/bin/core_perl"
-               "/usr/local/sbin"
-               "/usr/local/bin"
-               "/usr/sbin"
-               "/usr/bin"
-               "/bin"
-             )
+source $HOME/.pathrc
 
-[[ -n "$JAVA_HOME" ]] && PATHS_TO_ADD+=("$JAVA_HOME/bin")
-
-# http://stackoverflow.com/a/5905019/198348
-export PATH=$(set -- ${PATHS_TO_ADD[@]}; IFS=:; echo "$*")
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
-
-force_color_prompt=yes
-if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-        color_prompt=yes
-    else
-	    color_prompt=
-    fi
-fi
-
-if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-fi
-unset color_prompt force_color_prompt
+PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
 # If this is an xterm set the title to user@host:dir
 # may do wonky things on other terminals, perhaps?
@@ -81,30 +43,4 @@ case "$TERM" in
         ;;
 esac
 
-# Setting up extra commands if they exist.
-# ====
-
-## for ARCH_LINUX
-[[ $(lsb_release --id --short) = "Arch" ]] && export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python2
-# TODO this should be cleaned up somehow..., so many extra commands
-command -v "virtualenvwrapper_lazy.sh" >/dev/null && source $(which virtualenvwrapper_lazy.sh)
-command -v "pip" >/dev/null && eval "$(pip completion --bash)"
-
-# fasd setup and aliases
-eval "$(fasd --init auto)"
-#alias v='f -t -e vim -b viminfo'
-#alias m='f -e mplayer' # quick opening files with mplayer
-#alias o='a -e xdg-open' # quick opening files with xdg-open
-
-[[ -s "$HOME/.bash_aliases" ]] && source "$HOME/.bash_aliases"
-## bash completions are sloooow.
-#[[ -s "/usr/share/bash-completion/bash_completion" ]] && source "/usr/share/bash-completion/bash_completion"
-#[[ -s "/etc/bash_completion" ]] && source "/etc/bash_completion"
-#[[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
-[[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh # This loads NVM
-[[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
-#eval "$(pyenv init -)"
-#eval "$(rbenv init -)"
-#eval $(ssh-agent)
-workon scratch
-nvm use 0.10.21
+source ~/.loadrc
