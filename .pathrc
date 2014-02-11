@@ -12,6 +12,7 @@ PATHS_TO_ADD=(
                "/usr/local/bin"
                "/usr/sbin"
                "/usr/bin"
+               "/sbin"
                "/bin"
              )
 
