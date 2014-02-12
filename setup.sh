@@ -10,7 +10,12 @@ sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
 
 (
     cd $HOME/projects-vanilla/
-    git clone https://github.com/clvv/fasd.git
+
+    ( #fasd
+        git clone https://github.com/clvv/fasd.git
+        cd fasd
+        PREFIX=$HOME make install
+    )
 
     ( #java, clojure, maven, leiningen
         git clone https://github.com/technomancy/leiningen.git
@@ -34,6 +39,7 @@ sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
         nvm use 0.10
         npm install -g http-server underscore-cli bower supervisor
     )
+
 )
 
 ( #dotfiles
