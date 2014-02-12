@@ -21,14 +21,17 @@ sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
         git clone https://github.com/zsh-users/zsh.git
         git clone https://github.com/zsh-users/antigen.git
         cd zsh
-        git checkout tags/5.0.5
+        git checkout tags/zsh-5.0.5
     )
 
     ( #Node.js
-        git clone https://github.com/creationix/nvm.git $HOME/.nvm
         git clone https://github.com/ddopson/underscore-cli.git
+        git clone https://github.com/creationix/nvm.git $HOME/.nvm
+        source $HOME/.nvm/nvm.sh
         # TODO
-        # nvm install latest; nvm use latest
+        nvm install 0.10
+        nvm alias default 0.10
+        nvm use
         # npm install -g http-server underscore-cli
     )
 )
@@ -46,3 +49,5 @@ sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
     git clone https://github.com/gmarik/vundle.git $HOME/.vim/bundle/vundle
     vim +BundleInstall +qall
 )
+
+source $HOME/.bashrc
