@@ -6,7 +6,7 @@ mkdir -p $HOME/projects
 
 sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
     emacs tmux ncdu lftp curl elinks cloc autossh feh htop rsync rlwrap st \
-    virtualbox postgresql postgresql-client
+    virtualbox postgresql postgresql-client python-dev
 
 (
     cd $HOME/projects-vanilla/
@@ -37,7 +37,7 @@ sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
         nvm install 0.10
         nvm alias default 0.10
         nvm use 0.10
-        npm install -g http-server underscore-cli bower supervisor
+        #npm install -g http-server underscore-cli bower supervisor
     )
 
 )
