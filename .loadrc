@@ -25,6 +25,6 @@ eval "$(fasd --init auto)"
 [[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
 #eval "$(pyenv init -)"
 #eval "$(rbenv init -)"
-eval $(keychain --eval --agents ssh id_rsa)
+#eval $(keychain --eval --agents ssh id_rsa)
 
 #workon scratch
