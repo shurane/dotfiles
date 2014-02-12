@@ -6,38 +6,50 @@ mkdir -p $HOME/projects
 
 sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
     emacs tmux ncdu lftp curl elinks cloc autossh feh htop rsync rlwrap st \
-    virtualbox
+    virtualbox postgresql postgresql-client
 
 (
     cd $HOME/projects-vanilla/
     git clone https://github.com/clvv/fasd.git
-    git clone https://github.com/zsh-users/antigen.git
-    https://github.com/ddopson/underscore-cli.git
-    git clone https://github.com/creationix/nvm.git
-    (
-	echo "in"
-        # TODO
-        # nvm install latest; nvm use latest
-        # npm install -g http-server underscore-cli
+
+    ( #git
+        git clone https://github.com/git/git.git
+        cd git
+        git checkout tags/v1.8.3.4
+        # git bash completion
     )
-    git clone https://github.com/technomancy/leiningen.git
-    git clone https://github.com/flexiondotorg/oab-java6.git
-    (
+
+    ( #java, clojure, maven, leiningen
+        git clone https://github.com/technomancy/leiningen.git
+        git clone https://github.com/flexiondotorg/oab-java6.git
+    )
+
+    ( #zsh
         git clone https://github.com/zsh-users/zsh.git
+        git clone https://github.com/zsh-users/antigen.git
         cd zsh
         git checkout tags/5.0.5
     )
 
+    ( #Node.js
+        git clone https://github.com/creationix/nvm.git $HOME/.nvm
+        git clone https://github.com/ddopson/underscore-cli.git
+        # TODO
+        # nvm install latest; nvm use latest
+        # npm install -g http-server underscore-cli
+    )
 )
 
-(
+( #dotfiles
     git clone https://github.com/shurane/dotfiles.git $HOME/dotfiles
     cd $HOME/dotfiles
     for elem in ".bashrc" ".pathrc" ".loadrc" ".bash_aliases" ".vimrc" ".tmux.conf" ".zshrc" ".ackrc" ".inputrc" ".gitconfig"; do
         rm $HOME/$elem
         ln -s $(readlink -f $elem) $HOME/
     done
-
 )
-git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
-vim +BundleInstall +qall
+
+( #vim
+    git clone https://github.com/gmarik/vundle.git $HOME/.vim/bundle/vundle
+    vim +BundleInstall +qall
+)
