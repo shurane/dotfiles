@@ -12,13 +12,6 @@ sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
     cd $HOME/projects-vanilla/
     git clone https://github.com/clvv/fasd.git
 
-    ( #git
-        git clone https://github.com/git/git.git
-        cd git
-        git checkout tags/v1.8.3.4
-        # git bash completion
-    )
-
     ( #java, clojure, maven, leiningen
         git clone https://github.com/technomancy/leiningen.git
         git clone https://github.com/flexiondotorg/oab-java6.git
