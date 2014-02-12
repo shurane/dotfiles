@@ -20,11 +20,11 @@ eval "$(fasd --init auto)"
 [[ -s "/usr/share/bash-completion/bash_completion" ]] && source "/usr/share/bash-completion/bash_completion"
 [[ -s "/etc/bash_completion" ]] && source "/etc/bash_completion"
 #[[ -s "$HOME/bin/git-completion.bash" ]] && source "$HOME/bin/git-completion.bash"
-[[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh # This loads NVM
+[[ -s $HOME/.nvm/nvm.sh ]] && source $HOME/.nvm/nvm.sh # This loads NVM
+[[ -s $NVM_DIR/bash_completion ]] && source $NVM_DIR/bash_completion
 [[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
 #eval "$(pyenv init -)"
 #eval "$(rbenv init -)"
 eval $(keychain --eval --agents ssh id_rsa)
 
-workon scratch
-nvm use 0.10.21
+#workon scratch
