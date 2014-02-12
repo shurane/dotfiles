@@ -16,3 +16,5 @@
 ; git stash show -p                 ; shows the stashed version against HEAD
 ; git show branch:file.py           ; show file from other branch
 ; git difftool branch1:file.py branch2:file.py
+[push]
+	default = simple
