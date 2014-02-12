@@ -31,8 +31,8 @@ sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
         # TODO
         nvm install 0.10
         nvm alias default 0.10
-        nvm use
-        # npm install -g http-server underscore-cli
+        nvm use 0.10
+        npm install -g http-server underscore-cli bower supervisor
     )
 )
 
