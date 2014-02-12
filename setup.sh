@@ -4,8 +4,9 @@ mkdir -p $HOME/bin
 mkdir -p $HOME/projects-vanilla
 mkdir -p $HOME/projects
 
-sudo apt-get install -y git mercurial build-essential vim-gtk emacs tmux ncdu \
-    lftp curl elinks cloc autossh feh htop rsync rlwrap st virtualbox
+sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
+    emacs tmux ncdu lftp curl elinks cloc autossh feh htop rsync rlwrap st \
+    virtualbox
 
 (
     cd $HOME/projects-vanilla/
@@ -14,6 +15,7 @@ sudo apt-get install -y git mercurial build-essential vim-gtk emacs tmux ncdu \
     https://github.com/ddopson/underscore-cli.git
     git clone https://github.com/creationix/nvm.git
     (
+	echo "in"
         # TODO
         # nvm install latest; nvm use latest
         # npm install -g http-server underscore-cli
@@ -28,5 +30,14 @@ sudo apt-get install -y git mercurial build-essential vim-gtk emacs tmux ncdu \
 
 )
 
-git clone https://github.com/shurane/dotfiles.git ~/dotfiles
+(
+    git clone https://github.com/shurane/dotfiles.git $HOME/dotfiles
+    cd $HOME/dotfiles
+    for elem in ".bashrc" ".pathrc" ".loadrc" ".bash_aliases" ".vimrc" ".tmux.conf" ".zshrc" ".ackrc" ".inputrc" ".gitconfig"; do
+        rm $HOME/$elem
+        ln -s $(readlink -f $elem) $HOME/
+    done
+
+)
 git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
+vim +BundleInstall +qall
