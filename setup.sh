@@ -17,6 +17,11 @@ sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
         PREFIX=$HOME make install
     )
 
+    ( #gist, github
+        git clone https://github.com/defunkt/gist.git
+        git clone https://github.com/github/hub.git
+    )
+
     ( #java, clojure, maven, leiningen
         git clone https://github.com/technomancy/leiningen.git
         git clone https://github.com/flexiondotorg/oab-java6.git
@@ -38,6 +43,10 @@ sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
         nvm alias default 0.10
         nvm use 0.10
         #npm install -g http-server underscore-cli bower supervisor
+    )
+
+    ( #TODO throwaway ruby, perl, python
+        echo "TODO"
     )
 
 )
