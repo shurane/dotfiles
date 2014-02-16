@@ -17,6 +17,8 @@ Bundle 'scrooloose/nerdtree'
 Bundle 'scrooloose/syntastic'
 Bundle 'tpope/vim-fugitive'
 Bundle 'tpope/vim-markdown'
+Bundle 'tpope/vim-surround'
+Bundle 'tpope/vim-repeat'
 Bundle 'mileszs/ack.vim'
 Bundle 'michalbachowski/vim-wombat256mod'
 Bundle 'kien/ctrlp.vim'
@@ -26,7 +28,6 @@ Bundle 'nathanaelkane/vim-indent-guides'
 
 " vim-scripts repos
 Bundle 'Tagbar'
-Bundle 'surround.vim'
 " non github repos
 
 filetype plugin indent on     " required!
