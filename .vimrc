@@ -202,6 +202,9 @@ nnoremap <Leader>b :ls<CR>:b
 "nnoremap <Leader>v :vsplit<CR>
 "nnoremap <Leader>h :split<CR>
 
+nnoremap <C-a> <Nop>
+nnoremap <C-x> <Nop>
+
 " Toggle different modes
 " syntax, diff, paste, wrap, listchars, highlight, and scrollbind. Missing anything?
 nnoremap <Leader>ts :call ToggleSyntax()<CR>
