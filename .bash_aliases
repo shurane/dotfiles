@@ -30,6 +30,7 @@ alias a="ack"
 #this is for ubuntu, where ack is installed as 'ack-grep'
 if command -v "ack-grep" 2>&1 >/dev/null; then
     alias ack="ack-grep"
+    alias a="ack-grep"
 fi
 
 alias grep="grep --color=auto --ignore-case"
@@ -41,6 +42,3 @@ alias less="less -R"
 alias t='python ~/bin/t --task-dir ~/Dropbox/tasks --list tasks'
 alias task='python ~/bin/t'
 alias chrome="google-chrome"
-alias startx='startx'
-# let's try this out. http://superuser.com/a/333740/45927
-alias ssh='ssh'
