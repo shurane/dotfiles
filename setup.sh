@@ -17,10 +17,11 @@ sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
         PREFIX=$HOME make install
     )
 
-    ( #gist, github, git-extras
+    ( #gist, github, git-extras, git-ignore
         git clone https://github.com/defunkt/gist.git
         git clone https://github.com/github/hub.git
         git clone https://github.com/visionmedia/git-extras.git
+        git clone https://github.com/github/gitignore.git
     )
 
     ( #java, clojure, maven, leiningen
