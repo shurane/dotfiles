@@ -234,6 +234,7 @@ let g:ctrlp_user_command = {
 nnoremap <Leader>gg :GundoToggle<CR>
 nnoremap <Leader>dd :TagbarToggle<CR>
 nnoremap <Leader>ff :CtrlPBuffer<CR>
+nnoremap <Leader>aa :NERDTreeToggle<CR>
 nnoremap <Leader>ss :Ack 
 " trailing space intentional
 
