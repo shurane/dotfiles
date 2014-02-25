@@ -15,10 +15,11 @@ Bundle 'gmarik/vundle'
 Bundle 'scrooloose/nerdcommenter'
 Bundle 'scrooloose/nerdtree'
 Bundle 'scrooloose/syntastic'
+Bundle 'tpope/vim-repeat'
 Bundle 'tpope/vim-fugitive'
 Bundle 'tpope/vim-markdown'
 Bundle 'tpope/vim-surround'
-Bundle 'tpope/vim-repeat'
+Bundle 'tpope/vim-unimpaired'
 Bundle 'mileszs/ack.vim'
 Bundle 'michalbachowski/vim-wombat256mod'
 Bundle 'kien/ctrlp.vim'
@@ -232,6 +233,9 @@ let g:ctrlp_user_command = {
 
 nnoremap <Leader>gg :GundoToggle<CR>
 nnoremap <Leader>dd :TagbarToggle<CR>
+nnoremap <Leader>ff :CtrlPBuffer<CR>
+nnoremap <Leader>ss :Ack 
+" trailing space intentional
 
 " }}}
 
