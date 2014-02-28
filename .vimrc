@@ -20,12 +20,14 @@ Bundle 'tpope/vim-fugitive'
 Bundle 'tpope/vim-markdown'
 Bundle 'tpope/vim-surround'
 Bundle 'tpope/vim-unimpaired'
+Bundle 'tpope/vim-rsi'
 Bundle 'mileszs/ack.vim'
 Bundle 'michalbachowski/vim-wombat256mod'
 Bundle 'kien/ctrlp.vim'
 Bundle 'vim-scripts/matchit.zip'
 Bundle 'sjl/gundo.vim'
 Bundle 'nathanaelkane/vim-indent-guides'
+Bundle 'Shougo/neocomplete.vim'
 
 " vim-scripts repos
 Bundle 'Tagbar'
@@ -231,10 +233,18 @@ let g:ctrlp_user_command = {
     \ 'fallback': 'find %s -type f'
     \ }
 
+let g:neocomplete#enable_at_startup = 1
+let g:tagbar_autofocus = 1
+let g:indent_guides_auto_colors = 0
+let g:indent_guides_guide_size = 1
+autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=red   ctermbg=black
+autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=green ctermbg=darkgrey
+
 nnoremap <Leader>gg :GundoToggle<CR>
 nnoremap <Leader>dd :TagbarToggle<CR>
 nnoremap <Leader>ff :CtrlPBuffer<CR>
 nnoremap <Leader>aa :NERDTreeToggle<CR>
+nnoremap <Leader>ii :IndentGuidesToggle<CR>
 nnoremap <Leader>ss :Ack 
 " trailing space intentional
 
