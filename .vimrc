@@ -27,7 +27,8 @@ Bundle 'kien/ctrlp.vim'
 Bundle 'vim-scripts/matchit.zip'
 Bundle 'sjl/gundo.vim'
 Bundle 'nathanaelkane/vim-indent-guides'
-Bundle 'Shougo/neocomplete.vim'
+Bundle 'airblade/vim-gitgutter'
+Bundle 'Shougo/neocomplete'
 
 " vim-scripts repos
 Bundle 'Tagbar'
@@ -246,7 +247,7 @@ nnoremap <Leader>ff :CtrlPBuffer<CR>
 nnoremap <Leader>aa :NERDTreeToggle<CR>
 nnoremap <Leader>ii :IndentGuidesToggle<CR>
 nnoremap <Leader>ss :Ack 
-" trailing space intentional
+" trailing space on <Leader>ss intentional
 
 " }}}
 
