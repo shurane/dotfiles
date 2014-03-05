@@ -29,9 +29,10 @@ Bundle 'sjl/gundo.vim'
 Bundle 'nathanaelkane/vim-indent-guides'
 Bundle 'airblade/vim-gitgutter'
 Bundle 'Shougo/neocomplete'
+Bundle 'majutsushi/tagbar'
+Bundle 'gregsexton/gitv'
 
 " vim-scripts repos
-Bundle 'Tagbar'
 " non github repos
 
 filetype plugin indent on     " required!
