@@ -4,9 +4,10 @@ mkdir -p $HOME/bin
 mkdir -p $HOME/projects-vanilla
 mkdir -p $HOME/projects
 
-sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
+sudo apt-add-repository -y ppa:ubuntu-mozilla-daily/firefox-aurora
+sudo apt-get install -y git mercurial build-essential vim-gtk \
     emacs tmux ncdu lftp curl elinks cloc autossh feh htop rsync rlwrap st \
-    virtualbox postgresql postgresql-client python-dev
+    virtualbox postgresql postgresql-client python-dev firefox
 
 (
     cd $HOME/projects-vanilla/
