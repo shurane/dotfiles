@@ -5,8 +5,9 @@ mkdir -p $HOME/projects-vanilla
 mkdir -p $HOME/projects
 
 sudo apt-add-repository -y ppa:ubuntu-mozilla-daily/firefox-aurora
+sudo apt-get update
 sudo apt-get install -y git mercurial build-essential vim-gtk \
-    emacs tmux ncdu lftp curl elinks cloc autossh feh htop rsync rlwrap st \
+    emacs tmux ncdu lftp curl elinks cloc autossh feh htop rsync rlwrap \
     virtualbox postgresql postgresql-client python-dev firefox flashplugin-installer
 
 (
