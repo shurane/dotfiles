@@ -40,6 +40,7 @@ syntax enable
 
 " Vim Settings {{{
 
+set t_Co=256
 colorscheme wombat256mod
 set history=10000           " keep n lines of history
 set bs=2                    " set backspace to wrap around to previous line

@@ -4,11 +4,13 @@ mkdir -p $HOME/bin
 mkdir -p $HOME/projects-vanilla
 mkdir -p $HOME/projects
 
+sudo add-apt-repository -y ppa:synapse-core/testing
 sudo apt-add-repository -y ppa:ubuntu-mozilla-daily/firefox-aurora
 sudo apt-get update
 sudo apt-get install -y git mercurial build-essential vim-gtk \
     emacs tmux ncdu lftp curl elinks cloc autossh feh htop rsync rlwrap \
-    virtualbox postgresql postgresql-client python-dev firefox flashplugin-installer
+    virtualbox postgresql postgresql-client python-dev firefox flashplugin-installer \
+    acpi synapse mosh
 
 (
     cd $HOME/projects-vanilla/
