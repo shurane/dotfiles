@@ -18,3 +18,5 @@
 ; git difftool branch1:file.py branch2:file.py
 [push]
 	default = simple
+[credential]
+	helper = cache
