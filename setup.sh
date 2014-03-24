@@ -10,7 +10,7 @@ sudo apt-get update
 sudo apt-get install -y git mercurial build-essential vim-gtk \
     emacs tmux ncdu lftp curl elinks cloc autossh feh htop rsync rlwrap \
     virtualbox postgresql postgresql-client python-dev firefox flashplugin-installer \
-    acpi synapse mosh
+    acpi synapse mosh openssh-server
 
 (
     cd $HOME/projects-vanilla/
