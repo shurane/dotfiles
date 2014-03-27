@@ -10,7 +10,7 @@ sudo apt-get update
 sudo apt-get install -y git mercurial build-essential vim-gtk \
     emacs tmux ncdu lftp curl elinks cloc autossh feh htop rsync rlwrap \
     virtualbox postgresql postgresql-client python-dev firefox flashplugin-installer \
-    acpi synapse mosh openssh-server pinta ranger mupdf
+    acpi synapse mosh openssh-server pinta ranger mupdf tig tree mplayer vlc vlc-nox
 
 (
     cd $HOME/projects-vanilla/
@@ -53,6 +53,12 @@ sudo apt-get install -y git mercurial build-essential vim-gtk \
 
     ( #TODO throwaway ruby, perl, python
         echo "TODO"
+    )
+
+    ( #ack
+        # should be https
+        # instructions from http://beyondgrep.com/install/
+        curl http://beyondgrep.com/ack-2.12-single-file > ~/bin/ack && chmod 0755 !#:3 
     )
 
 )
