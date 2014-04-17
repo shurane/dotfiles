@@ -1,31 +1,9 @@
-# tab completion like vim's
-#“\t”: menu-complete
-
 # completion is case-insensitive, could be useful
 set completion-ignore-case on
 # '-' is treated as '_' for completion purposes, too
 set completion-map-case on
-set completion-query-items 30
+set completion-query-items 100
 set visible-stats on
-
-#cycle through tab-completions
-TAB: menu-complete
-"\C-j": menu-complete
-"\C-k": menu-complete-backward
-"\C-a": beginning-of-line
-
-#special option for readline characters?
-#set bind-tty-special-chars off      
-
-# PageUp goes to top of history, PageDown goes to bottom of history
-"\e[5~": beginning-of-history
-"\e[6~": end-of-history
-#"\C-l":'clear\n'
-
-# Use '/' for word boundaries for Ctrl-w
-#"\C-w": unix-filename-rubout
-#"\C-w": backward-kill-word
-#"\C-x\C-r": re-read-init-file
 
 set editing-mode vi
 set keymap vi
