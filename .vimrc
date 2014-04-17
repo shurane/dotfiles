@@ -1,46 +1,52 @@
 set nocompatible               " be iMproved
 
+
 filetype off                   " required!
+set runtimepath+=~/.vim/bundle/neobundle.vim/
 
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
+" Required:
+call neobundle#begin(expand('~/.vim/bundle/'))
 
-" let Vundle manage Vundle
-" required!
-Bundle 'gmarik/vundle'
+" Let NeoBundle manage NeoBundle
+" Required:
+NeoBundleFetch 'Shougo/neobundle.vim'
 
 " My Bundles here:
 "
 " original repos on github
-Bundle 'scrooloose/nerdcommenter'
-Bundle 'scrooloose/nerdtree'
-Bundle 'scrooloose/syntastic'
-Bundle 'tpope/vim-repeat'
-Bundle 'tpope/vim-fugitive'
-Bundle 'tpope/vim-markdown'
-Bundle 'tpope/vim-surround'
-Bundle 'tpope/vim-unimpaired'
-Bundle 'tpope/vim-rsi'
-Bundle 'mileszs/ack.vim'
-Bundle 'michalbachowski/vim-wombat256mod'
-Bundle 'kien/ctrlp.vim'
-Bundle 'vim-scripts/matchit.zip'
-Bundle 'sjl/gundo.vim'
-Bundle 'nathanaelkane/vim-indent-guides'
-Bundle 'airblade/vim-gitgutter'
-Bundle 'Shougo/neocomplete'
-Bundle 'majutsushi/tagbar'
-Bundle 'gregsexton/gitv'
+NeoBundle 'scrooloose/nerdcommenter'
+NeoBundle 'scrooloose/nerdtree'
+NeoBundle 'scrooloose/syntastic'
+NeoBundle 'tpope/vim-repeat'
+NeoBundle 'tpope/vim-fugitive'
+NeoBundle 'tpope/vim-markdown'
+NeoBundle 'tpope/vim-surround'
+NeoBundle 'tpope/vim-unimpaired'
+NeoBundle 'tpope/vim-rsi'
+NeoBundle 'mileszs/ack.vim'
+NeoBundle 'michalbachowski/vim-wombat256mod'
+NeoBundle 'kien/ctrlp.vim'
+NeoBundle 'vim-scripts/matchit.zip'
+NeoBundle 'sjl/gundo.vim'
+NeoBundle 'nathanaelkane/vim-indent-guides'
+NeoBundle 'airblade/vim-gitgutter'
+NeoBundle 'Shougo/neocomplete'
+NeoBundle 'majutsushi/tagbar'
+NeoBundle 'gregsexton/gitv'
+NeoBundle 'sheerun/vim-polyglot'
 
 " vim-scripts repos
 " non github repos
+call neobundle#end()
+
+NeoBundleCheck
 
 filetype plugin indent on     " required!
 syntax enable
 
 " Vim Settings {{{
 
-set t_Co=256
+set t_Co=256                " colors!
 colorscheme wombat256mod
 set history=10000           " keep n lines of history
 set bs=2                    " set backspace to wrap around to previous line
@@ -49,7 +55,6 @@ set number                  " enable line numbering
 set numberwidth=5           " set line numbering to take up 5 lines
 set cursorline              " highlights current line
 
-"set t_Co=256                " colors!
 set ruler                   " show the cursor position all the time
 set nowrap                  " don't wrap long lines
 set showbreak=>\ \ \        " for wrapped lines
