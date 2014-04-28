@@ -4,9 +4,19 @@ mkdir -p $HOME/bin
 mkdir -p $HOME/projects-vanilla
 mkdir -p $HOME/projects
 
-sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
-    emacs tmux ncdu lftp curl elinks cloc autossh feh htop rsync rlwrap st \
-    virtualbox postgresql postgresql-client python-dev
+DESKTOP="${DESKTOP:=0}"
+
+sudo apt-get update
+sudo apt-get install -y git mercurial build-essential vim-gtk emacs tmux ncdu \
+    lftp curl elinks cloc autossh feh htop rsync rlwrap virtualbox postgresql \
+    postgresql-client python-dev exuberant-ctags acpi mosh openssh-server ranger \
+    tig tree 
+
+if [ $DESKTOP -eq 1 ]; then
+    sudo add-apt-repository -y ppa:synapse-core/testing
+    sudo apt-add-repository -y ppa:ubuntu-mozilla-daily/firefox-aurora
+    sudo apt-get install -y synapse pinta mupdf mplayer vlc vlc-nox firefox flashplugin-installer
+fi 
 
 (
     cd $HOME/projects-vanilla/
@@ -51,6 +61,12 @@ sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
         echo "TODO"
     )
 
+    ( #ack
+        # should be https
+        # instructions from http://beyondgrep.com/install/
+        curl http://beyondgrep.com/ack-2.12-single-file > ~/bin/ack && chmod 0755 !#:3 
+    )
+
 )
 
 ( #dotfiles
@@ -63,8 +79,9 @@ sudo apt-get install -y squid-deb-proxy git mercurial build-essential vim-gtk \
 )
 
 ( #vim
-    git clone https://github.com/gmarik/vundle.git $HOME/.vim/bundle/vundle
-    vim +BundleInstall +qall
+    git clone https://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
+    #git clone https://github.com/gmarik/vundle.git $HOME/.vim/bundle/vundle
+    vim +NeoBundleInstall! +qall
 )
 
 source $HOME/.bashrc
