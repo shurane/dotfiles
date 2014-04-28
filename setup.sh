@@ -18,6 +18,11 @@ if [ $DESKTOP -eq 1 ]; then
     sudo apt-get install -y synapse pinta mupdf mplayer vlc vlc-nox firefox flashplugin-installer
 fi 
 
+if [ $LATEST_VIM -eq 1]; then
+    sudo apt-add-repository -y ppa:pi-rho/dev
+    sudo apt-get install -y vim-gtk
+fi
+
 (
     cd $HOME/projects-vanilla/
 
