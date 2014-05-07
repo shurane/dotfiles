@@ -6,6 +6,9 @@ mkdir -p $HOME/projects
 
 DESKTOP="${DESKTOP:=0}"
 
+sudo add-apt-repository -y ppa:synapse-core/testing
+sudo apt-add-repository -y ppa:ubuntu-mozilla-daily/firefox-aurora
+sudo apt-add-repository -y ppa:pi-rho/dev
 sudo apt-get update
 sudo apt-get install -y git mercurial build-essential vim-gtk emacs tmux ncdu \
     lftp curl elinks cloc autossh feh htop rsync rlwrap virtualbox postgresql \
@@ -13,13 +16,10 @@ sudo apt-get install -y git mercurial build-essential vim-gtk emacs tmux ncdu \
     tig tree 
 
 if [ $DESKTOP -eq 1 ]; then
-    sudo add-apt-repository -y ppa:synapse-core/testing
-    sudo apt-add-repository -y ppa:ubuntu-mozilla-daily/firefox-aurora
     sudo apt-get install -y synapse pinta mupdf mplayer vlc vlc-nox firefox flashplugin-installer
 fi 
 
 if [ $LATEST_VIM -eq 1]; then
-    sudo apt-add-repository -y ppa:pi-rho/dev
     sudo apt-get install -y vim-gtk
 fi
 
