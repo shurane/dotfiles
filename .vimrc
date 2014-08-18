@@ -59,6 +59,7 @@ set cursorline              " highlights current line
 
 set ruler                   " show the cursor position all the time
 set nowrap                  " don't wrap long lines
+set linebreak               " don't wrap in the middle of words
 set showbreak=>\ \ \        " for wrapped lines
 set lcs=trail:-,extends:>,tab:>-,eol:$   " indicates trailing spaces by '-',  wrapped lines by '>', and tabs by '>-'
 set scrolloff=3             " scroll up/down by n instead of 1
