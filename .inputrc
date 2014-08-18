@@ -14,6 +14,7 @@ $if mode=vi
     set keymap vi-command
     "gg": beginning-of-history
     "G": end-of-history
+    "v": ''
     set keymap vi-insert
     "jj": vi-movement-mode
     "\C-a": beginning-of-line
