@@ -20,9 +20,6 @@ export INPUTRC="$HOME/.inputrc"
 export PAGER="less"
 export EDITOR="vim"
 export LESS="-R"
-export USE_CCACHE=1
-export WORKON_HOME="$HOME/.virtualenvs"
-export CCACHE_DIR="$HOME/.ccache"
 
 source $HOME/.pathrc
 

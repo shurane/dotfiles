@@ -3,8 +3,11 @@
 # Setting up extra commands if they exist.
 # ====
 
-## for ARCH_LINUX
-[[ $(lsb_release --id --short) = "Arch" ]] && export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python2
+export WORKON_HOME="$HOME/.virtualenvs"
+export WHEELHOUSE="$HOME/tmp/wheelhouse"
+export GOPATH=$HOME/.go/
+mkdir -p $GOPATH
+
 # TODO this should be cleaned up somehow..., so many extra commands
 command -v "virtualenvwrapper_lazy.sh" >/dev/null && source $(which virtualenvwrapper_lazy.sh)
 command -v "pip" >/dev/null && eval "$(pip completion --bash)"
