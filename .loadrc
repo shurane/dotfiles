@@ -26,6 +26,7 @@ eval "$(fasd --init auto)"
 [[ -s $HOME/.nvm/nvm.sh ]] && source $HOME/.nvm/nvm.sh # This loads NVM
 [[ -s $NVM_DIR/bash_completion ]] && source $NVM_DIR/bash_completion
 [[ -s $HOME/.tmuxinator/scripts/tmuxinator ]] && source $HOME/.tmuxinator/scripts/tmuxinator
+[[ -s $HOME/.nix-profile/etc/profile.d/nix.sh ]] && source $HOME/.nix-profile/etc/profile.d/nix.sh
 #eval "$(pyenv init -)"
 #eval "$(rbenv init -)"
 #eval $(keychain --eval --agents ssh id_rsa)

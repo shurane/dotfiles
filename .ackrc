@@ -1,2 +1,10 @@
 --ignore-case
 --pager=less -FRX
+--type-set=diff:ext:diff,patch
+--type-set=puppet:ext:pp
+--ignore-dir=node_modules/
+--ignore-dir=bower_components/
+--ignore-dir=client/vendor/ 
+--ignore-dir=reports/ 
+--ignore-dir=server/public/
+--ignore-dir=logs/

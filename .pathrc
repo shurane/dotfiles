@@ -1,8 +1,11 @@
 #!/bin/bash
 
+export GOPATH=$HOME/.go
+
 PATHS_TO_ADD=( 
                "$HOME/bin"
                #"$HOME/.pyenv/bin"
+               "$HOME/$GOPATH/bin"
                #"$HOME/.rbenv/bin"
                "$HOME/.cabal/bin"
                "/usr/bin/site_perl"
