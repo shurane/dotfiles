@@ -32,11 +32,12 @@ fi
         PREFIX=$HOME make install
     )
 
-    ( #gist, github, git-extras, git-ignore
+    ( #gist, github, git-extras, git-ignore, gitsh
         git clone https://github.com/defunkt/gist.git
         git clone https://github.com/github/hub.git
         git clone https://github.com/visionmedia/git-extras.git
         git clone https://github.com/github/gitignore.git
+        git clone https://github.com/thoughtbot/gitsh.git
     )
 
     ( #java, clojure, maven, leiningen
