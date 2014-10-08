@@ -10,6 +10,7 @@ LATEST_VIM="${LATEST_VIM:=0}"
 
 sudo add-apt-repository -y ppa:synapse-core/testing
 sudo apt-add-repository -y ppa:ubuntu-mozilla-daily/firefox-aurora
+sudo apt-add-repository -y ppa:videolan/master-daily
 sudo apt-add-repository -y ppa:plt/racket
 sudo apt-add-repository -y ppa:pi-rho/dev
 sudo apt-get -y update
@@ -19,7 +20,7 @@ sudo apt-get -y install git mercurial build-essential emacs tmux ncdu \
     tig tree plt-racket
 
 if [ $DESKTOP -eq 1 ]; then
-    sudo apt-get -y install synapse pinta mupdf mplayer vlc vlc-nox firefox flashplugin-installer
+    sudo apt-get -y install synapse pinta mupdf mplayer vlc firefox flashplugin-installer
 fi 
 
 if [ $LATEST_VIM -eq 1]; then
