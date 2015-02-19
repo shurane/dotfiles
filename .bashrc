@@ -19,7 +19,7 @@ stty -ixon
 export INPUTRC="$HOME/.inputrc"
 export PAGER="less"
 export EDITOR="vim"
-export LESS="-R"
+export LESS="-Ri"
 
 source $HOME/.pathrc
 

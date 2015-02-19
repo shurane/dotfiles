@@ -17,18 +17,20 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 NeoBundle 'Shougo/neocomplete'
 NeoBundle 'Shougo/vimproc.vim'
 NeoBundle 'airblade/vim-gitgutter'
-NeoBundle 'gregsexton/gitv'
+"NeoBundle 'gregsexton/gitv'
 NeoBundle 'kien/ctrlp.vim'
-NeoBundle 'majutsushi/tagbar'
+"NeoBundle 'majutsushi/tagbar'
+NeoBundle 'mbbill/undotree'
 NeoBundle 'michalbachowski/vim-wombat256mod'
 NeoBundle 'mileszs/ack.vim'
 NeoBundle 'nathanaelkane/vim-indent-guides'
+NeoBundle 'paradigm/TextObjectify'
 NeoBundle 'scrooloose/nerdcommenter'
-NeoBundle 'scrooloose/nerdtree'
+"NeoBundle 'scrooloose/nerdtree'
 NeoBundle 'scrooloose/syntastic'
 NeoBundle 'sheerun/vim-polyglot'
-NeoBundle 'sjl/gundo.vim'
 NeoBundle 'sjl/clam.vim'
+NeoBundle 'tpope/vim-eunuch'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-markdown'
 NeoBundle 'tpope/vim-repeat'
@@ -36,6 +38,9 @@ NeoBundle 'tpope/vim-rsi'
 NeoBundle 'tpope/vim-surround'
 NeoBundle 'tpope/vim-unimpaired'
 NeoBundle 'vim-scripts/matchit.zip'
+NeoBundle 'chase/vim-ansible-yaml'
+NeoBundle 'amdt/vim-niji'
+NeoBundle 'wlangstroth/vim-racket'
 
 " vim-scripts repos
 " non github repos
@@ -196,6 +201,8 @@ nnoremap <Leader>v <Leader>tp"+p<Leader>tp
 vnoremap <Leader>v <Leader>tp"+p<Leader>tp
 nnoremap <Leader>c "+yy
 vnoremap <Leader>c "+y
+nnoremap <Leader>y "+yy
+vnoremap <Leader>y "+y
 vnoremap <Leader>x "+d
 
 " do :ls before switching buffers
@@ -224,7 +231,7 @@ nnoremap <Leader>tb :set scrollbind!<CR>
 
 " Plugin Maps {{{
 
-" CtrlP is pretty hawsome
+" CtrlP is pretty awesome
 let g:ctrlp_user_command = {
     \ 'types': {
         \ 1: ['.git', 'cd %s && git ls-files'],
@@ -241,7 +248,7 @@ let g:clam_autoreturn = 1
 
 autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=red   ctermbg=black
 autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=green ctermbg=darkgrey
-nnoremap <Leader>gg :GundoToggle<CR>
+nnoremap <Leader>gg :UndotreeToggle<CR>
 nnoremap <Leader>dd :TagbarToggle<CR>
 nnoremap <Leader>ff :CtrlPBuffer<CR>
 nnoremap <Leader>aa :NERDTreeToggle<CR>
