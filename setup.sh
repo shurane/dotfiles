@@ -8,13 +8,14 @@ DESKTOP="${DESKTOP:=0}"
 DEPLOY="${DEPLOY:=0}"
 LATEST_VIM="${LATEST_VIM:=0}"
 
-sudo add-apt-repository -y ppa:synapse-core/testing
+sudo apt-add-repository -y ppa:synapse-core/testing
 sudo apt-add-repository -y ppa:ubuntu-mozilla-daily/firefox-aurora
 sudo apt-add-repository -y ppa:videolan/master-daily
 sudo apt-add-repository -y ppa:plt/racket
 sudo apt-add-repository -y ppa:pi-rho/dev
-sudo apt-get -y update
-sudo apt-get -y install git mercurial build-essential emacs tmux ncdu \
+sudo apt-add-repository -y ppa:teward/znc-staging-trusty+
+sudo apt-get update
+sudo apt-get install -y git mercurial build-essential vim-gtk emacs tmux ncdu \
     lftp curl elinks cloc autossh feh htop rsync rlwrap virtualbox postgresql \
     postgresql-client python-dev exuberant-ctags acpi mosh openssh-server ranger \
     tig tree plt-racket
