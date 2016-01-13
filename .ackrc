@@ -1,7 +1,10 @@
 --ignore-case
 --pager=less -FRX
+--type-set=gradle:ext:gradle
 --type-set=diff:ext:diff,patch
+--type-set=haml:ext:haml
 --type-set=puppet:ext:pp
+--type-set=racket:ext:rkt,scm
 --ignore-dir=node_modules/
 --ignore-dir=bower_components/
 --ignore-dir=client/vendor/ 
