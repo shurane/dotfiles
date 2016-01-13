@@ -1,6 +1,5 @@
 set nocompatible               " be iMproved
 
-
 filetype off                   " required!
 set runtimepath+=~/.vim/bundle/neobundle.vim/
 
@@ -29,7 +28,7 @@ NeoBundle 'scrooloose/nerdcommenter'
 "NeoBundle 'scrooloose/nerdtree'
 NeoBundle 'scrooloose/syntastic'
 NeoBundle 'sheerun/vim-polyglot'
-NeoBundle 'sjl/clam.vim'
+"NeoBundle 'sjl/clam.vim'
 NeoBundle 'tpope/vim-eunuch'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-markdown'
@@ -38,8 +37,7 @@ NeoBundle 'tpope/vim-rsi'
 NeoBundle 'tpope/vim-surround'
 NeoBundle 'tpope/vim-unimpaired'
 NeoBundle 'vim-scripts/matchit.zip'
-NeoBundle 'chase/vim-ansible-yaml'
-NeoBundle 'amdt/vim-niji'
+NeoBundle 'luochen1990/rainbow'
 NeoBundle 'wlangstroth/vim-racket'
 
 " vim-scripts repos
@@ -239,12 +237,17 @@ let g:ctrlp_user_command = {
         \ },
     \ 'fallback': 'find %s -type f'
     \ }
+let g:NERDCustomDelimiters = {
+  \ 'racket': { 'left': ';', 'leftAlt': '#| ', 'rightAlt': ' |#' },
+\ }
 
 let g:neocomplete#enable_at_startup = 1
 let g:tagbar_autofocus = 1
 let g:indent_guides_auto_colors = 0
 let g:indent_guides_guide_size = 1
 let g:clam_autoreturn = 1
+let g:syntastic_cpp_compiler = 'clang++'
+let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
 
 autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=red   ctermbg=black
 autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=green ctermbg=darkgrey
