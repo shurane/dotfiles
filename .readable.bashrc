@@ -1,12 +1,12 @@
 # force ignoredups and ignorespace
-histcontrol=ignoredups:ignorespace
-histsize=200000
-histfilesize=200000
+HISTCONTROL=ignoredups:ignorespace
+HISTSIZE=200000
+HISTFILESIZE=200000
 # append to the history file, don't overwrite it
 shopt -s histappend
 # save and reload the history after each command finishes
 # taken from http://stackoverflow.com/a/3055135/198348
-export prompt_command="history -a; history -c; history -r; $prompt_command"
+export PROMPT_COMMAND="history -a; history -c; history -r; $prompt_command"
 # update the values of lines and columns after each command
 shopt -s checkwinsize
 
@@ -16,10 +16,10 @@ stty werase undef
 # disable terminal flow control
 stty -ixon
 
-export inputrc="$HOME/.inputrc"
-export pager="less"
-export editor="vim"
-export less="-ri"
+export INPUTRC="$HOME/.inputrc"
+export PAGER="less"
+export EDITOR="vim"
+export LESS="-RI"
 
 alias ..="cd .."
 alias ...="cd ../.."
