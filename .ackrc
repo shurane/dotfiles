@@ -1,7 +1,7 @@
 --ignore-case
 --pager=less -FRX
 --type-set=gradle:ext:gradle
---type-set=vs:ext:csproj,sln,config,DotSettings,targets
+--type-set=vs:ext:csproj,ccproj,csdef,cscfg,sln,config,DotSettings,targets,runsettings
 --type-set=diff:ext:diff,patch
 --type-set=haml:ext:haml
 --type-set=puppet:ext:pp
