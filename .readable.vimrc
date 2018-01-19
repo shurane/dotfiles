@@ -9,6 +9,7 @@ set scrolloff=3
 set incsearch 
 set ignorecase 
 set pastetoggle=,tp 
+set directory=$HOME/.vim/swapfiles/
 set lcs=trail:-,extends:>,tab:>-,eol:$ 
 let mapleader = "," 
 inoremap jj <Esc> 
