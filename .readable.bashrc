@@ -38,3 +38,9 @@ LS_COLORS="ow=01;36;40" && export LS_COLORS
 
 alias grep="grep --color=auto --ignore-case"
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
+
+
+# https://github.com/BurntSushi/ripgrep/issues/86#issuecomment-331718946
+rgl() {
+  rg -i -p "$@" | less -XFR
+}
