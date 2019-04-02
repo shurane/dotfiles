@@ -19,7 +19,7 @@ stty -ixon
 export INPUTRC="$HOME/.inputrc"
 export PAGER="less"
 export EDITOR="vim"
-export LESS="-RI"
+export LESS="-FRXI"
 
 alias ..="cd .."
 alias ...="cd ../.."
@@ -32,9 +32,7 @@ PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 
 # https://github.com/clvv/fasd/wiki/Installing-via-Package-Managers
 eval "$(fasd --init auto)"
-
-# https://github.com/Microsoft/vscode/issues/7556
-LS_COLORS="ow=01;36;40" && export LS_COLORS
+test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)"
 
 alias grep="grep --color=auto --ignore-case"
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
@@ -42,5 +40,19 @@ alias ls="ls --human-readable --group-directories-first --sort=extension --color
 
 # https://github.com/BurntSushi/ripgrep/issues/86#issuecomment-331718946
 rgl() {
-  rg -i -p "$@" | less -XFR
+  rg -i -p -M 500 "$@" | less -XFR
 }
+
+rgf() {
+  rg --files | rg -i -p -M 500 "$@" | less -XFR
+}
+
+rglc() {
+  rg -i -p -M 500 --type csharp "$@" | less -XFR
+}
+
+# https://github.com/junegunn/fzf#respecting-gitignore
+export FZF_DEFAULT_COMMAND='
+ (git ls-tree -r --name-only HEAD ||
+  find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
+  sed s/^..//) 2> /dev/null'
