@@ -1,25 +1,22 @@
 [user]
 	name = Ehtesh Choudhury
 	email = ehtesh.choudhury@gmail.com
-[color]
-    diff=auto
-    ui=auto
 [core]
+	# https://stackoverflow.com/questions/3206843/how-line-ending-conversions-work-with-git-core-autocrlf-between-different-operat
+    # https://github.com/Microsoft/WSL/issues/184, change to true on Windows
 	autocrlf = input
 	preloadindex = true
 [alias]
     hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short 
-    ; http://stackoverflow.com/a/9074343/198348
+    # http://stackoverflow.com/a/9074343/198348
     lg1 = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
     lg2 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all
-
-; TODO things to look at:
-; git diff "@{30 minutes ago}"      ; is a very useful way to check by time
-; git checkout "@{30 minutes ago}"  ; 
-; git stash show -p                 ; shows the stashed version against HEAD
-; git show branch:file.py           ; show file from other branch
-; git difftool branch1:file.py branch2:file.py
+    lg3 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(bold cyan)(committed: %cD)%C(reset) %C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset)%n''          %C(dim white)- %an <%ae> %C(reset) %C(dim white)(committer: %cn <%ce>)%C(reset) --all'
+    # there's also git log --oneline
 [push]
+	# https://stackoverflow.com/questions/3206843/how-line-ending-conversions-work-with-git-core-autocrlf-between-different-operat
 	default = simple
 [credential]
 	helper = cache
+    # https://stackoverflow.com/questions/45925964/how-to-use-git-credential-store-on-wsl-ubuntu-on-windows
+	#helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-wincred.exe
