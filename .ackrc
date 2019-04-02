@@ -14,3 +14,4 @@
 --ignore-dir=logs/
 --ignore-dir=Debug/
 --ignore-dir=Release/
+--ignore-file=match:/.*\.dll\.cs$/
