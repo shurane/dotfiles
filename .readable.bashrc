@@ -56,9 +56,9 @@ alias grep="grep --color=auto --ignore-case"
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
 
 # https://github.com/BurntSushi/ripgrep/issues/86#issuecomment-331718946
-rgl() { rg -i -p -M 500 "$@" | less -XFR }
-rgf() { rg --files | rg -i -p -M 500 "$@" | less -XFR }
-rglc() { rg -i -p -M 500 --type csharp "$@" | less -XFR }
+rgl() { rg -i -p -M 500 "$@" | less -XFR; }
+rgf() { rg --files | rg -i -p -M 500 "$@" | less -XFR; }
+rglc() { rg -i -p -M 500 --type csharp "$@" | less -XFR; }
 
 # https://github.com/junegunn/fzf#respecting-gitignore
 export FZF_DEFAULT_COMMAND='
