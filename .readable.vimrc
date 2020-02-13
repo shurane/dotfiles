@@ -33,13 +33,20 @@ endif
 
 call plug#begin('~/.vim/plugged')
 
-Plug 'junegunn/fzf'
-Plug 'scrooloose/nerdcommenter'
-Plug 'leafgarland/typescript-vim'
-" Plug 'peitalin/vim-jsx-typescript'
-Plug 'flazz/vim-colorschemes'
+    Plug 'junegunn/fzf'
+    Plug 'scrooloose/nerdcommenter'
+    Plug 'leafgarland/typescript-vim'
+    " Plug 'peitalin/vim-jsx-typescript'
+    Plug 'flazz/vim-colorschemes'
 
 call plug#end()
+
+" see https://vi.stackexchange.com/a/456/11757
+function TrimWhitespace()
+    let l:save = winsaveview()
+    keeppatterns %s/\s\+$//e
+    call winrestview(l:save)
+endfun
 
 colorscheme wombat256mod
 nnoremap <C-p> :FZF<CR>
