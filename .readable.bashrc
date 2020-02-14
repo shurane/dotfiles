@@ -48,6 +48,10 @@ alias ......="cd ../../../../.."
 PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 #PS1='\u@\h:\w\$ '
 
+# https://github.com/Microsoft/vscode/issues/7556 for WSL colors
+# see https://stackoverflow.com/a/43618657/198348
+grep -qEi "(Microsoft|WSL)" /proc/version && LS_COLORS="ow=01;36;40" && export LS_COLORS
+
 # https://github.com/clvv/fasd/wiki/Installing-via-Package-Managers
 test -x "$(command -v fasd)" && eval "$(fasd --init auto)"
 test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)"
@@ -59,6 +63,8 @@ alias ls="ls --human-readable --group-directories-first --sort=extension --color
 rgl() { rg -i -p -M 500 "$@" | less -XFR; }
 rgf() { rg --files | rg -i -p -M 500 "$@" | less -XFR; }
 rglc() { rg -i -p -M 500 --type csharp "$@" | less -XFR; }
+rglt() { rg -i -p -M 500 --type ts "$@" | less -XFR; }
+rglweb() { rg -i -p -M 500 --type-add 'web:*.{htm,html,css,sass,less,js,jsx,ts,tsx}' --type web "$@" | less -XFR; }
 
 # https://github.com/junegunn/fzf#respecting-gitignore
 export FZF_DEFAULT_COMMAND='
