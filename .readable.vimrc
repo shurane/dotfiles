@@ -34,6 +34,7 @@ endif
 call plug#begin('~/.vim/plugged')
 
     Plug 'junegunn/fzf'
+    Plug 'tpope/vim-surround'
     Plug 'scrooloose/nerdcommenter'
     Plug 'leafgarland/typescript-vim'
     " Plug 'peitalin/vim-jsx-typescript'
