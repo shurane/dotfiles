@@ -48,9 +48,10 @@ alias ......="cd ../../../../.."
 PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 #PS1='\u@\h:\w\$ '
 
+test -x "$(command -v vivid)" && export LS_COLORS="$(vivid generate snazzy)"
 # https://github.com/Microsoft/vscode/issues/7556 for WSL colors
 # see https://stackoverflow.com/a/43618657/198348
-grep -qEi "(Microsoft|WSL)" /proc/version && LS_COLORS="ow=01;36;40" && export LS_COLORS
+grep -qEi "(Microsoft|WSL)" /proc/version && LS_COLORS="$LS_COLORS:ow=01;36;40" && export LS_COLORS
 
 # https://github.com/clvv/fasd/wiki/Installing-via-Package-Managers
 test -x "$(command -v fasd)" && eval "$(fasd --init auto)"
