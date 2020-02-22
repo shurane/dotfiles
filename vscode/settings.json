@@ -1,0 +1,17 @@
+{
+    "workbench.startupEditor": "welcomePage",
+    "update.showReleaseNotes": false,
+    "files.trimTrailingWhitespace": true,
+    "explorer.openEditors.visible": 0,
+    "editor.autoClosingBrackets": "never",
+    "editor.autoClosingQuotes": "never",
+    "editor.parameterHints.enabled": false,
+    "editor.hover.enabled": false,
+    "editor.hover.sticky": false,
+    "window.zoomLevel": 0,
+    "terminal.integrated.shell.windows": "C:/Program Files/PowerShell/6/pwsh.exe",
+    "files.exclude": {
+        "**/.pyc": true
+    },
+    "explorer.confirmDelete": false
+}
