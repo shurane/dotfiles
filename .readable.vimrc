@@ -43,7 +43,7 @@ call plug#begin('~/.vim/plugged')
 call plug#end()
 
 " see https://vi.stackexchange.com/a/456/11757
-function TrimWhitespace()
+function! TrimWhitespace()
     let l:save = winsaveview()
     keeppatterns %s/\s\+$//e
     call winrestview(l:save)
