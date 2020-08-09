@@ -8,6 +8,7 @@ set bs=2
 set scrolloff=3
 set incsearch
 set ignorecase
+set linebreak
 set pastetoggle=,tp
 set directory=$HOME/.vim/swapfiles/
 set lcs=trail:-,extends:>,tab:>-,eol:$
@@ -35,6 +36,7 @@ call plug#begin('~/.vim/plugged')
 
     Plug 'junegunn/fzf'
     Plug 'tpope/vim-surround'
+    Plug 'plasticboy/vim-markdown'
     Plug 'scrooloose/nerdcommenter'
     Plug 'leafgarland/typescript-vim'
     " Plug 'peitalin/vim-jsx-typescript'
