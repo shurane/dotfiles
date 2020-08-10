@@ -33,7 +33,6 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 endif
 
 call plug#begin('~/.vim/plugged')
-
     Plug 'junegunn/fzf'
     Plug 'tpope/vim-surround'
     Plug 'plasticboy/vim-markdown'
@@ -41,7 +40,6 @@ call plug#begin('~/.vim/plugged')
     Plug 'leafgarland/typescript-vim'
     " Plug 'peitalin/vim-jsx-typescript'
     Plug 'flazz/vim-colorschemes'
-
 call plug#end()
 
 " see https://vi.stackexchange.com/a/456/11757
@@ -53,3 +51,4 @@ endfun
 
 colorscheme wombat256mod
 nnoremap <C-p> :FZF<CR>
+let g:vim_markdown_folding_disabled = 1
