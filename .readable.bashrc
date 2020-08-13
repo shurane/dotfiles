@@ -59,12 +59,15 @@ test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)"
 
 alias grep="grep --color=auto --ignore-case"
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
+alias tree="tree -C"
+type nvim >/dev/null 2>&1 && alias vim=nvim
 
 # https://github.com/BurntSushi/ripgrep/issues/86#issuecomment-331718946
 rgl() { rg -i -p -M 500 "$@" | less -XFR; }
 rgf() { rg --files | rg -i -p -M 500 "$@" | less -XFR; }
 rglc() { rg -i -p -M 500 --type csharp "$@" | less -XFR; }
 rglt() { rg -i -p -M 500 --type ts "$@" | less -XFR; }
+rgltj() { rg -i -p -M 500 --type ts --type js "$@" | less -XFR; }
 rglweb() { rg -i -p -M 500 --type-add 'web:*.{htm,html,css,sass,less,js,jsx,ts,tsx}' --type web "$@" | less -XFR; }
 
 # https://github.com/junegunn/fzf#respecting-gitignore
