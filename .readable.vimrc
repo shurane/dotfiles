@@ -21,6 +21,8 @@ nnoremap <Leader>tl :set list!<CR>
 nnoremap <CR> o<Esc>
 nnoremap \r :e $MYVIMRC<CR>
 nnoremap <Leader>r :source $MYVIMRC<CR>
+vnoremap < <gv
+vnoremap > >gv
 
 " https://github.com/junegunn/vim-plug
 " Automatic installaion of vim-plug and swapfiles creation
@@ -38,8 +40,9 @@ call plug#begin('~/.vim/plugged')
     Plug 'plasticboy/vim-markdown'
     Plug 'scrooloose/nerdcommenter'
     Plug 'leafgarland/typescript-vim'
-    " Plug 'peitalin/vim-jsx-typescript'
     Plug 'flazz/vim-colorschemes'
+    " Plug 'mhinz/vim-grepper'
+    " Plug 'peitalin/vim-jsx-typescript'
 call plug#end()
 
 " see https://vi.stackexchange.com/a/456/11757
@@ -52,3 +55,4 @@ endfun
 colorscheme wombat256mod
 nnoremap <C-p> :FZF<CR>
 let g:vim_markdown_folding_disabled = 1
+let g:vim_markdown_new_list_item_indent = 0
