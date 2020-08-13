@@ -60,6 +60,7 @@ test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)"
 alias grep="grep --color=auto --ignore-case"
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
 alias tree="tree -C"
+type fdfind >/dev/null 2>&1 && alias fd=fdfind
 type nvim >/dev/null 2>&1 && alias vim=nvim
 
 # https://github.com/BurntSushi/ripgrep/issues/86#issuecomment-331718946
