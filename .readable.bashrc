@@ -38,6 +38,7 @@ export INPUTRC="$HOME/.inputrc"
 export PAGER="less"
 export EDITOR="vim"
 export LESS="-FRXI"
+export PATH="$HOME/.local/bin:$PATH"
 
 alias ..="cd .."
 alias ...="cd ../.."
@@ -72,7 +73,4 @@ rgltj() { rg -i -p -M 500 --type ts --type js "$@" | less -XFR; }
 rglweb() { rg -i -p -M 500 --type-add 'web:*.{htm,html,css,sass,less,js,jsx,ts,tsx}' --type web "$@" | less -XFR; }
 
 # https://github.com/junegunn/fzf#respecting-gitignore
-export FZF_DEFAULT_COMMAND='
- (git ls-tree -r --name-only HEAD ||
-  find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
-  sed s/^..//) 2> /dev/null'
+export FZF_DEFAULT_COMMAND='rg --files' # '2> /dev/null'
