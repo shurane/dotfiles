@@ -1,6 +1,14 @@
 // Place your key bindings in this file to override the defaults
 [
     {
+        "key": "ctrl+shift+tab",
+        "command": "workbench.action.previousEditor"
+    },
+    {
+        "key": "ctrl+tab",
+        "command": "workbench.action.nextEditor"
+    },
+    {
         "key": "ctrl+g",
         "command": "editor.action.nextMatchFindAction",
         "when": "editorTextFocus"
@@ -9,5 +17,15 @@
         "key": "ctrl+shift+g",
         "command": "editor.action.previousMatchFindAction",
         "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+g",
+        "command": "editor.action.nextMatchFindAction",
+        "when": "editorFocus"
+    },
+    {
+        "key": "ctrl+shift+g",
+        "command": "editor.action.previousMatchFindAction",
+        "when": "editorFocus"
     }
 ]
