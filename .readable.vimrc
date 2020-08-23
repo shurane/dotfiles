@@ -39,22 +39,14 @@ call plug#begin('~/.vim/plugged')
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-eunuch' " useful for :Rename, :Move
     Plug 'scrooloose/nerdcommenter'
+    Plug 'ntpeters/vim-better-whitespace'
     Plug 'flazz/vim-colorschemes'
-    Plug 'plasticboy/vim-markdown'
-    Plug 'leafgarland/typescript-vim'
-    Plug 'yuezk/vim-js'
-    Plug 'maxmellon/vim-jsx-pretty'
+    Plug 'sheerun/vim-polyglot'
     " Plug 'mhinz/vim-grepper'
 call plug#end()
-
-" see https://vi.stackexchange.com/a/456/11757
-function! TrimWhitespace()
-    let l:save = winsaveview()
-    keeppatterns %s/\s\+$//e
-    call winrestview(l:save)
-endfun
 
 colorscheme wombat256mod
 nnoremap <C-p> :FZF<CR>
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_new_list_item_indent = 0
+let g:strip_whitespace_on_save = 1
