@@ -37,12 +37,14 @@ endif
 call plug#begin('~/.vim/plugged')
     Plug 'junegunn/fzf'
     Plug 'tpope/vim-surround'
-    Plug 'plasticboy/vim-markdown'
+    Plug 'tpope/vim-eunuch' " useful for :Rename, :Move
     Plug 'scrooloose/nerdcommenter'
-    Plug 'leafgarland/typescript-vim'
     Plug 'flazz/vim-colorschemes'
+    Plug 'plasticboy/vim-markdown'
+    Plug 'leafgarland/typescript-vim'
+    Plug 'yuezk/vim-js'
+    Plug 'maxmellon/vim-jsx-pretty'
     " Plug 'mhinz/vim-grepper'
-    " Plug 'peitalin/vim-jsx-typescript'
 call plug#end()
 
 " see https://vi.stackexchange.com/a/456/11757
