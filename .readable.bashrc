@@ -56,7 +56,7 @@ grep -qEi "(Microsoft|WSL)" /proc/version && LS_COLORS="$LS_COLORS:ow=01;36;40" 
 
 # https://github.com/clvv/fasd/wiki/Installing-via-Package-Managers
 test -x "$(command -v fasd)" && eval "$(fasd --init auto)"
-test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)"
+#test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)"
 
 alias grep="grep --color=auto --ignore-case"
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
