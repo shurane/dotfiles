@@ -14,6 +14,10 @@ set directory=$HOME/.vim/swapfiles/
 set lcs=trail:-,extends:>,tab:>-,eol:$
 set vb t_vb=
 let mapleader = ","
+nnoremap j gj
+nnoremap k gk
+nnoremap 0 g0
+nnoremap $ g$
 inoremap jj <Esc>
 nnoremap <C-l> :set hlsearch!<CR>
 nnoremap <Leader>tw :set wrap!<CR>
