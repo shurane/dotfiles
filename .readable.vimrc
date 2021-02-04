@@ -19,6 +19,8 @@ nnoremap k gk
 nnoremap 0 g0
 nnoremap $ g$
 inoremap jj <Esc>
+nnoremap k gk
+nnoremap j gj
 nnoremap <C-l> :set hlsearch!<CR>
 nnoremap <Leader>tw :set wrap!<CR>
 nnoremap <Leader>tl :set list!<CR>
