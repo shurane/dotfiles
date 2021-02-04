@@ -9,7 +9,7 @@
     "editor.hover.enabled": false,
     "editor.hover.sticky": false,
     "window.zoomLevel": 0,
-    "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+    "terminal.integrated.shell.windows": "pwsh.exe",
     "files.exclude": {
         "**/.pyc": true
     },
