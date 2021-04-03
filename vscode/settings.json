@@ -1,5 +1,5 @@
 {
-    "workbench.startupEditor": "welcomePage",
+    "workbench.startupEditor": "newUntitledFile",
     "update.showReleaseNotes": false,
     "files.trimTrailingWhitespace": true,
     "files.trimFinalNewlines": true,
@@ -12,6 +12,7 @@
     "editor.hover.enabled": false,
     "editor.hover.sticky": false,
     "editor.codeLens": false,
+    "editor.minimap.enabled": false,
     "window.zoomLevel": 0,
     "terminal.integrated.shell.windows": "pwsh.exe",
     "terminal.integrated.automationShell.windows": "pwsh.exe",
