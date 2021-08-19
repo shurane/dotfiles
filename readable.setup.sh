@@ -1,10 +1,9 @@
-# https://launchpad.net/~neovim-ppa/+archive/ubuntu/stable
-sudo add-apt-repository ppa:neovim-ppa/stable
 # https://github.com/nodesource/distributions/blob/master/README.md
 curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 
 # third party binaries, installed manually
 : << 'END'
+- neovim https://github.com/neovim/neovim/wiki/Installing-Neovim#appimage-universal-linux-package
 - ripgrep https://github.com/BurntSushi/ripgrep#installation
 - scc https://github.com/boyter/scc
 END
@@ -12,7 +11,7 @@ END
 sudo apt install -y tmux mosh tree rsync ncdu htop fasd p7zip-full
 # for programming
 sudo apt -y install postgresql postgresql-client
-sudo apt install -y neovim nodejs python3-pip tig
+sudo apt install -y nodejs python3-pip tig
 
 sudo pip3 install ipython requests flask pylint black
 
