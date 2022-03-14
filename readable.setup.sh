@@ -6,6 +6,10 @@ curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 - neovim https://github.com/neovim/neovim/wiki/Installing-Neovim#appimage-universal-linux-package
 - ripgrep https://github.com/BurntSushi/ripgrep#installation
 - scc https://github.com/boyter/scc
+- sharkdp/fd  https://github.com/sharkdp/fd (find alternative)
+- sharkdp/bat https://github.com/sharkdp/bat (cat alternative with syntax highlighting)
+- sharkdp/vivid https://github.com/sharkdp/vivid (LS_COLORS for different file extensions)
+- https://github.com/sharkdp/diskus (du -sh alternative that's parallelized)
 END
 
 sudo apt install -y tmux mosh tree rsync ncdu htop fasd p7zip-full
