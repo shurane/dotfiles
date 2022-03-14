@@ -45,21 +45,20 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias ......="cd ../../../../.."
+alias tree="tree -C"
 
 PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 #PS1='\u@\h:\w\$ '
 
-test -x "$(command -v vivid)" && export LS_COLORS="$(vivid generate snazzy)"
-
-# https://github.com/clvv/fasd/wiki/Installing-via-Package-Managers
-test -x "$(command -v fasd)" && eval "$(fasd --init auto)"
-
-alias grep="rg --ignore-case"
+# https://the.exa.website/
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
-alias cat="bat --number"
-alias tree="tree -C"
-type fdfind >/dev/null 2>&1 && alias fd=fdfind
-type nvim >/dev/null 2>&1 && alias vim=nvim
+test -x "$(command -v exa)" && alias ls="exa --group-directories-first --sort=extension"
+
+test -x "$(command -v cat)" && alias cat="bat --number"
+test -x "$(command -v rg)" && alias grep="rg --ignore-case"
+test -x "$(command -v vivid)" && export LS_COLORS="$(vivid generate snazzy)"
+test -x "$(command -v fasd)" && eval "$(fasd --init auto)"
+test -x "$(command -v nvim)" && alias vim=nvim
 
 # https://github.com/BurntSushi/ripgrep/issues/86#issuecomment-331718946
 rgl() { rg -i -p -M 500 "$@" | less -XFR; }
@@ -69,9 +68,8 @@ rglt() { rg -i -p -M 500 --type ts "$@" | less -XFR; }
 rgltj() { rg -i -p -M 500 --type ts --type js "$@" | less -XFR; }
 rglweb() { rg -i -p -M 500 --type-add 'web:*.{htm,html,css,sass,less,js,jsx,ts,tsx}' --type web "$@" | less -XFR; }
 
-batdiff() {
-    git diff --name-only --diff-filter=d | xargs bat --diff
-}
+batdiff() { git diff --name-only --diff-filter=d | xargs bat --diff; }
 
 # https://github.com/junegunn/fzf#respecting-gitignore
-export FZF_DEFAULT_COMMAND='rg --files --hidden -g "!.git" '
+#export FZF_DEFAULT_COMMAND='rg --files --hidden -g "!.git"'
+export FZF_DEFAULT_COMMAND='fd --hidden --exclude .git'
