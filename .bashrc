@@ -50,16 +50,13 @@ PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 #PS1='\u@\h:\w\$ '
 
 test -x "$(command -v vivid)" && export LS_COLORS="$(vivid generate snazzy)"
-# https://github.com/Microsoft/vscode/issues/7556 for WSL colors
-# see https://stackoverflow.com/a/43618657/198348
-grep -qEi "(Microsoft|WSL)" /proc/version && LS_COLORS="$LS_COLORS:ow=01;36;40" && export LS_COLORS
 
 # https://github.com/clvv/fasd/wiki/Installing-via-Package-Managers
 test -x "$(command -v fasd)" && eval "$(fasd --init auto)"
-#test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)"
 
-alias grep="grep --color=auto --ignore-case"
+alias grep="rg --ignore-case"
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
+alias cat="bat --number"
 alias tree="tree -C"
 type fdfind >/dev/null 2>&1 && alias fd=fdfind
 type nvim >/dev/null 2>&1 && alias vim=nvim
@@ -73,4 +70,4 @@ rgltj() { rg -i -p -M 500 --type ts --type js "$@" | less -XFR; }
 rglweb() { rg -i -p -M 500 --type-add 'web:*.{htm,html,css,sass,less,js,jsx,ts,tsx}' --type web "$@" | less -XFR; }
 
 # https://github.com/junegunn/fzf#respecting-gitignore
-export FZF_DEFAULT_COMMAND='rg --files' # '2> /dev/null'
+export FZF_DEFAULT_COMMAND='rg --files --hidden -g "!.git" '
