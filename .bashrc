@@ -69,5 +69,7 @@ rglt() { rg -i -p -M 500 --type ts "$@" | less -XFR; }
 rgltj() { rg -i -p -M 500 --type ts --type js "$@" | less -XFR; }
 rglweb() { rg -i -p -M 500 --type-add 'web:*.{htm,html,css,sass,less,js,jsx,ts,tsx}' --type web "$@" | less -XFR; }
 
+batdiff() { git diff --name-only --diff-filter=d | xargs bat --diff }
+
 # https://github.com/junegunn/fzf#respecting-gitignore
 export FZF_DEFAULT_COMMAND='rg --files --hidden -g "!.git" '
