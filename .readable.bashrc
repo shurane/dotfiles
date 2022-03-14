@@ -35,7 +35,7 @@ if ! shopt -oq posix; then
 fi
 
 export INPUTRC="$HOME/.inputrc"
-export PAGER="less"
+export PAGER="less -RX"
 export EDITOR="vim"
 export LESS="-FRXI"
 export PATH="$HOME/.local/bin:$PATH"
