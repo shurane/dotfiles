@@ -42,6 +42,7 @@ endif
 
 call plug#begin('~/.vim/plugged')
     Plug 'junegunn/fzf'
+    Plug 'ziglang/zig.vim'
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-eunuch' " useful for :Rename, :Move
     Plug 'scrooloose/nerdcommenter'
@@ -49,6 +50,13 @@ call plug#begin('~/.vim/plugged')
     Plug 'flazz/vim-colorschemes'
     Plug 'sheerun/vim-polyglot'
     " Plug 'mhinz/vim-grepper'
+    " something for neovim
+    if has('nvim')
+        Plug 'neovim/nvim-lspconfig'
+        " https://github.com/neoclide/coc.nvim
+        " Plug 'neoclide/coc.nvim', {'branch': 'release'}
+        set signcolumn=number
+    endif
 call plug#end()
 
 colorscheme wombat256mod
