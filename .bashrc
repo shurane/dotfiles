@@ -4,8 +4,7 @@ case $- in
       *) return;;
 esac
 
-# force ignoredups and ignorespace
-HISTCONTROL=ignoredups:ignorespace
+HISTCONTROL=ignoredups:ignorespace:erasedups
 HISTSIZE=200000
 HISTFILESIZE=200000
 # append to the history file, don't overwrite it
@@ -35,10 +34,13 @@ if ! shopt -oq posix; then
 fi
 
 export INPUTRC="$HOME/.inputrc"
-export PAGER="less -RX"
+export PAGER="less"
 export EDITOR="vim"
 export LESS="-FRXI"
 export PATH="$HOME/.local/bin:$PATH"
+
+[ -f "$HOME/.ghcup/env" ] && source "$HOME/.ghcup/env" # https://gitlab.haskell.org/haskell/ghcup-hs
+[ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env" # https://rustup.rs/
 
 alias ..="cd .."
 alias ...="cd ../.."
