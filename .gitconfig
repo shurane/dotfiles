@@ -1,10 +1,24 @@
 [user]
 	name = Ehtesh Choudhury
 	email = ehtesh.choudhury@gmail.com
+
+# https://dandavison.github.io/delta/get-started.html
 [core]
-	# https://stackoverflow.com/questions/3206843/how-line-ending-conversions-work-with-git-core-autocrlf-between-different-operat
-    # https://github.com/Microsoft/WSL/issues/184, change to true on Windows
-	autocrlf = input
+    pager = delta
+	autocrlf = false
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+
+[merge]
+    conflictstyle = diff3
+
+[diff]
+    colorMoved = default
+
 [alias]
     hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
     # http://stackoverflow.com/a/9074343/198348
@@ -12,7 +26,9 @@
     lg2 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all
     lg3 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(bold cyan)(committed: %cD)%C(reset) %C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset)%n''          %C(dim white)- %an <%ae> %C(reset) %C(dim white)(committer: %cn <%ce>)%C(reset) --all'
     # there's also git log --oneline
+
 [push]
 	default = simple
+
 [credential]
 	helper = cache

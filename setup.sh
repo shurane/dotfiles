@@ -8,6 +8,7 @@
 - sharkdp/bat https://github.com/sharkdp/bat (cat alternative with syntax highlighting)
 - sharkdp/vivid https://github.com/sharkdp/vivid (LS_COLORS for different file extensions)
 - sharkdp/diskus https://github.com/sharkdp/diskus (du -sh alternative that's parallelized)
+- dandavision/delta https://github.com/dandavison/delta
 - plt/racket
 - rustup
 - ghcup
