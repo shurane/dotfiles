@@ -56,6 +56,7 @@ call plug#begin('~/.vim/plugged')
         " https://github.com/neoclide/coc.nvim
         Plug 'neoclide/coc.nvim', {'branch': 'release'}
         set signcolumn=number
+        set updatetime=300
     endif
 
 call plug#end()
