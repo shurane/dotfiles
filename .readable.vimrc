@@ -54,14 +54,55 @@ call plug#begin('~/.vim/plugged')
     if has('nvim')
         Plug 'neovim/nvim-lspconfig'
         " https://github.com/neoclide/coc.nvim
-        " Plug 'neoclide/coc.nvim', {'branch': 'release'}
+        Plug 'neoclide/coc.nvim', {'branch': 'release'}
         set signcolumn=number
     endif
+
 call plug#end()
 
 colorscheme wombat256mod
 nnoremap <C-p> :FZF<CR>
+
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_new_list_item_indent = 0
 let g:strip_whitespace_on_save = 1
 let g:strip_whitespace_confirm = 0
+
+if !has('nvim')
+  finish
+endif
+
+lua << EOF
+require'lspconfig'.pyright.setup{}
+require'lspconfig'.clangd.setup{}
+EOF
+
+" https://github.com/neoclide/coc.nvim#example-vim-configuration
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocActionAsync('doHover')
+  endif
+endfunction
+
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Symbol renaming.
+nmap <leader>rn <Plug>(coc-rename)
+
+" Formatting selected code.
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
