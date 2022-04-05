@@ -78,6 +78,11 @@ require'lspconfig'.pyright.setup{}
 require'lspconfig'.clangd.setup{}
 EOF
 
+" https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions#install-extensions
+" maybe: coc-pairs
+let g:coc_global_extensions = ['coc-pyright', 'coc-clangd', 'coc-highlight', 'coc-pairs']
+
+
 " https://github.com/neoclide/coc.nvim#example-vim-configuration
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
