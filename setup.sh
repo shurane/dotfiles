@@ -33,7 +33,10 @@ END
 # https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
-sudo apt update && sudo apt install clang-14 clang++-14 clangd-14 gcc-11
+sudo apt update && sudo apt install clang-14 clangd-14 gcc-11
+# https://gist.github.com/mpusz/886a2a68742f1f63820d6b1425866791
+sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 140 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-14
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11
 
 # https://github.com/nodesource/distributions/blob/master/README.md
 curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
