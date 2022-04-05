@@ -35,7 +35,7 @@ sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
 sudo apt update && sudo apt install clang-14 clangd-14 gcc-11 g++-11
 # https://gist.github.com/mpusz/886a2a68742f1f63820d6b1425866791
-sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 140 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-14
+sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 140 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-14 --slave /usr/bin/clangd clangd /usr/bin/clangd-14
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11
 
 # https://github.com/nodesource/distributions/blob/master/README.md
