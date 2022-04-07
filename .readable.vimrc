@@ -41,33 +41,41 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 endif
 
 call plug#begin('~/.vim/plugged')
-    Plug 'junegunn/fzf'
-    Plug 'ziglang/zig.vim'
-    Plug 'tpope/vim-surround'
-    Plug 'tpope/vim-eunuch' " useful for :Rename, :Move
-    Plug 'scrooloose/nerdcommenter'
-    Plug 'ntpeters/vim-better-whitespace'
-    Plug 'flazz/vim-colorschemes'
-    Plug 'sheerun/vim-polyglot'
-    " Plug 'mhinz/vim-grepper'
-    " something for neovim
-    if has('nvim')
-        Plug 'neovim/nvim-lspconfig'
-        " https://github.com/neoclide/coc.nvim
-        Plug 'neoclide/coc.nvim', {'branch': 'release'}
-        set signcolumn=number
-        set updatetime=300
-    endif
+  Plug 'junegunn/fzf'
+  Plug 'ziglang/zig.vim'
+  Plug 'tpope/vim-surround'
+  Plug 'tpope/vim-eunuch' "useful for :Rename, :Move
+  Plug 'scrooloose/nerdcommenter'
+  Plug 'ntpeters/vim-better-whitespace'
+  Plug 'sheerun/vim-polyglot'
 
+  "colorschemes
+  Plug 'rktjmp/lush.nvim', {'branch': 'main'}
+  Plug 'ViViDboarder/wombat.nvim', {'branch': 'main'}
+  Plug 'EvitanRelta/vim-colorschemes'
+  Plug 'sainnhe/sonokai'
+  Plug 'Mofiqul/vscode.nvim', {'branch': 'main'}
+  Plug 'EdenEast/nightfox.nvim', {'branch': 'main'}
+
+  "Plug 'mhinz/vim-grepper'
+  if has('nvim')
+    Plug 'neovim/nvim-lspconfig'
+    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+    " :TSInstall cpp python javascript jsonc vim zig html
+    " https://github.com/neoclide/coc.nvim
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    set signcolumn=number
+    set updatetime=300
+  endif
 call plug#end()
 
-colorscheme wombat256mod
 nnoremap <C-p> :FZF<CR>
 
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_new_list_item_indent = 0
 let g:strip_whitespace_on_save = 1
 let g:strip_whitespace_confirm = 0
+colorscheme nightfox
 
 if !has('nvim')
   finish
@@ -76,12 +84,31 @@ endif
 lua << EOF
 require'lspconfig'.pyright.setup{}
 require'lspconfig'.clangd.setup{}
+
+-- https://github.com/nvim-treesitter/nvim-treesitter
+require'nvim-treesitter.configs'.setup {
+  highlight = {
+    enable = true,
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = "vim"
+  }, incremental_selection = {
+    enable = true,
+    keymaps = {
+      init_selection = "gnn",
+      node_incremental = "grn",
+      scope_incremental = "grc",
+      node_decremental = "grm",
+    },
+  },
+}
 EOF
 
 " https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions#install-extensions
 " maybe: coc-pairs
 let g:coc_global_extensions = ['coc-pyright', 'coc-clangd', 'coc-highlight', 'coc-pairs']
-
 
 " https://github.com/neoclide/coc.nvim#example-vim-configuration
 nnoremap <silent> K :call <SID>show_documentation()<CR>
