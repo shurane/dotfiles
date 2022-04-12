@@ -75,7 +75,8 @@ let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_new_list_item_indent = 0
 let g:strip_whitespace_on_save = 1
 let g:strip_whitespace_confirm = 0
-colorscheme nightfox
+colorscheme terafox " why do I need both of these to activate wombat_classic correctly?
+"colorscheme wombat_classic
 
 if !has('nvim')
   finish
@@ -109,6 +110,10 @@ EOF
 " https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions#install-extensions
 " maybe: coc-pairs
 let g:coc_global_extensions = ['coc-pyright', 'coc-clangd', 'coc-highlight', 'coc-pairs']
+
+" h :coc#on_enter(), https://github.com/neoclide/coc-pairs
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+      \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 " https://github.com/neoclide/coc.nvim#example-vim-configuration
 nnoremap <silent> K :call <SID>show_documentation()<CR>
