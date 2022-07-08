@@ -14,8 +14,9 @@
     "editor.codeLens": false,
     "editor.minimap.enabled": false,
     "window.zoomLevel": 0,
-    "terminal.integrated.shell.windows": "pwsh.exe",
-    "terminal.integrated.automationShell.windows": "pwsh.exe",
+    // https://code.visualstudio.com/docs/editor/integrated-terminal
+    "terminal.integrated.profiles.windows": { "pwsh": { "path": "pwsh.exe" } },
+    "terminal.integrated.defaultProfile.windows": "pwsh",
     "files.exclude": {
         "**/.pyc": true
     }
