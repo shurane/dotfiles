@@ -75,8 +75,16 @@ let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_new_list_item_indent = 0
 let g:strip_whitespace_on_save = 1
 let g:strip_whitespace_confirm = 0
-colorscheme terafox " why do I need both of these to activate wombat_classic correctly?
+"colorscheme terafox
+"colorscheme wombat256mod
 "colorscheme wombat_classic
+colorscheme onedark
+" https://stackoverflow.com/a/7616332/198348
+highlight Normal guibg=black guifg=white
+
+if has('termguicolors')
+  set termguicolors
+endif
 
 if !has('nvim')
   finish

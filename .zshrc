@@ -7,14 +7,11 @@ export PROMPT="%n@%m:%20<...<%d%<<%% "
 export EDITOR=vim
 # End of lines configured by zsh-newuser-install
 # The following lines were added by compinstall
-zstyle :compinstall filename '/home/ehtesh/.zshrc'
-
-source $HOME/.pathrc
+zstyle :compinstall filename $HOME/.zshrc
 
 autoload -Uz compinit
 compinit
 # End of lines added by compinstall
-
 
 #TODO double check these options?
 unsetopt beep
@@ -47,29 +44,3 @@ bindkey -M viins 'b' vi-backward-word
 bindkey -M viins 'f' vi-forward-word
 
 # }}}
-
-# antigen.zsh stuff: https://github.com/zsh-users/antigen
-
-source $HOME/projects-vanilla/antigen/antigen.zsh
-
-antigen use oh-my-zsh
-antigen bundle zsh-users/zsh-syntax-highlighting
-antigen bundle zsh-users/zsh-completions src
-antigen bundle git
-#antigen bundle pip
-#antigen bundle lein
-#antigen bundle command-not-found
-#antigen bundle rsync
-antigen bundle python
-#antigen bundle virtualenvwrapper
-#antigen bundle node
-#antigen bundle npm
-#antigen bundle history
-#antigen bundle tmux
-#antigen bundle vundle
-#antigen bundle sprunge
-antigen theme alanpeabody
-
-antigen apply
-
-source ~/.loadrc

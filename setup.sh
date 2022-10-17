@@ -15,7 +15,7 @@
 - ziglang
 END
 
-sudo apt install -y tmux mosh tree rsync ncdu htop fasd tig p7zip-full
+sudo apt install -y tmux mosh tree rsync ncdu htop zoxide tig p7zip-full #fasd
 
 # for programming
 sudo apt install -y postgresql postgresql-client
