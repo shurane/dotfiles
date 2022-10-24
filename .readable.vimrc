@@ -48,6 +48,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'scrooloose/nerdcommenter'
   Plug 'ntpeters/vim-better-whitespace'
   Plug 'sheerun/vim-polyglot'
+  Plug 'lambdalisue/suda.vim'
 
   "colorschemes
   Plug 'rktjmp/lush.nvim', {'branch': 'main'}

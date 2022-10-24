@@ -20,8 +20,13 @@ sudo apt install -y tmux mosh tree rsync ncdu htop zoxide tig p7zip-full #fasd
 # for programming
 sudo apt install -y postgresql postgresql-client
 
-# TODO install python 3.10
-sudo pip3 install ipython requests flask pylint black
+# python 3.10 or maybe use pyenv?
+sudo add-apt-repository -y ppa:deadsnakes/ppa
+sudo apt update && sudo apt install python3.10
+
+# python packages
+sudo pip3 install pandas numpy scipy
+sudo pip3 install ipython bpython requests flask pylint black pep8 rope pyright
 
 # clang, gcc
 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
@@ -43,6 +48,5 @@ curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 
 sudo apt install -y nodejs
 sudo npm install -g http-server serve nodemon
-sudo npm install -g typescript ts-node js-beautify eslint rimraf
-sudo npm install -g npm-check tldr #optional
-
+sudo npm install -g typescript ts-node js-beautify tslint
+#sudo npm update -g # update global packages
