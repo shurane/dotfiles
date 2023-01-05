@@ -42,7 +42,7 @@ endif
 
 call plug#begin('~/.vim/plugged')
   Plug 'junegunn/fzf'
-  Plug 'ziglang/zig.vim'
+  "Plug 'ziglang/zig.vim'
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-eunuch' "useful for :Rename, :Move
   Plug 'scrooloose/nerdcommenter'
@@ -51,12 +51,14 @@ call plug#begin('~/.vim/plugged')
   Plug 'lambdalisue/suda.vim'
 
   "colorschemes
+  Plug 'EvitanRelta/vim-colorschemes'
+  "Plug 'navarasu/onedark.nvim'
+  Plug 'sainnhe/sonokai'
   Plug 'rktjmp/lush.nvim', {'branch': 'main'}
   Plug 'ViViDboarder/wombat.nvim', {'branch': 'main'}
-  Plug 'EvitanRelta/vim-colorschemes'
-  Plug 'sainnhe/sonokai'
   Plug 'Mofiqul/vscode.nvim', {'branch': 'main'}
   Plug 'EdenEast/nightfox.nvim', {'branch': 'main'}
+  Plug 'tiagovla/tokyodark.nvim'
 
   "Plug 'mhinz/vim-grepper'
   if has('nvim')
@@ -70,7 +72,33 @@ call plug#begin('~/.vim/plugged')
   endif
 call plug#end()
 
-nnoremap <C-p> :FZF<CR>
+" https://cj.rs/blog/git-ls-files-is-faster-than-fd-and-find/
+" https://github.com/junegunn/fzf/blob/master/README-VIM.md
+" https://github.com/junegunn/fzf/issues/31
+function! FZFExecute()
+  " Remove trailing new line to make it work with tmux splits
+  let directory = substitute(system('git rev-parse --show-toplevel'), '\n$', '', '')
+  if !v:shell_error
+    call fzf#run({'sink': 'e', 'dir': directory, 'source': 'git ls-files -c --exclude-standard', 'window': { 'width': 0.9, 'height': 0.6 } })
+  else
+    FZF
+  endif
+endfunction
+command! FZFExecute call FZFExecute()
+
+function! FZFCWDExecute()
+  " Remove trailing new line to make it work with tmux splits
+  if !v:shell_error
+    call fzf#run({'sink': 'e', 'dir': '.', 'window': { 'width': 0.9, 'height': 0.6 } })
+  else
+    FZF
+  endif
+endfunction
+command! FZFCWDExecute call FZFCWDExecute()
+
+let $FZF_DEFAULT_COMMAND = 'fd --type f --exclude .git'
+nnoremap <C-p> :FZFExecute<CR>
+nnoremap <C-.> :FZFCWDExecute<CR>
 
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_new_list_item_indent = 0
@@ -97,6 +125,7 @@ require'lspconfig'.clangd.setup{}
 
 -- https://github.com/nvim-treesitter/nvim-treesitter
 require'nvim-treesitter.configs'.setup {
+  ensure_installed = { "java", "cpp", "python", "javascript", "bash" },
   highlight = {
     enable = true,
     -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
