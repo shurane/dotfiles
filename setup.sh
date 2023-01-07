@@ -9,13 +9,14 @@
 - sharkdp/vivid https://github.com/sharkdp/vivid (LS_COLORS for different file extensions)
 - sharkdp/diskus https://github.com/sharkdp/diskus (du -sh alternative that's parallelized)
 - dandavision/delta https://github.com/dandavison/delta
+- zoxide (successor to fasd, autojump) https://github.com/ajeetdsouza/zoxide
 - plt/racket
 - rustup
 - ghcup
 - ziglang
 END
 
-sudo apt install -y tmux mosh tree rsync ncdu htop zoxide tig p7zip-full #fasd
+sudo apt install -y tmux mosh tree rsync ncdu htop zoxide tig p7zip-full
 
 # for programming
 sudo apt install -y postgresql postgresql-client
