@@ -13,35 +13,33 @@ set pastetoggle=,tp
 set directory=$HOME/.vim/swapfiles/
 set lcs=trail:-,extends:>,tab:>-,eol:$
 set vb t_vb=
+set splitright
 let mapleader = ","
-nnoremap j gj
-nnoremap k gk
-"nnoremap 0 g0
-"nnoremap $ g$
 inoremap jj <Esc>
-nnoremap k gk
 nnoremap j gj
-nnoremap <C-l> :set hlsearch!<CR>
+nnoremap k gk
+nnoremap <C-h> :bprevious<CR>
+nnoremap <C-l> :bnext<CR>
+nnoremap <C-s> :set hlsearch!<CR>
 nnoremap <Leader>tw :set wrap!<CR>
 nnoremap <Leader>tl :set list!<CR>
 nnoremap <CR> o<Esc>
-nnoremap \r :e $MYVIMRC<CR>
-nnoremap <Leader>r :source $MYVIMRC<CR>
+nnoremap <Leader>ev :e $HOME/.vimrc<CR>
+nnoremap <Leader>sv :source $HOME/.vimrc<CR>
 vnoremap < <gv
 vnoremap > >gv
 
 " https://github.com/junegunn/vim-plug
 " Automatic installaion of vim-plug and swapfiles creation
 if empty(glob('~/.vim/autoload/plug.vim'))
-    silent !mkdir -p ~/.vim/swapfiles
-    silent !mkdir -p ~/.vim/autoload
-    silent !curl -fLo ~/.vim/autoload/plug.vim
-                \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall
+  silent !mkdir -p ~/.vim/swapfiles
+  silent !mkdir -p ~/.vim/autoload
+  silent !curl -fLo ~/.vim/autoload/plug.vim
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall
 endif
 
 call plug#begin('~/.vim/plugged')
-  " TODO switch from fzf to fzy for better greedy string matching
   Plug 'junegunn/fzf'
   "Plug 'ziglang/zig.vim'
   Plug 'tpope/vim-surround'
@@ -108,6 +106,11 @@ let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_new_list_item_indent = 0
 let g:strip_whitespace_on_save = 1
 let g:strip_whitespace_confirm = 0
+
+let g:bufferline = {
+  \ 'auto_hide': 1
+\ }
+
 "colorscheme terafox
 "colorscheme wombat256mod
 "colorscheme wombat_classic
