@@ -41,14 +41,18 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 endif
 
 call plug#begin('~/.vim/plugged')
+  " TODO switch from fzf to fzy for better greedy string matching
   Plug 'junegunn/fzf'
   "Plug 'ziglang/zig.vim'
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-eunuch' "useful for :Rename, :Move
   Plug 'scrooloose/nerdcommenter'
   Plug 'ntpeters/vim-better-whitespace'
-  Plug 'sheerun/vim-polyglot'
   Plug 'lambdalisue/suda.vim'
+  " similar plugins, mostly barebones, render all buffers as visual "tabs", with some differences like sorting
+  "Plug 'ap/vim-buftabline'
+  Plug 'nvim-tree/nvim-web-devicons'
+  Plug 'romgrk/barbar.nvim'
 
   "colorschemes
   Plug 'EvitanRelta/vim-colorschemes'
