@@ -32,16 +32,18 @@ sudo pip3 install ipython bpython requests flask pylint black pep8 rope pyright
 # clang, gcc
 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
 sudo tee /etc/apt/sources.list.d/llvm.list << END
-# 14, https://apt.llvm.org/
-deb http://apt.llvm.org/focal/ llvm-toolchain-focal-14 main
-deb-src http://apt.llvm.org/focal/ llvm-toolchain-focal-14 main
+# 15, https://apt.llvm.org/
+deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main
+deb-src http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main
 END
 # https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+# related to having a c compiler
+# https://github.com/microsoft/WSL/issues/5663 - "/sbin/ldconfig.real: /usr/lib/wsl/lib/libcuda.so.1 is not a symbolic link"
 
-sudo apt update && sudo apt install clang-14 clangd-14 gcc-11 g++-11
+sudo apt update && sudo apt install clang-15 clangd-15 gcc-11 g++-11
 # https://gist.github.com/mpusz/886a2a68742f1f63820d6b1425866791
-sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 140 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-14 --slave /usr/bin/clangd clangd /usr/bin/clangd-14
+sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 150 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-15 --slave /usr/bin/clangd clangd /usr/bin/clangd-15
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 --slave /usr/bin/g++ g++ /usr/bin/g++-11
 
 # https://github.com/nodesource/distributions/blob/master/README.md
