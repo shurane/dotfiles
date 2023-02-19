@@ -41,6 +41,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 [ -f "$HOME/.ghcup/env" ] && source "$HOME/.ghcup/env" # https://gitlab.haskell.org/haskell/ghcup-hs
 [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env" # https://rustup.rs/
+[ -f "$HOME/.fzf.bash" ] && source "$HOME/.fzf.bash" # https://github.com/junegunn/fzf#key-bindings-for-command-line
 
 alias ..="cd .."
 alias ...="cd ../.."
@@ -75,3 +76,4 @@ batdiff() { git diff --name-only --diff-filter=d | xargs bat --diff; }
 # https://github.com/junegunn/fzf#respecting-gitignore
 #export FZF_DEFAULT_COMMAND='rg --files --hidden -g "!.git"'
 export FZF_DEFAULT_COMMAND='fd --hidden --exclude .git'
+
