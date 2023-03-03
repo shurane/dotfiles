@@ -47,10 +47,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'scrooloose/nerdcommenter'
   Plug 'ntpeters/vim-better-whitespace'
   Plug 'lambdalisue/suda.vim'
-  " similar plugins, mostly barebones, render all buffers as visual "tabs", with some differences like sorting
-  "Plug 'ap/vim-buftabline'
   Plug 'nvim-tree/nvim-web-devicons'
-  Plug 'romgrk/barbar.nvim'
 
   "colorschemes
   Plug 'EvitanRelta/vim-colorschemes'
@@ -68,6 +65,9 @@ call plug#begin('~/.vim/plugged')
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
     " :TSInstall cpp python javascript jsonc vim zig html
     " https://github.com/neoclide/coc.nvim
+    " similar plugins, mostly barebones, render all buffers as visual "tabs", with some differences like sorting
+    "Plug 'ap/vim-buftabline'
+    Plug 'romgrk/barbar.nvim'
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
     set signcolumn=number
     set updatetime=300
@@ -106,10 +106,6 @@ let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_new_list_item_indent = 0
 let g:strip_whitespace_on_save = 1
 let g:strip_whitespace_confirm = 0
-
-let g:bufferline = {
-  \ 'auto_hide': 1
-\ }
 
 "colorscheme terafox
 "colorscheme wombat256mod
@@ -151,6 +147,16 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 EOF
+
+" use barbar.nvim
+let g:bufferline = {
+  \ 'auto_hide': 1
+\ }
+
+nnoremap <C-h> :BufferPrevious<CR>
+nnoremap <C-l> :BufferNext<CR>
+nnoremap <Leader>bc :BufferClose<CR>
+nnoremap <Leader>bw :BufferWipeout<CR>
 
 " https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions#install-extensions
 " maybe: coc-pairs
