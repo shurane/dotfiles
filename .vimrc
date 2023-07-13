@@ -132,7 +132,7 @@ require'barbar'.setup {
 
 -- https://github.com/nvim-treesitter/nvim-treesitter
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = { "java", "cpp", "python", "javascript", "typescript", "tsx", "bash", "markdown" },
+  ensure_installed = { "java", "cpp", "rust", "python", "javascript", "typescript", "tsx", "bash", "markdown", "vim", "lua" },
   highlight = {
     enable = true,
     -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
