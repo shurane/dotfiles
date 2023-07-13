@@ -30,7 +30,7 @@ sudo pip3 install pandas numpy scipy
 sudo pip3 install ipython bpython requests flask pylint black pep8 rope pyright
 
 # clang, gcc
-wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 sudo tee /etc/apt/sources.list.d/llvm.list << END
 # 15, https://apt.llvm.org/
 deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main

@@ -1,270 +1,196 @@
-set nocompatible               " be iMproved
-
-filetype off                   " required!
-set runtimepath+=~/.vim/bundle/neobundle.vim/
-
-" Required:
-call neobundle#begin(expand('~/.vim/bundle/'))
-
-" Let NeoBundle manage NeoBundle
-" Required:
-NeoBundleFetch 'Shougo/neobundle.vim'
-
-" My Bundles here:
-"
-" original repos on github
-NeoBundle 'Shougo/neocomplete'
-NeoBundle 'Shougo/vimproc.vim'
-NeoBundle 'airblade/vim-gitgutter'
-"NeoBundle 'gregsexton/gitv'
-NeoBundle 'kien/ctrlp.vim'
-"NeoBundle 'majutsushi/tagbar'
-NeoBundle 'mbbill/undotree'
-NeoBundle 'michalbachowski/vim-wombat256mod'
-NeoBundle 'mileszs/ack.vim'
-NeoBundle 'nathanaelkane/vim-indent-guides'
-NeoBundle 'paradigm/TextObjectify'
-NeoBundle 'scrooloose/nerdcommenter'
-"NeoBundle 'scrooloose/nerdtree'
-NeoBundle 'scrooloose/syntastic'
-NeoBundle 'sheerun/vim-polyglot'
-"NeoBundle 'sjl/clam.vim'
-NeoBundle 'tpope/vim-eunuch'
-NeoBundle 'tpope/vim-fugitive'
-NeoBundle 'tpope/vim-markdown'
-NeoBundle 'tpope/vim-repeat'
-NeoBundle 'tpope/vim-rsi'
-NeoBundle 'tpope/vim-surround'
-NeoBundle 'tpope/vim-unimpaired'
-NeoBundle 'vim-scripts/matchit.zip'
-NeoBundle 'luochen1990/rainbow'
-NeoBundle 'wlangstroth/vim-racket'
-
-" vim-scripts repos
-" non github repos
-call neobundle#end()
-
-NeoBundleCheck
-
-filetype plugin indent on     " required!
-syntax enable
-
-" Vim Settings {{{
-
-set t_Co=256                " colors!
-colorscheme wombat256mod
-set history=10000           " keep n lines of history
-set bs=2                    " set backspace to wrap around to previous line
-set whichwrap=~,[,]         " Wrap around lines with ~, left-arrow key, and right-arrow key
-set number                  " enable line numbering
-set numberwidth=5           " set line numbering to take up 5 lines
-set cursorline              " highlights current line
-
-set ruler                   " show the cursor position all the time
-set nowrap                  " don't wrap long lines
-set linebreak               " don't wrap in the middle of words
-set showbreak=>\ \ \        " for wrapped lines
-set lcs=trail:-,extends:>,tab:>-,eol:$   " indicates trailing spaces by '-',  wrapped lines by '>', and tabs by '>-'
-set scrolloff=3             " scroll up/down by n instead of 1
-set showcmd                 " display incomplete command
-set cmdheight=1             " set command bar height
-set vb t_vb=""              " Turn visual bell off
-set mouse=a                 " use the mouse in console vim
-set mousehide
-
-set splitright              " vertical splits split to the right (instead of left)
-set clipboard+=unnamed      " yanks go onto the global clipboard as well -- this might make a mapping unnecessary
-
-" very informative status line, but should document later
-set statusline=%F%m%r%h%w\ [TYPE=%Y\ %{&ff}]\ [%l/%L\ (%p%%)]%=%{fugitive#statusline()}
-set laststatus=2            " always keep status line on
-
-set noautochdir               " don't always switch to the current file directory
-set modeline                " allow vim options to be embedded in files
-set modelines=5             " found either in first n lines or last n lines
-set noautowrite             " don't write on make/shell, and other commands
-set autoread                " reload changed files
-set hidden                  " look this up -- something about efficient writing
-set backup                  " simple backup
-set backupext=~             " backup for 'file' is 'file~'
-set lazyredraw              " don't redraw vim during macros and stuff. Force with :redraw
-
-let required_dirs = ['$HOME/.vim','$HOME/.vim/backup','$HOME/.vim/swap','$HOME/.vim/undo']
-for dir in required_dirs
-    if finddir(expand(dir)) == ''
-        call mkdir(expand(dir))
-    endif
-endfor
-
-set backupdir=~/.vim/backup " stores all backups here
-set directory=~/.vim/swap   " stores all swap files here
-
-"set nowrapscan              " turn off search wrap
-set incsearch               " turn on incremental search
-set ignorecase              " ignore case for searching
-set smartcase               " exclude explicit CAPS from ignorecase
-
-set autoindent              " Turn on auto indent
-set tabstop=4               " set tab character to n space
-set expandtab               " turn tabs into whitespace
-set softtabstop=4           " n spaces are treated as tabs
-set shiftwidth=4            " indent width for autoindent
-"set foldmethod=marker      " for explicit folds
-
-set cpoptions=yraABceFq
-set formatoptions+=tcq
-" this formatoption isn't working, it seems
-set formatoptions-=r        " don't insert comment after <CR>
-
-au BufWritePost,BufNewFile,BufRead *.md,*.markdown,*.mdown,*.mkd,*.mkdn set filetype=markdown
-
-" }}}
-
-" Functions {{{
-
-" trim whitespace, from http://vim.wikia.com/wiki/Remove_unwanted_spaces
-function! StripTrailingWhitespace()
-    normal mZ
-    %s/\s\+$//e
-    if line("'Z") != line(".")
-        echo "Stripped whitespace"
-    endif
-    normal `Z
-endfunction
-
-" toggle syntax
-function! ToggleSyntax()
-    if exists("g:syntax_on")
-        syntax off
-    else
-        syntax enable
-    endif
-endfunction
-
-" toggle diff
-function! ToggleDiff()
-    if &diff
-        diffoff
-    else
-        diffthis
-    endif
-endfunction
-
-" }}}
-
-" Vim Maps {{{
-
-let mapleader = ","
-
-" save a file as root
-" quit without confirmation
-" wipe buffer
-" open new tab
-" open up vimrc in current window
-" reload .vimrc
-cabbrev w!! w !sudo tee % > /dev/null<CR>:e!<CR><CR>
-nnoremap \q :q!<CR>
-nnoremap \bw :bw<CR>
-nnoremap \t :tabedit<CR>
-nnoremap \r :e $MYVIMRC<CR>
-nnoremap <Leader>r :source $MYVIMRC<CR>
-
-nnoremap <C-w>j <C-w>w
-nnoremap <C-w>k <C-w>W
-nnoremap <C-w><C-j> <C-w>w
-nnoremap <C-w><C-k> <C-w>W
-
-" switch back and forth between buffers
-nnoremap `n :bn<CR>
-nnoremap `p :bp<CR>
-" switch back and forth between tabs
-noremap <S-H> gT
-noremap <S-L> gt
-noremap j gj
-noremap k gk
-
-" mappings during insert mode
-" when using C-u/C-w in insert mode, create a new change instead of appending
-inoremap <C-u> <C-g>u<C-u>
-inoremap <C-w> <C-g>u<C-w>
-" escape while in insert-mode
-inoremap jj <Esc>
-" insert newline without going into insert-mode
-nnoremap <CR> o<Esc>
-
-" copy and paste to global clipboard using leader key
-"nnoremap <Leader>v "+p
-"vnoremap <Leader>v "+p
-nnoremap <Leader>v <Leader>tp"+p<Leader>tp
-vnoremap <Leader>v <Leader>tp"+p<Leader>tp
-nnoremap <Leader>c "+yy
-vnoremap <Leader>c "+y
-nnoremap <Leader>y "+yy
-vnoremap <Leader>y "+y
-vnoremap <Leader>x "+d
-
-" do :ls before switching buffers
-nnoremap <Leader>b :ls<CR>:b
-
-nnoremap <C-a> <Nop>
-nnoremap <C-x> <Nop>
-
-" Toggle different modes
-" syntax, diff, paste, wrap, listchars, highlight, and scrollbind. Missing anything?
-nnoremap <Leader>ts :call ToggleSyntax()<CR>
-nnoremap <Leader>td :call ToggleDiff()<CR>
+set nocp
+set number
+set ts=4
+set sts=4
+set sw=4
+set expandtab
+set bs=2
+set scrolloff=3
+set incsearch
+set ignorecase
+set linebreak
 set pastetoggle=,tp
+set directory=$HOME/.vim/swapfiles/
+set lcs=trail:-,extends:>,tab:>-,eol:$
+set vb t_vb=
+set splitright
+let mapleader = ","
+inoremap jj <Esc>
+nnoremap j gj
+nnoremap k gk
+nnoremap <C-h> :bprevious<CR>
+nnoremap <C-l> :bnext<CR>
+nnoremap <C-s> :set hlsearch!<CR>
 nnoremap <Leader>tw :set wrap!<CR>
 nnoremap <Leader>tl :set list!<CR>
-" add a second <C-l> after <CR> to redraw the screen
-nnoremap <C-l> :set hlsearch!<CR>
-nnoremap <Leader>tb :set scrollbind!<CR>
+nnoremap <CR> o<Esc>
+nnoremap <Leader>ev :e $HOME/.vimrc<CR>
+nnoremap <Leader>sv :source $HOME/.vimrc<CR>
+vnoremap < <gv
+vnoremap > >gv
 
-" stolen from @dirn
-:iabbrev :shrug: ¯\_(ツ)_/¯
-:iabbrev :tableflip: (╯°□°)╯︵ ┻━┻
-" TODO kind of incomplete?
-"nnoremap <Leader>tc :setlocal invspell spellang=en_us<CR>
-" }}}
+" https://github.com/junegunn/vim-plug
+" Automatic installaion of vim-plug and swapfiles creation
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !mkdir -p ~/.vim/swapfiles
+  silent !mkdir -p ~/.vim/autoload
+  silent !curl -fLo ~/.vim/autoload/plug.vim
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall
+endif
 
-" Plugin Maps {{{
+call plug#begin('~/.vim/plugged')
+  Plug 'junegunn/fzf'
+  "Plug 'ziglang/zig.vim'
+  Plug 'tpope/vim-surround'
+  Plug 'tpope/vim-eunuch' "useful for :Rename, :Move
+  Plug 'scrooloose/nerdcommenter'
+  Plug 'ntpeters/vim-better-whitespace'
+  Plug 'lambdalisue/suda.vim'
+  Plug 'nvim-tree/nvim-web-devicons'
 
-" CtrlP is pretty awesome
-let g:ctrlp_user_command = {
-    \ 'types': {
-        \ 1: ['.git', 'cd %s && git ls-files'],
-        \ 2: ['.hg', 'hg --cwd %s locate -I .'],
-        \ },
-    \ 'fallback': 'find %s -type f'
-    \ }
-let g:NERDCustomDelimiters = {
-  \ 'racket': { 'left': ';', 'leftAlt': '#| ', 'rightAlt': ' |#' },
-\ }
+  "colorschemes
+  Plug 'EvitanRelta/vim-colorschemes'
+  "Plug 'navarasu/onedark.nvim'
+  Plug 'sainnhe/sonokai'
+  Plug 'rktjmp/lush.nvim', {'branch': 'main'}
+  Plug 'ViViDboarder/wombat.nvim', {'branch': 'main'}
+  Plug 'Mofiqul/vscode.nvim', {'branch': 'main'}
+  Plug 'EdenEast/nightfox.nvim', {'branch': 'main'}
+  Plug 'tiagovla/tokyodark.nvim'
 
-let g:neocomplete#enable_at_startup = 1
-let g:tagbar_autofocus = 1
-let g:indent_guides_auto_colors = 0
-let g:indent_guides_guide_size = 1
-let g:clam_autoreturn = 1
-let g:syntastic_cpp_compiler = 'clang++'
-let g:syntastic_cpp_compiler_options = ' -std=c++11 -stdlib=libc++'
+  "Plug 'mhinz/vim-grepper'
+  if has('nvim')
+    Plug 'neovim/nvim-lspconfig'
+    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+    " :TSInstall cpp python javascript jsonc vim zig html
+    " https://github.com/neoclide/coc.nvim
+    " similar plugins, mostly barebones, render all buffers as visual "tabs", with some differences like sorting
+    "Plug 'ap/vim-buftabline'
+    Plug 'romgrk/barbar.nvim'
+    "Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    set signcolumn=number
+    set updatetime=300
+  endif
+call plug#end()
 
-autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=red   ctermbg=black
-autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=green ctermbg=darkgrey
-nnoremap <Leader>gg :UndotreeToggle<CR>
-nnoremap <Leader>dd :TagbarToggle<CR>
-nnoremap <Leader>ff :CtrlPBuffer<CR>
-nnoremap <Leader>aa :NERDTreeToggle<CR>
-nnoremap <Leader>ii :IndentGuidesToggle<CR>
-nnoremap <Leader>ss :Ack 
-" trailing space on <Leader>ss intentional
+" https://cj.rs/blog/git-ls-files-is-faster-than-fd-and-find/
+" https://github.com/junegunn/fzf/blob/master/README-VIM.md
+" https://github.com/junegunn/fzf/issues/31
+function! FZFExecute()
+  " Remove trailing new line to make it work with tmux splits
+  let directory = substitute(system('git rev-parse --show-toplevel'), '\n$', '', '')
+  if !v:shell_error
+    call fzf#run({'sink': 'e', 'dir': directory, 'source': 'git ls-files -c --exclude-standard', 'window': { 'width': 0.9, 'height': 0.6 } })
+  else
+    FZF
+  endif
+endfunction
+command! FZFExecute call FZFExecute()
 
-" }}}
+function! FZFCWDExecute()
+  " Remove trailing new line to make it work with tmux splits
+  if !v:shell_error
+    call fzf#run({'sink': 'e', 'dir': '.', 'window': { 'width': 0.9, 'height': 0.6 } })
+  else
+    FZF
+  endif
+endfunction
+command! FZFCWDExecute call FZFCWDExecute()
 
-" TODO {{{
-" http://stackoverflow.com/questions/63104/smarter-vim-recovery
-" or some better recovery method.
+let $FZF_DEFAULT_COMMAND = 'fd --type f --exclude .git'
+nnoremap <C-p> :FZFExecute<CR>
+nnoremap <C-.> :FZFCWDExecute<CR>
 
-" }}}
+let g:vim_markdown_folding_disabled = 1
+let g:vim_markdown_new_list_item_indent = 0
+let g:strip_whitespace_on_save = 1
+let g:strip_whitespace_confirm = 0
 
-" vim:fdm=marker:fdl=1
+"colorscheme terafox
+"colorscheme wombat256mod
+"colorscheme wombat_classic
+colorscheme onedark
+" https://stackoverflow.com/a/7616332/198348
+highlight Normal guibg=black guifg=white
+
+if has('termguicolors')
+  set termguicolors
+endif
+
+if !has('nvim')
+  finish
+endif
+
+lua << EOF
+require'lspconfig'.pyright.setup{}
+require'lspconfig'.clangd.setup{}
+
+require'barbar'.setup {
+    auto_hide = true,
+}
+
+-- https://github.com/nvim-treesitter/nvim-treesitter
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = { "java", "cpp", "python", "javascript", "typescript", "tsx", "bash", "markdown" },
+  highlight = {
+    enable = true,
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = "vim"
+  }, incremental_selection = {
+    enable = true,
+    keymaps = {
+      init_selection = "gnn",
+      node_incremental = "grn",
+      scope_incremental = "grc",
+      node_decremental = "grm",
+    },
+  },
+}
+EOF
+
+nnoremap <C-h> :BufferPrevious<CR>
+nnoremap <C-l> :BufferNext<CR>
+nnoremap <Leader>bc :BufferClose<CR>
+nnoremap <Leader>bw :BufferWipeout<CR>
+
+"" https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions#install-extensions
+"" maybe: coc-pairs
+"let g:coc_global_extensions = ['coc-pyright', 'coc-clangd', 'coc-highlight', 'coc-pairs']
+
+"" h :coc#on_enter(), https://github.com/neoclide/coc-pairs
+"inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+      "\: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+"" https://github.com/neoclide/coc.nvim#example-vim-configuration
+"nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+"function! s:show_documentation()
+  "if (index(['vim','help'], &filetype) >= 0)
+    "execute 'h '.expand('<cword>')
+  "else
+    "call CocActionAsync('doHover')
+  "endif
+"endfunction
+
+"" Highlight the symbol and its references when holding the cursor.
+"autocmd CursorHold * silent call CocActionAsync('highlight')
+
+"" Use <c-space> to trigger completion.
+"inoremap <silent><expr> <c-space> coc#refresh()
+
+"" GoTo code navigation.
+"nmap <silent> gd <Plug>(coc-definition)
+"nmap <silent> gy <Plug>(coc-type-definition)
+"nmap <silent> gi <Plug>(coc-implementation)
+"nmap <silent> gr <Plug>(coc-references)
+
+"" Symbol renaming.
+"nmap <leader>rn <Plug>(coc-rename)
+
+"" Formatting selected code.
+"xmap <leader>f  <Plug>(coc-format-selected)
+"nmap <leader>f  <Plug>(coc-format-selected)
