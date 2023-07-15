@@ -36,7 +36,7 @@ fi
 export INPUTRC="$HOME/.inputrc"
 export PAGER="less"
 export EDITOR="vim"
-export LESS="-FRXI"
+export LESS="-FRXi --incsearch"
 export PATH="$HOME/.local/bin:$PATH"
 
 [ -f "$HOME/.ghcup/env" ] && source "$HOME/.ghcup/env" # https://gitlab.haskell.org/haskell/ghcup-hs
