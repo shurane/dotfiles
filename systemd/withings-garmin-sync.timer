@@ -3,7 +3,7 @@ Description=Run Withings Garmin sync regularly
 
 [Timer]
 OnBootSec=15min
-OnUnitActiveSec=daily
+OnUnitActiveSec=1d
 RandomizedDelaySec=12h
 Persistent=true
 
