@@ -1,0 +1,8 @@
+[Unit]
+Description=Sync weight data between Withings and Garmin
+After=network.target
+
+[Service]
+EnvironmentFile=/home/pi/dotfiles/systemd/.env
+;ExecStart=/bin/bash -c 'echo $$GARMIN_USERNAME at 2 days ago: $(date -d -2days +%%Y-%%m-%%d), looking also for $$WITHINGS_APP and $$WITHINGS_USER'
+ExecStart=/bin/bash -c '/home/pi/.local/bin/withings-sync --fromdate $(date -d -2days +%%Y-%%m-%%d)'
