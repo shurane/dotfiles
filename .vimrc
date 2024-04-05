@@ -24,8 +24,8 @@ nnoremap <C-s> :set hlsearch!<CR>
 nnoremap <Leader>tw :set wrap!<CR>
 nnoremap <Leader>tl :set list!<CR>
 nnoremap <CR> o<Esc>
-nnoremap <Leader>ev :e $HOME/.vimrc<CR>
-nnoremap <Leader>sv :source $HOME/.vimrc<CR>
+nnoremap <Leader>ev :e $MYVIMRC<CR>
+nnoremap <Leader>sv :source $MYVIMRC<CR>
 vnoremap < <gv
 vnoremap > >gv
 
@@ -53,17 +53,16 @@ call plug#begin('~/.vim/plugged')
   Plug 'EvitanRelta/vim-colorschemes'
   "Plug 'navarasu/onedark.nvim'
   Plug 'sainnhe/sonokai'
-  Plug 'rktjmp/lush.nvim', {'branch': 'main'}
-  Plug 'ViViDboarder/wombat.nvim', {'branch': 'main'}
-  Plug 'Mofiqul/vscode.nvim', {'branch': 'main'}
-  Plug 'EdenEast/nightfox.nvim', {'branch': 'main'}
+  Plug 'rktjmp/lush.nvim'
+  Plug 'ViViDboarder/wombat.nvim'
+  Plug 'Mofiqul/vscode.nvim'
+  Plug 'EdenEast/nightfox.nvim'
   Plug 'tiagovla/tokyodark.nvim'
 
   "Plug 'mhinz/vim-grepper'
   if has('nvim')
     Plug 'neovim/nvim-lspconfig'
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-    " :TSInstall cpp python javascript jsonc vim zig html
     " https://github.com/neoclide/coc.nvim
     " similar plugins, mostly barebones, render all buffers as visual "tabs", with some differences like sorting
     "Plug 'ap/vim-buftabline'
@@ -133,14 +132,7 @@ require'barbar'.setup {
 -- https://github.com/nvim-treesitter/nvim-treesitter
 require'nvim-treesitter.configs'.setup {
   ensure_installed = { "java", "cpp", "rust", "python", "javascript", "typescript", "tsx", "bash", "markdown", "vim", "lua" },
-  highlight = {
-    enable = true,
-    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-    -- Instead of true it can also be a list of languages
-    additional_vim_regex_highlighting = "vim"
-  }, incremental_selection = {
+  incremental_selection = {
     enable = true,
     keymaps = {
       init_selection = "gnn",
