@@ -57,7 +57,7 @@ PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
 test -x "$(command -v exa)" && alias ls="exa --group-directories-first --sort=extension"
 
-test -x "$(command -v cat)" && alias cat=bat
+test -x "$(command -v bat)" && alias cat=bat
 test -x "$(command -v rg)" && alias grep="rg --ignore-case"
 test -x "$(command -v vivid)" && export LS_COLORS="$(vivid generate snazzy)"
 test -x "$(command -v zoxide)" && eval "$(zoxide init bash)"
