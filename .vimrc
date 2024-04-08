@@ -52,22 +52,20 @@ call plug#begin('~/.vim/plugged')
   "colorschemes
   Plug 'EvitanRelta/vim-colorschemes'
   "Plug 'navarasu/onedark.nvim'
-  Plug 'sainnhe/sonokai'
-  Plug 'rktjmp/lush.nvim'
-  Plug 'ViViDboarder/wombat.nvim'
-  Plug 'Mofiqul/vscode.nvim'
-  Plug 'EdenEast/nightfox.nvim'
-  Plug 'tiagovla/tokyodark.nvim'
+  "Plug 'sainnhe/sonokai'
+  "Plug 'rktjmp/lush.nvim'
+  "Plug 'ViViDboarder/wombat.nvim'
+  "Plug 'Mofiqul/vscode.nvim'
+  "Plug 'EdenEast/nightfox.nvim'
+  "Plug 'tiagovla/tokyodark.nvim'
 
   "Plug 'mhinz/vim-grepper'
   if has('nvim')
-    Plug 'neovim/nvim-lspconfig'
+     Plug 'neovim/nvim-lspconfig'
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-    " https://github.com/neoclide/coc.nvim
     " similar plugins, mostly barebones, render all buffers as visual "tabs", with some differences like sorting
     "Plug 'ap/vim-buftabline'
     Plug 'romgrk/barbar.nvim'
-    "Plug 'neoclide/coc.nvim', {'branch': 'release'}
     set signcolumn=number
     set updatetime=300
   endif
@@ -126,7 +124,7 @@ require'lspconfig'.pyright.setup{}
 require'lspconfig'.clangd.setup{}
 
 require'barbar'.setup {
-    auto_hide = true,
+  auto_hide = true,
 }
 
 -- https://github.com/nvim-treesitter/nvim-treesitter
@@ -149,40 +147,3 @@ nnoremap <C-l> :BufferNext<CR>
 nnoremap <Leader>bc :BufferClose<CR>
 nnoremap <Leader>bw :BufferWipeout<CR>
 
-"" https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions#install-extensions
-"" maybe: coc-pairs
-"let g:coc_global_extensions = ['coc-pyright', 'coc-clangd', 'coc-highlight', 'coc-pairs']
-
-"" h :coc#on_enter(), https://github.com/neoclide/coc-pairs
-"inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
-      "\: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-
-"" https://github.com/neoclide/coc.nvim#example-vim-configuration
-"nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-"function! s:show_documentation()
-  "if (index(['vim','help'], &filetype) >= 0)
-    "execute 'h '.expand('<cword>')
-  "else
-    "call CocActionAsync('doHover')
-  "endif
-"endfunction
-
-"" Highlight the symbol and its references when holding the cursor.
-"autocmd CursorHold * silent call CocActionAsync('highlight')
-
-"" Use <c-space> to trigger completion.
-"inoremap <silent><expr> <c-space> coc#refresh()
-
-"" GoTo code navigation.
-"nmap <silent> gd <Plug>(coc-definition)
-"nmap <silent> gy <Plug>(coc-type-definition)
-"nmap <silent> gi <Plug>(coc-implementation)
-"nmap <silent> gr <Plug>(coc-references)
-
-"" Symbol renaming.
-"nmap <leader>rn <Plug>(coc-rename)
-
-"" Formatting selected code.
-"xmap <leader>f  <Plug>(coc-format-selected)
-"nmap <leader>f  <Plug>(coc-format-selected)
