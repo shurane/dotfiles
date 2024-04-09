@@ -9,3 +9,9 @@ sudo ln -s $HOME/dotfiles/systemd/* /etc/systemd/system/
 systemctl enable --now withings-garmin-sync.timer
 sudo systemctl status withings-garmin-sync.service withings-garmin-sync.timer
 ```
+
+To source env variables:
+
+```bash
+set -a; source ~/dotfiles/systemd/.env; set +a
+```
