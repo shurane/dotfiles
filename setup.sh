@@ -10,6 +10,7 @@
 - sharkdp/diskus https://github.com/sharkdp/diskus (du -sh alternative that's parallelized)
 - dandavision/delta https://github.com/dandavison/delta
 - zoxide (successor to fasd, autojump) https://github.com/ajeetdsouza/zoxide
+- bkt https://github.com/dimo414/bkt (for caching command output)
 - plt/racket
 - rustup
 - ghcup
