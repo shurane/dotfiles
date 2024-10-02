@@ -48,9 +48,9 @@ sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 160 --
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130 --slave /usr/bin/g++ g++ /usr/bin/g++-13
 
 # https://github.com/nodesource/distributions/blob/master/README.md
-curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 
 sudo apt install -y nodejs
 sudo npm install -g http-server serve nodemon
-sudo npm install -g typescript ts-node js-beautify tslint
+sudo npm install -g typescript ts-node js-beautify eslint
 #sudo npm update -g # update global packages
