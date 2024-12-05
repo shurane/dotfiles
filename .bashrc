@@ -53,15 +53,16 @@ alias tree="tree -C"
 PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 #PS1='\u@\h:\w\$ '
 
-# https://the.exa.website/
+# https://github.com/eza-community/eza
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
-test -x "$(command -v exa)" && alias ls="exa --group-directories-first --sort=extension"
+test -x "$(command -v eza)" && alias ls="eza --group-directories-first --sort=extension"
 
 test -x "$(command -v bat)" && alias cat=bat
 test -x "$(command -v rg)" && alias grep="rg --ignore-case"
 test -x "$(command -v vivid)" && export LS_COLORS="$(vivid generate snazzy)"
 test -x "$(command -v zoxide)" && eval "$(zoxide init bash)"
 test -x "$(command -v nvim)" && alias vim=nvim
+test -x "$(command -v broot)" && source $HOME/.config/broot/launcher/bash/br
 
 # https://github.com/BurntSushi/ripgrep/issues/86#issuecomment-331718946
 rgl() { rg -i -p -M 500 "$@" | less -XFR; }
@@ -76,4 +77,5 @@ batdiff() { git diff --name-only --diff-filter=d | xargs bat --diff; }
 # https://github.com/junegunn/fzf#respecting-gitignore
 #export FZF_DEFAULT_COMMAND='rg --files --hidden -g "!.git"'
 export FZF_DEFAULT_COMMAND='fd --hidden --exclude .git'
+
 
