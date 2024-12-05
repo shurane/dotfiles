@@ -10,6 +10,7 @@
 - sharkdp/diskus https://github.com/sharkdp/diskus (du -sh alternative that's parallelized)
 - dandavision/delta https://github.com/dandavison/delta
 - zoxide (successor to fasd, autojump) https://github.com/ajeetdsouza/zoxide
+- broot https://github.com/Canop/broot - file manager
 - bkt https://github.com/dimo414/bkt (for caching command output)
 - plt/racket
 - rustup
@@ -33,18 +34,18 @@ sudo pip3 install ipython bpython requests flask pylint black pep8 rope pyright
 # clang, gcc
 wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 sudo tee /etc/apt/sources.list.d/llvm.list << END
-# 16, https://apt.llvm.org/
-deb http://apt.llvm.org/focal/ llvm-toolchain-focal-16 main
-deb-src http://apt.llvm.org/focal/ llvm-toolchain-focal-16 main
+# https://apt.llvm.org/
+deb http://apt.llvm.org/noble/ llvm-toolchain-noble main
+deb-src http://apt.llvm.org/noble/ llvm-toolchain-noble main
 END
 # https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 # related to having a c compiler
 # https://github.com/microsoft/WSL/issues/5663 - "/sbin/ldconfig.real: /usr/lib/wsl/lib/libcuda.so.1 is not a symbolic link"
 
-sudo apt update && sudo apt install clang-16 clangd-16 gcc-13 g++-13
+sudo apt update && sudo apt install clang clangd clang-format gcc-13 g++-13
 # https://gist.github.com/mpusz/886a2a68742f1f63820d6b1425866791
-sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 160 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-16 --slave /usr/bin/clangd clangd /usr/bin/clangd-16
+#sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 180 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-18 --slave /usr/bin/clangd clangd /usr/bin/clangd-18
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130 --slave /usr/bin/g++ g++ /usr/bin/g++-13
 
 # https://github.com/nodesource/distributions/blob/master/README.md
