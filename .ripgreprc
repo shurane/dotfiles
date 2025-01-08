@@ -1,0 +1,5 @@
+--ignore-case
+--max-columns 150
+--max-columns-preview
+
+--type-add 'web:*.{htm,html,css,sass,less,js,jsx,ts,tsx}'
