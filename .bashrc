@@ -65,12 +65,12 @@ test -x "$(command -v nvim)" && alias vim=nvim
 test -x "$(command -v broot)" && source $HOME/.config/broot/launcher/bash/br
 
 # https://github.com/BurntSushi/ripgrep/issues/86#issuecomment-331718946
-rgl() { rg -i -p -M 500 "$@" | less -XFR; }
-rgf() { rg --files | rg -i -p -M 500 "$@" | less -XFR; }
-rglc() { rg -i -p -M 500 --type csharp "$@" | less -XFR; }
-rglt() { rg -i -p -M 500 --type ts "$@" | less -XFR; }
-rgltj() { rg -i -p -M 500 --type ts --type js "$@" | less -XFR; }
-rglweb() { rg -i -p -M 500 --type-add 'web:*.{htm,html,css,sass,less,js,jsx,ts,tsx}' --type web "$@" | less -XFR; }
+rgl() { rg --pretty "$@" | less -XFR; }
+rgf() { rg --files | rg --pretty "$@" | less -XFR; }
+rglc() { rg --pretty --type csharp "$@" | less -XFR; }
+rglt() { rg --pretty --type ts "$@" | less -XFR; }
+rgltj() { rg --pretty --type ts --type js "$@" | less -XFR; }
+rglweb() { rg --pretty --type web "$@" | less -XFR; }
 
 batdiff() { git diff --name-only --diff-filter=d | xargs bat --diff; }
 
