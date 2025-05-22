@@ -55,7 +55,7 @@ PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 # https://github.com/eza-community/eza
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
 test -x "$(command -v eza)" && alias ls="eza --group-directories-first --sort=extension"
-test -x "$(command -v eza)" && alias tree="eza --tree --depth=3"
+test -x "$(command -v eza)" && alias tree="eza --tree --level=3"
 
 test -x "$(command -v bat)" && alias cat="bat --style=plain --paging=never"
 test -x "$(command -v rg)" && alias grep="rg --ignore-case"
