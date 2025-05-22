@@ -1,5 +1,6 @@
+# https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md#configuration-file
 --ignore-case
---max-columns 150
+--max-columns=150
 --max-columns-preview
 
---type-add 'web:*.{htm,html,css,sass,less,js,jsx,ts,tsx}'
+--type-add=web:*.{htm,html,css,sass,less,js,jsx,ts,tsx}
