@@ -13,5 +13,9 @@ sudo systemctl status withings-garmin-sync.service withings-garmin-sync.timer
 To source env variables:
 
 ```bash
+# https://stackoverflow.com/questions/19331497/set-environment-variables-from-file-of-key-value-pairs
 set -a; source ~/dotfiles/systemd/.env; set +a
+
+# or 
+env $(cat .env | xargs) withings-sync
 ```
