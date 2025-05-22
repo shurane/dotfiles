@@ -38,6 +38,12 @@ export PAGER="less"
 export EDITOR="vim"
 export LESS="-FRXi --incsearch"
 export PATH="$HOME/.local/bin:$PATH"
+export RIPGREP_CONFIG_PATH="$HOME/dotfiles/.ripgreprc"
+export BAT_CONFIG_PATH="$HOME/dotfiles/.bat.conf"
+
+# https://github.com/junegunn/fzf#respecting-gitignore
+#export FZF_DEFAULT_COMMAND='rg --files --hidden -g "!.git"'
+export FZF_DEFAULT_COMMAND='fd --hidden --exclude .git'
 
 [ -f "$HOME/.ghcup/env" ] && source "$HOME/.ghcup/env" # https://gitlab.haskell.org/haskell/ghcup-hs
 [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env" # https://rustup.rs/
@@ -57,25 +63,22 @@ alias ls="ls --human-readable --group-directories-first --sort=extension --color
 test -x "$(command -v eza)" && alias ls="eza --group-directories-first --sort=extension"
 test -x "$(command -v eza)" && alias tree="eza --tree --level=3"
 
-test -x "$(command -v bat)" && alias cat="bat --style=plain --paging=never"
+test -x "$(command -v bat)" && alias cat=bat
+test -x "$(command -v bat)" && alias batpp="bat --style=plain --paging=never"
 test -x "$(command -v rg)" && alias grep="rg --ignore-case"
+test -x "$(command -v nvim)" && alias vim=nvim
 test -x "$(command -v vivid)" && export LS_COLORS="$(vivid generate snazzy)"
 test -x "$(command -v zoxide)" && eval "$(zoxide init bash)"
-test -x "$(command -v nvim)" && alias vim=nvim
 test -x "$(command -v broot)" && source $HOME/.config/broot/launcher/bash/br
 
 # https://github.com/BurntSushi/ripgrep/issues/86#issuecomment-331718946
 rgl() { rg --pretty "$@" | less -XFR; }
 rgf() { rg --files | rg --pretty "$@" | less -XFR; }
+rgld() { rg --pretty --type dart "$@" | less -XFR; }
 rglc() { rg --pretty --type csharp "$@" | less -XFR; }
 rglt() { rg --pretty --type ts "$@" | less -XFR; }
 rgltj() { rg --pretty --type ts --type js "$@" | less -XFR; }
 rglweb() { rg --pretty --type web "$@" | less -XFR; }
 
 batdiff() { git diff --name-only --diff-filter=d | xargs bat --diff; }
-
-# https://github.com/junegunn/fzf#respecting-gitignore
-#export FZF_DEFAULT_COMMAND='rg --files --hidden -g "!.git"'
-export FZF_DEFAULT_COMMAND='fd --hidden --exclude .git'
-
 
