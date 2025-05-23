@@ -33,11 +33,12 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# https://stackoverflow.com/a/1397020/198348 conditionally add to path if it doesn't exist
+[[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && export PATH="$HOME/.local/bin:$PATH"
 export INPUTRC="$HOME/.inputrc"
 export PAGER="less"
 export EDITOR="vim"
 export LESS="-FRXi --incsearch"
-export PATH="$HOME/.local/bin:$PATH"
 export RIPGREP_CONFIG_PATH="$HOME/dotfiles/.ripgreprc"
 export BAT_CONFIG_PATH="$HOME/dotfiles/.bat.conf"
 
