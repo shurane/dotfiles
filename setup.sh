@@ -32,12 +32,21 @@ sudo pip3 install pandas numpy scipy
 sudo pip3 install ipython bpython requests flask pylint black pep8 rope pyright
 
 # clang, gcc
-wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
-sudo tee /etc/apt/sources.list.d/llvm.list << END
-# https://apt.llvm.org/
-deb http://apt.llvm.org/noble/ llvm-toolchain-noble main
-deb-src http://apt.llvm.org/noble/ llvm-toolchain-noble main
-END
+
+# https://github.com/llvm/llvm-project/issues/55784
+curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/llvm-snapshot.gpg
+sudo chmod a+r /etc/apt/keyrings/llvm-snapshot.gpg
+source /etc/os-release # sources $VERSION_CODENAME
+
+sudo tee /etc/apt/sources.list.d/llvm.sources <<EOF
+Enabled: yes
+Types: deb
+URIs: http://apt.llvm.org/$VERSION_CODENAME/
+Suites: llvm-toolchain-$VERSION_CODENAME
+Components: main
+Signed-By: /etc/apt/keyrings/llvm-snapshot.gpg
+EOF
+
 # https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 # related to having a c compiler

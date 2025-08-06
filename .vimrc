@@ -9,7 +9,6 @@ set scrolloff=3
 set incsearch
 set ignorecase
 set linebreak
-set pastetoggle=,tp
 set directory=$HOME/.vim/swapfiles/
 set lcs=trail:-,extends:>,tab:>-,eol:$
 set vb t_vb=
