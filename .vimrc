@@ -119,8 +119,8 @@ if !has('nvim')
 endif
 
 lua << EOF
-require'lspconfig'.pyright.setup{}
-require'lspconfig'.clangd.setup{}
+vim.lsp.enable('pyright')
+vim.lsp.enable('clangd')
 
 require'barbar'.setup {
   auto_hide = true,
