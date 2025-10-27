@@ -1,3 +1,4 @@
+
 setopt histignorealldups
 setopt inc_append_history
 setopt share_history
@@ -19,6 +20,10 @@ export SAVEHIST=200000
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
@@ -26,11 +31,10 @@ alias .....="cd ../../../.."
 alias ......="cd ../../../../.."
 alias .......="cd ../../../../../.."
 
-alias ls="gls --human-readable --group-directories-first --sort=extension --color=auto"
-alias rm="grm"
-test -x "$(command -v exa)" && alias ls="exa --group-directories-first --sort=extension"
-test -x "$(command -v exa)" && alias lt="exa --group-directories-first --sort=extension --long --tree"
-test -x "$(command -v cat)" && alias cat=bat
+# alias rm="grm"
+test -x "$(command -v eza)" && alias ls="eza --group-directories-first --sort=extension"
+test -x "$(command -v eza)" && alias lt="eza --group-directories-first --sort=extension --long --tree"
+test -x "$(command -v bat)" && alias cat=bat
 test -x "$(command -v rg)" && alias grep="rg --ignore-case"
 test -x "$(command -v vivid)" && export LS_COLORS="$(vivid generate snazzy)"
 #test -x "$(command -v fasd)" && eval "$(fasd --init auto)"
