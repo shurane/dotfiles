@@ -16,6 +16,8 @@
 - nb - note taking tool, https://github.com/xwmx/nb
 - fastfetch - show system info, kind of like motd https://github.com/fastfetch-cli/fastfetch
 - dundee/gdu - alternative to du and ncdu https://github.com/dundee/gdu
+- broot https://github.com/Canop/broot (CLI file manager)
+- ranger https://github.com/ranger/ranger (CLI file manager, with vim bindings)
 - plt/racket
 - rustup
 - ghcup
