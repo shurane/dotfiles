@@ -12,24 +12,17 @@
 - zoxide (successor to fasd, autojump) https://github.com/ajeetdsouza/zoxide
 - broot https://github.com/Canop/broot - file manager
 - bkt https://github.com/dimo414/bkt (for caching command output)
+- glow - CLI markdown renderer, https://github.com/charmbracelet/glow
+- nb - note taking tool, https://github.com/xwmx/nb
+- fastfetch - show system info, kind of like motd https://github.com/fastfetch-cli/fastfetch
+- dundee/gdu - alternative to du and ncdu https://github.com/dundee/gdu
 - plt/racket
 - rustup
 - ghcup
 - ziglang
 END
 
-sudo apt install -y tmux mosh tree rsync ncdu htop zoxide tig p7zip-full
-
-# for programming
-sudo apt install -y postgresql postgresql-client
-
-# python 3.10 or maybe use pyenv?
-sudo add-apt-repository -y ppa:deadsnakes/ppa
-sudo apt update && sudo apt install python3.10
-
-# python packages
-sudo pip3 install pandas numpy scipy
-sudo pip3 install ipython bpython requests flask pylint black pep8 rope pyright
+sudo apt install -y tmux rsync btop zoxide tig p7zip-full
 
 # clang, gcc
 

@@ -9,6 +9,7 @@ set scrolloff=3
 set incsearch
 set ignorecase
 set linebreak
+"set pastetoggle=,tp
 set directory=$HOME/.vim/swapfiles/
 set lcs=trail:-,extends:>,tab:>-,eol:$
 set vb t_vb=
@@ -102,6 +103,7 @@ let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_new_list_item_indent = 0
 let g:strip_whitespace_on_save = 1
 let g:strip_whitespace_confirm = 0
+let g:suda_smart_edit = 1
 
 "colorscheme terafox
 "colorscheme wombat256mod
