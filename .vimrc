@@ -24,7 +24,8 @@ nnoremap <C-s> :set hlsearch!<CR>
 nnoremap <Leader>tw :set wrap!<CR>
 nnoremap <Leader>tl :set list!<CR>
 nnoremap <CR> o<Esc>
-nnoremap <Leader>ev :e $MYVIMRC<CR>
+nnoremap <Leader>ev :e $HOME/.vimrc<CR>
+nnoremap <Leader>eev :e $MYVIMRC<CR>
 nnoremap <Leader>sv :source $MYVIMRC<CR>
 vnoremap < <gv
 vnoremap > >gv
@@ -61,11 +62,13 @@ call plug#begin('~/.vim/plugged')
 
   "Plug 'mhinz/vim-grepper'
   if has('nvim')
-     Plug 'neovim/nvim-lspconfig'
+    Plug 'neovim/nvim-lspconfig'
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
     " similar plugins, mostly barebones, render all buffers as visual "tabs", with some differences like sorting
     "Plug 'ap/vim-buftabline'
     Plug 'romgrk/barbar.nvim'
+    Plug 'LunarVim/bigfile.nvim'
+    Plug 'folke/trouble.nvim'
     set signcolumn=number
     set updatetime=300
   endif
@@ -121,8 +124,11 @@ if !has('nvim')
 endif
 
 lua << EOF
-vim.lsp.enable('pyright')
+-- vim.lsp.enable('pyright')
 vim.lsp.enable('clangd')
+vim.lsp.enable('ruff')
+
+require("trouble").setup({})
 
 require'barbar'.setup {
   auto_hide = true,
@@ -155,3 +161,11 @@ nnoremap <C-l> :BufferNext<CR>
 nnoremap <Leader>bc :BufferClose<CR>
 nnoremap <Leader>bw :BufferWipeout<CR>
 
+" https://github.com/folke/trouble.nvim?tab=readme-ov-file#lazynvim
+" Leader-xx is useful, unsure about the others
+nnoremap <leader>xx :Trouble diagnostics toggle<CR>
+nnoremap <leader>xX :Trouble diagnostics toggle filter.buf=0<CR>
+nnoremap <leader>cs :Trouble symbols toggle focus=false<CR>
+nnoremap <leader>cl :Trouble lsp toggle focus=false win.position=right<CR>
+nnoremap <leader>xL :Trouble loclist toggle<CR>
+nnoremap <leader>xQ :Trouble qflist toggle<CR>
