@@ -42,6 +42,7 @@ endif
 
 call plug#begin('~/.vim/plugged')
   Plug 'junegunn/fzf'
+  Plug 'junegunn/fzf.vim'
   "Plug 'ziglang/zig.vim'
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-eunuch' "useful for :Rename, :Move
@@ -74,33 +75,18 @@ call plug#begin('~/.vim/plugged')
   endif
 call plug#end()
 
-" https://cj.rs/blog/git-ls-files-is-faster-than-fd-and-find/
-" https://github.com/junegunn/fzf/blob/master/README-VIM.md
-" https://github.com/junegunn/fzf/issues/31
-function! FZFExecute()
-  " Remove trailing new line to make it work with tmux splits
-  let directory = substitute(system('git rev-parse --show-toplevel'), '\n$', '', '')
-  if !v:shell_error
-    call fzf#run({'sink': 'e', 'dir': directory, 'source': 'git ls-files -c --exclude-standard', 'window': { 'width': 0.9, 'height': 0.6 } })
+function! FzfGitOrFiles()
+  let is_git = system('git rev-parse --is-inside-work-tree 2>/dev/null')
+  if v:shell_error == 0
+    GFiles
   else
-    FZF
+    Files
   endif
 endfunction
-command! FZFExecute call FZFExecute()
-
-function! FZFCWDExecute()
-  " Remove trailing new line to make it work with tmux splits
-  if !v:shell_error
-    call fzf#run({'sink': 'e', 'dir': '.', 'window': { 'width': 0.9, 'height': 0.6 } })
-  else
-    FZF
-  endif
-endfunction
-command! FZFCWDExecute call FZFCWDExecute()
 
 let $FZF_DEFAULT_COMMAND = 'fd --type f --exclude .git'
-nnoremap <C-p> :FZFExecute<CR>
-nnoremap <C-.> :FZFCWDExecute<CR>
+command! FzfGitOrFiles call FzfGitOrFiles()
+nnoremap <C-p> :FzfGitOrFiles<CR>
 
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_new_list_item_indent = 0
