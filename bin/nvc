@@ -1,0 +1,14 @@
+#!/bin/bash
+# Open neovim with all config files
+
+nvim -p \
+  ~/.config/nvim/init.lua \
+  ~/.config/nvim/lua/config/options.lua \
+  ~/.config/nvim/lua/config/keymaps.lua \
+  ~/.config/nvim/lua/config/lazy.lua \
+  ~/.config/nvim/lua/plugins/editor.lua \
+  ~/.config/nvim/lua/plugins/fzf.lua \
+  ~/.config/nvim/lua/plugins/git.lua \
+  ~/.config/nvim/lua/plugins/lsp.lua \
+  ~/.config/nvim/lua/plugins/treesitter.lua \
+  ~/.config/nvim/lua/plugins/ui.lua
