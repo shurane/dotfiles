@@ -10,19 +10,21 @@ return {
     "ibhagwan/fzf-lua",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     keys = {
-      { "<C-p>", "<cmd>lua require('fzf-lua').files()<CR>", desc = "Find files" },
-      { "<leader>fg", "<cmd>lua require('fzf-lua').live_grep()<CR>", desc = "Live grep" },
-      { "<leader>fb", "<cmd>lua require('fzf-lua').buffers()<CR>", desc = "Buffers" },
-      { "<leader>fh", "<cmd>lua require('fzf-lua').help_tags()<CR>", desc = "Help tags" },
-      { "<leader>fo", "<cmd>lua require('fzf-lua').oldfiles()<CR>", desc = "Old files" },
-      { "<leader>fl", "<cmd>lua require('fzf-lua').lsp_document_symbols()<CR>", desc = "LSP document symbols" },
-      { "<leader>fs", "<cmd>lua require('fzf-lua').lsp_workspace_symbols()<CR>", desc = "LSP workspace symbols" },
+      "<C-p>",
+      "<leader>fg",
+      "<leader>fb",
+      "<leader>f/",
+      "<leader>fh",
+      "<leader>fo",
+      "<leader>fl",
+      "<leader>fs",
     },
     config = function()
-      require("fzf-lua").setup({
+      local fzf = require("fzf-lua")
+      fzf.setup({
         winopts = {
-          height = 0.85,
-          width = 0.80,
+          height = 0.95,
+          width = 0.95,
           preview = {
             default = "builtin",
             border = "border",
@@ -36,6 +38,16 @@ return {
           fd_opts = "--color=never --type f --hidden --follow --exclude .git",
         },
       })
+
+      -- Keybindings
+      vim.keymap.set("n", "<C-p>", fzf.files, { desc = "Find files" })
+      vim.keymap.set("n", "<leader>fg", fzf.live_grep, { desc = "Live grep" })
+      vim.keymap.set("n", "<leader>fb", fzf.buffers, { desc = "Buffers" })
+      vim.keymap.set("n", "<leader>f/", fzf.blines, { desc = "Search in buffers" })
+      vim.keymap.set("n", "<leader>fh", fzf.help_tags, { desc = "Help tags" })
+      vim.keymap.set("n", "<leader>fo", fzf.oldfiles, { desc = "Old files" })
+      vim.keymap.set("n", "<leader>fl", fzf.lsp_document_symbols, { desc = "LSP document symbols" })
+      vim.keymap.set("n", "<leader>fs", fzf.lsp_workspace_symbols, { desc = "LSP workspace symbols" })
     end,
   },
 }

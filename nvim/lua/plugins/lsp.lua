@@ -4,6 +4,7 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     config = function()
       vim.lsp.enable("clangd")
+      vim.lsp.enable("pyright")
       vim.lsp.enable("ruff")
 
       -- LSP keybindings
