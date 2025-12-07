@@ -20,6 +20,7 @@ keymap("n", "<Leader>ev", function()
   -- vim.cmd("tabnew ~/.config/nvim/lua/plugins/lsp.lua")
   -- vim.cmd("tabnew ~/.config/nvim/lua/plugins/treesitter.lua")
   -- vim.cmd("tabnew ~/.config/nvim/lua/plugins/ui.lua")
+  -- see also `nvimconfig` bash script that I wrote to open all these up
 end, { noremap = true, silent = true, desc = "Edit nvim config" })
 keymap("n", "<Leader>sv", ":source $MYVIMRC<CR>", opts)
 keymap("v", "<", "<gv", opts)

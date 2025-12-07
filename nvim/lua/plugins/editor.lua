@@ -15,55 +15,8 @@ return {
       -- Custom keybindings for old nerdcommenter style
       vim.keymap.set("n", "<leader>cc", api.toggle.linewise.current, { desc = "Comment line" })
       vim.keymap.set("n", "<leader>cu", api.toggle.linewise.current, { desc = "Uncomment line" })
-      vim.keymap.set("v", "<leader>cc", "<ESC><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>", { desc = "Comment selection" })
-      vim.keymap.set("v", "<leader>cu", "<ESC><cmd>lua require('Comment.api').toggle.linewise(vim.fn.visualmode())<CR>", { desc = "Uncomment selection" })
-    end,
-  },
-
-  -- nvim-surround
-  {
-    "kylechui/nvim-surround",
-    event = "VeryLazy",
-    config = function()
-      require("nvim-surround").setup()
-    end,
-  },
-
-  -- nvim-autopairs
-  {
-    "windwp/nvim-autopairs",
-    event = "InsertEnter",
-    config = function()
-      require("nvim-autopairs").setup()
-    end,
-  },
-
-  -- mini.nvim (trailspace)
-  {
-    "echasnovski/mini.nvim",
-    config = function()
-      require("mini.trailspace").setup()
-    end,
-  },
-
-  -- vim-repeat
-  {
-    "tpope/vim-repeat",
-    event = "VeryLazy",
-  },
-
-  -- vim-eunuch
-  {
-    "tpope/vim-eunuch",
-    cmd = { "Remove", "Delete", "Move", "Rename", "Chmod", "Mkdir", "SudoWrite", "SudoEdit" },
-  },
-
-  -- suda.vim
-  {
-    "lambdalisue/suda.vim",
-    lazy = false,
-    init = function()
-      vim.g.suda_smart_edit = 1
+      vim.keymap.set("v", "<leader>cc", function() api.toggle.linewise(vim.fn.visualmode()) end, { desc = "Comment selection" })
+      vim.keymap.set("v", "<leader>cu", function() api.toggle.linewise(vim.fn.visualmode()) end, { desc = "Uncomment selection" })
     end,
   },
 
@@ -107,9 +60,11 @@ return {
     end,
   },
 
-  -- bigfile.nvim
-  {
-    "LunarVim/bigfile.nvim",
-    event = { "BufReadPre", "BufNewFile" },
-  },
+  { "lambdalisue/suda.vim", lazy = false, init = function() vim.g.suda_smart_edit = 1 end, },
+  { "kylechui/nvim-surround", event = "VeryLazy", config = function() require("nvim-surround").setup() end, },
+  { "windwp/nvim-autopairs", event = "InsertEnter", config = function() require("nvim-autopairs").setup() end, },
+  { "echasnovski/mini.nvim", config = function() require("mini.trailspace").setup() end, },
+  { "tpope/vim-repeat", event = "VeryLazy", },
+  { "tpope/vim-eunuch", cmd = { "Remove", "Delete", "Move", "Rename", "Chmod", "Mkdir" }, },
+  { "LunarVim/bigfile.nvim", event = { "BufReadPre", "BufNewFile" }, },
 }

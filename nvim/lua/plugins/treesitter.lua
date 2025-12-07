@@ -6,14 +6,14 @@ return {
     config = function()
       require("nvim-treesitter.configs").setup({
         ensure_installed = {
-          "java",
+          -- "java",
+          -- "rust",
           "cpp",
-          "rust",
           "python",
           "javascript",
-          "jsonc",
           "typescript",
           "tsx",
+          "jsonc",
           "bash",
           "markdown",
           "vim",
