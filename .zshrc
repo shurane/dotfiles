@@ -1,7 +1,7 @@
-
 setopt histignorealldups
 setopt inc_append_history
 setopt share_history
+setopt interactivecomments
 
 autoload -U colors && colors
 autoload -U select-word-style && select-word-style bash
@@ -10,6 +10,10 @@ autoload -Uz compinit && compinit
 # https://superuser.com/questions/458906/zsh-tab-completion-of-git-commands-is-very-slow-how-can-i-turn-it-off, zsh completion kinda slow
 fpath=(~/.zsh $fpath)
 
+# macOS
+export HOMEBREW_NO_ENV_HINTS=1
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 # matches the style of bashrc with `username@host:dir$`
 # see https://zsh-prompt-generator.site/ and https://stackoverflow.com/questions/689765/how-can-i-change-the-color-of-my-prompt-in-zsh-different-from-normal-text
 export PROMPT="%{$fg[green]%}%n@%m%{$reset_color%}:%{$fg[blue]%}%~%{$reset_color%}$ "
@@ -17,12 +21,14 @@ export EDITOR=nvim
 export LESS="-FRXi --incsearch"
 export HISTSIZE=200000
 export SAVEHIST=200000
+export RIPGREP_CONFIG_PATH="$HOME/dotfiles/.ripgreprc"
+export BAT_CONFIG_PATH="$HOME/dotfiles/.bat.conf"
+[[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && export PATH="$HOME/.local/bin:$PATH"
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+test -s "$NVM_DIR/nvm.sh" && source "$NVM_DIR/nvm.sh"  # This loads nvm
+test -s "$NVM_DIR/bash_completion"  && source "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 alias ..="cd .."
 alias ...="cd ../.."
@@ -34,19 +40,22 @@ alias .......="cd ../../../../../.."
 # alias rm="grm"
 test -x "$(command -v eza)" && alias ls="eza --group-directories-first --sort=extension"
 test -x "$(command -v eza)" && alias lt="eza --group-directories-first --sort=extension --long --tree"
+test -x "$(command -v eza)" && alias tree=lt
+test -x "$(command -v fd)" && alias fdi="fd --no-ignore"
 test -x "$(command -v bat)" && alias cat=bat
-test -x "$(command -v rg)" && alias grep="rg --ignore-case"
+#test -x "$(command -v rg)" && alias grep="rg --ignore-case"
 test -x "$(command -v vivid)" && export LS_COLORS="$(vivid generate snazzy)"
-#test -x "$(command -v fasd)" && eval "$(fasd --init auto)"
 test -x "$(command -v zoxide)" && eval "$(zoxide init zsh)"
 test -x "$(command -v nvim)" && alias vim=nvim
 test -x "$(command -v nvim)" && alias view="nvim -R"
-test -f $HOME/.fzf.zsh && source $HOME/.fzf.zsh
+test -x "$(command -v broot)" && source $HOME/.config/broot/launcher/bash/br
+test -s $HOME/.secrets && source $HOME/.secrets
+test -s $HOME/.local/bin/env && source $HOME/.local/bin/env
 
 # https://github.com/BurntSushi/ripgrep/issues/86#issuecomment-331718946
 rgf() { rg --files | rg -i -p -M 500 "$@" | less -XFRi; }
 rgl() { rg -i -p -M 500 "$@" | less -XFRi; }
-rglp() { rg -i -p -M 500 --type protobuf "$@" | less -XFRi; }
+rglp() { rg -i -p -M 500 --type python "$@" | less -XFRi; }
 rglj() { rg -i -p -M 500 --type java "$@" | less -XFRi; }
 rglt() { rg -i -p -M 500 --type ts "$@" | less -XFRi; }
 rgltj() { rg -i -p -M 500 --type ts --type js "$@" | less -XFRi; }
@@ -81,3 +90,6 @@ zle -N zle-line-init
 zle -N zle-keymap-select
 #export KEYTIMEOUT=1
 
+# TODO why does this need to be at the end of the file? It doesn't load when placed next to the others
+test -x "$(command -v fzf)" && source <(fzf --zsh)
+# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
