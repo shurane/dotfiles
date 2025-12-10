@@ -60,10 +60,22 @@ return {
     end,
   },
 
+  {
+    "echasnovski/mini.nvim",
+    config = function()
+      require("mini.trailspace").setup()
+      -- Trim whitespace on save
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        pattern = "*",
+        callback = function()
+          require("mini.trailspace").trim()
+        end,
+      })
+    end,
+  },
   { "lambdalisue/suda.vim", lazy = false, init = function() vim.g.suda_smart_edit = 1 end, },
   { "kylechui/nvim-surround", event = "VeryLazy", config = function() require("nvim-surround").setup() end, },
   { "windwp/nvim-autopairs", event = "InsertEnter", config = function() require("nvim-autopairs").setup() end, },
-  { "echasnovski/mini.nvim", config = function() require("mini.trailspace").setup() end, },
   { "tpope/vim-repeat", event = "VeryLazy", },
   { "tpope/vim-eunuch", cmd = { "Remove", "Delete", "Move", "Rename", "Chmod", "Mkdir" }, },
   { "LunarVim/bigfile.nvim", event = { "BufReadPre", "BufNewFile" }, },
