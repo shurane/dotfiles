@@ -42,14 +42,14 @@ return {
 
       -- Keybindings
       vim.keymap.set("n", "<C-p>", fzf.files, { desc = "Find files" })
-      vim.keymap.set("n", "<leader>fg", fzf.live_grep, { desc = "Live grep" })
-      vim.keymap.set("n", "<leader>ff", function() fzf.lines({ hls = { cursorline = "IncSearch"}}) end, { desc = "Live grep in open buffers" })
-      vim.keymap.set("n", "<leader>fb", fzf.buffers, { desc = "Buffers" })
-      vim.keymap.set("n", "<leader>f/", fzf.blines, { desc = "Search in buffers" })
+      vim.keymap.set("n", "<leader>fg", fzf.live_grep, { desc = "Grep" })
+      vim.keymap.set("n", "<leader>fs", function() fzf.blines({ hls = { cursorline = "IncSearch"}}) end, { desc = "Grep current buffer" })
+      vim.keymap.set("n", "<leader>ff", function() fzf.lines({ hls = { cursorline = "IncSearch"}}) end, { desc = "Grep open buffers" })
+      vim.keymap.set("n", "<leader>fb", fzf.buffers, { desc = "Search buffer names" })
       vim.keymap.set("n", "<leader>fh", fzf.help_tags, { desc = "Help tags" })
       vim.keymap.set("n", "<leader>fo", fzf.oldfiles, { desc = "Old files" })
       vim.keymap.set("n", "<leader>fl", fzf.lsp_document_symbols, { desc = "LSP document symbols" })
-      vim.keymap.set("n", "<leader>fs", fzf.lsp_workspace_symbols, { desc = "LSP workspace symbols" })
+      vim.keymap.set("n", "<leader>fw", fzf.lsp_workspace_symbols, { desc = "LSP workspace symbols" })
     end,
   },
 }
