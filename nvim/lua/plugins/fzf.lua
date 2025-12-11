@@ -12,6 +12,7 @@ return {
     keys = {
       "<C-p>",
       "<leader>fg",
+      "<leader>ff",
       "<leader>fb",
       "<leader>f/",
       "<leader>fh",
@@ -42,6 +43,7 @@ return {
       -- Keybindings
       vim.keymap.set("n", "<C-p>", fzf.files, { desc = "Find files" })
       vim.keymap.set("n", "<leader>fg", fzf.live_grep, { desc = "Live grep" })
+      vim.keymap.set("n", "<leader>ff", function() fzf.lines({ hls = { cursorline = "IncSearch"}}) end, { desc = "Live grep in open buffers" })
       vim.keymap.set("n", "<leader>fb", fzf.buffers, { desc = "Buffers" })
       vim.keymap.set("n", "<leader>f/", fzf.blines, { desc = "Search in buffers" })
       vim.keymap.set("n", "<leader>fh", fzf.help_tags, { desc = "Help tags" })
