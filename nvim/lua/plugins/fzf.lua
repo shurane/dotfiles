@@ -48,6 +48,7 @@ return {
       vim.keymap.set("n", "<leader>fb", fzf.buffers, { desc = "Search buffer names" })
       vim.keymap.set("n", "<leader>fh", fzf.help_tags, { desc = "Help tags" })
       vim.keymap.set("n", "<leader>fo", fzf.oldfiles, { desc = "Old files" })
+      vim.keymap.set("n", "<leader>fr", fzf.lsp_references, { desc = "LSP references" })
       vim.keymap.set("n", "<leader>fl", fzf.lsp_document_symbols, { desc = "LSP document symbols" })
       vim.keymap.set("n", "<leader>fw", fzf.lsp_workspace_symbols, { desc = "LSP workspace symbols" })
     end,
