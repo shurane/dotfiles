@@ -4,12 +4,10 @@
 
 [push]
 	default = simple
+	autoSetupRemote = true
 
 [pull]
 	rebase = true
-
-[credential]
-	helper = cache
 
 [alias]
     # http://stackoverflow.com/a/9074343/198348
@@ -19,19 +17,40 @@
     dshow = -c diff.external=difft show --ext-diff
     ddiff = -c diff.external=difft diff
 
-# https://dandavison.github.io/delta/get-started.html
 [core]
     pager = delta
 	autocrlf = false
+	excludesFile = /Users/ehteshchoudhury/.gitignore
 
 [interactive]
     diffFilter = delta --color-only
 
-[delta]
-    navigate = true
-
 [merge]
     conflictstyle = zdiff3
 
+# https://dandavison.github.io/delta/get-started.html
+# https://dandavison.github.io/delta/features-named-groups-of-settings.html
+[delta]
+    navigate = true
+    features = unobtrusive-line-numbers decorations
+
+[delta "unobtrusive-line-numbers"]
+    line-numbers = true
+    line-numbers-minus-style = "#444444"
+    line-numbers-zero-style = "#444444"
+    line-numbers-plus-style = "#444444"
+    line-numbers-left-format = "{nm:>4}┊"
+    line-numbers-right-format = "{np:>4}│"
+    line-numbers-left-style = blue
+    line-numbers-right-style = blue
+
+[delta "decorations"]
+    file-decoration-style = yellow box
+    hunk-header-decoration-style = none
+
 [diff]
     colorMoved = default
+
+[init]
+	defaultBranch = main
+
