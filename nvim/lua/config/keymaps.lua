@@ -27,3 +27,9 @@ keymap("v", "<", "<gv", opts)
 keymap("v", ">", ">gv", opts)
 keymap('n', '<A-j>', '<cmd>cnext<return>', opts)
 keymap('n', '<A-k>', '<cmd>cprev<return>', opts)
+
+-- Copy and paste to Windows Clipboard
+if vim.fn.has("wsl") == 1 then
+  keymap({ "n", "v" }, "<leader>y", [["+y]], { desc = "Yank to system clipboard" })
+  keymap({ "n", "v" }, "<leader>p", [["+p]], { desc = "Paste from system clipboard" })
+end
