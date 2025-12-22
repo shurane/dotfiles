@@ -108,8 +108,8 @@ nnoremap <leader>fl <cmd>lua require('fzf-lua').lsp_document_symbols()<CR>
 nnoremap <leader>fs <cmd>lua require('fzf-lua').lsp_workspace_symbols()<CR>
 
 " Buffer navigation (barbar.nvim)
-nnoremap <C-h> :BufferPrevious<CR>
-nnoremap <C-l> :BufferNext<CR>
+nnoremap <C-h> :bprevious<CR>
+nnoremap <C-l> :bnext<CR>
 nnoremap <Leader>bc :BufferClose<CR>
 nnoremap <Leader>bw :BufferWipeout<CR>
 
