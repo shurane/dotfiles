@@ -13,10 +13,20 @@ return {
       require("Comment").setup()
 
       -- Custom keybindings for old nerdcommenter style
-      vim.keymap.set("n", "<leader>cc", api.toggle.linewise.current, { desc = "Comment line" })
-      vim.keymap.set("n", "<leader>cu", api.toggle.linewise.current, { desc = "Uncomment line" })
-      vim.keymap.set("v", "<leader>cc", function() api.toggle.linewise(vim.fn.visualmode()) end, { desc = "Comment selection" })
-      vim.keymap.set("v", "<leader>cu", function() api.toggle.linewise(vim.fn.visualmode()) end, { desc = "Uncomment selection" })
+      vim.keymap.set("n", "<leader>cc", api.comment.linewise.current, { desc = "Comment line" })
+      vim.keymap.set("n", "<leader>cu", api.uncomment.linewise.current, { desc = "Uncomment line" })
+
+      -- Send ESC to update the marks '< and '>, then call the API
+      vim.keymap.set("x", "<leader>cc", function()
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<ESC>", true, false, true), "nx", false)
+        api.comment.linewise(vim.fn.visualmode())
+      end, { desc = "Comment selection" })
+
+      vim.keymap.set("x", "<leader>cu", function()
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<ESC>", true, false, true), "nx", false)
+        api.uncomment.linewise(vim.fn.visualmode())
+      end, { desc = "Uncomment selection" })
+
     end,
   },
 
