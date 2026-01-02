@@ -9,7 +9,7 @@ set scrolloff=3
 set incsearch
 set ignorecase
 set linebreak
-"set pastetoggle=,tp
+set pastetoggle=,tp
 set directory=$HOME/.vim/swapfiles/
 set lcs=trail:-,extends:>,tab:>-,eol:$
 set vb t_vb=
@@ -26,8 +26,8 @@ nnoremap <C-s> :set hlsearch!<CR>
 nnoremap <Leader>tw :set wrap!<CR>
 nnoremap <Leader>tl :set list!<CR>
 nnoremap <CR> o<Esc>
-nnoremap <Leader>ev :e $HOME/.vimrc<CR>
-nnoremap <Leader>eev :e $MYVIMRC<CR>
+nnoremap <Leader>eev :e $HOME/.vimrc<CR>
+nnoremap <Leader>ev :e $MYVIMRC<CR>
 nnoremap <Leader>sv :source $MYVIMRC<CR>
 vnoremap < <gv
 vnoremap > >gv
@@ -45,34 +45,36 @@ endif
 call plug#begin('~/.vim/plugged')
   " Fuzzy finding
   Plug 'junegunn/fzf'
-  Plug 'ibhagwan/fzf-lua'
+  Plug 'junegunn/fzf.vim'
 
   " Editing enhancements
-  Plug 'numToStr/Comment.nvim'
-  Plug 'kylechui/nvim-surround'
-  Plug 'windwp/nvim-autopairs'
-  Plug 'echasnovski/mini.nvim'
+  Plug 'tpope/vim-commentary'
+  Plug 'tpope/vim-surround'
+  Plug 'jiangmiao/auto-pairs'
+  Plug 'ntpeters/vim-better-whitespace'
   Plug 'tpope/vim-repeat'
   Plug 'tpope/vim-eunuch'
   Plug 'lambdalisue/suda.vim'
 
   " Git integration
   Plug 'tpope/vim-fugitive'
-  Plug 'lewis6991/gitsigns.nvim'
+  Plug 'airblade/vim-gitgutter'
 
   " File management
-  Plug 'stevearc/oil.nvim'
+  Plug 'tpope/vim-vinegar'
 
   " UI enhancements
-  Plug 'nvim-tree/nvim-web-devicons'
-  Plug 'romgrk/barbar.nvim'
-  Plug 'folke/which-key.nvim'
+  Plug 'ryanoasis/vim-devicons'
+  Plug 'ap/vim-buftabline'
+  Plug 'liuchengxu/vim-which-key'
 
-  " LSP and treesitter
-  Plug 'neovim/nvim-lspconfig'
-  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-  Plug 'folke/trouble.nvim'
-  Plug 'LunarVim/bigfile.nvim'
+  " LSP and linting
+  Plug 'prabirshrestha/async.vim'
+  Plug 'prabirshrestha/vim-lsp'
+  Plug 'mattn/vim-lsp-settings'
+  Plug 'prabirshrestha/asyncomplete.vim'
+  Plug 'prabirshrestha/asyncomplete-lsp.vim'
+  Plug 'dense-analysis/ale'
 
   " Colorschemes
   Plug 'EvitanRelta/vim-colorschemes'
@@ -98,173 +100,143 @@ if has('termguicolors')
   set termguicolors
 endif
 
-" fzf-lua keybindings
-nnoremap <C-p> <cmd>lua require('fzf-lua').files()<CR>
-nnoremap <leader>fg <cmd>lua require('fzf-lua').live_grep()<CR>
-nnoremap <leader>fb <cmd>lua require('fzf-lua').buffers()<CR>
-nnoremap <leader>fh <cmd>lua require('fzf-lua').help_tags()<CR>
-nnoremap <leader>fo <cmd>lua require('fzf-lua').oldfiles()<CR>
-nnoremap <leader>fl <cmd>lua require('fzf-lua').lsp_document_symbols()<CR>
-nnoremap <leader>fs <cmd>lua require('fzf-lua').lsp_workspace_symbols()<CR>
+" fzf.vim settings
+let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.85, 'border': 'rounded' } }
+let g:fzf_preview_window = ['right:50%', 'ctrl-/']
 
-" Buffer navigation (barbar.nvim)
+" fzf.vim keybindings
+nnoremap <C-p> :Files<CR>
+nnoremap <leader>fg :Rg<CR>
+nnoremap <leader>fb :Buffers<CR>
+nnoremap <leader>fh :Helptags<CR>
+nnoremap <leader>fo :History<CR>
+nnoremap <leader>fl :BTags<CR>
+nnoremap <leader>fs :Tags<CR>
+
+" Buffer navigation
 nnoremap <C-h> :bprevious<CR>
 nnoremap <C-l> :bnext<CR>
-nnoremap <Leader>bc :BufferClose<CR>
-nnoremap <Leader>bw :BufferWipeout<CR>
+nnoremap <Leader>bc :bd<CR>
+nnoremap <Leader>bw :bw<CR>
 
-" Trouble (diagnostics)
-nnoremap <leader>xx :Trouble diagnostics toggle<CR>
-nnoremap <leader>xX :Trouble diagnostics toggle filter.buf=0<CR>
-nnoremap <leader>cs :Trouble symbols toggle focus=false<CR>
-nnoremap <leader>cl :Trouble lsp toggle focus=false win.position=right<CR>
-nnoremap <leader>xL :Trouble loclist toggle<CR>
-nnoremap <leader>xQ :Trouble qflist toggle<CR>
+" ALE diagnostics
+nnoremap <leader>xx :lopen<CR>
+nnoremap <leader>xc :lclose<CR>
+nnoremap <leader>xq :copen<CR>
+nnoremap [d :ALEPreviousWrap<CR>
+nnoremap ]d :ALENextWrap<CR>
 
-" which-key
-nnoremap <leader><leader> <cmd>WhichKey<CR>
+" vim-which-key
+nnoremap <leader><leader> :WhichKey ','<CR>
 
-" oil.nvim file explorer
-nnoremap - <cmd>Oil<CR>
+" vim-vinegar uses - by default for netrw
 
-if !has('nvim')
-  finish
+" vim-lsp configuration
+function! s:on_lsp_buffer_enabled() abort
+  setlocal omnifunc=lsp#complete
+  setlocal signcolumn=yes
+  nmap <buffer> gd <plug>(lsp-definition)
+  nmap <buffer> gr <plug>(lsp-references)
+  nmap <buffer> gi <plug>(lsp-implementation)
+  nmap <buffer> gt <plug>(lsp-type-definition)
+  nmap <buffer> K <plug>(lsp-hover)
+  nmap <buffer> <leader>rn <plug>(lsp-rename)
+  nmap <buffer> <leader>ca <plug>(lsp-code-action)
+  nmap <buffer> <leader>ld <plug>(lsp-document-diagnostics)
+endfunction
+
+augroup lsp_install
+  au!
+  autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
+
+" vim-lsp settings
+let g:lsp_diagnostics_enabled = 1
+let g:lsp_diagnostics_echo_cursor = 1
+let g:lsp_diagnostics_float_cursor = 1
+let g:lsp_document_highlight_enabled = 1
+
+" asyncomplete settings
+let g:asyncomplete_auto_popup = 1
+let g:asyncomplete_auto_completeopt = 0
+set completeopt=menuone,noinsert,noselect,preview
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <CR> pumvisible() ? asyncomplete#close_popup() : "\<CR>"
+
+" Register LSP servers (vim-lsp-settings will auto-install)
+if executable('clangd')
+  au User lsp_setup call lsp#register_server({
+    \ 'name': 'clangd',
+    \ 'cmd': {server_info->['clangd']},
+    \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp'],
+    \ })
 endif
 
-lua << EOF
--- LSP setup
-vim.lsp.enable('clangd')
-vim.lsp.enable('ruff')
+if executable('pyright-langserver')
+  au User lsp_setup call lsp#register_server({
+    \ 'name': 'pyright',
+    \ 'cmd': {server_info->['pyright-langserver', '--stdio']},
+    \ 'allowlist': ['python'],
+    \ })
+endif
 
--- LSP keybindings
-vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = 'Go to definition' })
-vim.keymap.set('n', 'gr', vim.lsp.buf.references, { desc = 'Go to references' })
-vim.keymap.set('n', 'K', vim.lsp.buf.hover, { desc = 'Hover documentation' })
-vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, { desc = 'Rename symbol' })
-vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, { desc = 'Code action' })
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Previous diagnostic' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Next diagnostic' })
+if executable('typescript-language-server')
+  au User lsp_setup call lsp#register_server({
+    \ 'name': 'typescript-language-server',
+    \ 'cmd': {server_info->['typescript-language-server', '--stdio']},
+    \ 'allowlist': ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'],
+    \ })
+endif
 
--- fzf-lua setup
-require('fzf-lua').setup({
-  winopts = {
-    height = 0.85,
-    width = 0.80,
-    preview = {
-      default = 'builtin',
-      border = 'border',
-      wrap = 'nowrap',
-      hidden = 'nohidden',
-    },
-  },
-  files = {
-    git_icons = true,
-    file_icons = true,
-    fd_opts = "--color=never --type f --hidden --follow --exclude .git",
-  },
-})
+" ALE configuration
+let g:ale_linters = {
+\   'python': ['ruff'],
+\   'javascript': ['eslint'],
+\   'typescript': ['eslint'],
+\}
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'python': ['ruff'],
+\   'javascript': ['prettier'],
+\   'typescript': ['prettier'],
+\}
+let g:ale_fix_on_save = 0
+let g:ale_sign_error = 'E'
+let g:ale_sign_warning = 'W'
 
--- gitsigns setup
-require('gitsigns').setup({
-  signs = {
-    add          = { text = '+' },
-    change       = { text = '~' },
-    delete       = { text = '_' },
-    topdelete    = { text = '‾' },
-    changedelete = { text = '~' },
-  },
-  on_attach = function(bufnr)
-    local gs = package.loaded.gitsigns
+" vim-gitgutter configuration
+let g:gitgutter_sign_added = '+'
+let g:gitgutter_sign_modified = '~'
+let g:gitgutter_sign_removed = '_'
+let g:gitgutter_sign_removed_first_line = '‾'
+let g:gitgutter_sign_modified_removed = '~'
+nmap ]c <Plug>(GitGutterNextHunk)
+nmap [c <Plug>(GitGutterPrevHunk)
+nmap <leader>hs <Plug>(GitGutterStageHunk)
+nmap <leader>hr <Plug>(GitGutterUndoHunk)
+nmap <leader>hp <Plug>(GitGutterPreviewHunk)
 
-    vim.keymap.set('n', ']c', function()
-      if vim.wo.diff then return ']c' end
-      vim.schedule(function() gs.next_hunk() end)
-      return '<Ignore>'
-    end, {expr=true, buffer=bufnr, desc = 'Next hunk'})
+" vim-better-whitespace
+let g:better_whitespace_enabled = 1
+let g:strip_whitespace_on_save = 0
 
-    vim.keymap.set('n', '[c', function()
-      if vim.wo.diff then return '[c' end
-      vim.schedule(function() gs.prev_hunk() end)
-      return '<Ignore>'
-    end, {expr=true, buffer=bufnr, desc = 'Previous hunk'})
+" vim-buftabline
+let g:buftabline_show = 1
+let g:buftabline_numbers = 1
 
-    vim.keymap.set('n', '<leader>hs', gs.stage_hunk, {buffer=bufnr, desc = 'Stage hunk'})
-    vim.keymap.set('n', '<leader>hr', gs.reset_hunk, {buffer=bufnr, desc = 'Reset hunk'})
-    vim.keymap.set('n', '<leader>hp', gs.preview_hunk, {buffer=bufnr, desc = 'Preview hunk'})
-    vim.keymap.set('n', '<leader>hb', gs.blame_line, {buffer=bufnr, desc = 'Blame line'})
-    vim.keymap.set('n', '<leader>tb', gs.toggle_current_line_blame, {buffer=bufnr, desc = 'Toggle inline blame'})
-  end
-})
+" vim-which-key
+let g:which_key_map = {}
+call which_key#register(',', "g:which_key_map")
 
--- Comment.nvim setup
-require('Comment').setup()
-
--- nvim-surround setup
-require('nvim-surround').setup()
-
--- nvim-autopairs setup
-require('nvim-autopairs').setup()
-
--- mini.trailspace setup (whitespace management)
-require('mini.trailspace').setup()
-
--- oil.nvim setup
-require('oil').setup({
-  default_file_explorer = true,
-  columns = {
-    "icon",
-    "permissions",
-    "size",
-    "mtime",
-  },
-  view_options = {
-    show_hidden = false,
-  },
-  keymaps = {
-    ["g?"] = "actions.show_help",
-    ["<CR>"] = "actions.select",
-    ["<C-v>"] = "actions.select_vsplit",
-    ["<C-x>"] = "actions.select_split",
-    ["<C-t>"] = "actions.select_tab",
-    ["<C-p>"] = "actions.preview",
-    ["<C-c>"] = "actions.close",
-    ["<C-l>"] = "actions.refresh",
-    ["-"] = "actions.parent",
-    ["_"] = "actions.open_cwd",
-    ["`"] = "actions.cd",
-    ["~"] = "actions.tcd",
-    ["gs"] = "actions.change_sort",
-    ["gx"] = "actions.open_external",
-    ["g."] = "actions.toggle_hidden",
-  },
-})
-
--- which-key setup
-require('which-key').setup()
-
--- barbar setup
-require('barbar').setup({
-  auto_hide = true,
-})
-
--- trouble setup
-require("trouble").setup({})
-
--- treesitter setup
-require('nvim-treesitter.configs').setup({
-  ensure_installed = { "java", "cpp", "rust", "python", "javascript", "jsonc", "typescript", "tsx", "bash", "markdown", "vim", "lua" },
-  highlight = {
-    enable = true,
-    additional_vim_regex_highlighting = "vim"
-  },
-  incremental_selection = {
-    enable = true,
-    keymaps = {
-      init_selection = "gnn",
-      node_incremental = "grn",
-      scope_incremental = "grc",
-      node_decremental = "grm",
-    },
-  },
-})
-EOF
+" Bigfile handling (disable features for large files)
+augroup bigfile
+  au!
+  autocmd BufReadPre * if getfsize(expand('%')) > 1048576 |
+    \ setlocal noswapfile |
+    \ setlocal bufhidden=unload |
+    \ setlocal undolevels=-1 |
+    \ setlocal foldmethod=manual |
+    \ setlocal nofoldenable |
+    \ endif
+augroup END
