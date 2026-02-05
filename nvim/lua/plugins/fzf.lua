@@ -2,7 +2,7 @@ return {
   -- fzf binary
   {
     "junegunn/fzf",
-    build = "./install --all",
+    build = "./install --bin",
   },
 
   -- fzf-lua
