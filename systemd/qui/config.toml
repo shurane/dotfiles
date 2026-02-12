@@ -1,0 +1,108 @@
+# config.toml - Auto-generated on first run
+
+# Hostname / IP
+# Default: "localhost" (or "0.0.0.0" in containers)
+host = "0.0.0.0"
+
+# Port
+# Default: 7476
+port = 7476
+
+# Base URL
+# Set custom baseUrl eg /qui/ to serve in subdirectory.
+# Not needed for subdomain, or by accessing with :port directly.
+# Optional
+#baseUrl = "/qui/"
+
+# Session secret
+# Auto-generated if not provided
+# WARNING: Changing this value will break decryption of existing instance passwords!
+# If changed, you'll need to re-enter passwords for all existing qBittorrent instances in the UI.
+sessionSecret = "REDACTED_ROTATE_THIS_SECRET"
+
+# Log file path
+# If not defined, logs to stdout
+# Optional
+logPath = "/var/log/qui/qui.log"
+
+# Log rotation
+# Maximum log file size in megabytes before rotation
+# Default: 50
+logMaxSize = 100
+
+# Number of rotated log files to retain (0 keeps all)
+# Default: 3
+#logMaxBackups = 3
+
+# Data directory (default: next to config file)
+# Database file (qui.db) will be created inside this directory
+#dataDir = "/var/db/qui"
+
+# Check for new releases via api.autobrr.com
+# Default: true
+checkForUpdates = true
+
+# Tracker icon fetching
+# Disable to prevent qui from requesting tracker favicons from remote trackers.
+# Default: true
+#trackerIconsFetchEnabled = true
+
+# Cross-seed errored torrent recovery (requires restart)
+# When enabled, cross-seed automation will attempt to recover torrents in error/missingFiles state
+# by triggering recheck and waiting for completion. This can cause runs to take 25+ minutes.
+# When disabled (default), errored torrents are simply excluded from candidate selection.
+# Default: false
+#crossSeedRecoverErroredTorrents = false
+
+# Log level
+# Default: "INFO"
+# Options: "ERROR", "DEBUG", "INFO", "WARN", "TRACE"
+logLevel = "INFO"
+
+# Prometheus Metrics
+# Enable Prometheus metrics on separate port (no authentication required)
+# Default: false
+#metricsEnabled = false
+
+# Metrics server host (bind address for metrics endpoint)
+# Default: "127.0.0.1"
+# Set to "0.0.0.0" to bind to all interfaces if needed
+#metricsHost = "127.0.0.1"
+
+# Metrics server port (separate from main web interface)
+# Default: 9074 (standard Prometheus range)
+#metricsPort = 9074
+
+# Basic authentication for metrics endpoint (optional)
+# Format: "username:bcrypt_hash" or "user1:hash1,user2:hash2" for multiple users
+# Passwords must be bcrypt-hashed. Use tools like htpasswd or online bcrypt generators
+# Example: "prometheus:$2y$10$example_bcrypt_hash_here"
+# Leave empty to disable authentication (default)
+#metricsBasicAuthUsers = ""
+
+# External program allow list
+# Restrict which executables can be started from qui.
+# Provide absolute paths to binaries or directories. Leave commented to allow any program.
+#externalProgramAllowList = [
+#       "/usr/local/bin/my-script",
+#       "/home/user/bin",
+#]
+
+# OpenID Connect (OIDC) Configuration
+# Enable OIDC authentication
+#oidcEnabled = false
+
+# OIDC Issuer URL (e.g. https://auth.example.com)
+#oidcIssuer = ""
+
+# OIDC Client ID
+#oidcClientId = ""
+
+# OIDC Client Secret
+#oidcClientSecret = ""
+
+# OIDC Redirect URL (e.g. http://localhost:7476/api/auth/oidc/callback)
+#oidcRedirectUrl = ""
+
+# Disable Built-In Login Form (only works when OIDC is enabled)
+#oidcDisableBuiltInLogin = false

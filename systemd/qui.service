@@ -1,0 +1,16 @@
+[Unit]
+Description=Qui - Web interface for qBittorrent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=qui
+Group=qui
+ExecStart=/usr/local/bin/qui serve --config-dir /var/lib/qui
+WorkingDirectory=/var/lib/qui
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
