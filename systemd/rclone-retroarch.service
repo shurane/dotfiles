@@ -1,0 +1,30 @@
+# from https://forum.rclone.org/t/rclone-serve-systemd/18161/4
+# Could also be useful: https://gist.github.com/kabili207/2cd2d637e5c7617411a666d8d7e97101
+# needed WebDAV so Retroarch can sync settings, saves, and files centrally
+
+# Place in ~/.config/systemd/user/
+# As your normal user, run
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now rclone-retroarch
+
+# some flags to rclone:
+#--vfs-cache-mode writes \
+#--vfs-cache-max-size 1024M \
+
+[Unit]
+Description=rclone:retroarch
+Documentation=man:rclone(1)
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/rclone serve webdav /srv/retroarch \
+    --addr :5001 \
+    --timeout=10m \
+    --contimeout 3m \
+    --log-level INFO \
+    --log-file /tmp/rclone.log
+RestartSec=5
+
+
+[Install]
+WantedBy=default.target
