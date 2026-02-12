@@ -61,13 +61,56 @@ return {
     end,
   },
 
+  -- lualine.nvim
+  {
+    "nvim-lualine/lualine.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      local is_root = (vim.env.USER == "root")
+      local sections = {
+        lualine_a = { "mode" },
+        lualine_b = { "branch", "diff", "diagnostics" },
+        lualine_c = { "filename" },
+        lualine_x = { "encoding", "filetype" },
+        lualine_y = { "progress" },
+        lualine_z = { "location" },
+      }
+
+      if is_root then
+        table.insert(sections.lualine_a, 1, {
+          function() return " ROOT" end,
+          color = { bg = "#cc3333", fg = "#ffffff", gui = "bold" },
+        })
+      end
+
+      require("lualine").setup({
+        options = {
+          theme = is_root and "ayu_dark" or "auto",
+          section_separators = "",
+          component_separators = "",
+        },
+        sections = sections,
+      })
+    end,
+  },
+
   -- Colorscheme
   {
     "olimorris/onedarkpro.nvim",
     lazy = false,
     priority = 1000,
     config = function()
-      require("onedarkpro").setup()
+      local is_root = (vim.env.USER == "root")
+      require("onedarkpro").setup({
+        highlights = is_root and {
+          Normal = { bg = "#1a0a0a" },
+          NormalFloat = { bg = "#1a0a0a" },
+          CursorLine = { bg = "#2a1010" },
+          StatusLine = { bg = "#331111" },
+          LineNr = { fg = "#804040" },
+          CursorLineNr = { fg = "#cc5555" },
+        } or {},
+      })
       -- vim.cmd([[colorscheme onedark]])
       vim.cmd([[colorscheme onedark_dark]])
     end,

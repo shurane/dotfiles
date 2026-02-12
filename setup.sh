@@ -10,14 +10,13 @@
 - sharkdp/diskus https://github.com/sharkdp/diskus (du -sh alternative that's parallelized)
 - dandavision/delta https://github.com/dandavison/delta
 - zoxide (successor to fasd, autojump) https://github.com/ajeetdsouza/zoxide
-- broot https://github.com/Canop/broot - file manager
+- broot https://github.com/Canop/broot (CLI file manager)
+- ranger https://github.com/ranger/ranger (CLI file manager, with vim bindings)
 - bkt https://github.com/dimo414/bkt (for caching command output)
 - glow - CLI markdown renderer, https://github.com/charmbracelet/glow
 - nb - note taking tool, https://github.com/xwmx/nb
-- fastfetch - show system info, kind of like motd https://github.com/fastfetch-cli/fastfetch
+- fastfetch - show system info, kind of like motd or neofetch https://github.com/fastfetch-cli/fastfetch
 - dundee/gdu - alternative to du and ncdu https://github.com/dundee/gdu
-- broot https://github.com/Canop/broot (CLI file manager)
-- ranger https://github.com/ranger/ranger (CLI file manager, with vim bindings)
 - plt/racket
 - rustup
 - ghcup
@@ -56,6 +55,7 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130 --slave 
 curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 
 sudo apt install -y nodejs
-sudo npm install -g http-server serve nodemon
-sudo npm install -g typescript ts-node js-beautify eslint
-#sudo npm update -g # update global packages
+# use npx with http-server@latest, serve@latest, nodemon, tsc@latest, tsx@latest, oxlint@latest, biome@latest
+
+# share neovim configuration between default user and root:
+sudo mkdir -p /root/.config && sudo ln -s $HOME/dotfiles/nvim /root/.config/nvim
