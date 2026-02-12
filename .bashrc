@@ -37,7 +37,7 @@ fi
 [[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && export PATH="$HOME/.local/bin:$PATH"
 export INPUTRC="$HOME/.inputrc"
 export PAGER="less"
-export EDITOR="vim"
+export EDITOR="nvim"
 export LESS="-FRXi --incsearch"
 export RIPGREP_CONFIG_PATH="$HOME/dotfiles/.ripgreprc"
 export BAT_CONFIG_PATH="$HOME/dotfiles/.bat.conf"
