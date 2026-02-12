@@ -26,10 +26,13 @@ sudo useradd -r -s /usr/bin/nologin -m -d /var/lib/qui qui
 # symlink systemd unit
 sudo ln -s $HOME/dotfiles/systemd/qui.service /etc/systemd/system/qui.service
 # copy config file
+sudo systemctl stop qui.service
 sudo cp $HOME/dotfiles/systemd/qui/config.toml /var/lib/qui/config.toml
 sudo chown qui:qui /var/lib/qui/config.toml
+# reload
+# first time to enable running on boot: sudo systemctl enable --now qui.service
 sudo systemctl daemon-reload
-sudo systemctl enable --now qui.service
+sudo systemctl start qui.service
 # check status:
 systemctl status qui.service
 journalctl -u qui.service -f
