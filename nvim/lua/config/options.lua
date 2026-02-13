@@ -22,6 +22,7 @@ vim.opt.splitright = true
 vim.opt.signcolumn = "number"
 vim.opt.updatetime = 300
 vim.opt.termguicolors = true
+vim.opt.cmdheight = 0
 
 -- Create swap directory if it doesn't exist
 vim.fn.mkdir(vim.fn.stdpath("data") .. "/swap", "p")
