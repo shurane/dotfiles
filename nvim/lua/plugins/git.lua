@@ -1,8 +1,14 @@
 return {
-  -- vim-fugitive
+  -- blame.nvim (full-file blame view)
   {
-    "tpope/vim-fugitive",
-    cmd = { "Git", "G", "Gblame", "Gdiff", "Gread", "Gwrite" },
+    "FabijanZulj/blame.nvim",
+    keys = { "<leader>gb" },
+    config = function()
+      local blame = require("blame")
+      blame.setup()
+
+      vim.keymap.set("n", "<leader>gb", "<cmd>BlameToggle window<cr>", { desc = "Git blame file" })
+    end,
   },
 
   -- gitsigns.nvim
