@@ -1,61 +1,29 @@
-
 # third party binaries, installed manually
 : << END
 - neovim https://github.com/neovim/neovim/wiki/Installing-Neovim#appimage-universal-linux-package
 - ripgrep https://github.com/BurntSushi/ripgrep#installation
-- scc https://github.com/boyter/scc
-- sharkdp/fd  https://github.com/sharkdp/fd (find alternative)
+- tokei https://github.com/XAMPPRocky/tokei (cloc, but faster. there's also scc)
+- sharkdp/fd https://github.com/sharkdp/fd (find alternative)
 - sharkdp/bat https://github.com/sharkdp/bat (cat alternative with syntax highlighting)
 - sharkdp/vivid https://github.com/sharkdp/vivid (LS_COLORS for different file extensions)
 - sharkdp/diskus https://github.com/sharkdp/diskus (du -sh alternative that's parallelized)
+- dundee/gdu alternative to du and ncdu https://github.com/dundee/gdu
 - dandavision/delta https://github.com/dandavison/delta
 - zoxide (successor to fasd, autojump) https://github.com/ajeetdsouza/zoxide
 - broot https://github.com/Canop/broot (CLI file manager)
 - ranger https://github.com/ranger/ranger (CLI file manager, with vim bindings)
 - bkt https://github.com/dimo414/bkt (for caching command output)
-- glow - CLI markdown renderer, https://github.com/charmbracelet/glow
-- nb - note taking tool, https://github.com/xwmx/nb
+- glow CLI markdown renderer, https://github.com/charmbracelet/glow
+- nb note taking tool, https://github.com/xwmx/nb
 - fastfetch - show system info, kind of like motd or neofetch https://github.com/fastfetch-cli/fastfetch
-- dundee/gdu - alternative to du and ncdu https://github.com/dundee/gdu
 - plt/racket
 - rustup
 - ghcup
 - ziglang
 END
 
-sudo apt install -y tmux rsync btop zoxide tig p7zip-full
-
-# clang, gcc
-
-# https://github.com/llvm/llvm-project/issues/55784
-curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/llvm-snapshot.gpg
-sudo chmod a+r /etc/apt/keyrings/llvm-snapshot.gpg
-source /etc/os-release # sources $VERSION_CODENAME
-
-sudo tee /etc/apt/sources.list.d/llvm.sources <<EOF
-Enabled: yes
-Types: deb
-URIs: http://apt.llvm.org/$VERSION_CODENAME/
-Suites: llvm-toolchain-$VERSION_CODENAME
-Components: main
-Signed-By: /etc/apt/keyrings/llvm-snapshot.gpg
-EOF
-
-# https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test
-sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-# related to having a c compiler
-# https://github.com/microsoft/WSL/issues/5663 - "/sbin/ldconfig.real: /usr/lib/wsl/lib/libcuda.so.1 is not a symbolic link"
-
-sudo apt update && sudo apt install clang clangd clang-format gcc-13 g++-13
-# https://gist.github.com/mpusz/886a2a68742f1f63820d6b1425866791
-#sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 180 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-18 --slave /usr/bin/clangd clangd /usr/bin/clangd-18
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130 --slave /usr/bin/g++ g++ /usr/bin/g++-13
-
-# https://github.com/nodesource/distributions/blob/master/README.md
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-
-sudo apt install -y nodejs
-# use npx with http-server@latest, serve@latest, nodemon, tsc@latest, tsx@latest, oxlint@latest, biome@latest
+sudo pacman -S 7zip ripgrep neovim nodejs clang gcc tmux rsync btop zoxide gdu glow fd bat vivid tokei git-delta lazygit broot ranger fastfetch
+# use `npx --yes` with http-server@latest, serve@latest, nodemon, tsc@latest, tsx@latest, oxlint@latest, biome@latest
 
 # share neovim configuration between default user and root:
 sudo mkdir -p /root/.config && sudo ln -s $HOME/dotfiles/nvim /root/.config/nvim
