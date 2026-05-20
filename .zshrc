@@ -25,10 +25,7 @@ export RIPGREP_CONFIG_PATH="$HOME/dotfiles/.ripgreprc"
 export BAT_CONFIG_PATH="$HOME/dotfiles/.bat.conf"
 [[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && export PATH="$HOME/.local/bin:$PATH"
 
-
-export NVM_DIR="$HOME/.nvm"
-test -s "$NVM_DIR/nvm.sh" && source "$NVM_DIR/nvm.sh"  # This loads nvm
-test -s "$NVM_DIR/bash_completion"  && source "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+eval "$(fnm env --use-on-cd --shell zsh)"
 
 alias ..="cd .."
 alias ...="cd ../.."
@@ -81,7 +78,13 @@ bindkey -M viins 'b' vi-backward-word
 bindkey -M viins 'f' vi-forward-word
 
 # https://dougblack.io/words/zsh-vi-mode.html
-function zle-line-init zle-keymap-select {
+function zle-keymap-select {
+    VIM_PROMPT="%{$fg_bold[yellow]%} [% NORMAL]% %{$reset_color%}"
+    RPS1="${${KEYMAP/vicmd/$VIM_PROMPT}/(main|viins)/} $EPS1"
+    zle reset-prompt
+}
+function zle-line-init {
+    zle -K viins  # always start new prompts in INSERT mode
     VIM_PROMPT="%{$fg_bold[yellow]%} [% NORMAL]% %{$reset_color%}"
     RPS1="${${KEYMAP/vicmd/$VIM_PROMPT}/(main|viins)/} $EPS1"
     zle reset-prompt
