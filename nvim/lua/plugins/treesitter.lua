@@ -1,37 +1,34 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
+    branch = "main",
     build = ":TSUpdate",
     event = { "BufReadPost", "BufNewFile" },
+    cmd = { "TSInstall", "TSUpdate", "TSUninstall", "TSInstallFromGrammar", "TSLog" },
     config = function()
-      require("nvim-treesitter.config").setup({
-        ensure_installed = {
-          -- "java",
-          -- "rust",
-          "cpp",
-          "python",
-          "javascript",
-          "typescript",
-          "tsx",
-          "jsonc",
-          "bash",
-          "markdown",
-          "vim",
-          "lua",
-        },
-        highlight = {
-          enable = true,
-          additional_vim_regex_highlighting = "vim",
-        },
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection = "gnn",
-            node_incremental = "grn",
-            scope_incremental = "grc",
-            node_decremental = "grm",
-          },
-        },
+      require("nvim-treesitter").setup()
+      vim.treesitter.language.register("json", "jsonc")
+      require("nvim-treesitter").install({
+        -- "java",
+        -- "rust",
+        "cpp",
+        "python",
+        "javascript",
+        "typescript",
+        "tsx",
+        "json",
+        "bash",
+        "markdown",
+        "vim",
+        "lua",
+      })
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function(args)
+          local ok = pcall(vim.treesitter.start, args.buf)
+          if ok then
+            vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
       })
     end,
   },
