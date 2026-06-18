@@ -1,7 +1,11 @@
-http://qui.svc.lan {
+http://qui.m70q.lan {
   reverse_proxy host.docker.internal:7476
 }
 
-http://qbittorrent.svc.lan {
+http://qbittorrent.m70q.lan {
   reverse_proxy host.docker.internal:8080
+}
+
+http://retroarch.m70q.lan {
+  reverse_proxy rclone-retroarch:5001
 }
