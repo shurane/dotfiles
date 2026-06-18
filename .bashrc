@@ -68,10 +68,10 @@ test -x "$(command -v eza)" && alias tree="eza --tree --level=3"
 test -x "$(command -v bat)" && alias cat=bat
 test -x "$(command -v bat)" && alias batpp="bat --style=plain --paging=never"
 test -x "$(command -v rg)" && alias grep="rg --ignore-case"
-#test -x "$(command -v nvim)" && alias vim=nvim
 test -x "$(command -v vivid)" && export LS_COLORS="$(vivid generate snazzy)"
 test -x "$(command -v zoxide)" && eval "$(zoxide init bash)"
 test -x "$(command -v broot)" && source $HOME/.config/broot/launcher/bash/br
+command -v nvim >/dev/null 2>&1 && ! command -v vim >/dev/null 2>&1 && alias vim=nvim
 
 # https://github.com/BurntSushi/ripgrep/issues/86#issuecomment-331718946
 rgl() { rg --pretty "$@" | less -XFR; }
