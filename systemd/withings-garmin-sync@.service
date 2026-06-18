@@ -1,0 +1,23 @@
+[Unit]
+Description=Sync weight data between Withings and Garmin (%i)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=%i
+Group=%i
+StateDirectory=withings-sync
+StateDirectoryMode=0700
+CacheDirectory=withings-sync/uv
+CacheDirectoryMode=0700
+Environment=HOME=/var/lib/withings-sync
+Environment=UV_CACHE_DIR=/var/cache/withings-sync/uv
+EnvironmentFile=/var/lib/withings-sync/.env
+WorkingDirectory=/var/lib/withings-sync
+ExecStart=/bin/bash -c 'exec /home/%i/.local/bin/uvx --from withings-sync==4.2.7 --with "setuptools<81" withings-sync --fromdate $(date -d -2days +%%Y-%%m-%%d)'
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/withings-sync /var/cache/withings-sync

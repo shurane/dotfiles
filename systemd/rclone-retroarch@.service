@@ -1,0 +1,20 @@
+[Unit]
+Description=rclone Retroarch WebDAV server (%i)
+Documentation=man:rclone(1)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=%i
+Group=%i
+ExecStart=/usr/bin/rclone --config /dev/null serve webdav /srv/retroarch --addr :5001 --timeout=10m --contimeout 3m --log-level INFO
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/retroarch
+
+[Install]
+WantedBy=multi-user.target

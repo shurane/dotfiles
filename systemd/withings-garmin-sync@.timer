@@ -1,10 +1,11 @@
 [Unit]
-Description=Run Withings Garmin sync regularly
+Description=Run Withings Garmin sync regularly (%i)
 
 [Timer]
 OnCalendar=*-*-* 12:00:00
 RandomizedDelaySec=2h
 Persistent=true
+Unit=withings-garmin-sync@%i.service
 
 [Install]
 WantedBy=timers.target
