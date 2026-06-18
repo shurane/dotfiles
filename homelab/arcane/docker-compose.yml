@@ -1,0 +1,20 @@
+services:
+  arcane:
+    image: ghcr.io/getarcaneapp/manager:latest
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - proxy-tier
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - arcane-data:/app/data
+      - ./backups:/backups
+      - ./builds:/builds
+      - /home/ehtesh/dotfiles/homelab:/home/ehtesh/dotfiles/homelab
+
+volumes:
+  arcane-data:
+
+networks:
+  proxy-tier:
+    external: true
