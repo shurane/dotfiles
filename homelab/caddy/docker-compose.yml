@@ -7,17 +7,17 @@ services:
       - "443:443/tcp"
       - "443:443/udp"
     environment:
-      CADDY_DOCKER_CADDYFILE_PATH: /etc/caddy/Caddyfile
       CADDY_INGRESS_NETWORKS: proxy-tier
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     networks:
       - proxy-tier
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./data:/data
-      - ./config:/config
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  caddy-data:
+  caddy-config:
 
 networks:
   proxy-tier:

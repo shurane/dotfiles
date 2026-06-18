@@ -11,6 +11,9 @@ services:
       - ./backups:/backups
       - ./builds:/builds
       - /home/ehtesh/dotfiles/homelab:/home/ehtesh/dotfiles/homelab
+    labels:
+      caddy: http://arcane.m70q.lan
+      caddy.reverse_proxy: "{{upstreams 3552}}"
 
 volumes:
   arcane-data:

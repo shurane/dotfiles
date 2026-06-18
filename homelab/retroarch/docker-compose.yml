@@ -8,6 +8,9 @@ services:
     volumes:
       - /srv/retroarch:/data
     command: ["--config", "/dev/null", "serve", "webdav", "/data", "--addr", ":8080", "--timeout", "10m", "--contimeout", "3m", "--log-level", "INFO"]
+    labels:
+      caddy: http://retroarch.m70q.lan
+      caddy.reverse_proxy: "{{upstreams 8080}}"
 
 networks:
   proxy-tier:

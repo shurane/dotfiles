@@ -1,0 +1,16 @@
+services:
+  qui:
+    image: ghcr.io/autobrr/qui:latest
+    restart: unless-stopped
+    user: "1000:1000"
+    networks:
+      - proxy-tier
+    volumes:
+      - ./config:/config
+    labels:
+      caddy: http://qui.m70q.lan
+      caddy.reverse_proxy: "{{upstreams 7476}}"
+
+networks:
+  proxy-tier:
+    external: true

@@ -1,0 +1,25 @@
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    restart: unless-stopped
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: America/Los_Angeles
+      WEBUI_PORT: "8080"
+      TORRENTING_PORT: "21354"
+    networks:
+      - proxy-tier
+    ports:
+      - "21354:21354"
+      - "21354:21354/udp"
+    volumes:
+      - ./config:/config
+      - /mnt/mango/torrents:/mnt/mango/torrents
+    labels:
+      caddy: http://qbittorrent.m70q.lan
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+
+networks:
+  proxy-tier:
+    external: true
