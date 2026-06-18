@@ -1,0 +1,7 @@
+http://qui.svc.lan {
+  reverse_proxy host.docker.internal:7476
+}
+
+http://qbittorrent.svc.lan {
+  reverse_proxy host.docker.internal:8080
+}
