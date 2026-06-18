@@ -1,0 +1,10 @@
+services:
+  rclone-retroarch:
+    image: rclone/rclone:latest
+    restart: unless-stopped
+    user: "1000:1000"
+    ports:
+      - "5001:5001"
+    volumes:
+      - /srv/retroarch:/data
+    command: ["--config", "/dev/null", "serve", "webdav", "/data", "--addr", ":5001", "--timeout", "10m", "--contimeout", "3m", "--log-level", "INFO"]

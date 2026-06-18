@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+
+fromdate="$(python - <<'PY'
+from datetime import date, timedelta
+print((date.today() - timedelta(days=2)).isoformat())
+PY
+)"
+
+exec poetry run withings-sync --config-folder /config --fromdate "$fromdate"
