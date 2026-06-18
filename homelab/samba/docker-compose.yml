@@ -1,0 +1,63 @@
+services:
+  samba:
+    image: ghcr.io/servercontainers/samba:latest
+    restart: unless-stopped
+    network_mode: host
+    # Host systemd-resolved should set LLMNR=no so wsdd2 can bind port 5355 cleanly.
+    cap_add:
+      - CAP_NET_ADMIN
+    env_file: .env
+    environment:
+      MODEL: "Macmini"
+      AVAHI_NAME: "m70q"
+      AVAHI_DISABLE: "true"
+      FAIL_FAST: "1"
+      ACCOUNT_share: "${SAMBA_SHARE_PASSWORD:?err}"
+      UID_share: "1000"
+      SAMBA_CONF_MAP_TO_GUEST: "Bad User"
+      SAMBA_VOLUME_CONFIG_mango: |
+        [mango]
+        path = /shares/mango
+        guest ok = yes
+        read only = no
+        browseable = yes
+        force user = share
+        force group = share
+        create mask = 0664
+        directory mask = 0775
+        veto files = /lost+found/
+      SAMBA_VOLUME_CONFIG_media: |
+        [media]
+        path = /shares/media
+        guest ok = yes
+        read only = no
+        browseable = yes
+        force user = share
+        force group = share
+        create mask = 0664
+        directory mask = 0775
+      SAMBA_VOLUME_CONFIG_downloads: |
+        [downloads]
+        path = /shares/downloads
+        guest ok = yes
+        read only = no
+        browseable = yes
+        force user = share
+        force group = share
+        create mask = 0664
+        directory mask = 0775
+      SAMBA_VOLUME_CONFIG_retroarch: |
+        [retroarch]
+        path = /shares/retroarch
+        guest ok = yes
+        read only = no
+        browseable = yes
+        force user = share
+        force group = share
+        create mask = 0664
+        directory mask = 0775
+    volumes:
+      - /mnt/mango:/shares/mango
+      - /mnt/mango/media:/shares/media
+      - /mnt/mango/torrents:/shares/downloads
+      - /srv/retroarch:/shares/retroarch
