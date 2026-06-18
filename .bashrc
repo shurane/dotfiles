@@ -58,6 +58,7 @@ alias ......="cd ../../../../.."
 
 PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 #PS1='\u@\h:\w\$ '
+#PS1='[\[\e[1;32m\]\u\[\e[0m\]@\h \w]\$ '
 
 # https://github.com/eza-community/eza
 alias ls="ls --human-readable --group-directories-first --sort=extension --color=auto"
@@ -67,7 +68,7 @@ test -x "$(command -v eza)" && alias tree="eza --tree --level=3"
 test -x "$(command -v bat)" && alias cat=bat
 test -x "$(command -v bat)" && alias batpp="bat --style=plain --paging=never"
 test -x "$(command -v rg)" && alias grep="rg --ignore-case"
-test -x "$(command -v nvim)" && alias vim=nvim
+#test -x "$(command -v nvim)" && alias vim=nvim
 test -x "$(command -v vivid)" && export LS_COLORS="$(vivid generate snazzy)"
 test -x "$(command -v zoxide)" && eval "$(zoxide init bash)"
 test -x "$(command -v broot)" && source $HOME/.config/broot/launcher/bash/br
