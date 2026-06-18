@@ -7,7 +7,7 @@ http://qbittorrent.m70q.lan {
 }
 
 http://retroarch.m70q.lan {
-  reverse_proxy rclone-retroarch:5001
+  reverse_proxy rclone-retroarch:8080
 }
 
 http://arcane.m70q.lan {

@@ -7,7 +7,7 @@ services:
       - proxy-tier
     volumes:
       - /srv/retroarch:/data
-    command: ["--config", "/dev/null", "serve", "webdav", "/data", "--addr", ":5001", "--timeout", "10m", "--contimeout", "3m", "--log-level", "INFO"]
+    command: ["--config", "/dev/null", "serve", "webdav", "/data", "--addr", ":8080", "--timeout", "10m", "--contimeout", "3m", "--log-level", "INFO"]
 
 networks:
   proxy-tier:
