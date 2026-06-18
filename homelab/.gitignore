@@ -1,1 +1,9 @@
-homelab-auth.env
+/homelab-auth.env
+/arcane/.env
+/arcane/backups/
+/arcane/builds/
+/qbittorrent/config/
+/qui/config/
+/samba/.env
+/withings-sync/.env
+/withings-sync/config/
