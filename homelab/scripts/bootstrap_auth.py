@@ -19,7 +19,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-AUTH_ENV = pathlib.Path(os.environ.get("AUTH_ENV", ROOT / "homelab-auth.env"))
+AUTH_ENV = pathlib.Path(os.environ.get("AUTH_ENV", ROOT / "homelab.env"))
 
 
 class HomelabAuth(BaseModel):
@@ -235,7 +235,7 @@ def apply_jellyfin(client: httpx.Client, auth: HomelabAuth) -> None:
     if not auth.jellyfin_current_password:
         raise RuntimeError(
             "Jellyfin does not accept the shared credentials; set JELLYFIN_CURRENT_PASSWORD "
-            "in homelab-auth.env or complete first-run setup manually"
+            "in homelab.env or complete first-run setup manually"
         )
 
     login = jellyfin_login(client, auth.username, auth.jellyfin_current_password)
