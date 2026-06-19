@@ -1,0 +1,26 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    restart: unless-stopped
+    user: "1000:1000"
+    group_add:
+      - "985"
+      - "989"
+    environment:
+      HOME: /config
+      TZ: America/Los_Angeles
+    devices:
+      - /dev/dri:/dev/dri
+    networks:
+      - proxy-tier
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - /mnt/mango:/mnt/mango:ro
+    labels:
+      caddy: http://jellyfin.m70q.lan
+      caddy.reverse_proxy: "{{upstreams 8096}}"
+
+networks:
+  proxy-tier:
+    external: true
