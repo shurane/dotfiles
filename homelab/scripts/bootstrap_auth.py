@@ -6,6 +6,7 @@
 #   "pydantic>=2.7.0",
 # ]
 # ///
+import argparse
 import json
 import os
 import pathlib
@@ -31,6 +32,10 @@ class HomelabAuth(BaseModel):
 
     username: str = Field(alias="HOMELAB_AUTH_USERNAME", min_length=1)
     password: str = Field(alias="HOMELAB_AUTH_PASSWORD", min_length=8)
+
+
+class BootstrapOptions(BaseModel):
+    skip_backup: bool = False
 
 
 class QbittorrentPreferences(BaseModel):
@@ -109,6 +114,17 @@ def load_env(path: pathlib.Path) -> dict[str, str]:
 
 def run(command: list[str], cwd: pathlib.Path | None = None) -> None:
     subprocess.run(command, cwd=cwd, check=True)
+
+
+def parse_args() -> BootstrapOptions:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--skip-backup",
+        action="store_true",
+        help="Do not back up Jellyfin SQLite files before changing auth state.",
+    )
+    args = parser.parse_args()
+    return BootstrapOptions(skip_backup=args.skip_backup)
 
 
 def apply_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
@@ -443,7 +459,7 @@ def write_jellyfin_admin_user(db_path: pathlib.Path, auth: HomelabAuth) -> None:
         upsert_jellyfin_admin_permissions(db, user_id)
 
 
-def apply_jellyfin(auth: HomelabAuth) -> None:
+def apply_jellyfin(auth: HomelabAuth, options: BootstrapOptions) -> None:
     print("Applying Jellyfin credentials and first-run config")
 
     jellyfin_root = ROOT / "jellyfin"
@@ -454,7 +470,10 @@ def apply_jellyfin(auth: HomelabAuth) -> None:
 
     run(["docker", "compose", "stop", "jellyfin"], cwd=jellyfin_root)
     try:
-        backup_jellyfin_db(db_path)
+        if options.skip_backup:
+            print("Skipping Jellyfin database backup")
+        else:
+            backup_jellyfin_db(db_path)
         write_jellyfin_admin_user(db_path, auth)
         mark_jellyfin_wizard_complete(system_config)
     finally:
@@ -505,6 +524,8 @@ def verify_jellyfin(auth: HomelabAuth) -> None:
 
 
 def main() -> int:
+    options = parse_args()
+
     if not AUTH_ENV.exists():
         print(f"missing auth env: {AUTH_ENV}", file=sys.stderr)
         return 1
@@ -526,7 +547,7 @@ def main() -> int:
         apply_arcane(client, auth)
     verify_arcane(auth)
 
-    apply_jellyfin(auth)
+    apply_jellyfin(auth, options)
     verify_jellyfin(auth)
 
     print("Homelab credentials applied")
