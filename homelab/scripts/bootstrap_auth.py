@@ -280,7 +280,7 @@ def wait_for_jellyfin(timeout_seconds: int = 60) -> None:
         except httpx.HTTPError:
             pass
         time.sleep(2)
-    raise RuntimeError("Jellyfin did not become ready after password reset")
+    raise RuntimeError("Jellyfin did not become ready")
 
 
 def ensure_jellyfin_files(jellyfin_root: pathlib.Path, db_path: pathlib.Path, system_config: pathlib.Path) -> None:
@@ -459,8 +459,6 @@ def apply_jellyfin(auth: HomelabAuth) -> None:
         mark_jellyfin_wizard_complete(system_config)
     finally:
         run(["docker", "compose", "up", "-d", "jellyfin"], cwd=jellyfin_root)
-
-    wait_for_jellyfin()
 
 
 def verify_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
