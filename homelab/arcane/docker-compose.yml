@@ -12,7 +12,7 @@ services:
       - ./builds:/builds
       - /home/ehtesh/dotfiles/homelab:/home/ehtesh/dotfiles/homelab
     labels:
-      caddy: http://arcane.m70q.lan
+      caddy: http://arcane.m70q.lan, http://arcane.m.lan
       caddy.reverse_proxy: "{{upstreams 3552}}"
 
 volumes:

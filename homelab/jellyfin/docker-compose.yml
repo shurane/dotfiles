@@ -18,7 +18,7 @@ services:
       - ./cache:/cache
       - /mnt/mango:/mnt/mango:ro
     labels:
-      caddy: http://jellyfin.m70q.lan
+      caddy: http://jellyfin.m70q.lan, http://jellyfin.m.lan
       caddy.reverse_proxy: "{{upstreams 8096}}"
 
 networks:
