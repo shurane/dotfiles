@@ -29,6 +29,7 @@ class HomelabAuth(BaseModel):
 
     username: str = Field(alias="HOMELAB_AUTH_USERNAME", min_length=1)
     password: str = Field(alias="HOMELAB_AUTH_PASSWORD", min_length=8)
+    jellyfin_current_password: str | None = Field(default=None, alias="JELLYFIN_CURRENT_PASSWORD")
 
 
 class QbittorrentPreferences(BaseModel):
@@ -48,6 +49,20 @@ class ArcaneResponse(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     data: ArcaneUser | None = None
+
+
+class JellyfinUser(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    id: str = Field(alias="Id", min_length=1)
+    name: str = Field(alias="Name", min_length=1)
+
+
+class JellyfinAuthResponse(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    user: JellyfinUser = Field(alias="User")
+    access_token: str = Field(alias="AccessToken", min_length=1)
 
 
 def load_env(path: pathlib.Path) -> dict[str, str]:
@@ -184,6 +199,62 @@ def apply_arcane(client: httpx.Client, auth: HomelabAuth) -> None:
     raise RuntimeError("Arcane accepts neither the current centralized credentials nor the first-run default")
 
 
+def jellyfin_auth_headers(token: str | None = None) -> dict[str, str]:
+    auth_parts = [
+        'MediaBrowser Client="HomelabBootstrap"',
+        'Device="HomelabBootstrap"',
+        'DeviceId="homelab-bootstrap"',
+        'Version="1.0"',
+    ]
+    if token:
+        auth_parts.append(f'Token="{token}"')
+    return {"X-Emby-Authorization": ", ".join(auth_parts)}
+
+
+def jellyfin_login(client: httpx.Client, username: str, password: str) -> JellyfinAuthResponse | None:
+    response = client.post(
+        "http://jellyfin.m.lan/Users/AuthenticateByName",
+        headers=jellyfin_auth_headers(),
+        json={
+            "Username": username,
+            "Pw": password,
+        },
+    )
+    if response.status_code == 200:
+        return JellyfinAuthResponse.model_validate(response.json())
+    if response.status_code in {400, 401, 403}:
+        return None
+    response.raise_for_status()
+    return None
+
+
+def apply_jellyfin(client: httpx.Client, auth: HomelabAuth) -> None:
+    print("Applying Jellyfin credentials")
+
+    if jellyfin_login(client, auth.username, auth.password):
+        return
+
+    if not auth.jellyfin_current_password:
+        raise RuntimeError(
+            "Jellyfin does not accept the shared credentials; set JELLYFIN_CURRENT_PASSWORD "
+            "in homelab-auth.env or complete first-run setup manually"
+        )
+
+    login = jellyfin_login(client, auth.username, auth.jellyfin_current_password)
+    if login is None:
+        raise RuntimeError("Jellyfin accepts neither the shared password nor JELLYFIN_CURRENT_PASSWORD")
+
+    response = client.post(
+        f"http://jellyfin.m.lan/Users/{login.user.id}/Password",
+        headers=jellyfin_auth_headers(login.access_token),
+        json={
+            "CurrentPw": auth.jellyfin_current_password,
+            "NewPw": auth.password,
+        },
+    )
+    response.raise_for_status()
+
+
 def verify_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
     print("Verifying qBittorrent username")
     response = client.get("http://qbittorrent.m70q.lan/api/v2/app/preferences")
@@ -211,6 +282,16 @@ def verify_arcane(auth: HomelabAuth) -> None:
         raise RuntimeError("Arcane username did not update")
 
 
+def verify_jellyfin(auth: HomelabAuth) -> None:
+    print("Verifying Jellyfin login")
+    with httpx.Client(timeout=15) as client:
+        login = jellyfin_login(client, auth.username, auth.password)
+    if login is None:
+        raise RuntimeError("Jellyfin shared credential login failed")
+    if login.user.name != auth.username:
+        raise RuntimeError("Jellyfin username did not match")
+
+
 def main() -> int:
     if not AUTH_ENV.exists():
         print(f"missing auth env: {AUTH_ENV}", file=sys.stderr)
@@ -232,6 +313,10 @@ def main() -> int:
     with httpx.Client(timeout=15) as client:
         apply_arcane(client, auth)
     verify_arcane(auth)
+
+    with httpx.Client(timeout=15) as client:
+        apply_jellyfin(client, auth)
+    verify_jellyfin(auth)
 
     print("Homelab credentials applied")
     return 0
