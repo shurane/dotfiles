@@ -2,6 +2,7 @@
 /arcane/.env
 /arcane/backups/
 /arcane/builds/
+/jellyfin/backups/
 /jellyfin/cache/
 /jellyfin/config/
 /qbittorrent/config/

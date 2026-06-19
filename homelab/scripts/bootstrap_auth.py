@@ -9,9 +9,11 @@
 import json
 import os
 import pathlib
+import secrets
 import sqlite3
 import subprocess
 import sys
+import time
 from typing import Any
 
 import httpx
@@ -27,7 +29,6 @@ class HomelabAuth(BaseModel):
 
     username: str = Field(alias="HOMELAB_AUTH_USERNAME", min_length=1)
     password: str = Field(alias="HOMELAB_AUTH_PASSWORD", min_length=8)
-    jellyfin_current_password: str | None = Field(default=None, alias="JELLYFIN_CURRENT_PASSWORD")
 
 
 class QbittorrentPreferences(BaseModel):
@@ -226,31 +227,80 @@ def jellyfin_login(client: httpx.Client, username: str, password: str) -> Jellyf
     return None
 
 
+def hash_jellyfin_password(password: str) -> str:
+    import hashlib
+
+    iterations = 210_000
+    salt = secrets.token_bytes(16)
+    password_hash = hashlib.pbkdf2_hmac("sha512", password.encode(), salt, iterations)
+    return f"$PBKDF2-SHA512$iterations={iterations}${salt.hex().upper()}${password_hash.hex().upper()}"
+
+
+def wait_for_jellyfin(timeout_seconds: int = 60) -> None:
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        try:
+            response = httpx.get("http://jellyfin.m.lan/System/Info/Public", timeout=5)
+            if response.status_code == 200:
+                return
+        except httpx.HTTPError:
+            pass
+        time.sleep(2)
+    raise RuntimeError("Jellyfin did not become ready after password reset")
+
+
+def reset_jellyfin_password_via_db(auth: HomelabAuth) -> None:
+    print("Resetting Jellyfin password through migrated SQLite state")
+
+    jellyfin_root = ROOT / "jellyfin"
+    db_path = jellyfin_root / "config" / "data" / "jellyfin.db"
+    backup_root = ROOT / "jellyfin" / "backups" / f"auth-reset-{time.strftime('%Y%m%d-%H%M%S')}"
+
+    if not db_path.exists():
+        raise RuntimeError(f"missing Jellyfin database: {db_path}")
+
+    run(["docker", "compose", "stop", "jellyfin"], cwd=jellyfin_root)
+    try:
+        backup_root.mkdir(parents=True, exist_ok=False)
+        for suffix in ("", "-wal", "-shm"):
+            source = db_path.with_name(db_path.name + suffix)
+            if source.exists():
+                run(["cp", "-a", str(source), str(backup_root / source.name)])
+
+        password_hash = hash_jellyfin_password(auth.password)
+        with sqlite3.connect(db_path) as db:
+            users = db.execute(
+                "select Id, Username from Users where NormalizedUsername = ? or Username = ?",
+                (auth.username.upper(), auth.username),
+            ).fetchall()
+            if len(users) != 1:
+                raise RuntimeError(f"expected exactly one Jellyfin user named {auth.username!r}, found {len(users)}")
+
+            db.execute(
+                """
+                update Users
+                set Password = ?,
+                    MustUpdatePassword = 0,
+                    InvalidLoginAttemptCount = 0,
+                    Username = ?,
+                    NormalizedUsername = ?
+                where Id = ?
+                """,
+                (password_hash, auth.username, auth.username.upper(), users[0][0]),
+            )
+    finally:
+        run(["docker", "compose", "up", "-d", "jellyfin"], cwd=jellyfin_root)
+
+    wait_for_jellyfin()
+
+
 def apply_jellyfin(client: httpx.Client, auth: HomelabAuth) -> None:
     print("Applying Jellyfin credentials")
 
     if jellyfin_login(client, auth.username, auth.password):
         return
 
-    if not auth.jellyfin_current_password:
-        raise RuntimeError(
-            "Jellyfin does not accept the shared credentials; set JELLYFIN_CURRENT_PASSWORD "
-            "in homelab.env or complete first-run setup manually"
-        )
-
-    login = jellyfin_login(client, auth.username, auth.jellyfin_current_password)
-    if login is None:
-        raise RuntimeError("Jellyfin accepts neither the shared password nor JELLYFIN_CURRENT_PASSWORD")
-
-    response = client.post(
-        f"http://jellyfin.m.lan/Users/{login.user.id}/Password",
-        headers=jellyfin_auth_headers(login.access_token),
-        json={
-            "CurrentPw": auth.jellyfin_current_password,
-            "NewPw": auth.password,
-        },
-    )
-    response.raise_for_status()
+    reset_jellyfin_password_via_db(auth)
 
 
 def verify_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
