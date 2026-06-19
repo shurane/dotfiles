@@ -1,13 +1,11 @@
 #!/usr/bin/env -S uv run
 # /// script
-# requires-python = ">=3.12"
+# requires-python = ">=3.14"
 # dependencies = [
 #   "httpx>=0.27.0",
 #   "pydantic>=2.7.0",
 # ]
 # ///
-from __future__ import annotations
-
 import json
 import os
 import pathlib
