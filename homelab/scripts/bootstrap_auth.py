@@ -10,6 +10,7 @@ import argparse
 import json
 import os
 import pathlib
+import re
 import secrets
 import sqlite3
 import subprocess
@@ -25,6 +26,9 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 AUTH_ENV = pathlib.Path(os.environ.get("AUTH_ENV", ROOT / "homelab.env"))
+QBITTORRENT_URL = os.environ.get("QBITTORRENT_URL", "http://qbittorrent.m70q.lan").rstrip("/")
+ARCANE_URL = os.environ.get("ARCANE_URL", "http://arcane.m70q.lan").rstrip("/")
+JELLYFIN_URL = os.environ.get("JELLYFIN_URL", "http://jellyfin.m.lan").rstrip("/")
 
 
 class HomelabAuth(BaseModel):
@@ -116,6 +120,49 @@ def run(command: list[str], cwd: pathlib.Path | None = None) -> None:
     subprocess.run(command, cwd=cwd, check=True)
 
 
+def output(command: list[str], cwd: pathlib.Path | None = None) -> str:
+    return subprocess.run(command, cwd=cwd, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).stdout
+
+
+def compose_up(stack: str, service: str) -> None:
+    run(["docker", "compose", "up", "-d", service], cwd=ROOT / stack)
+
+
+def ensure_state_dir(path: pathlib.Path) -> None:
+    path.mkdir(parents=True, exist_ok=True)
+
+
+def wait_for_http(client: httpx.Client, url: str, ready_statuses: set[int], timeout_seconds: int = 60) -> None:
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        try:
+            response = client.get(url)
+            if response.status_code in ready_statuses:
+                return
+        except httpx.HTTPError:
+            pass
+        time.sleep(2)
+    raise RuntimeError(f"timed out waiting for {url}")
+
+
+def wait_for_sqlite_table(db_path: pathlib.Path, table_name: str, timeout_seconds: int = 60) -> None:
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        if db_path.exists():
+            try:
+                with sqlite3.connect(db_path) as db:
+                    row = db.execute(
+                        "select name from sqlite_master where type = 'table' and name = ?",
+                        (table_name,),
+                    ).fetchone()
+                if row is not None:
+                    return
+            except sqlite3.Error:
+                pass
+        time.sleep(2)
+    raise RuntimeError(f"timed out waiting for table {table_name!r} in {db_path}")
+
+
 def parse_args() -> BootstrapOptions:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -127,16 +174,60 @@ def parse_args() -> BootstrapOptions:
     return BootstrapOptions(skip_backup=args.skip_backup)
 
 
+def qbittorrent_login(client: httpx.Client, username: str, password: str) -> bool:
+    response = client.post(
+        f"{QBITTORRENT_URL}/api/v2/auth/login",
+        data={"username": username, "password": password},
+    )
+    if response.status_code == 204:
+        return True
+    if response.status_code != 200:
+        return False
+    return response.text.strip() == "Ok."
+
+
+def qbittorrent_temporary_password(timeout_seconds: int = 60) -> str | None:
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        logs = output(["docker", "compose", "logs", "--no-color", "qbittorrent"], cwd=ROOT / "qbittorrent")
+        match = re.search(r"temporary password[^:]*:\s*(\S+)", logs, flags=re.IGNORECASE)
+        if match is not None:
+            return match.group(1)
+        time.sleep(2)
+    return None
+
+
+def authenticate_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
+    if qbittorrent_login(client, auth.username, auth.password):
+        return
+
+    temporary_password = qbittorrent_temporary_password()
+    if temporary_password and qbittorrent_login(client, "admin", temporary_password):
+        return
+
+    raise RuntimeError("qBittorrent rejected shared credentials and no working temporary admin password was found")
+
+
 def apply_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
     print("Applying qBittorrent credentials")
+    ensure_state_dir(ROOT / "qbittorrent" / "config")
+    compose_up("qbittorrent", "qbittorrent")
+    wait_for_http(client, QBITTORRENT_URL, {200, 401, 403})
+
     preferences = {
         "web_ui_username": auth.username,
         "web_ui_password": auth.password,
     }
     response = client.post(
-        "http://qbittorrent.m70q.lan/api/v2/app/setPreferences",
+        f"{QBITTORRENT_URL}/api/v2/app/setPreferences",
         data={"json": json.dumps(preferences)},
     )
+    if response.status_code in {401, 403}:
+        authenticate_qbittorrent(client, auth)
+        response = client.post(
+            f"{QBITTORRENT_URL}/api/v2/app/setPreferences",
+            data={"json": json.dumps(preferences)},
+        )
     response.raise_for_status()
 
 
@@ -144,14 +235,40 @@ def apply_qui(auth: HomelabAuth) -> None:
     print("Applying Qui credentials")
     qui_config = ROOT / "qui" / "config"
     db_path = qui_config / "qui.db"
+    ensure_state_dir(qui_config)
+    compose_up("qui", "qui")
+    wait_for_sqlite_table(db_path, "user")
 
     with sqlite3.connect(db_path) as db:
         row: tuple[str] | None = db.execute("select username from user where id = 1").fetchone()
-        if row and row[0] != auth.username:
+        if row is not None and row[0] != auth.username:
             db.execute(
                 "update user set username = ?, updated_at = current_timestamp where id = 1",
                 (auth.username,),
             )
+
+    if row is None:
+        run(
+            [
+                "docker",
+                "compose",
+                "exec",
+                "-T",
+                "qui",
+                "qui",
+                "create-user",
+                "--config-dir",
+                "/config",
+                "--data-dir",
+                "/config",
+                "--username",
+                auth.username,
+                "--password",
+                auth.password,
+            ],
+            cwd=ROOT / "qui",
+        )
+        return
 
     run(
         [
@@ -177,7 +294,7 @@ def apply_qui(auth: HomelabAuth) -> None:
 
 def arcane_login(client: httpx.Client, username: str, password: str) -> bool:
     response = client.post(
-        "http://arcane.m70q.lan/api/auth/login",
+        f"{ARCANE_URL}/api/auth/login",
         json={"username": username, "password": password},
     )
     if response.status_code == 200:
@@ -193,7 +310,7 @@ def arcane_login(client: httpx.Client, username: str, password: str) -> bool:
 
 
 def arcane_current_user(client: httpx.Client) -> ArcaneUser:
-    response = client.get("http://arcane.m70q.lan/api/auth/me")
+    response = client.get(f"{ARCANE_URL}/api/auth/me")
     response.raise_for_status()
     payload: dict[str, Any] = response.json()
     parsed = ArcaneResponse.model_validate(payload)
@@ -204,7 +321,7 @@ def arcane_current_user(client: httpx.Client) -> ArcaneUser:
 
 def arcane_change_password(client: httpx.Client, current_password: str, auth: HomelabAuth) -> None:
     response = client.post(
-        "http://arcane.m70q.lan/api/auth/password",
+        f"{ARCANE_URL}/api/auth/password",
         json={
             "currentPassword": current_password,
             "newPassword": auth.password,
@@ -217,7 +334,7 @@ def arcane_change_password(client: httpx.Client, current_password: str, auth: Ho
 
 def arcane_update_via_api(client: httpx.Client, user: ArcaneUser, auth: HomelabAuth) -> None:
     response = client.put(
-        f"http://arcane.m70q.lan/api/users/{user.id}",
+        f"{ARCANE_URL}/api/users/{user.id}",
         json={
             "username": auth.username,
             "password": auth.password,
@@ -230,6 +347,10 @@ def arcane_update_via_api(client: httpx.Client, user: ArcaneUser, auth: HomelabA
 
 def apply_arcane(client: httpx.Client, auth: HomelabAuth) -> None:
     print("Applying Arcane credentials")
+    ensure_state_dir(ROOT / "arcane" / "backups")
+    ensure_state_dir(ROOT / "arcane" / "builds")
+    compose_up("arcane", "arcane")
+    wait_for_http(client, ARCANE_URL, {200, 404})
 
     if arcane_login(client, auth.username, auth.password):
         user = arcane_current_user(client)
@@ -260,7 +381,7 @@ def jellyfin_auth_headers(token: str | None = None) -> dict[str, str]:
 
 def jellyfin_login(client: httpx.Client, username: str, password: str) -> JellyfinAuthResponse | None:
     response = client.post(
-        "http://jellyfin.m.lan/Users/AuthenticateByName",
+        f"{JELLYFIN_URL}/Users/AuthenticateByName",
         headers=jellyfin_auth_headers(),
         json={
             "Username": username,
@@ -290,7 +411,7 @@ def wait_for_jellyfin(timeout_seconds: int = 60) -> None:
     deadline = time.monotonic() + timeout_seconds
     while time.monotonic() < deadline:
         try:
-            response = httpx.get("http://jellyfin.m.lan/System/Info/Public", timeout=5)
+            response = httpx.get(f"{JELLYFIN_URL}/System/Info/Public", timeout=5)
             if response.status_code == 200:
                 return
         except httpx.HTTPError:
@@ -465,6 +586,8 @@ def apply_jellyfin(auth: HomelabAuth, options: BootstrapOptions) -> None:
     jellyfin_root = ROOT / "jellyfin"
     db_path = jellyfin_root / "config" / "data" / "jellyfin.db"
     system_config = jellyfin_root / "config" / "config" / "system.xml"
+    ensure_state_dir(jellyfin_root / "config")
+    ensure_state_dir(jellyfin_root / "cache")
 
     ensure_jellyfin_files(jellyfin_root, db_path, system_config)
 
@@ -482,7 +605,10 @@ def apply_jellyfin(auth: HomelabAuth, options: BootstrapOptions) -> None:
 
 def verify_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
     print("Verifying qBittorrent username")
-    response = client.get("http://qbittorrent.m70q.lan/api/v2/app/preferences")
+    response = client.get(f"{QBITTORRENT_URL}/api/v2/app/preferences")
+    if response.status_code in {401, 403}:
+        authenticate_qbittorrent(client, auth)
+        response = client.get(f"{QBITTORRENT_URL}/api/v2/app/preferences")
     response.raise_for_status()
     prefs = QbittorrentPreferences.model_validate(response.json())
     if prefs.web_ui_username != auth.username:
