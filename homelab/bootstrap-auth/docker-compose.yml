@@ -5,6 +5,7 @@ services:
     entrypoint: ["${PWD}/../bootstrap-auth/entrypoint.sh"]
     environment:
       QBITTORRENT_URL: http://qbittorrent:8080
+      QUI_URL: http://qui:7476
       ARCANE_URL: http://arcane:3552
       JELLYFIN_URL: http://jellyfin:8096
     networks:

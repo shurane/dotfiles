@@ -6,9 +6,9 @@
 #   "httpx>=0.27.0",
 #   "pydantic>=2.7.0",
 #   "trio>=0.27.0",
+#   "typer>=0.16.0",
 # ]
 # ///
-import argparse
 import json
 import os
 import pathlib
@@ -21,16 +21,18 @@ import time
 import uuid
 import xml.etree.ElementTree as ET
 from collections.abc import Callable
-from typing import Any
+from typing import Annotated, Any
 
 import anyio
 import httpx
+import typer
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 AUTH_ENV = pathlib.Path(os.environ.get("AUTH_ENV", ROOT / "homelab.env"))
 QBITTORRENT_URL = os.environ.get("QBITTORRENT_URL", "http://qbittorrent:8080").rstrip("/")
+QUI_URL = os.environ.get("QUI_URL", "http://qui:7476").rstrip("/")
 ARCANE_URL = os.environ.get("ARCANE_URL", "http://arcane:3552").rstrip("/")
 JELLYFIN_URL = os.environ.get("JELLYFIN_URL", "http://jellyfin:8096").rstrip("/")
 
@@ -155,6 +157,20 @@ def wait_for_http(client: httpx.Client, url: str, ready_statuses: set[int], time
     raise RuntimeError(f"timed out waiting for {url}")
 
 
+def wait_for_arcane(client: httpx.Client, timeout_seconds: int = 60) -> None:
+    url = f"{ARCANE_URL}/api/health"
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        try:
+            response = client.get(url)
+            if response.status_code == 200 and response.json().get("status") == "UP":
+                return
+        except (httpx.HTTPError, ValueError):
+            pass
+        time.sleep(2)
+    raise RuntimeError(f"timed out waiting for {url}")
+
+
 def wait_for_sqlite_table(db_path: pathlib.Path, table_name: str, timeout_seconds: int = 60) -> None:
     deadline = time.monotonic() + timeout_seconds
     while time.monotonic() < deadline:
@@ -173,31 +189,14 @@ def wait_for_sqlite_table(db_path: pathlib.Path, table_name: str, timeout_second
     raise RuntimeError(f"timed out waiting for table {table_name!r} in {db_path}")
 
 
-def parse_args() -> BootstrapOptions:
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--skip-backup",
-        action="store_true",
-        help="Do not back up Jellyfin SQLite files before changing auth state.",
-    )
-    parser.add_argument(
-        "--parallel",
-        action="store_true",
-        help="Bootstrap selected services concurrently. Defaults to serial execution.",
-    )
-    parser.add_argument(
-        "--services",
-        default=",".join(SERVICE_NAMES),
-        help=f"Comma-separated services to bootstrap. Choices: {', '.join(SERVICE_NAMES)}.",
-    )
-    args = parser.parse_args()
-    services = tuple(service.strip().lower() for service in args.services.split(",") if service.strip())
+def build_options(skip_backup: bool, parallel: bool, services_value: str) -> BootstrapOptions:
+    services = tuple(service.strip().lower() for service in services_value.split(",") if service.strip())
     unknown_services = sorted(set(services) - set(SERVICE_NAMES))
     if unknown_services:
-        parser.error(f"unknown services: {', '.join(unknown_services)}")
+        raise typer.BadParameter(f"unknown services: {', '.join(unknown_services)}", param_hint="--services")
     if not services:
-        parser.error("--services must include at least one service")
-    return BootstrapOptions(parallel=args.parallel, skip_backup=args.skip_backup, services=services)
+        raise typer.BadParameter("must include at least one service", param_hint="--services")
+    return BootstrapOptions(parallel=parallel, skip_backup=skip_backup, services=services)
 
 
 def qbittorrent_login(client: httpx.Client, username: str, password: str) -> bool:
@@ -238,7 +237,7 @@ def apply_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
     print("Applying qBittorrent credentials")
     ensure_state_dir(ROOT / "qbittorrent" / "config")
     compose_up("qbittorrent", "qbittorrent")
-    wait_for_http(client, QBITTORRENT_URL, {200, 401, 403})
+    wait_for_http(client, f"{QBITTORRENT_URL}/api/v2/app/version", {200})
 
     preferences = {
         "web_ui_username": auth.username,
@@ -263,6 +262,8 @@ def apply_qui(auth: HomelabAuth) -> None:
     db_path = qui_config / "qui.db"
     ensure_state_dir(qui_config)
     compose_up("qui", "qui")
+    with httpx.Client(timeout=15) as client:
+        wait_for_http(client, QUI_URL, {200})
     wait_for_sqlite_table(db_path, "user")
 
     with sqlite3.connect(db_path) as db:
@@ -376,7 +377,7 @@ def apply_arcane(client: httpx.Client, auth: HomelabAuth) -> None:
     ensure_state_dir(ROOT / "arcane" / "backups")
     ensure_state_dir(ROOT / "arcane" / "builds")
     compose_up("arcane", "arcane")
-    wait_for_http(client, ARCANE_URL, {200, 404})
+    wait_for_arcane(client)
 
     if arcane_login(client, auth.username, auth.password):
         user = arcane_current_user(client)
@@ -718,9 +719,7 @@ def run_service_sync(name: str, task: Callable[[], None]) -> None:
     print(f"{name} credentials verified")
 
 
-async def main_async() -> int:
-    options = parse_args()
-
+async def main_async(options: BootstrapOptions) -> int:
     if not AUTH_ENV.exists():
         print(f"missing auth env: {AUTH_ENV}", file=sys.stderr)
         return 1
@@ -750,9 +749,26 @@ async def main_async() -> int:
     return 0
 
 
-def main() -> int:
-    return anyio.run(main_async, backend="trio")
+def main(
+    skip_backup: Annotated[
+        bool,
+        typer.Option("--skip-backup", help="Do not back up Jellyfin SQLite files before changing auth state."),
+    ] = False,
+    parallel: Annotated[
+        bool,
+        typer.Option("--parallel", help="Bootstrap selected services concurrently. Defaults to serial execution."),
+    ] = False,
+    services: Annotated[
+        str,
+        typer.Option(
+            "--services",
+            help=f"Comma-separated services to bootstrap. Choices: {', '.join(SERVICE_NAMES)}.",
+        ),
+    ] = ",".join(SERVICE_NAMES),
+) -> None:
+    options = build_options(skip_backup=skip_backup, parallel=parallel, services_value=services)
+    raise typer.Exit(anyio.run(main_async, options, backend="trio"))
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    typer.run(main)
