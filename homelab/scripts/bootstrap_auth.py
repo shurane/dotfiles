@@ -2,8 +2,10 @@
 # /// script
 # requires-python = ">=3.14"
 # dependencies = [
+#   "anyio>=4.7.0",
 #   "httpx>=0.27.0",
 #   "pydantic>=2.7.0",
+#   "trio>=0.27.0",
 # ]
 # ///
 import argparse
@@ -18,17 +20,19 @@ import sys
 import time
 import uuid
 import xml.etree.ElementTree as ET
+from collections.abc import Callable
 from typing import Any
 
+import anyio
 import httpx
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 AUTH_ENV = pathlib.Path(os.environ.get("AUTH_ENV", ROOT / "homelab.env"))
-QBITTORRENT_URL = os.environ.get("QBITTORRENT_URL", "http://qbittorrent.m70q.lan").rstrip("/")
-ARCANE_URL = os.environ.get("ARCANE_URL", "http://arcane.m70q.lan").rstrip("/")
-JELLYFIN_URL = os.environ.get("JELLYFIN_URL", "http://jellyfin.m.lan").rstrip("/")
+QBITTORRENT_URL = os.environ.get("QBITTORRENT_URL", "http://qbittorrent:8080").rstrip("/")
+ARCANE_URL = os.environ.get("ARCANE_URL", "http://arcane:3552").rstrip("/")
+JELLYFIN_URL = os.environ.get("JELLYFIN_URL", "http://jellyfin:8096").rstrip("/")
 
 
 class HomelabAuth(BaseModel):
@@ -39,7 +43,9 @@ class HomelabAuth(BaseModel):
 
 
 class BootstrapOptions(BaseModel):
+    parallel: bool = False
     skip_backup: bool = False
+    services: tuple[str, ...]
 
 
 class QbittorrentPreferences(BaseModel):
@@ -103,6 +109,7 @@ JELLYFIN_PERMISSION_VALUES = {
 }
 
 JELLYFIN_PREFERENCE_KINDS = range(13)
+SERVICE_NAMES = ("qbittorrent", "qui", "arcane", "jellyfin")
 
 
 def load_env(path: pathlib.Path) -> dict[str, str]:
@@ -130,6 +137,9 @@ def compose_up(stack: str, service: str) -> None:
 
 def ensure_state_dir(path: pathlib.Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
+    if os.geteuid() == 0:
+        root_stat = ROOT.stat()
+        os.chown(path, root_stat.st_uid, root_stat.st_gid)
 
 
 def wait_for_http(client: httpx.Client, url: str, ready_statuses: set[int], timeout_seconds: int = 60) -> None:
@@ -170,8 +180,24 @@ def parse_args() -> BootstrapOptions:
         action="store_true",
         help="Do not back up Jellyfin SQLite files before changing auth state.",
     )
+    parser.add_argument(
+        "--parallel",
+        action="store_true",
+        help="Bootstrap selected services concurrently. Defaults to serial execution.",
+    )
+    parser.add_argument(
+        "--services",
+        default=",".join(SERVICE_NAMES),
+        help=f"Comma-separated services to bootstrap. Choices: {', '.join(SERVICE_NAMES)}.",
+    )
     args = parser.parse_args()
-    return BootstrapOptions(skip_backup=args.skip_backup)
+    services = tuple(service.strip().lower() for service in args.services.split(",") if service.strip())
+    unknown_services = sorted(set(services) - set(SERVICE_NAMES))
+    if unknown_services:
+        parser.error(f"unknown services: {', '.join(unknown_services)}")
+    if not services:
+        parser.error("--services must include at least one service")
+    return BootstrapOptions(parallel=args.parallel, skip_backup=args.skip_backup, services=services)
 
 
 def qbittorrent_login(client: httpx.Client, username: str, password: str) -> bool:
@@ -407,7 +433,7 @@ def hash_jellyfin_password(password: str) -> str:
     return f"$PBKDF2-SHA512$iterations={iterations}${salt.hex().upper()}${password_hash.hex().upper()}"
 
 
-def wait_for_jellyfin(timeout_seconds: int = 60) -> None:
+def wait_for_jellyfin(timeout_seconds: int = 90) -> None:
     deadline = time.monotonic() + timeout_seconds
     while time.monotonic() < deadline:
         try:
@@ -635,11 +661,14 @@ def verify_arcane(auth: HomelabAuth) -> None:
 
 def verify_jellyfin(auth: HomelabAuth) -> None:
     print("Verifying Jellyfin login")
-    deadline = time.monotonic() + 60
+    deadline = time.monotonic() + 90
     login: JellyfinAuthResponse | None = None
     with httpx.Client(timeout=15) as client:
         while time.monotonic() < deadline:
-            login = jellyfin_login(client, auth.username, auth.password)
+            try:
+                login = jellyfin_login(client, auth.username, auth.password)
+            except httpx.HTTPError:
+                login = None
             if login is not None:
                 break
             time.sleep(2)
@@ -649,7 +678,47 @@ def verify_jellyfin(auth: HomelabAuth) -> None:
         raise RuntimeError("Jellyfin username did not match")
 
 
-def main() -> int:
+def apply_and_verify_qbittorrent(auth: HomelabAuth) -> None:
+    with httpx.Client(timeout=15) as client:
+        apply_qbittorrent(client, auth)
+        verify_qbittorrent(client, auth)
+
+
+def apply_and_verify_qui(auth: HomelabAuth) -> None:
+    apply_qui(auth)
+    verify_qui(auth)
+
+
+def apply_and_verify_arcane(auth: HomelabAuth) -> None:
+    with httpx.Client(timeout=15) as client:
+        apply_arcane(client, auth)
+    verify_arcane(auth)
+
+
+def apply_and_verify_jellyfin(auth: HomelabAuth, options: BootstrapOptions) -> None:
+    apply_jellyfin(auth, options)
+    verify_jellyfin(auth)
+
+
+async def run_service(name: str, task: Callable[[], None]) -> None:
+    try:
+        await anyio.to_thread.run_sync(task)
+    except Exception:
+        print(f"{name} bootstrap failed", file=sys.stderr)
+        raise
+    print(f"{name} credentials verified")
+
+
+def run_service_sync(name: str, task: Callable[[], None]) -> None:
+    try:
+        task()
+    except Exception:
+        print(f"{name} bootstrap failed", file=sys.stderr)
+        raise
+    print(f"{name} credentials verified")
+
+
+async def main_async() -> int:
     options = parse_args()
 
     if not AUTH_ENV.exists():
@@ -662,22 +731,27 @@ def main() -> int:
         print(error, file=sys.stderr)
         return 1
 
-    with httpx.Client(timeout=15) as client:
-        apply_qbittorrent(client, auth)
-        verify_qbittorrent(client, auth)
-
-    apply_qui(auth)
-    verify_qui(auth)
-
-    with httpx.Client(timeout=15) as client:
-        apply_arcane(client, auth)
-    verify_arcane(auth)
-
-    apply_jellyfin(auth, options)
-    verify_jellyfin(auth)
+    task_definitions = {
+        "qbittorrent": ("qBittorrent", lambda: apply_and_verify_qbittorrent(auth)),
+        "qui": ("Qui", lambda: apply_and_verify_qui(auth)),
+        "arcane": ("Arcane", lambda: apply_and_verify_arcane(auth)),
+        "jellyfin": ("Jellyfin", lambda: apply_and_verify_jellyfin(auth, options)),
+    }
+    selected_tasks = [task_definitions[service] for service in options.services]
+    if options.parallel:
+        async with anyio.create_task_group() as task_group:
+            for name, task in selected_tasks:
+                task_group.start_soon(run_service, name, task)
+    else:
+        for name, task in selected_tasks:
+            run_service_sync(name, task)
 
     print("Homelab credentials applied")
     return 0
+
+
+def main() -> int:
+    return anyio.run(main_async, backend="trio")
 
 
 if __name__ == "__main__":

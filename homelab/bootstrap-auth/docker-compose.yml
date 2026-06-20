@@ -1,0 +1,24 @@
+services:
+  bootstrap-auth:
+    image: docker:29-cli
+    working_dir: ${PWD}/..
+    entrypoint: ["${PWD}/../bootstrap-auth/entrypoint.sh"]
+    environment:
+      QBITTORRENT_URL: http://qbittorrent:8080
+      ARCANE_URL: http://arcane:3552
+      JELLYFIN_URL: http://jellyfin:8096
+    networks:
+      - proxy-tier
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${PWD}/..:${PWD}/..
+      - uv-bin:/root/.local/bin
+      - uv-cache:/root/.cache/uv
+
+networks:
+  proxy-tier:
+    external: true
+
+volumes:
+  uv-bin:
+  uv-cache:
