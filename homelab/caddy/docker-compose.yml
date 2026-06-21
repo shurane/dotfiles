@@ -1,5 +1,5 @@
 services:
-  docker-socket-proxy:
+  caddy-docker-socket-proxy:
     image: ghcr.io/tecnativa/docker-socket-proxy:latest
     restart: unless-stopped
     networks:
@@ -21,14 +21,14 @@ services:
     image: lucaslorentz/caddy-docker-proxy:ci
     restart: unless-stopped
     depends_on:
-      - docker-socket-proxy
+      - caddy-docker-socket-proxy
     ports:
       - "80:80"
       - "443:443/tcp"
       - "443:443/udp"
     environment:
       CADDY_INGRESS_NETWORKS: proxy-tier
-      DOCKER_HOST: tcp://docker-socket-proxy:2375
+      DOCKER_HOST: tcp://caddy-docker-socket-proxy:2375
     networks:
       - caddy-docker-api
       - proxy-tier

@@ -1,16 +1,51 @@
 services:
+  arcane-docker-socket-proxy:
+    image: ghcr.io/tecnativa/docker-socket-proxy:latest
+    restart: unless-stopped
+    networks:
+      - arcane-docker-api
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      AUTH: "0"
+      BUILD: "0"
+      COMMIT: "0"
+      CONFIGS: "0"
+      CONTAINERS: "1"
+      DISTRIBUTION: "1"
+      EVENTS: "1"
+      EXEC: "1"
+      IMAGES: "1"
+      INFO: "1"
+      NETWORKS: "1"
+      NODES: "0"
+      PING: "1"
+      PLUGINS: "0"
+      POST: "1"
+      SECRETS: "0"
+      SERVICES: "0"
+      SESSION: "0"
+      SWARM: "0"
+      SYSTEM: "0"
+      TASKS: "0"
+      VERSION: "1"
+      VOLUMES: "1"
+
   arcane:
     image: ghcr.io/getarcaneapp/manager:latest
     restart: unless-stopped
+    depends_on:
+      - arcane-docker-socket-proxy
     env_file: .env
     environment:
       APP_URL: http://arcane.${HOSTNAME_BASE:?err}
+      DOCKER_HOST: tcp://arcane-docker-socket-proxy:2375
       PUID: "1000"
       PGID: "1000"
     networks:
+      - arcane-docker-api
       - proxy-tier
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - arcane-data:/app/data
       - ./backups:/backups
       - ./builds:/builds
@@ -23,5 +58,7 @@ volumes:
   arcane-data:
 
 networks:
+  arcane-docker-api:
+    internal: true
   proxy-tier:
     external: true
