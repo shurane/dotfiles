@@ -1,0 +1,21 @@
+include:
+  - path: caddy/docker-compose.yml
+    env_file: homelab.env
+  - path: arcane/docker-compose.yml
+    env_file:
+      - homelab.env
+      - arcane/.env
+  - path: qbittorrent/docker-compose.yml
+    env_file: homelab.env
+  - path: qui/docker-compose.yml
+    env_file: homelab.env
+  - path: jellyfin/docker-compose.yml
+    env_file: homelab.env
+  - path: retroarch/docker-compose.yml
+    env_file: homelab.env
+  - path: samba/docker-compose.yml
+    env_file: homelab.env
+  - path: withings-sync/docker-compose.yml
+    env_file:
+      - homelab.env
+      - withings-sync/.env
