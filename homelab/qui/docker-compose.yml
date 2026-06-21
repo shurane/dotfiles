@@ -8,7 +8,7 @@ services:
     volumes:
       - ./config:/config
     labels:
-      caddy: http://qui.m70q.lan, http://qui.m.lan
+      caddy: http://qui.${HOSTNAME_BASE:?err}
       caddy.reverse_proxy: "{{upstreams 7476}}"
 
 networks:

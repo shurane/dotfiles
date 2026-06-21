@@ -6,7 +6,6 @@ services:
     # Host systemd-resolved should set LLMNR=no so wsdd2 can bind port 5355 cleanly.
     cap_add:
       - CAP_NET_ADMIN
-    env_file: .env
     environment:
       MODEL: "Macmini"
       AVAHI_NAME: "m70q"

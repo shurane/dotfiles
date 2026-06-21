@@ -17,7 +17,7 @@ services:
       - ./config:/config
       - /mnt/mango/torrents:/mnt/mango/torrents
     labels:
-      caddy: http://qbittorrent.m70q.lan, http://qbittorrent.m.lan
+      caddy: http://qbittorrent.${HOSTNAME_BASE:?err}
       caddy.reverse_proxy: "{{upstreams 8080}}"
 
 networks:
