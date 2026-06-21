@@ -1,6 +1,6 @@
 services:
   caddy:
-    image: lucaslorentz/caddy-docker-proxy:2.12.1-alpine
+    image: lucaslorentz/caddy-docker-proxy:ci-alpine
     restart: unless-stopped
     ports:
       - "80:80"
