@@ -5,6 +5,8 @@ services:
     env_file: .env
     environment:
       APP_URL: http://arcane.${HOSTNAME_BASE:?err}
+      PUID: "1000"
+      PGID: "1000"
     networks:
       - proxy-tier
     volumes:
