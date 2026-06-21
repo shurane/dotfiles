@@ -6,7 +6,8 @@ BASE_EXCLUDES=/etc/backup-sync-excludes
 MAX_FILE_SIZE="+500M"
 REPORT_HOME=/home/pi
 REPORT_DIR="$REPORT_HOME/.rpi-clone"
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_PATH="$(readlink -f -- "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(cd -- "$(dirname -- "$SCRIPT_PATH")" && pwd)"
 
 # shellcheck source=backup-sync-lib.sh
 source "$SCRIPT_DIR/backup-sync-lib.sh"
@@ -80,7 +81,7 @@ synced_report_name="$timestamp.synced.txt"
 extension_regex="$(backup_sync_extension_regex "$BASE_EXCLUDES")"
 
 if [[ -n "$extension_regex" ]]; then
-  find / -xdev \
+  find / -regextype posix-extended -xdev \
     \( -path /dev -o -path /proc -o -path /run -o -path /sys -o -path /tmp -o -path /mnt -o -path /media \) -prune \
     -o -type f \( -size "$MAX_FILE_SIZE" -o -iregex "$extension_regex" \) -printf "/%P\n" \
     | sort -u >"$dynamic_skips"

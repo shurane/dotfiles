@@ -39,6 +39,13 @@ EXCLUDES
 regex="$(backup_sync_extension_regex "$tmpdir/excludes")"
 assert_eq '.*\.(mp4|tar\.gz|qcow2)' "$regex" 'extension regex is derived from *.ext patterns'
 
+mkdir -p "$tmpdir/regex"
+printf video >"$tmpdir/regex/clip.mp4"
+printf disk >"$tmpdir/regex/image.qcow2"
+printf text >"$tmpdir/regex/note.txt"
+regex_matches="$(find "$tmpdir/regex" -regextype posix-extended -type f -iregex "$regex" -printf '%f\n' | sort)"
+assert_eq $'clip.mp4\nimage.qcow2' "$regex_matches" 'extension regex works with find posix-extended'
+
 patterns="$(backup_sync_summary_patterns "$tmpdir/excludes")"
 assert_eq $'/home/*/.cache\n/var/cache' "$patterns" 'summary patterns are derived from absolute /*** excludes only'
 
