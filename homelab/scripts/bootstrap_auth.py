@@ -146,15 +146,17 @@ def ensure_state_dir(path: pathlib.Path) -> None:
 
 def wait_for_http(client: httpx.Client, url: str, ready_statuses: set[int], timeout_seconds: int = 60) -> None:
     deadline = time.monotonic() + timeout_seconds
+    last_error = "no response"
     while time.monotonic() < deadline:
         try:
             response = client.get(url)
+            last_error = f"HTTP {response.status_code}"
             if response.status_code in ready_statuses:
                 return
-        except httpx.HTTPError:
-            pass
+        except httpx.HTTPError as error:
+            last_error = str(error)
         time.sleep(2)
-    raise RuntimeError(f"timed out waiting for {url}")
+    raise RuntimeError(f"timed out waiting for {url}; last result: {last_error}")
 
 
 def wait_for_arcane(client: httpx.Client, timeout_seconds: int = 60) -> None:
@@ -237,7 +239,7 @@ def apply_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
     print("Applying qBittorrent credentials")
     ensure_state_dir(ROOT / "qbittorrent" / "config")
     compose_up("qbittorrent", "qbittorrent")
-    wait_for_http(client, f"{QBITTORRENT_URL}/api/v2/app/version", {200})
+    wait_for_http(client, f"{QBITTORRENT_URL}/api/v2/app/version", {200, 403})
 
     preferences = {
         "web_ui_username": auth.username,
