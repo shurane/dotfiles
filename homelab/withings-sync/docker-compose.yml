@@ -2,14 +2,12 @@ services:
   withings-sync:
     image: ghcr.io/jaroslawhartman/withings-sync:latest
     restart: unless-stopped
-    env_file: .env
-    environment:
-      TZ: ${TZ:?err}
-      GARMIN_USERNAME: ${GARMIN_USERNAME:?err}
-      GARMIN_PASSWORD: ${GARMIN_PASSWORD:?err}
+    env_file:
+      - path: .env
+        required: false
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${STACK_PATH:?err}/config:/config
-      - ${STACK_PATH:?err}/entrypoint.sh:/home/withings-sync/entrypoint.sh:ro
-      - ${STACK_PATH:?err}/run-sync:/home/withings-sync/run-sync:ro
+      - ./config:/config
+      - ./entrypoint.sh:/home/withings-sync/entrypoint.sh:ro
+      - ./run-sync:/home/withings-sync/run-sync:ro
     entrypoint: ["sh", "/home/withings-sync/entrypoint.sh"]
