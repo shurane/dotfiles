@@ -1,0 +1,9 @@
+[Unit]
+Description=Sync SSD root filesystem to SD fallback using rpi-clone
+Documentation=https://github.com/geerlingguy/rpi-clone
+Wants=local-fs.target
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/backup-sync
