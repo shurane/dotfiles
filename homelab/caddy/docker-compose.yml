@@ -1,21 +1,24 @@
 services:
   caddy-docker-socket-proxy:
-    image: ghcr.io/tecnativa/docker-socket-proxy:latest
+    image: ghcr.io/wollomatic/socket-proxy:1
     restart: unless-stopped
-    networks:
-      - caddy-docker-api
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - -loglevel=info
+      - -proxysocketendpoint=/socket/docker.sock
+      - -proxysocketendpointfilemode=0660
+      - -allowGET=/v[0-9.]+/(version|containers.*|events.*|info|networks.*|services.*|tasks.*)
+      - -allowGET=/(_ping|version|containers.*|events.*|info|networks.*|services.*|tasks.*)
+      - -allowHEAD=/(_ping|version)
+      - -watchdoginterval=3600
+      - -stoponwatchdog
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      CONTAINERS: "1"
-      EVENTS: "1"
-      INFO: "1"
-      NETWORKS: "1"
-      PING: "1"
-      POST: "0"
-      SERVICES: "1"
-      TASKS: "1"
-      VERSION: "1"
+      - caddy-docker-socket:/socket
 
   caddy:
     image: lucaslorentz/caddy-docker-proxy:ci
@@ -28,20 +31,18 @@ services:
       - "443:443/udp"
     environment:
       CADDY_INGRESS_NETWORKS: proxy-tier
-      DOCKER_HOST: tcp://caddy-docker-socket-proxy:2375
     networks:
-      - caddy-docker-api
       - proxy-tier
     volumes:
+      - caddy-docker-socket:/var/run:ro
       - caddy-data:/data
       - caddy-config:/config
 
 volumes:
+  caddy-docker-socket:
   caddy-data:
   caddy-config:
 
 networks:
-  caddy-docker-api:
-    internal: true
   proxy-tier:
     external: true
