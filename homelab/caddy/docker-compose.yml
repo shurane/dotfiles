@@ -2,6 +2,7 @@ services:
   caddy-docker-socket-proxy:
     image: ghcr.io/wollomatic/socket-proxy:1
     restart: unless-stopped
+    user: "0:0"
     read_only: true
     cap_drop:
       - ALL
