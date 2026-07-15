@@ -39,3 +39,21 @@ journalctl -u qui.service -f
 # list users on qui:
 sudo -u qui sqlite3 /var/lib/qui/qui.db "SELECT username FROM user;"
 ```
+
+Arch update checks download pending packages without installing them:
+
+```bash
+sudo pacman -S pacman-contrib
+sudo ln -s "$HOME/dotfiles/systemd/arch-checkupdates.service" /etc/systemd/system/
+sudo ln -s "$HOME/dotfiles/systemd/arch-checkupdates.timer" /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now arch-checkupdates.timer
+systemctl list-timers arch-checkupdates.timer
+journalctl -u arch-checkupdates.service
+```
+
+Install downloaded updates manually after reviewing Arch news and package changes:
+
+```bash
+sudo pacman -Syu
+```

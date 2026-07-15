@@ -1,0 +1,12 @@
+[Unit]
+Description=Check for and download Arch Linux package updates
+Documentation=man:checkupdates(8)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=CHECKUPDATES_DB=/var/lib/arch-checkupdates
+StateDirectory=arch-checkupdates
+ExecStart=/usr/bin/checkupdates --download
+SuccessExitStatus=2

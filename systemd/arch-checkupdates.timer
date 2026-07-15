@@ -1,0 +1,12 @@
+[Unit]
+Description=Check for Arch Linux package updates daily
+
+[Timer]
+OnCalendar=*-*-* 06:00:00
+RandomizedDelaySec=2h
+Persistent=true
+Unit=arch-checkupdates.service
+
+[Install]
+WantedBy=timers.target
+
