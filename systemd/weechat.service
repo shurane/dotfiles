@@ -1,0 +1,13 @@
+[Unit]
+Description=WeeChat in tmux
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/tmux new-session -d -s weechat /usr/bin/weechat
+ExecStop=/usr/bin/tmux send-keys -t weechat "/quit -yes" Enter
+RemainAfterExit=yes
+
+[Install]
+WantedBy=default.target
