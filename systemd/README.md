@@ -57,3 +57,14 @@ Install downloaded updates manually after reviewing Arch news and package change
 ```bash
 sudo pacman -Syu
 ```
+
+Run WeeChat in a persistent tmux session, including before login:
+
+```bash
+mkdir -p ~/.config/systemd/user
+ln -s ~/dotfiles/systemd/weechat.service ~/.config/systemd/user/
+sudo loginctl enable-linger "$USER"
+systemctl --user daemon-reload
+systemctl --user enable --now weechat.service
+tmux attach -t weechat
+```
