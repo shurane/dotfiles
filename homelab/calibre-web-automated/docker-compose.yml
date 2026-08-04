@@ -1,0 +1,26 @@
+services:
+  calibre-web-automated:
+    image: crocodilestick/calibre-web-automated:latest
+    restart: unless-stopped
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: America/Los_Angeles
+      CWA_PORT_OVERRIDE: "8083"
+      NETWORK_SHARE_MODE: "false"
+    networks:
+      - proxy-tier
+    volumes:
+      - ./config:/config
+      - ./ingest:/cwa-book-ingest
+      - ./library:/calibre-library
+    labels:
+      caddy_0: http://calibre.m.lan, http://calibre.m70q.lan
+      caddy_0.reverse_proxy: "{{upstreams 8083}}"
+      caddy_1: https://calibre.m.lan, https://calibre.m70q.lan
+      caddy_1.tls: internal
+      caddy_1.reverse_proxy: "{{upstreams 8083}}"
+
+networks:
+  proxy-tier:
+    external: true

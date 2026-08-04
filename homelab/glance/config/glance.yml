@@ -91,6 +91,9 @@ pages:
                   - title: Qui
                     url: http://qui.m.lan
                     icon: /assets/icons/qui.svg
+                  - title: Calibre
+                    url: http://calibre.m.lan
+                    icon: /assets/icons/calibre-web.svg
                   - title: RetroArch WebDAV
                     url: http://retroarch.m.lan
                     icon: /assets/icons/rclone.svg
@@ -112,6 +115,9 @@ pages:
               - title: Qui
                 url: http://qui.m.lan
                 check-url: http://qui:7476
+              - title: Calibre
+                url: http://calibre.m.lan
+                check-url: http://calibre-web-automated:8083
               - title: RetroArch WebDAV
                 url: http://retroarch.m.lan
                 check-url: http://rclone-retroarch:8080/manifest.server

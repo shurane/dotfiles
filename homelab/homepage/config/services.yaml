@@ -19,6 +19,11 @@
         href: http://qui.m.lan
         description: Torrent dashboard
         siteMonitor: http://qui:7476
+    - Calibre:
+        icon: calibre-web.svg
+        href: http://calibre.m.lan
+        description: Ebook library
+        siteMonitor: http://calibre-web-automated:8083
     - RetroArch WebDAV:
         icon: rclone.svg
         href: http://retroarch.m.lan
