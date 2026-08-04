@@ -1,0 +1,117 @@
+server:
+  proxied: true
+  assets-path: /app/assets
+
+document:
+  head: |
+    <style>
+      .homelab-monitor {
+        display: none;
+      }
+
+      .homelab-monitor.is-visible {
+        display: block;
+      }
+
+      .homelab-monitor-toggle {
+        margin-block: 12px;
+        width: max-content;
+        border: 1px solid var(--color-widget-content-border);
+        border-radius: 6px;
+        padding: 7px 11px;
+        background: var(--color-widget-background);
+        color: var(--color-text-base);
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .homelab-monitor-toggle:hover,
+      .homelab-monitor-toggle:focus-visible {
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+      }
+    </style>
+    <script>
+      (() => {
+        const installToggle = () => {
+          const monitor = document.querySelector(".homelab-monitor");
+          if (!monitor || document.querySelector(".homelab-monitor-toggle")) return;
+
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "homelab-monitor-toggle";
+          button.textContent = "Show status";
+          button.setAttribute("aria-expanded", "false");
+
+          button.addEventListener("click", () => {
+            const visible = monitor.classList.toggle("is-visible");
+            button.textContent = visible ? "Hide status" : "Show status";
+            button.setAttribute("aria-expanded", String(visible));
+          });
+
+          monitor.before(button);
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+          installToggle();
+          new MutationObserver(installToggle).observe(document.body, {
+            childList: true,
+            subtree: true,
+          });
+        });
+      })();
+    </script>
+
+theme:
+  background-color: 225 14 8
+  primary-color: 199 89 48
+  contrast-multiplier: 1.1
+
+branding:
+  app-name: m.lan
+
+pages:
+  - name: Home
+    columns:
+      - size: full
+        widgets:
+          - type: bookmarks
+            css-class: homelab-services
+            groups:
+              - links:
+                  - title: Arcane
+                    url: http://arcane.m.lan
+                    icon: /assets/icons/arcane.svg
+                  - title: Jellyfin
+                    url: http://jellyfin.m.lan
+                    icon: /assets/icons/jellyfin.svg
+                  - title: qBittorrent
+                    url: http://qbittorrent.m.lan
+                    icon: /assets/icons/qbittorrent.svg
+                  - title: Qui
+                    url: http://qui.m.lan
+                    icon: /assets/icons/qui.svg
+                  - title: RetroArch WebDAV
+                    url: http://retroarch.m.lan
+                    icon: /assets/icons/rclone.svg
+          - type: monitor
+            css-class: homelab-monitor
+            cache: 1m
+            sites:
+              - title: Arcane
+                url: http://arcane.m.lan
+                check-url: http://arcane:3552
+              - title: Jellyfin
+                url: http://jellyfin.m.lan
+                check-url: http://jellyfin:8096
+                alt-status-codes:
+                  - 302
+              - title: qBittorrent
+                url: http://qbittorrent.m.lan
+                check-url: http://qbittorrent:8080
+              - title: Qui
+                url: http://qui.m.lan
+                check-url: http://qui:7476
+              - title: RetroArch WebDAV
+                url: http://retroarch.m.lan
+                check-url: http://rclone-retroarch:8080/manifest.server

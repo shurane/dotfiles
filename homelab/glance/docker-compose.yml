@@ -1,0 +1,21 @@
+services:
+  glance:
+    image: glanceapp/glance:latest
+    restart: unless-stopped
+    environment:
+      TZ: America/Los_Angeles
+    networks:
+      - proxy-tier
+    volumes:
+      - ./config:/app/config
+      - ./assets:/app/assets
+    labels:
+      caddy_0: http://m.lan, http://m70q.lan
+      caddy_0.reverse_proxy: "{{upstreams 8080}}"
+      caddy_1: https://m.lan, https://m70q.lan
+      caddy_1.tls: internal
+      caddy_1.reverse_proxy: "{{upstreams 8080}}"
+
+networks:
+  proxy-tier:
+    external: true

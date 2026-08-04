@@ -1,5 +1,6 @@
 include:
   - path: caddy/docker-compose.yml
+  - path: glance/docker-compose.yml
   - path: arcane/docker-compose.yml
   - path: qbittorrent/docker-compose.yml
   - path: qui/docker-compose.yml
