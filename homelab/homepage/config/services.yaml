@@ -1,0 +1,26 @@
+- Services:
+    - Arcane:
+        icon: arcane.svg
+        href: http://arcane.m.lan
+        description: Docker manager
+        siteMonitor: http://arcane:3552
+    - Jellyfin:
+        icon: jellyfin.svg
+        href: http://jellyfin.m.lan
+        description: Media library
+        siteMonitor: http://jellyfin:8096
+    - qBittorrent:
+        icon: qbittorrent.svg
+        href: http://qbittorrent.m.lan
+        description: Torrent WebUI
+        siteMonitor: http://qbittorrent:8080
+    - Qui:
+        icon: qui.svg
+        href: http://qui.m.lan
+        description: Torrent dashboard
+        siteMonitor: http://qui:7476
+    - RetroArch WebDAV:
+        icon: rclone.svg
+        href: http://retroarch.m.lan
+        description: Save sync files
+        siteMonitor: http://rclone-retroarch:8080/manifest.server

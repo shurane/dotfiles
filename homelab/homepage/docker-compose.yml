@@ -1,0 +1,20 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    restart: unless-stopped
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: homepage.m.lan,homepage.m70q.lan
+    networks:
+      - proxy-tier
+    volumes:
+      - ./config:/app/config
+    labels:
+      caddy_0: http://homepage.m.lan, http://homepage.m70q.lan
+      caddy_0.reverse_proxy: "{{upstreams 3000}}"
+      caddy_1: https://homepage.m.lan, https://homepage.m70q.lan
+      caddy_1.tls: internal
+      caddy_1.reverse_proxy: "{{upstreams 3000}}"
+
+networks:
+  proxy-tier:
+    external: true

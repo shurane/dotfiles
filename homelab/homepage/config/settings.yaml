@@ -1,0 +1,8 @@
+title: m.lan
+description: Homelab services
+theme: dark
+color: slate
+headerStyle: clean
+target: _self
+disableCollapse: true
+hideVersion: true
