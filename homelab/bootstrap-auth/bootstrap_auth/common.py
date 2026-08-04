@@ -7,7 +7,7 @@ import httpx
 import typer
 
 from .config import ROOT
-from .models import BootstrapOptions, SERVICE_NAMES, ServiceName
+from .models import SERVICE_NAMES, BootstrapOptions, ServiceName
 
 
 def load_env(path: Path) -> dict[str, str]:

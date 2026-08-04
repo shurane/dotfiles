@@ -15,7 +15,6 @@ from ..config import JELLYFIN_URL, ROOT
 from ..http_models import JellyfinAuthRequest, JellyfinAuthResponse
 from ..models import BootstrapOptions, HomelabAuth
 
-
 JELLYFIN_PERMISSION_VALUES = {
     0: 1,
     1: 1,
@@ -198,7 +197,10 @@ def insert_jellyfin_admin_user(db: sqlite3.Connection, auth: HomelabAuth, passwo
             MaxParentalRatingSubScore,
             NormalizedUsername
         )
-        values (?, '', ?, null, 0, 0, 0, 0, 1, 1, 1, ?, 0, null, null, null, 0, null, 0, ?, ?, 1, 1, 1, null, 0, '', 0, 0, ?, null, ?)
+        values (
+            ?, '', ?, null, 0, 0, 0, 0, 1, 1, 1, ?, 0, null, null, null, 0, null, 0,
+            ?, ?, 1, 1, 1, null, 0, '', 0, 0, ?, null, ?
+        )
         """,
         (
             user_id,
