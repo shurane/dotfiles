@@ -3,6 +3,7 @@
 # requires-python = ">=3.14"
 # dependencies = [
 #   "anyio>=4.7.0",
+#   "docker>=7.1.0",
 #   "httpx>=0.27.0",
 #   "pydantic>=2.7.0",
 #   "trio>=0.27.0",
@@ -15,6 +16,7 @@ import os
 import pathlib
 import re
 import secrets
+import shutil
 import sqlite3
 import subprocess
 import sys
@@ -25,8 +27,10 @@ from collections.abc import Callable
 from typing import Annotated, Any
 
 import anyio
+import docker
 import httpx
 import typer
+from docker.models.containers import Container
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from werkzeug.security import generate_password_hash
 
@@ -131,12 +135,68 @@ def run(command: list[str], cwd: pathlib.Path | None = None) -> None:
     subprocess.run(command, cwd=cwd, check=True)
 
 
-def output(command: list[str], cwd: pathlib.Path | None = None) -> str:
-    return subprocess.run(command, cwd=cwd, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).stdout
+def docker_client() -> docker.DockerClient:
+    return docker.from_env()
 
 
-def compose_up(stack: str, service: str) -> None:
+def compose_service(stack: str, service: str | None = None) -> str:
+    return service or stack
+
+
+def compose_containers(stack: str, service: str | None = None) -> list[Container]:
+    service = compose_service(stack, service)
+    client = docker_client()
+    return client.containers.list(
+        all=True,
+        filters={
+            "label": [
+                f"com.docker.compose.project={stack}",
+                f"com.docker.compose.service={service}",
+            ],
+        },
+    )
+
+
+def compose_container(stack: str, service: str | None = None) -> Container:
+    service = compose_service(stack, service)
+    containers = compose_containers(stack, service)
+    if len(containers) != 1:
+        raise RuntimeError(f"expected one Compose container for {stack}/{service}, found {len(containers)}")
+    return containers[0]
+
+
+def compose_up(stack: str, service: str | None = None) -> None:
+    service = compose_service(stack, service)
+    containers = compose_containers(stack, service)
+    if len(containers) == 1:
+        container = containers[0]
+        container.reload()
+        if container.status not in {"running", "restarting"}:
+            container.start()
+        return
+    if len(containers) > 1:
+        raise RuntimeError(f"expected at most one Compose container for {stack}/{service}, found {len(containers)}")
+
+    # docker-py manages Docker Engine resources, but it does not apply Compose
+    # YAML. Keep first creation/reconciliation on the Compose CLI.
     run(["docker", "compose", "up", "-d", service], cwd=ROOT / stack)
+
+
+def compose_logs(stack: str, service: str | None = None) -> str:
+    return compose_container(stack, service).logs(stdout=True, stderr=True).decode(errors="replace")
+
+
+def compose_exec(stack: str, command: list[str], service: str | None = None) -> None:
+    service = compose_service(stack, service)
+    result = compose_container(stack, service).exec_run(command, stdout=True, stderr=True)
+    if result.exit_code != 0:
+        output_text = result.output.decode(errors="replace") if isinstance(result.output, bytes) else str(result.output)
+        raise RuntimeError(f"{stack}/{service} exec failed with exit code {result.exit_code}:\n{output_text}")
+
+
+def compose_stop(stack: str, service: str | None = None) -> None:
+    container = compose_container(stack, service)
+    container.stop()
 
 
 def ensure_state_dir(path: pathlib.Path) -> None:
@@ -218,7 +278,7 @@ def qbittorrent_login(client: httpx.Client, username: str, password: str) -> boo
 def qbittorrent_temporary_password(timeout_seconds: int = 60) -> str | None:
     deadline = time.monotonic() + timeout_seconds
     while time.monotonic() < deadline:
-        logs = output(["docker", "compose", "logs", "--no-color", "qbittorrent"], cwd=ROOT / "qbittorrent")
+        logs = compose_logs("qbittorrent")
         match = re.search(r"temporary password[^:]*:\s*(\S+)", logs, flags=re.IGNORECASE)
         if match is not None:
             return match.group(1)
@@ -240,7 +300,7 @@ def authenticate_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
 def apply_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
     print("Applying qBittorrent credentials")
     ensure_state_dir(ROOT / "qbittorrent" / "config")
-    compose_up("qbittorrent", "qbittorrent")
+    compose_up("qbittorrent")
     wait_for_http(client, f"{QBITTORRENT_URL}/api/v2/app/version", {200, 403})
 
     preferences = {
@@ -265,7 +325,7 @@ def apply_qui(auth: HomelabAuth) -> None:
     qui_config = ROOT / "qui" / "config"
     db_path = qui_config / "qui.db"
     ensure_state_dir(qui_config)
-    compose_up("qui", "qui")
+    compose_up("qui")
     with httpx.Client(timeout=15) as client:
         wait_for_http(client, QUI_URL, {200})
     wait_for_sqlite_table(db_path, "user")
@@ -279,13 +339,9 @@ def apply_qui(auth: HomelabAuth) -> None:
             )
 
     if row is None:
-        run(
+        compose_exec(
+            "qui",
             [
-                "docker",
-                "compose",
-                "exec",
-                "-T",
-                "qui",
                 "qui",
                 "create-user",
                 "--config-dir",
@@ -297,17 +353,12 @@ def apply_qui(auth: HomelabAuth) -> None:
                 "--password",
                 auth.password,
             ],
-            cwd=ROOT / "qui",
         )
         return
 
-    run(
+    compose_exec(
+        "qui",
         [
-            "docker",
-            "compose",
-            "exec",
-            "-T",
-            "qui",
             "qui",
             "change-password",
             "--config-dir",
@@ -319,7 +370,6 @@ def apply_qui(auth: HomelabAuth) -> None:
             "--new-password",
             auth.password,
         ],
-        cwd=ROOT / "qui",
     )
 
 
@@ -380,7 +430,7 @@ def apply_arcane(client: httpx.Client, auth: HomelabAuth) -> None:
     print("Applying Arcane credentials")
     ensure_state_dir(ROOT / "arcane" / "backups")
     ensure_state_dir(ROOT / "arcane" / "builds")
-    compose_up("arcane", "arcane")
+    compose_up("arcane")
     wait_for_arcane(client)
 
     if arcane_login(client, auth.username, auth.password):
@@ -456,7 +506,7 @@ def ensure_jellyfin_files(jellyfin_root: pathlib.Path, db_path: pathlib.Path, sy
         return
 
     print("Starting Jellyfin once so it can create its local schema")
-    run(["docker", "compose", "up", "-d", "jellyfin"], cwd=jellyfin_root)
+    compose_up("jellyfin")
     wait_for_jellyfin()
 
     if not db_path.exists():
@@ -476,7 +526,7 @@ def backup_jellyfin_db(db_path: pathlib.Path) -> pathlib.Path:
     for suffix in ("", "-wal", "-shm"):
         source = db_path.with_name(db_path.name + suffix)
         if source.exists():
-            run(["cp", "-a", str(source), str(backup_root / source.name)])
+            shutil.copy2(source, backup_root / source.name)
     return backup_root
 
 
@@ -622,7 +672,7 @@ def apply_jellyfin(auth: HomelabAuth, options: BootstrapOptions) -> None:
 
     ensure_jellyfin_files(jellyfin_root, db_path, system_config)
 
-    run(["docker", "compose", "stop", "jellyfin"], cwd=jellyfin_root)
+    compose_stop("jellyfin")
     try:
         if options.skip_backup:
             print("Skipping Jellyfin database backup")
@@ -631,7 +681,7 @@ def apply_jellyfin(auth: HomelabAuth, options: BootstrapOptions) -> None:
         write_jellyfin_admin_user(db_path, auth)
         mark_jellyfin_wizard_complete(system_config)
     finally:
-        run(["docker", "compose", "up", "-d", "jellyfin"], cwd=jellyfin_root)
+        compose_up("jellyfin")
 
 
 def backup_cwa_db(db_path: pathlib.Path) -> pathlib.Path:
@@ -645,7 +695,7 @@ def backup_cwa_db(db_path: pathlib.Path) -> pathlib.Path:
     for suffix in ("", "-wal", "-shm"):
         source = db_path.with_name(db_path.name + suffix)
         if source.exists():
-            run(["cp", "-a", str(source), str(backup_root / source.name)])
+            shutil.copy2(source, backup_root / source.name)
     return backup_root
 
 
@@ -686,10 +736,10 @@ def apply_cwa(auth: HomelabAuth, options: BootstrapOptions) -> None:
     ensure_state_dir(config_root)
     ensure_state_dir(cwa_root / "ingest")
     ensure_state_dir(cwa_root / "library")
-    compose_up("calibre-web-automated", "calibre-web-automated")
+    compose_up("calibre-web-automated")
     wait_for_sqlite_table(db_path, "user")
 
-    run(["docker", "compose", "stop", "calibre-web-automated"], cwd=cwa_root)
+    compose_stop("calibre-web-automated")
     try:
         if options.skip_backup:
             print("Skipping Calibre-Web-Automated database backup")
@@ -697,7 +747,7 @@ def apply_cwa(auth: HomelabAuth, options: BootstrapOptions) -> None:
             backup_cwa_db(db_path)
         write_cwa_admin_user(db_path, auth)
     finally:
-        run(["docker", "compose", "up", "-d", "calibre-web-automated"], cwd=cwa_root)
+        compose_up("calibre-web-automated")
 
 
 def verify_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
