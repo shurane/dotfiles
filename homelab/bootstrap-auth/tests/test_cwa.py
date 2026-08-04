@@ -1,13 +1,13 @@
 import sqlite3
+from pathlib import Path
 
 import pytest
-from werkzeug.security import check_password_hash
-
 from bootstrap_auth.models import HomelabAuth
 from bootstrap_auth.services.cwa import write_cwa_admin_user
+from werkzeug.security import check_password_hash
 
 
-def create_cwa_db(path):
+def create_cwa_db(path: Path) -> None:
     with sqlite3.connect(path) as db:
         db.execute(
             """
@@ -24,7 +24,7 @@ def create_cwa_db(path):
         )
 
 
-def test_write_cwa_admin_user_updates_id_one(tmp_path):
+def test_write_cwa_admin_user_updates_id_one(tmp_path: Path) -> None:
     db_path = tmp_path / "app.db"
     create_cwa_db(db_path)
     auth = HomelabAuth.model_validate(
@@ -44,7 +44,7 @@ def test_write_cwa_admin_user_updates_id_one(tmp_path):
     assert check_password_hash(row[2], "plugin88")
 
 
-def test_write_cwa_admin_user_rejects_conflicting_user(tmp_path):
+def test_write_cwa_admin_user_rejects_conflicting_user(tmp_path: Path) -> None:
     db_path = tmp_path / "app.db"
     create_cwa_db(db_path)
     with sqlite3.connect(db_path) as db:

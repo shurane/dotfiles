@@ -15,7 +15,6 @@ from .services.jellyfin import apply_and_verify_jellyfin
 from .services.qbittorrent import apply_and_verify_qbittorrent
 from .services.qui import apply_and_verify_qui
 
-
 type BootstrapTask = Callable[[], None]
 
 

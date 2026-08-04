@@ -25,6 +25,19 @@ packages = ["bootstrap_auth"]
 [dependency-groups]
 dev = [
   "pytest>=8.0.0",
+  "ruff>=0.16.1",
+]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 120
+src = ["bootstrap_auth", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "C4", "PIE", "RUF", "ANN"]
+ignore = [
+  # Typer uses Option(...) calls as defaults by design.
+  "B008",
 ]
 
 [tool.pytest.ini_options]

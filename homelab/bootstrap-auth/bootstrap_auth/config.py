@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 AUTH_ENV = Path(os.environ.get("AUTH_ENV", ROOT / "homelab.env"))
 
