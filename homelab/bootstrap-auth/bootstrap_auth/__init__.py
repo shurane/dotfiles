@@ -1,0 +1,1 @@
+"""Homelab auth bootstrap tool."""
