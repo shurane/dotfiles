@@ -8,6 +8,5 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./config:/config
-      - ./entrypoint.sh:/home/withings-sync/entrypoint.sh:ro
-      - ./run-sync:/home/withings-sync/run-sync:ro
-    entrypoint: ["sh", "/home/withings-sync/entrypoint.sh"]
+      - ./entrypoint.py:/home/withings-sync/entrypoint.py:ro
+    entrypoint: ["/home/withings-sync/entrypoint.py"]
