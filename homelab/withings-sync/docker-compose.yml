@@ -10,3 +10,4 @@ services:
       - ./config:/config
       - ./entrypoint.py:/home/withings-sync/entrypoint.py:ro
     entrypoint: ["/home/withings-sync/entrypoint.py"]
+    command: ["cron"]

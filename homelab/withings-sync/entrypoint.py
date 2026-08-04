@@ -35,9 +35,15 @@ def run_cron() -> None:
 
 
 def main() -> None:
-    if len(sys.argv) > 1 and sys.argv[1] == "sync":
+    if len(sys.argv) != 2:
+        raise ValueError("expected exactly one mode: cron or sync")
+
+    mode = sys.argv[1]
+    if mode == "sync":
         run_sync()
-    run_cron()
+    if mode == "cron":
+        run_cron()
+    raise ValueError(f"unknown mode: {mode}")
 
 
 if __name__ == "__main__":
