@@ -6,6 +6,9 @@
 /calibre-web-automated/ingest/
 /calibre-web-automated/library/
 /calibre-web-automated/backups/
+/bookorbit/.env
+/bookorbit/books/
+/bookorbit/data/
 /jellyfin/backups/
 /jellyfin/cache/
 /jellyfin/config/

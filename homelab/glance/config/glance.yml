@@ -94,6 +94,9 @@ pages:
                   - title: Calibre
                     url: http://calibre.m.lan
                     icon: /assets/icons/calibre-web.svg
+                  - title: BookOrbit
+                    url: http://bookorbit.m.lan
+                    icon: /assets/icons/bookorbit.svg
                   - title: RetroArch WebDAV
                     url: http://retroarch.m.lan
                     icon: /assets/icons/rclone.svg
@@ -118,6 +121,9 @@ pages:
               - title: Calibre
                 url: http://calibre.m.lan
                 check-url: http://calibre-web-automated:8083
+              - title: BookOrbit
+                url: http://bookorbit.m.lan
+                check-url: http://bookorbit:3000/api/v1/health
               - title: RetroArch WebDAV
                 url: http://retroarch.m.lan
                 check-url: http://rclone-retroarch:8080/manifest.server

@@ -3,6 +3,7 @@ include:
   - path: glance/docker-compose.yml
   - path: homepage/docker-compose.yml
   - path: calibre-web-automated/docker-compose.yml
+  - path: bookorbit/docker-compose.yml
   - path: arcane/docker-compose.yml
   - path: qbittorrent/docker-compose.yml
   - path: qui/docker-compose.yml

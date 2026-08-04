@@ -1,0 +1,77 @@
+services:
+  bookorbit:
+    image: ghcr.io/bookorbit/bookorbit:latest
+    restart: unless-stopped
+    init: true
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      POSTGRES_HOST: bookorbit-postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: bookorbit
+      POSTGRES_DB: bookorbit
+      APP_URL: http://bookorbit.m.lan
+      CLIENT_URL: http://bookorbit.m.lan
+      PUID: "1000"
+      PGID: "1000"
+      NODE_MAX_OLD_SPACE_SIZE: "2048"
+      LIBRARY_BROWSE_ROOT: /books
+    depends_on:
+      bookorbit-postgres:
+        condition: service_healthy
+    networks:
+      - proxy-tier
+      - bookorbit
+    volumes:
+      - ./books:/books
+      - ./data/app:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+    labels:
+      caddy_0: http://bookorbit.m.lan, http://bookorbit.m70q.lan
+      caddy_0.reverse_proxy: "{{upstreams 3000}}"
+      caddy_1: https://bookorbit.m.lan, https://bookorbit.m70q.lan
+      caddy_1.tls: internal
+      caddy_1.reverse_proxy: "{{upstreams 3000}}"
+
+  bookorbit-postgres:
+    image: pgvector/pgvector:pg18
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: bookorbit
+      POSTGRES_DB: bookorbit
+      PGDATA: /var/lib/postgresql/data/pgdata
+    networks:
+      - bookorbit
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+networks:
+  proxy-tier:
+    external: true
+  bookorbit:
+
+volumes:
+  postgres-data:

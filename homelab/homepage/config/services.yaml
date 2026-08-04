@@ -24,6 +24,11 @@
         href: http://calibre.m.lan
         description: Ebook library
         siteMonitor: http://calibre-web-automated:8083
+    - BookOrbit:
+        icon: bookorbit.svg
+        href: http://bookorbit.m.lan
+        description: Ebook reader
+        siteMonitor: http://bookorbit:3000/api/v1/health
     - RetroArch WebDAV:
         icon: rclone.svg
         href: http://retroarch.m.lan
