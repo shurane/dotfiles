@@ -10,7 +10,6 @@ from .common import build_options, load_env
 from .config import AUTH_ENV
 from .models import SERVICE_NAMES, BootstrapOptions, HomelabAuth, ServiceName
 from .services.arcane import apply_and_verify_arcane
-from .services.cwa import apply_and_verify_cwa
 from .services.jellyfin import apply_and_verify_jellyfin
 from .services.qbittorrent import apply_and_verify_qbittorrent
 from .services.qui import apply_and_verify_qui
@@ -42,7 +41,6 @@ def task_definitions(auth: HomelabAuth, options: BootstrapOptions) -> dict[Servi
         ServiceName.QUI: ("Qui", lambda: apply_and_verify_qui(auth)),
         ServiceName.ARCANE: ("Arcane", lambda: apply_and_verify_arcane(auth)),
         ServiceName.JELLYFIN: ("Jellyfin", lambda: apply_and_verify_jellyfin(auth, options)),
-        ServiceName.CWA: ("Calibre-Web-Automated", lambda: apply_and_verify_cwa(auth, options)),
     }
 
 

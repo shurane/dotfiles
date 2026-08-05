@@ -2,10 +2,6 @@
 /arcane/.env
 /arcane/backups/
 /arcane/builds/
-/calibre-web-automated/config/
-/calibre-web-automated/ingest/
-/calibre-web-automated/library/
-/calibre-web-automated/backups/
 /bookorbit/.env
 /bookorbit/books/
 /bookorbit/data/
