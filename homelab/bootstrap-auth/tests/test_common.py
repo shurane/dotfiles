@@ -27,11 +27,11 @@ def test_load_env_parses_simple_quoted_and_ignored_lines(tmp_path: Path) -> None
 
 
 def test_build_options_parses_services_to_enum_values() -> None:
-    options = build_options(skip_backup=True, parallel=True, services_value="qui,cwa")
+    options = build_options(skip_backup=True, parallel=True, services_value="qui,jellyfin")
 
     assert options.skip_backup is True
     assert options.parallel is True
-    assert options.services == (ServiceName.QUI, ServiceName.CWA)
+    assert options.services == (ServiceName.QUI, ServiceName.JELLYFIN)
 
 
 def test_build_options_rejects_unknown_services() -> None:
