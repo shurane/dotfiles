@@ -75,3 +75,4 @@ networks:
 
 volumes:
   postgres-data:
+    name: homelab_postgres-data
