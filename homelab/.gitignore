@@ -5,6 +5,7 @@
 /bookorbit/.env
 /bookorbit/books/
 /bookorbit/data/
+/homepage/config/logs/
 /jellyfin/backups/
 /jellyfin/cache/
 /jellyfin/config/
