@@ -11,3 +11,9 @@ services:
       - ./entrypoint.py:/home/withings-sync/entrypoint.py:ro
     entrypoint: ["/home/withings-sync/entrypoint.py"]
     command: ["cron"]
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "supercronic"]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 20s

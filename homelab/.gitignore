@@ -1,3 +1,4 @@
+/\.env
 /homelab.env
 /arcane/.env
 /arcane/backups/
@@ -5,12 +6,14 @@
 /bookorbit/.env
 /bookorbit/books/
 /bookorbit/data/
+/homepage/config/custom.css
+/homepage/config/custom.js
 /homepage/config/logs/
+/homepage/config/proxmox.yaml
 /jellyfin/backups/
 /jellyfin/cache/
 /jellyfin/config/
 /qbittorrent/config/
 /qui/config/
-/samba/.env
 /withings-sync/.env
 /withings-sync/config/

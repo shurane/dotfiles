@@ -7,9 +7,18 @@ services:
       - proxy-tier
     volumes:
       - ./config:/config
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "-T", "5", "http://127.0.0.1:7476"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     labels:
-      caddy: http://qui.${HOSTNAME_BASE:?err}
-      caddy.reverse_proxy: "{{upstreams 7476}}"
+      caddy_0: http://qui.${HOSTNAME_BASE:?err}, http://qui.${HOSTNAME_ALIAS_BASE:-m.lan}
+      caddy_0.reverse_proxy: "{{upstreams 7476}}"
+      caddy_1: https://qui.${HOSTNAME_BASE:?err}, https://qui.${HOSTNAME_ALIAS_BASE:-m.lan}
+      caddy_1.tls: internal
+      caddy_1.reverse_proxy: "{{upstreams 7476}}"
 
 networks:
   proxy-tier:
