@@ -58,6 +58,7 @@ services:
     networks:
       - bookorbit
     volumes:
+      - postgres-root:/var/lib/postgresql
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
@@ -72,5 +73,7 @@ networks:
   bookorbit:
 
 volumes:
+  postgres-root:
+    name: homelab_postgres-root
   postgres-data:
     name: homelab_postgres-data
