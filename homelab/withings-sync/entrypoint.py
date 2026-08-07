@@ -41,9 +41,10 @@ def main() -> None:
     mode = sys.argv[1]
     if mode == "sync":
         run_sync()
-    if mode == "cron":
+    elif mode == "cron":
         run_cron()
-    raise ValueError(f"unknown mode: {mode}")
+    else:
+        raise ValueError(f"unknown mode: {mode}")
 
 
 if __name__ == "__main__":

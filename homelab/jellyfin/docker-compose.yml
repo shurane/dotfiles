@@ -17,9 +17,18 @@ services:
       - ./config:/config
       - ./cache:/cache
       - /mnt/mango:/mnt/mango:ro
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "--max-time", "5", "http://127.0.0.1:8096/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
-      caddy: http://jellyfin.${HOSTNAME_BASE:?err}
-      caddy.reverse_proxy: "{{upstreams 8096}}"
+      caddy_0: http://jellyfin.${HOSTNAME_BASE:?err}, http://jellyfin.${HOSTNAME_ALIAS_BASE:-m.lan}
+      caddy_0.reverse_proxy: "{{upstreams 8096}}"
+      caddy_1: https://jellyfin.${HOSTNAME_BASE:?err}, https://jellyfin.${HOSTNAME_ALIAS_BASE:-m.lan}
+      caddy_1.tls: internal
+      caddy_1.reverse_proxy: "{{upstreams 8096}}"
 
 networks:
   proxy-tier:

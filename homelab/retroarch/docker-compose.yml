@@ -8,9 +8,18 @@ services:
     volumes:
       - /srv/retroarch:/data
     command: ["--config", "/dev/null", "serve", "webdav", "/data", "--addr", ":8080", "--timeout", "10m", "--contimeout", "3m", "--log-level", "INFO"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "-T", "5", "http://127.0.0.1:8080/manifest.server"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     labels:
-      caddy: http://retroarch.${HOSTNAME_BASE:?err}
-      caddy.reverse_proxy: "{{upstreams 8080}}"
+      caddy_0: http://retroarch.${HOSTNAME_BASE:?err}, http://retroarch.${HOSTNAME_ALIAS_BASE:-m.lan}
+      caddy_0.reverse_proxy: "{{upstreams 8080}}"
+      caddy_1: https://retroarch.${HOSTNAME_BASE:?err}, https://retroarch.${HOSTNAME_ALIAS_BASE:-m.lan}
+      caddy_1.tls: internal
+      caddy_1.reverse_proxy: "{{upstreams 8080}}"
 
 networks:
   proxy-tier:

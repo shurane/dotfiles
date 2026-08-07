@@ -49,18 +49,21 @@ assert_eq $'clip.mp4\nimage.qcow2' "$regex_matches" 'extension regex works with 
 patterns="$(backup_sync_summary_patterns "$tmpdir/excludes")"
 assert_eq $'/home/*/.cache\n/var/cache' "$patterns" 'summary patterns are derived from absolute /*** excludes only'
 
-mkdir -p "$tmpdir/home/alice/.cache/pip" "$tmpdir/var/cache/apt" "$tmpdir/other"
+mkdir -p "$tmpdir/home/alice/.cache/pip" "$tmpdir/var/cache/apt" "$tmpdir/My Photos/cache" "$tmpdir/other"
 printf x >"$tmpdir/home/alice/.cache/pip/a"
 printf y >"$tmpdir/var/cache/apt/b"
+printf z >"$tmpdir/My Photos/cache/c"
 cat >"$tmpdir/excludes-local" <<EXCLUDES
 $tmpdir/home/*/.cache/***
 $tmpdir/var/cache/***
+$tmpdir/My Photos/cache/***
 *.mp4
 EXCLUDES
 
 backup_sync_write_static_summary "$tmpdir/excludes-local" "$tmpdir/summary"
 grep -F "  $tmpdir/home/alice/.cache" "$tmpdir/summary" >/dev/null || fail 'home cache summary missing'
 grep -F "  $tmpdir/var/cache" "$tmpdir/summary" >/dev/null || fail 'var cache summary missing'
+grep -F "  $tmpdir/My Photos/cache" "$tmpdir/summary" >/dev/null || fail 'path with spaces summary missing'
 grep -F 'files: 1' "$tmpdir/summary" >/dev/null || fail 'file count missing from summary'
 grep -F 'top-level entries:' "$tmpdir/summary" >/dev/null || fail 'top-level entries missing from summary'
 

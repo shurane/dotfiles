@@ -47,7 +47,7 @@ backup_sync_write_static_summary() {
 
   : >"$output_file"
   while IFS= read -r path_pattern; do
-    for path in $path_pattern; do
+    while IFS= read -r path; do
       [[ -d "$path" ]] || continue
       {
         printf "  %s\n" "$path"
@@ -57,6 +57,6 @@ backup_sync_write_static_summary() {
         du -xhd1 "$path" 2>/dev/null | sort -h | sed "s/^/      /"
         printf "\n"
       } >>"$output_file"
-    done
+    done < <(compgen -G "$path_pattern")
   done < <(backup_sync_summary_patterns "$exclude_file")
 }

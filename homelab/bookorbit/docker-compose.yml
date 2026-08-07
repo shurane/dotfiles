@@ -12,8 +12,8 @@ services:
       POSTGRES_PORT: "5432"
       POSTGRES_USER: bookorbit
       POSTGRES_DB: bookorbit
-      APP_URL: http://bookorbit.m.lan
-      CLIENT_URL: http://bookorbit.m.lan
+      APP_URL: http://bookorbit.${HOSTNAME_BASE:?err}
+      CLIENT_URL: http://bookorbit.${HOSTNAME_BASE:?err}
       PUID: "1000"
       PGID: "1000"
       NODE_MAX_OLD_SPACE_SIZE: "2048"
@@ -42,9 +42,9 @@ services:
       - no-new-privileges:true
     stop_grace_period: 30s
     labels:
-      caddy_0: http://bookorbit.m.lan, http://bookorbit.m70q.lan
+      caddy_0: http://bookorbit.${HOSTNAME_BASE:?err}, http://bookorbit.${HOSTNAME_ALIAS_BASE:-m.lan}
       caddy_0.reverse_proxy: "{{upstreams 3000}}"
-      caddy_1: https://bookorbit.m.lan, https://bookorbit.m70q.lan
+      caddy_1: https://bookorbit.${HOSTNAME_BASE:?err}, https://bookorbit.${HOSTNAME_ALIAS_BASE:-m.lan}
       caddy_1.tls: internal
       caddy_1.reverse_proxy: "{{upstreams 3000}}"
 
