@@ -42,11 +42,9 @@ services:
       - no-new-privileges:true
     stop_grace_period: 30s
     labels:
-      caddy_0: http://bookorbit.${HOSTNAME_BASE:?err}, http://bookorbit.${HOSTNAME_ALIAS_BASE:-m.lan}
-      caddy_0.reverse_proxy: "{{upstreams 3000}}"
-      caddy_1: https://bookorbit.${HOSTNAME_BASE:?err}, https://bookorbit.${HOSTNAME_ALIAS_BASE:-m.lan}
-      caddy_1.tls: internal
-      caddy_1.reverse_proxy: "{{upstreams 3000}}"
+      caddy: bookorbit.${HOSTNAME_BASE:?err}, bookorbit.${HOSTNAME_ALIAS_BASE:-m.lan}
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3000}}"
 
   bookorbit-postgres:
     image: pgvector/pgvector:pg18

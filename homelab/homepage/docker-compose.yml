@@ -15,11 +15,9 @@ services:
       retries: 3
       start_period: 20s
     labels:
-      caddy_0: http://homepage.${HOSTNAME_BASE:?err}, http://homepage.${HOSTNAME_ALIAS_BASE:-m.lan}
-      caddy_0.reverse_proxy: "{{upstreams 3000}}"
-      caddy_1: https://homepage.${HOSTNAME_BASE:?err}, https://homepage.${HOSTNAME_ALIAS_BASE:-m.lan}
-      caddy_1.tls: internal
-      caddy_1.reverse_proxy: "{{upstreams 3000}}"
+      caddy: homepage.${HOSTNAME_BASE:?err}, homepage.${HOSTNAME_ALIAS_BASE:-m.lan}
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3000}}"
 
 networks:
   proxy-tier:

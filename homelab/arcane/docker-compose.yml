@@ -22,11 +22,9 @@ services:
       retries: 3
       start_period: 20s
     labels:
-      caddy_0: http://arcane.${HOSTNAME_BASE:?err}, http://arcane.${HOSTNAME_ALIAS_BASE:-m.lan}
-      caddy_0.reverse_proxy: "{{upstreams 3552}}"
-      caddy_1: https://arcane.${HOSTNAME_BASE:?err}, https://arcane.${HOSTNAME_ALIAS_BASE:-m.lan}
-      caddy_1.tls: internal
-      caddy_1.reverse_proxy: "{{upstreams 3552}}"
+      caddy: arcane.${HOSTNAME_BASE:?err}, arcane.${HOSTNAME_ALIAS_BASE:-m.lan}
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 3552}}"
 
 volumes:
   arcane-data:
