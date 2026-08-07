@@ -56,12 +56,7 @@ services:
         create mask = 0664
         directory mask = 0775
     volumes:
-      - samba-shares:/shares
       - /mnt/mango:/shares/mango
       - /mnt/mango/media:/shares/media
       - /mnt/mango/torrents:/shares/downloads
       - /srv/retroarch:/shares/retroarch
-
-volumes:
-  samba-shares:
-    name: homelab_samba-shares
