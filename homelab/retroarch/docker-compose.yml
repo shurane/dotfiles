@@ -15,11 +15,9 @@ services:
       retries: 3
       start_period: 20s
     labels:
-      caddy_0: http://retroarch.${HOSTNAME_BASE:?err}, http://retroarch.${HOSTNAME_ALIAS_BASE:-m.lan}
-      caddy_0.reverse_proxy: "{{upstreams 8080}}"
-      caddy_1: https://retroarch.${HOSTNAME_BASE:?err}, https://retroarch.${HOSTNAME_ALIAS_BASE:-m.lan}
-      caddy_1.tls: internal
-      caddy_1.reverse_proxy: "{{upstreams 8080}}"
+      caddy: retroarch.${HOSTNAME_BASE:?err}, retroarch.${HOSTNAME_ALIAS_BASE:-m.lan}
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8080}}"
 
 networks:
   proxy-tier:

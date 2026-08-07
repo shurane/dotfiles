@@ -24,11 +24,9 @@ services:
       retries: 3
       start_period: 30s
     labels:
-      caddy_0: http://jellyfin.${HOSTNAME_BASE:?err}, http://jellyfin.${HOSTNAME_ALIAS_BASE:-m.lan}
-      caddy_0.reverse_proxy: "{{upstreams 8096}}"
-      caddy_1: https://jellyfin.${HOSTNAME_BASE:?err}, https://jellyfin.${HOSTNAME_ALIAS_BASE:-m.lan}
-      caddy_1.tls: internal
-      caddy_1.reverse_proxy: "{{upstreams 8096}}"
+      caddy: jellyfin.${HOSTNAME_BASE:?err}, jellyfin.${HOSTNAME_ALIAS_BASE:-m.lan}
+      caddy.tls: internal
+      caddy.reverse_proxy: "{{upstreams 8096}}"
 
 networks:
   proxy-tier:
