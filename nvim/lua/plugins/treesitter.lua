@@ -19,6 +19,7 @@ return {
         "json",
         "bash",
         "markdown",
+        "markdown_inline",
         "vim",
         "lua",
       })
