@@ -24,6 +24,7 @@ export SAVEHIST=200000
 export RIPGREP_CONFIG_PATH="$HOME/dotfiles/.ripgreprc"
 export BAT_CONFIG_PATH="$HOME/dotfiles/.bat.conf"
 [[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && export PATH="$HOME/.local/bin:$PATH"
+[[ ":$PATH:" != *":$(go env GOPATH)/bin:"* ]] && export PATH="$PATH:$(go env GOPATH)/bin"
 
 eval "$(fnm env --use-on-cd --shell zsh)"
 
@@ -38,7 +39,7 @@ alias .......="cd ../../../../../.."
 test -x "$(command -v eza)" && alias ls="eza --group-directories-first --sort=extension"
 test -x "$(command -v eza)" && alias lt="eza --group-directories-first --sort=extension --long --tree"
 test -x "$(command -v eza)" && alias tree=lt
-test -x "$(command -v fd)" && alias fdi="fd --no-ignore"
+test -x "$(command -v fd)" && alias fdu="fd --unrestricted"
 test -x "$(command -v bat)" && alias cat=bat
 #test -x "$(command -v rg)" && alias grep="rg --ignore-case"
 test -x "$(command -v vivid)" && export LS_COLORS="$(vivid generate snazzy)"
