@@ -1,5 +1,4 @@
 return {
-  -- Comment.nvim
   {
     "numToStr/Comment.nvim",
     keys = {
@@ -36,8 +35,28 @@ return {
 
     end,
   },
+  -- {
+  --   "brenoprata10/nvim-highlight-colors",
+  --   keys = {
+  --     { "<leader>hc", mode = { "n", "v" }, desc = "Toggle Log Color Highlights" },
+  --   },
+  --   config = function()
+  --     vim.opt.termguicolors = true
+  --     local hc = require("nvim-highlight-colors")
+  --     hc.setup({
+  --       render = "background",
+  --       enable_named_colors = true,
+  --       enable_tailwind = true,
+  --       exclude_filetypes = {},
+  --       exclude_buftypes = {},
+  --     })
+  --
+  --     vim.keymap.set("n", "<leader>hc", function()
+  --       hc.toggle()
+  --     end, { desc = "Toggle Log Color Highlights" })
+  --   end
+  -- },
 
-  -- oil.nvim
   {
     "stevearc/oil.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
