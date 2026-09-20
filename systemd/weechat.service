@@ -1,13 +1,15 @@
 [Unit]
-Description=WeeChat in tmux
+Description=WeeChat IRC Client (in tmux)
+After=network.target network-online.target
 Wants=network-online.target
-After=network-online.target
 
 [Service]
-Type=oneshot
-ExecStart=/usr/bin/tmux new-session -d -s weechat /usr/bin/weechat
-ExecStop=/usr/bin/tmux send-keys -t weechat "/quit -yes" Enter
-RemainAfterExit=yes
+Type=forking
+RemainAfterExit=no
+ExecStart=/usr/bin/tmux new-session -d -s weechat /usr/bin/weechat --upgrade
+ExecStop=-%h/.local/bin/weecmd core "/upgrade -quit"
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=default.target
