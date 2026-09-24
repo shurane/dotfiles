@@ -16,7 +16,10 @@ services:
     volumes:
       - ./config:/config
       - ./cache:/cache
+      - ./detect-settings.sh:/detect-settings.sh:ro
       - /mnt/mango:/mnt/mango:ro
+    entrypoint: ["/detect-settings.sh"]
+    command: ["/jellyfin/jellyfin"]
     healthcheck:
       test: ["CMD", "curl", "-fsS", "--max-time", "5", "http://127.0.0.1:8096/health"]
       interval: 30s
