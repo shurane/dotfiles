@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Ensure Arcane project override mounts are up to date
+"$ROOT_DIR/arcane/generate_overrides.py"
+
+# Pass all arguments to docker compose up (default to -d if none provided)
+if [ "$#" -eq 0 ]; then
+  exec docker compose -f "$ROOT_DIR/docker-compose.yml" up -d
+else
+  exec docker compose -f "$ROOT_DIR/docker-compose.yml" up "$@"
+fi
