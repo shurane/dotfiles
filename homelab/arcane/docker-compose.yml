@@ -14,6 +14,7 @@ services:
       - arcane-data:/app/data
       - ./backups:/backups
       - ./builds:/builds
+      - ..:/app/data/projects
     healthcheck:
       test: ["CMD", "/app/arcane", "health"]
       interval: 30s
