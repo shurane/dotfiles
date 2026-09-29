@@ -9,6 +9,7 @@ services:
     environment:
       HOME: /config
       TZ: America/Los_Angeles
+      DOTNET_gcServer: "0"
     devices:
       - /dev/dri:/dev/dri
     networks:

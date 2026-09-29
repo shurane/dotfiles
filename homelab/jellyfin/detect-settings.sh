@@ -82,6 +82,8 @@ if [ "$ACCEL" = "qsv" ]; then
         # Ensure Intel low power encoders are enabled
         sed -i 's|<EnableIntelLowPowerH264HwEncoder>.*</EnableIntelLowPowerH264HwEncoder>|<EnableIntelLowPowerH264HwEncoder>true</EnableIntelLowPowerH264HwEncoder>|g' "$CONFIG"
         sed -i 's|<EnableIntelLowPowerHevcHwEncoder>.*</EnableIntelLowPowerHevcHwEncoder>|<EnableIntelLowPowerHevcHwEncoder>true</EnableIntelLowPowerHevcHwEncoder>|g' "$CONFIG"
+        # Ensure HEVC hardware encoding is enabled
+        sed -i 's|<AllowHevcEncoding>.*</AllowHevcEncoding>|<AllowHevcEncoding>true</AllowHevcEncoding>|g' "$CONFIG"
     fi
 elif [ "$ACCEL" = "vaapi" ]; then
     echo "[detect-settings] AMD/generic GPU detected. Ensuring VAAPI is configured..."
@@ -94,6 +96,9 @@ elif [ "$ACCEL" = "vaapi" ]; then
 else
     echo "[detect-settings] No supported GPU acceleration found. Running in standard mode."
 fi
+
+# Ensure transcode temp directory exists to prevent startup warnings
+mkdir -p /tmp/jellyfin
 
 # Execute whatever command was passed from docker-compose.yml
 echo "[detect-settings] Launching: $@"
