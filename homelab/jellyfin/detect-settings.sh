@@ -65,6 +65,7 @@ fi
 
 # --- Container Auto-Detection & Configuration Mode ---
 CONFIG="/config/config/encoding.xml"
+SYSTEM_CONFIG="/config/config/system.xml"
 ACCEL=$(detect_gpu)
 
 echo "[detect-settings] Detecting hardware capabilities..."
@@ -85,6 +86,11 @@ if [ "$ACCEL" = "qsv" ]; then
         # Ensure HEVC hardware encoding is enabled
         sed -i 's|<AllowHevcEncoding>.*</AllowHevcEncoding>|<AllowHevcEncoding>true</AllowHevcEncoding>|g' "$CONFIG"
     fi
+    if [ -f "$SYSTEM_CONFIG" ]; then
+        # Ensure Trickplay thumbnail generation uses hardware acceleration & encoding
+        sed -i 's|<EnableHwAcceleration>.*</EnableHwAcceleration>|<EnableHwAcceleration>true</EnableHwAcceleration>|g' "$SYSTEM_CONFIG"
+        sed -i 's|<EnableHwEncoding>.*</EnableHwEncoding>|<EnableHwEncoding>true</EnableHwEncoding>|g' "$SYSTEM_CONFIG"
+    fi
 elif [ "$ACCEL" = "vaapi" ]; then
     echo "[detect-settings] AMD/generic GPU detected. Ensuring VAAPI is configured..."
     if [ -f "$CONFIG" ]; then
@@ -93,8 +99,16 @@ elif [ "$ACCEL" = "vaapi" ]; then
         sed -i 's|<EnableVppTonemapping>.*</EnableVppTonemapping>|<EnableVppTonemapping>true</EnableVppTonemapping>|g' "$CONFIG"
         sed -i 's|<EnableThrottling>.*</EnableThrottling>|<EnableThrottling>true</EnableThrottling>|g' "$CONFIG"
     fi
+    if [ -f "$SYSTEM_CONFIG" ]; then
+        sed -i 's|<EnableHwAcceleration>.*</EnableHwAcceleration>|<EnableHwAcceleration>true</EnableHwAcceleration>|g' "$SYSTEM_CONFIG"
+        sed -i 's|<EnableHwEncoding>.*</EnableHwEncoding>|<EnableHwEncoding>true</EnableHwEncoding>|g' "$SYSTEM_CONFIG"
+    fi
 else
     echo "[detect-settings] No supported GPU acceleration found. Running in standard mode."
+    if [ -f "$SYSTEM_CONFIG" ]; then
+        sed -i 's|<EnableHwAcceleration>.*</EnableHwAcceleration>|<EnableHwAcceleration>false</EnableHwAcceleration>|g' "$SYSTEM_CONFIG"
+        sed -i 's|<EnableHwEncoding>.*</EnableHwEncoding>|<EnableHwEncoding>false</EnableHwEncoding>|g' "$SYSTEM_CONFIG"
+    fi
 fi
 
 # Ensure transcode temp directory exists to prevent startup warnings
