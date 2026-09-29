@@ -1,7 +1,7 @@
 include:
   - path: caddy/docker-compose.yml
   - path: glance/docker-compose.yml
-  - path: homepage/docker-compose.yml
+  # - path: homepage/docker-compose.yml  # Replaced by glance (14MB vs 152MB)
   - path: bookorbit/docker-compose.yml
   - path: arcane/docker-compose.yml
   - path: qbittorrent/docker-compose.yml
