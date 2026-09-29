@@ -16,7 +16,7 @@ services:
       CLIENT_URL: http://bookorbit.${HOSTNAME_BASE:?err}
       PUID: "1000"
       PGID: "1000"
-      NODE_MAX_OLD_SPACE_SIZE: "2048"
+      NODE_MAX_OLD_SPACE_SIZE: "256"
       LIBRARY_BROWSE_ROOT: /books
     depends_on:
       bookorbit-postgres:
