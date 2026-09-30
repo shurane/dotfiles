@@ -1,13 +1,13 @@
 [Unit]
 Description=WeeChat IRC Client (in tmux)
-After=network.target network-online.target
+After=network.target network-online.target soju.service
 Wants=network-online.target
 
 [Service]
 Type=forking
 RemainAfterExit=no
-ExecStart=/usr/bin/tmux new-session -d -s weechat /usr/bin/weechat --upgrade
-ExecStop=-%h/.local/bin/weecmd core "/upgrade -quit"
+ExecStart=/usr/bin/tmux new-session -d -s weechat /usr/bin/weechat
+ExecStop=-%h/.local/bin/weecmd core "/quit"
 Restart=on-failure
 RestartSec=5s
 
