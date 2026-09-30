@@ -2,7 +2,7 @@
 Description=Periodic export of Soju backlog to compressed disk logs
 
 [Timer]
-OnCalendar=hourly
+OnCalendar=daily
 Persistent=true
 
 [Install]
