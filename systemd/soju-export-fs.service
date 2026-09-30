@@ -1,0 +1,10 @@
+[Unit]
+Description=Export Soju IRC backlog to compressed daily disk logs
+After=soju.service
+Wants=soju.service
+
+[Service]
+Type=oneshot
+User=soju
+Group=soju
+ExecStart=/usr/local/bin/soju-export-fs --db-path /var/lib/soju/main.db --output-dir /var/lib/soju/logs
