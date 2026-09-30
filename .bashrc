@@ -72,7 +72,8 @@ test -x "$(command -v vivid)" && export LS_COLORS="$(vivid generate snazzy)"
 test -x "$(command -v zoxide)" && eval "$(zoxide init bash)"
 test -x "$(command -v broot)" && source $HOME/.config/broot/launcher/bash/br
 test -x "$(command -v fnm)" && eval "$(fnm env --use-on-cd --shell bash)"
-command -v nvim >/dev/null 2>&1 && ! command -v vim >/dev/null 2>&1 && alias vim=nvim
+test -x "$(command -v nvim)" && alias vim=nvim
+test -s "$HOME/.secrets" && source "$HOME/.secrets"
 
 # https://github.com/BurntSushi/ripgrep/issues/86#issuecomment-331718946
 rgl() { rg --pretty "$@" | less -XFR; }
@@ -85,5 +86,7 @@ rglweb() { rg --pretty --type web "$@" | less -XFR; }
 
 batdiff() { git diff --name-only --diff-filter=d | xargs bat --diff; }
 
-# Attach or start WeeChat inside tmux
-alias tweechat="tmux new-session -A -s weechat 'weechat --upgrade'"
+# Attach or start WeeChat inside tmux via systemd
+alias tweechat="systemctl --user start weechat.service && tmux attach -t weechat"
+
+
