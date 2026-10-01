@@ -1,6 +1,7 @@
 services:
   jellyfin:
     image: jellyfin/jellyfin:latest
+    mem_limit: 512m
     restart: unless-stopped
     user: "1000:1000"
     group_add:
