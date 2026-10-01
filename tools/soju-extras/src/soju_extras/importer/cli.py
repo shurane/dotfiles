@@ -17,10 +17,10 @@ from rich.progress import (
     TimeRemainingColumn,
 )
 
-from soju.db import open_soju_db
-from soju.importer.parser import parse_weechat_log_file
-from soju.models import MessageKind, SojuTargetFile, WeeChatLogRecord
-from soju.resolver import SojuTargetResolver
+from soju_extras.db import open_soju_db
+from soju_extras.importer.parser import parse_weechat_log_file
+from soju_extras.models import MessageKind, SojuTargetFile, WeeChatLogRecord
+from soju_extras.resolver import SojuTargetResolver
 
 console = Console()
 

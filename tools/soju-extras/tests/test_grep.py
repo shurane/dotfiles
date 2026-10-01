@@ -9,9 +9,9 @@ import pytest
 import sqlite_utils
 from pydantic import ValidationError
 
-from soju.grep.cli import execute_search, print_result
-from soju.grep.sanitizer import sanitize_fts5_query
-from soju.models import SearchQuery, SearchResult
+from soju_extras.grep.cli import execute_search, print_result
+from soju_extras.grep.sanitizer import sanitize_fts5_query
+from soju_extras.models import SearchQuery, SearchResult
 
 
 def test_sanitize_fts5_query_edge_cases() -> None:

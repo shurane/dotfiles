@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sqlite_utils
 
-from soju.resolver import SojuTargetResolver
+from soju_extras.resolver import SojuTargetResolver
 
 
 def test_resolver_create_and_cache() -> None:

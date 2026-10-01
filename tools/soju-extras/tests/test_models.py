@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from soju.models import MessageKind, SojuTargetFile, WeeChatLogRecord
+from soju_extras.models import MessageKind, SojuTargetFile, WeeChatLogRecord
 
 
 def test_weechat_log_record_parse_privmsg() -> None:

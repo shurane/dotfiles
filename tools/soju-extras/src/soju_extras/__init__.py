@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from soju.db import open_soju_db
-from soju.models import (
+from soju_extras.db import open_soju_db
+from soju_extras.models import (
     ExportedLogRecord,
     MessageKind,
     SearchQuery,

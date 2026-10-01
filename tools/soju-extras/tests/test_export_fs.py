@@ -7,7 +7,7 @@ from pathlib import Path
 
 import sqlite_utils
 
-from soju.export_fs.cli import SojuFSExporter
+from soju_extras.export_fs.cli import SojuFSExporter
 
 
 def setup_mock_soju_db(db_path: Path) -> None:
