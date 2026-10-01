@@ -1,4 +1,4 @@
-# soju-tools
+# soju-extras
 
 Modern Python 3.14 toolkit for Soju IRC bouncer:
 - **`sojugrep`**: Instant FTS5 full-text search across Soju SQLite IRC backlog.

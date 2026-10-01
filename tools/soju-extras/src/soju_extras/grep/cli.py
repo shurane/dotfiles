@@ -6,9 +6,9 @@ import argparse
 import sqlite3
 import sys
 
-from soju.db import open_soju_db
-from soju.grep.sanitizer import sanitize_fts5_query
-from soju.models import SearchQuery, SearchResult
+from soju_extras.db import open_soju_db
+from soju_extras.grep.sanitizer import sanitize_fts5_query
+from soju_extras.models import SearchQuery, SearchResult
 
 # ANSI terminal formatting
 RESET = "\x1b[0m"

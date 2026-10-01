@@ -6,7 +6,7 @@ import gzip
 from collections.abc import Iterator
 from pathlib import Path
 
-from soju.models import WeeChatLogRecord
+from soju_extras.models import WeeChatLogRecord
 
 
 def parse_weechat_log_file(file_path: Path) -> Iterator[WeeChatLogRecord]:

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import sqlite_utils
 
-from soju.importer.cli import SojuLogImporter
+from soju_extras.importer.cli import SojuLogImporter
 
 
 def test_weechat_importer_db(tmp_path: Path) -> None:

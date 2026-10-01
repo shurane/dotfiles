@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "soju-tools"
+name = "soju-extras"
 version = "0.1.0"
-description = "Modern Python 3.14 toolkit for Soju IRC bouncer (search, flat-file export, log migration)"
+description = "Modern Python 3.14 toolkit for Soju IRC bouncer (sojugrep, soju-export-fs, weechat-to-soju)"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
@@ -15,12 +15,15 @@ dependencies = [
 ]
 
 [project.scripts]
-sojugrep = "soju.grep.cli:main"
-soju-export-fs = "soju.export_fs.cli:main"
-weechat-to-soju = "soju.importer.cli:main"
+sojugrep = "soju_extras.grep.cli:main"
+soju-export-fs = "soju_extras.export_fs.cli:main"
+weechat-to-soju = "soju_extras.importer.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/soju"]
+packages = ["src/soju_extras"]
+
+[tool.uv]
+default-groups = ["dev"]
 
 [dependency-groups]
 dev = [

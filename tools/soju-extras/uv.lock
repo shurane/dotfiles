@@ -239,7 +239,7 @@ wheels = [
 ]
 
 [[package]]
-name = "soju-tools"
+name = "soju-extras"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

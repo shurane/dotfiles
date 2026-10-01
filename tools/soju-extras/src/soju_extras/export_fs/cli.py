@@ -9,8 +9,8 @@ import re
 import sys
 from pathlib import Path
 
-from soju.db import open_soju_db
-from soju.models import ExportedLogRecord, MessageKind
+from soju_extras.db import open_soju_db
+from soju_extras.models import ExportedLogRecord, MessageKind
 
 
 def parse_irc_raw(raw: str, sender: str, text: str | None) -> tuple[MessageKind, str]:

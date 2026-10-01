@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from soju.db import open_soju_db
+from soju_extras.db import open_soju_db
 
 
 def test_open_soju_db_read_write(tmp_path: Path) -> None:
