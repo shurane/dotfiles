@@ -1,85 +1,50 @@
-"""Target and network resolution utilities for Soju database."""
+"""Resolve existing Soju identities without inventing server configuration."""
 
-from __future__ import annotations
+import sqlite3
 
-import sqlite_utils
+from pydantic import BaseModel, ConfigDict
+
+from soju_extras.db import execute, query_rows
+
+
+class IDRow(BaseModel):
+    model_config = ConfigDict(strict=True, extra="forbid")
+    id: int
 
 
 class SojuTargetResolver:
-    """Resolves and caches Soju Network and MessageTarget mappings."""
-
-    def __init__(self, db: sqlite_utils.Database) -> None:
+    def __init__(self, db: sqlite3.Connection) -> None:
         self.db = db
-        self._user_ids: dict[str, int] = {}
-        self._network_ids: dict[tuple[int, str], int] = {}
-        self._target_ids: dict[tuple[int, str], int] = {}
 
-    def get_or_create_user(self, username: str) -> int:
-        """Resolve user ID or create user record."""
-        if username in self._user_ids:
-            return self._user_ids[username]
+    def resolve_user(self, username: str) -> int:
+        rows = query_rows(self.db, IDRow, "SELECT id FROM User WHERE username = ?", (username,))
+        if len(rows) != 1:
+            raise ValueError(f"Soju user {username!r} does not exist")
+        return rows[0].id
 
-        rows = list(self.db.query("SELECT id FROM User WHERE username = ?", [username]))
-        if rows:
-            uid = int(rows[0]["id"])
-        else:
-            t = self.db.table("User").insert({"username": username, "admin": 0})
-            uid = int(t.last_pk or t.last_rowid or 0)
-
-        self._user_ids[username] = uid
-        return uid
-
-    def get_or_create_network(self, user_id: int, network_name: str) -> int:
-        """Resolve network ID for a user or create network record."""
-        key = (user_id, network_name.lower())
-        if key in self._network_ids:
-            return self._network_ids[key]
-
-        rows = list(
-            self.db.query(
-                "SELECT id FROM Network WHERE user = ? AND LOWER(name) = ?",
-                [user_id, network_name.lower()],
-            )
+    def resolve_network(self, user_id: int, name: str) -> int:
+        rows = query_rows(
+            self.db,
+            IDRow,
+            "SELECT id FROM Network WHERE user = ? AND (name = ? COLLATE NOCASE OR addr = ?)",
+            (user_id, name, name),
         )
-        if rows:
-            net_id = int(rows[0]["id"])
-        else:
-            t = self.db.table("Network").insert(
-                {
-                    "user": user_id,
-                    "name": network_name.lower(),
-                    "addr": f"irc.{network_name.lower()}.net:6697",
-                    "nick": "user",
-                    "enabled": 1,
-                }
+        if len(rows) != 1:
+            raise ValueError(
+                f"Network {name!r} must identify one existing network; use --network-map"
             )
-            net_id = int(t.last_pk or t.last_rowid or 0)
-
-        self._network_ids[key] = net_id
-        return net_id
+        return rows[0].id
 
     def get_or_create_target(self, network_id: int, target: str) -> int:
-        """Resolve MessageTarget ID or create target record."""
-        key = (network_id, target.lower())
-        if key in self._target_ids:
-            return self._target_ids[key]
-
-        rows = list(
-            self.db.query(
-                "SELECT id FROM MessageTarget WHERE network = ? AND LOWER(target) = ?",
-                [network_id, target.lower()],
-            )
+        # Target casing is preserved. Soju owns network-specific IRC case mapping.
+        execute(
+            self.db,
+            "INSERT INTO MessageTarget(network, target) VALUES (?, ?) ON CONFLICT DO NOTHING",
+            (network_id, target),
         )
-        if rows:
-            target_id = int(rows[0]["id"])
-        else:
-            t = self.db.table("MessageTarget").insert(
-                {
-                    "network": network_id,
-                    "target": target.lower(),
-                }
-            )
-            target_id = int(t.last_pk or t.last_rowid or 0)
-
-        self._target_ids[key] = target_id
-        return target_id
+        return query_rows(
+            self.db,
+            IDRow,
+            "SELECT id FROM MessageTarget WHERE network = ? AND target = ?",
+            (network_id, target),
+        )[0].id
