@@ -1,0 +1,9 @@
+[Unit]
+Description=Retain verified daily, weekly and monthly Soju backups
+
+[Service]
+Type=oneshot
+# Set User and ExecStart to the receiving account/toolkit installation if needed.
+ExecStart=/opt/soju-extras/.venv/bin/soju-backup prune /var/lib/soju/backups --apply
+TimeoutStartSec=5min
+UMask=0077

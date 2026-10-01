@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily retention for verified Soju backups
+
+[Timer]
+OnCalendar=*-*-* 05:00:00 America/Chicago
+Persistent=true
+
+[Install]
+WantedBy=timers.target

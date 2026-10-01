@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily Soju and WeeChat backup
+
+[Timer]
+OnCalendar=*-*-* 04:15:00 America/Chicago
+Persistent=true
+
+[Install]
+WantedBy=timers.target
