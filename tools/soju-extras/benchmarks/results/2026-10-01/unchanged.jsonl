@@ -1,0 +1,2 @@
+{"messages":2000000,"phase":"first","seconds":46.547,"cpu_seconds":33.781,"peak_rss_mib":139.6,"database_bytes":892444672,"log_bytes":83807860,"log_files":6800,"snapshot_bytes":309031632,"snapshot":"2026-10-01T185315Z","remote":true}
+{"messages":2000000,"phase":"unchanged","seconds":17.64,"cpu_seconds":11.346,"peak_rss_mib":126.5,"database_bytes":892444672,"log_bytes":83807860,"log_files":6800,"snapshot_bytes":309031632,"snapshot":"2026-10-01T185403Z","remote":true}
