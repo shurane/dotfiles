@@ -1,0 +1,11 @@
+[Unit]
+Description=Verified compressed Soju and WeeChat backup
+Requires=soju-export-fs.service
+After=soju-export-fs.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/soju-extras/.venv/bin/soju-backup run /etc/soju/backup.json
+TimeoutStartSec=30min
+UMask=0077

@@ -15,6 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
+soju-backup = "soju_extras.backup.cli:main"
 sojugrep = "soju_extras.grep.cli:main"
 soju-export-fs = "soju_extras.export_fs.cli:main"
 weechat-to-soju = "soju_extras.importer.cli:main"

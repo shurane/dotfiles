@@ -76,13 +76,13 @@ def durable_mkdir(path: Path) -> None:
 
 
 @contextmanager
-def export_lock(path: Path) -> Generator[None]:
+def export_lock(path: Path, *, label: str = "exporter") -> Generator[None]:
     durable_mkdir(path.parent)
     with path.open("a") as stream:
         try:
             fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError as exc:
-            raise ValueError("Another exporter is using this output directory") from exc
+            raise ValueError(f"Another {label} is using this output directory") from exc
         try:
             yield
         finally:

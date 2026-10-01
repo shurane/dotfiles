@@ -393,3 +393,75 @@ workload. The importer keeps one transaction per file for its all-or-nothing
 behavior. These measurements cover the write phase only; whole-import timings
 include parsing, staging and duplicate detection. Smaller transactions could
 reduce waits for other writers, but they would permit partially committed files.
+
+## Compressed backups (`soju-backup`)
+
+`soju-backup run CONFIG.json` takes a consistent online SQLite snapshot, copies
+configured settings/data, and stores each payload as a `.zst` file in a dated
+backup directory. It uses the same database contexts, validated query rows,
+export lock and durable metadata writes as the importer/exporter. Rsync handles
+copying and SSH transfers. Python 3.14's `compression.zstd` handles streaming
+compression; Pydantic validates configuration, manifests and completion receipts.
+
+Start with [`contrib/backup.example.json`](contrib/backup.example.json). Configure
+all additional sources explicitly: WeeChat settings/scripts, credentials, TLS
+material, service files and recovery tools live outside Soju's data directory.
+Exclude the live database and its WAL/SHM files from the ordinary file copy;
+`database_destination` (default `soju/main.db`) receives the SQLite backup instead.
+The exporter lock covers file staging and the database backup. Configured sources
+must not overlap in the destination or contain the backup root.
+
+The backup layout preserves directories:
+
+```text
+2026-10-01T091537Z/
+  manifest.json
+  .complete.json
+  soju/main.db.zst
+  soju/logs/users/USER/networks/NETWORK/channels/TARGET/YYYY-MM-DD.log.zst
+  soju/legacy-archives/USER/NETWORK/TARGET/YYYY-MM.weechatlog.zst
+  etc/soju/config.zst
+  weechat/config/weechat.conf.zst    # when configured as a source
+```
+
+Plain files are compressed. Gzip files are decoded and stored as Zstandard;
+existing Zstandard streams are validated and reused without wrapping them again.
+Only the small manifest and completion receipt remain uncompressed. The manifest
+records original paths, encodings, modes, symlinks and checksums, so restoration
+can recreate gzip exports as well as ordinary files. Soju cannot directly read
+these compressed backup payloads. No history is discarded merely because it is
+absent from the current database: include the legacy archives in the sources.
+
+Remote SSH uses a pinned host key and a dedicated identity. The receiver's
+`rrsync` root is the backup directory; the command never needs remote shell
+access. A completion receipt is uploaded only after remote checksum verification.
+Unchanged compressed files share disk space via hard links. Treat completed
+snapshots as immutable. The script leaves incomplete uploads without receipts;
+they and older formats are ignored by retention and can be reviewed separately.
+
+```sh
+soju-backup run /etc/soju/backup.json
+soju-backup verify /var/backups/soju/2026-10-01T091537Z
+soju-backup restore /var/backups/soju/2026-10-01T091537Z /tmp/soju-restore
+soju-backup prune /var/backups/soju                 # preview only
+soju-backup prune /var/backups/soju --apply         # delete eligible snapshots
+```
+
+Restoration verifies both stored and decoded SHA-256 checksums before publishing
+into an absent destination. It restores file modes and symlinks; set ownership
+for the service account before promoting restored data. This command deliberately
+does not replace a running database. SQLite integrity checks can additionally be
+run on the restored `soju/main.db` before promotion.
+
+Retention keeps the newest snapshot in each of the most recent **7 distinct
+calendar days, 4 ISO weeks and 6 months**, using `America/Chicago` by default.
+These sets overlap (at most 17 snapshots). Sparse backup schedules keep older
+available recovery points. Only valid completion receipts qualify a directory
+for pruning; legacy migration backups remain untouched. Local pruning happens
+after successful remote delivery. Run a receiver-side `soju-backup prune` timer
+for the remote root; the restricted transfer key does not gain deletion rights.
+
+The CLI exits with status 1 on operational/validation failures and 2 on invalid
+command-line syntax. `verify` and `restore` do not require SSH. Neither Soju nor
+WeeChat needs to stop for backups; the optional WeeChat checkpoint runs `/save`
+through the existing helper, without saving native sessions.

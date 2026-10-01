@@ -1,0 +1,19 @@
+{
+  "database": "/var/lib/soju/main.db",
+  "export_directory": "/var/lib/soju/logs",
+  "root": "/var/backups/soju",
+  "sources": [
+    {
+      "source": "/var/lib/soju",
+      "destination": "soju",
+      "excludes": ["/main.db", "/main.db-wal", "/main.db-shm", "/logs/.export.lock"]
+    },
+    {"source": "/etc/soju", "destination": "etc/soju"}
+  ],
+  "remote": {
+    "host": "pi@raspy.lan",
+    "identity_file": "/var/lib/soju-migration/backup-ssh/id_ed25519",
+    "known_hosts": "/var/lib/soju-migration/backup-ssh/known_hosts"
+  },
+  "retention": {"daily": 7, "weekly": 4, "monthly": 6, "timezone": "America/Chicago"}
+}
