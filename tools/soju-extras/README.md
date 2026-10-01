@@ -339,6 +339,9 @@ replacements, and preservation of archived messages deleted by database retentio
 
 Run measurements in separate processes so peak RSS is comparable:
 
+For complete backup scaling, including optional remote transfer and unchanged
+repeats, see the [backup benchmark](benchmarks/README.md).
+
 ```sh
 uv run python benchmarks/throughput.py export --messages 20000
 uv run python benchmarks/throughput.py export --messages 200000

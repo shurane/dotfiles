@@ -1,0 +1,23 @@
+{"event": "generate", "messages": 100000, "target": 2000000, "elapsed_seconds": 4.0}
+{"event": "generate", "messages": 200000, "target": 2000000, "elapsed_seconds": 8.2}
+{"event": "generate", "messages": 300000, "target": 2000000, "elapsed_seconds": 12.3}
+{"event": "generate", "messages": 400000, "target": 2000000, "elapsed_seconds": 16.8}
+{"event": "generate", "messages": 500000, "target": 2000000, "elapsed_seconds": 21.2}
+{"event": "generate", "messages": 600000, "target": 2000000, "elapsed_seconds": 25.7}
+{"event": "generate", "messages": 700000, "target": 2000000, "elapsed_seconds": 30.0}
+{"event": "generate", "messages": 800000, "target": 2000000, "elapsed_seconds": 34.9}
+{"event": "generate", "messages": 900000, "target": 2000000, "elapsed_seconds": 39.4}
+{"event": "generate", "messages": 1000000, "target": 2000000, "elapsed_seconds": 43.9}
+{"event": "generate", "messages": 1100000, "target": 2000000, "elapsed_seconds": 48.3}
+{"event": "generate", "messages": 1200000, "target": 2000000, "elapsed_seconds": 52.8}
+{"event": "generate", "messages": 1300000, "target": 2000000, "elapsed_seconds": 57.3}
+{"event": "generate", "messages": 1400000, "target": 2000000, "elapsed_seconds": 61.8}
+{"event": "generate", "messages": 1500000, "target": 2000000, "elapsed_seconds": 66.2}
+{"event": "generate", "messages": 1600000, "target": 2000000, "elapsed_seconds": 71.2}
+{"event": "generate", "messages": 1700000, "target": 2000000, "elapsed_seconds": 75.6}
+{"event": "generate", "messages": 1800000, "target": 2000000, "elapsed_seconds": 80.1}
+{"event": "generate", "messages": 1900000, "target": 2000000, "elapsed_seconds": 84.5}
+{"event": "generate", "messages": 2000000, "target": 2000000, "elapsed_seconds": 88.8}
+{"event": "ready", "messages": 2000000, "setup_seconds": 91.318, "database_bytes": 892444672}
+{"messages":2000000,"phase":"first","seconds":46.547,"cpu_seconds":33.781,"peak_rss_mib":139.6,"database_bytes":892444672,"log_bytes":83807860,"log_files":6800,"snapshot_bytes":309031632,"snapshot":"2026-10-01T185315Z","remote":true}
+{"messages":2000000,"phase":"unchanged","seconds":17.64,"cpu_seconds":11.346,"peak_rss_mib":126.5,"database_bytes":892444672,"log_bytes":83807860,"log_files":6800,"snapshot_bytes":309031632,"snapshot":"2026-10-01T185403Z","remote":true}

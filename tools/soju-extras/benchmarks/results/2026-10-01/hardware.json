@@ -1,0 +1,31 @@
+{
+  "source": {
+    "host": "m70q",
+    "cpu": "Intel Core i5-11400T",
+    "logical_cpus": 12,
+    "memory_gib_approx": 15,
+    "source_storage": "NVMe, /dev/nvme0n1p3"
+  },
+  "destination": {
+    "host": "raspy",
+    "architecture": "aarch64",
+    "memory_gib_approx": 3.7,
+    "destination_storage": "/dev/sda2"
+  },
+  "process_priority": {
+    "nice": 10,
+    "ionice_class": 2,
+    "ionice_level": 7
+  },
+  "backup_code_commit": "a333140",
+  "remote_reuse_audit": {
+    "messages": 2000000,
+    "hardlinked_payloads": 6801,
+    "new_payloads": 1
+  },
+  "unchanged_reuse_audit": {
+    "messages": 2000000,
+    "payloads": 6802,
+    "hardlinked_payloads": 6802
+  }
+}
