@@ -8,7 +8,7 @@ def sanitize_fts5_query(query: str) -> str:
 
     Features:
     - Balances unclosed double quotes and parentheses
-    - Automatically quotes terms containing special punctuation (e.g. `c++`, `https://...`)
+    - Automatically quotes terms containing special punctuation (e.g. `c++`, `https://...`, `it's`)
     - Strips invalid leading wildcards (`*word` -> `word`)
     - Prunes dangling or consecutive boolean operators (`AND`, `OR`, `NOT`)
     - Normalizes `AND NOT` to SQLite FTS5's binary `NOT` operator
@@ -88,7 +88,6 @@ def sanitize_fts5_query(query: str) -> str:
     prev = ""
     for tok in tokens:
         if tok == "NOT" and prev == "AND":
-            # Replace 'AND NOT' with FTS5 binary 'NOT'
             filtered[-1] = "NOT"
             prev = "NOT"
             continue
@@ -123,11 +122,9 @@ def sanitize_fts5_query(query: str) -> str:
     for _ in range(open_count):
         balanced.append(")")
 
-    # Final check on balanced structure
-    res = " ".join(balanced)
     # Check if string contains at least one non-operator term
     terms = [t for t in balanced if t not in ("AND", "OR", "NOT", "(", ")")]
     if not terms:
         return ""
 
-    return res
+    return " ".join(balanced)

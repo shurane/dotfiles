@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "soju-tools"
+version = "0.1.0"
+description = "Modern Python 3.14 toolkit for Soju IRC bouncer (search, flat-file export, log migration)"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "sqlite-utils>=3.38.0",
+    "pydantic>=2.10.0",
+    "rich>=13.0.0",
+]
+
+[project.scripts]
+sojugrep = "soju.grep.cli:main"
+soju-export-fs = "soju.export_fs.cli:main"
+weechat-to-soju = "soju.importer.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/soju"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.9.0",
+    "ty>=0.0.84",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
