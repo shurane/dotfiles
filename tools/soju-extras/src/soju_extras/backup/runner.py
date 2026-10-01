@@ -2,15 +2,17 @@
 
 import os
 import shlex
+import shutil
 import subprocess
 import time
 from collections.abc import Sequence
-from pathlib import Path
+from functools import partial
+from pathlib import Path, PurePosixPath
 from tempfile import TemporaryDirectory
 
 from whenever import Instant
 
-from soju_extras.backup.models import BackupConfig, FileEntry, Receipt, Remote
+from soju_extras.backup.models import BackupConfig, CopySource, Receipt, Remote
 from soju_extras.backup.retention import completed, prune_completed, validate_root
 from soju_extras.backup.snapshot import (
     MANIFEST,
@@ -57,18 +59,35 @@ def flush_weechat(config: BackupConfig) -> None:
         time.sleep(0.1)
 
 
+def ignored_names(source: CopySource, directory: str, names: list[str]) -> set[str]:
+    """Use stdlib glob matching for source-relative paths and basename patterns."""
+    parent = Path(directory)
+    ignored: set[str] = set()
+    for name in names:
+        path = parent / name
+        relative = path.relative_to(source.source).as_posix()
+        for pattern in source.excludes:
+            if pattern.endswith("/") and (path.is_symlink() or not path.is_dir()):
+                continue
+            anchored = pattern.startswith("/")
+            glob = pattern.strip("/")
+            candidate = relative if anchored or "/" in glob else name
+            if PurePosixPath(candidate).full_match(glob):
+                ignored.add(name)
+                break
+    return ignored
+
+
 def copy_sources(config: BackupConfig, stage: Path) -> None:
     for source in config.sources:
         destination = stage / source.destination
         destination.parent.mkdir(parents=True, exist_ok=True)
-        exclusions = [f"--exclude={pattern}" for pattern in source.excludes]
         if source.source.is_dir() and not source.source.is_symlink():
-            destination.mkdir(exist_ok=True)
-            run(
-                ["rsync", "-a", *exclusions, "--", str(source.source) + "/", str(destination) + "/"]
+            shutil.copytree(
+                source.source, destination, symlinks=True, ignore=partial(ignored_names, source)
             )
         else:
-            run(["rsync", "-a", *exclusions, "--", str(source.source), str(destination)])
+            shutil.copy2(source.source, destination, follow_symlinks=False)
 
 
 def remote_environment(remote: Remote) -> dict[str, str]:
@@ -141,23 +160,8 @@ def create_backup(config: BackupConfig) -> Path:
                 copy_sources(config, raw)
                 backup_database(config.database, raw / config.database_destination)
             packed = Path(temporary) / "snapshot"
-            manifest = pack_tree(raw, packed, name)
+            pack_tree(raw, packed, name, previous=config.root / previous if previous else None)
             verify_snapshot(packed)
-            # Reuse unchanged compressed files, even when gzip headers/mtimes changed.
-            if previous:
-                prior = config.root / previous
-                for entry in manifest.entries:
-                    if not isinstance(entry, FileEntry):
-                        continue
-                    path, old = packed / entry.stored, prior / entry.stored
-                    if (
-                        old.is_file()
-                        and not old.is_symlink()
-                        and entry.stored_sha256 == sha256(old)
-                    ):
-                        path.unlink()
-                        os.link(old, path)
-                        sync_directory(path.parent)
             os.rename(packed, destination)
             sync_directory(config.root)
         if config.remote:

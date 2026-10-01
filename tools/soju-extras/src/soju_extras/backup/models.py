@@ -120,6 +120,7 @@ class FileEntry(Entry):
     sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     stored_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     encoding: Literal["plain", "gzip", "zstd"]
+    source_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
 
     _stored = field_validator("stored")(relative_path)
 
@@ -139,7 +140,7 @@ type SnapshotEntry = Annotated[
 
 
 class Manifest(Boundary):
-    version: Literal[1] = 1
+    version: Literal[1, 2] = 2
     snapshot: str
     entries: list[SnapshotEntry]
 

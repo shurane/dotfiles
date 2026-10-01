@@ -399,8 +399,9 @@ reduce waits for other writers, but they would permit partially committed files.
 `soju-backup run CONFIG.json` takes a consistent online SQLite snapshot, copies
 configured settings/data, and stores each payload as a `.zst` file in a dated
 backup directory. It uses the same database contexts, validated query rows,
-export lock and durable metadata writes as the importer/exporter. Rsync handles
-copying and SSH transfers. Python 3.14's `compression.zstd` handles streaming
+export lock and durable metadata writes as the importer/exporter. The standard
+library handles local staging; rsync handles SSH transfers. Python 3.14's
+`compression.zstd` handles streaming
 compression; Pydantic validates configuration, manifests and completion receipts.
 
 Start with [`contrib/backup.example.json`](contrib/backup.example.json). Configure
@@ -409,7 +410,10 @@ material, service files and recovery tools live outside Soju's data directory.
 Exclude the live database and its WAL/SHM files from the ordinary file copy;
 `database_destination` (default `soju/main.db`) receives the SQLite backup instead.
 The exporter lock covers file staging and the database backup. Configured sources
-must not overlap in the destination or contain the backup root.
+must not overlap in the destination or contain the backup root. Exclusions use
+stdlib glob matching: `/path` is anchored at the source root, `name` matches a
+basename at any depth, and a trailing `/` matches directories only. Symlinks are
+copied as links, never followed during staging.
 
 The backup layout preserves directories:
 
@@ -435,8 +439,18 @@ absent from the current database: include the legacy archives in the sources.
 Remote SSH uses a pinned host key and a dedicated identity. The receiver's
 `rrsync` root is the backup directory; the command never needs remote shell
 access. A completion receipt is uploaded only after remote checksum verification.
-Unchanged compressed files share disk space via hard links. Treat completed
-snapshots as immutable. The script leaves incomplete uploads without receipts;
+Before compression, the job compares source content hashes with the previous
+manifest and verifies the prior stored payload's checksum. Matching payloads
+are hard-linked immediately, avoiding redundant compression, writes and per-file
+fsync calls. Content comparison catches same-size edits even when timestamps
+are preserved. Full stored/decoded verification still covers every resulting
+snapshot. Small files use single-thread Zstandard; files at least 8 MiB use two
+workers. Manifest version 2 records encoded source hashes; version 1 snapshots
+remain readable and can supply payloads for reuse.
+
+There is one bulk rsync upload at the end. A separate checksum comparison follows,
+then a small completion-receipt upload and verification. No rsync processes are
+launched for local file copies. Treat completed snapshots as immutable. The script leaves incomplete uploads without receipts;
 they and older formats are ignored by retention and can be reviewed separately.
 
 ```sh

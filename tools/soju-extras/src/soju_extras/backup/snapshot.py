@@ -84,7 +84,56 @@ def decoded(
             yield stream
 
 
-def pack_file(source: Path, destination: Path, relative: str, stored: str) -> FileEntry:
+def decoded_digest(path: Path, encoding: Literal["plain", "gzip", "zstd"]) -> tuple[int, str]:
+    digest = hashlib.sha256()
+    size = 0
+    with decoded(path, encoding) as reader:
+        while chunk := reader.read(1024 * 1024):
+            digest.update(chunk)
+            size += len(chunk)
+    return size, digest.hexdigest()
+
+
+def reuse_file(
+    source: Path,
+    destination: Path,
+    previous: Path,
+    entry: FileEntry,
+    source_hash: str,
+    mode: int,
+) -> FileEntry | None:
+    """Compare content, never just mtime/size; validate old bytes before linking."""
+    prior_hash = entry.source_sha256
+    if prior_hash is None:
+        # Bootstrap snapshots written before encoded source hashes were recorded.
+        prior_hash = (
+            entry.sha256
+            if entry.encoding == "plain"
+            else (entry.stored_sha256 if entry.encoding == "zstd" else None)
+        )
+    if prior_hash is not None:
+        if source_hash != prior_hash:
+            return None
+    elif decoded_digest(source, entry.encoding) != (entry.size, entry.sha256):
+        return None
+    try:
+        old = stored_file(previous, entry.stored)
+    except OSError, ValueError:
+        return None
+    if sha256(old) != entry.stored_sha256:
+        return None  # Rebuild a damaged previous payload from the staged source.
+    os.link(old, destination)
+    return entry.model_copy(update={"mode": mode, "source_sha256": source_hash})
+
+
+def pack_file(
+    source: Path,
+    destination: Path,
+    relative: str,
+    stored: str,
+    *,
+    source_hash: str | None = None,
+) -> FileEntry:
     encoding: Literal["plain", "gzip", "zstd"] = (
         "gzip" if source.suffix == ".gz" else "zstd" if source.suffix == ".zst" else "plain"
     )
@@ -103,7 +152,9 @@ def pack_file(source: Path, destination: Path, relative: str, stored: str) -> Fi
                 destination,
                 "wb",
                 options={
-                    zstd.CompressionParameter.nb_workers: 2,
+                    zstd.CompressionParameter.nb_workers: 2
+                    if before.st_size >= 8 * 1024 * 1024
+                    else 0,
                     zstd.CompressionParameter.checksum_flag: 1,
                 },
             ) as writer:
@@ -127,12 +178,28 @@ def pack_file(source: Path, destination: Path, relative: str, stored: str) -> Fi
         sha256=digest.hexdigest(),
         stored_sha256=sha256(destination),
         encoding=encoding,
+        source_sha256=source_hash if source_hash is not None else sha256(source),
     )
 
 
-def pack_tree(source: Path, destination: Path, name: str) -> Manifest:
+def pack_tree(
+    source: Path,
+    destination: Path,
+    name: str,
+    *,
+    previous: Path | None = None,
+) -> Manifest:
     """Input is a private staging tree. No source symlinks are followed."""
     destination.mkdir(mode=0o700)
+    prior = (
+        {
+            entry.path: entry
+            for entry in read_manifest(previous).entries
+            if isinstance(entry, FileEntry)
+        }
+        if previous
+        else {}
+    )
     entries: list[SnapshotEntry] = []
     stored_paths: set[str] = set()
     for path in sorted(source.rglob("*")):
@@ -154,7 +221,13 @@ def pack_tree(source: Path, destination: Path, name: str) -> Manifest:
             stored_paths.add(stored)
             output = destination / stored
             output.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-            entry = pack_file(path, output, relative, stored)
+            source_hash = sha256(path)
+            old = prior.get(relative)
+            entry = None
+            if previous is not None and old is not None and old.stored == stored:
+                entry = reuse_file(path, output, previous, old, source_hash, mode)
+            if entry is None:
+                entry = pack_file(path, output, relative, stored, source_hash=source_hash)
             entries.append(entry)
         else:
             raise ValueError(f"Cannot back up special file: {path}")
@@ -187,16 +260,11 @@ def verify_snapshot(root: Path) -> Manifest:
             path = stored_file(root, entry.stored)
             if sha256(path) != entry.stored_sha256:
                 raise ValueError(f"Stored checksum mismatch: {entry.path}")
-            digest = hashlib.sha256()
-            size = 0
             try:
-                with zstd.open(path, "rb") as stream:
-                    while chunk := stream.read(1024 * 1024):
-                        digest.update(chunk)
-                        size += len(chunk)
+                contents = decoded_digest(path, "zstd")
             except (EOFError, zstd.ZstdError) as error:
                 raise ValueError(f"Invalid Zstandard payload: {entry.path}") from error
-            if (size, digest.hexdigest()) != (entry.size, entry.sha256):
+            if contents != (entry.size, entry.sha256):
                 raise ValueError(f"Decoded checksum mismatch: {entry.path}")
     return manifest
 

@@ -9,6 +9,7 @@ from contextlib import closing
 from datetime import date, timedelta
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Literal
 
 import pytest
 from pydantic import ValidationError
@@ -333,3 +334,134 @@ def test_database_backup_cannot_follow_staged_symlink(tmp_path: Path, soju_db: P
     with pytest.raises(ValueError, match="symlinks"):
         backup_database(soju_db, link / "main.db")
     assert not (outside / "main.db").exists()
+
+
+@pytest.mark.parametrize("encoding", ["plain", "gzip", "zstd"])
+@pytest.mark.parametrize("old_manifest", [False, True])
+def test_unchanged_files_skip_compression_and_preserve_new_permissions(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    encoding: Literal["plain", "gzip", "zstd"],
+    old_manifest: bool,
+) -> None:
+    from soju_extras.backup.snapshot import decoded
+
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    name = {"plain": "file", "gzip": "file.gz", "zstd": "file.zst"}[encoding]
+    path = raw / name
+    if encoding == "plain":
+        path.write_bytes(b"unchanged content")
+    elif encoding == "gzip":
+        with gzip.open(path, "wb") as writer:
+            writer.write(b"unchanged content")
+    else:
+        with zstd.open(path, "wb") as writer:
+            writer.write(b"unchanged content")
+    path.chmod(0o600)
+    first = tmp_path / "first"
+    pack_tree(raw, first, stamp("2026-10-01"))
+    if old_manifest:
+        data = json.loads((first / MANIFEST).read_text())
+        data["version"] = 1
+        for entry in data["entries"]:
+            entry.pop("source_sha256", None)
+        (first / MANIFEST).write_text(json.dumps(data))
+    path.chmod(0o755)
+
+    def unexpected(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("Unchanged payload was recompressed")
+
+    monkeypatch.setattr("soju_extras.backup.snapshot.pack_file", unexpected)
+    second = tmp_path / "second"
+    pack_tree(raw, second, stamp("2026-10-02"), previous=first)
+    verify_snapshot(second)
+    assert (first / "file.zst").stat().st_ino == (second / "file.zst").stat().st_ino
+    assert (first / "file.zst").stat().st_mode & 0o777 == 0o600
+    restored = tmp_path / "restored"
+    restore_snapshot(second, restored)
+    assert (restored / name).stat().st_mode & 0o777 == 0o755
+    with decoded(restored / name, encoding) as reader:
+        assert reader.read() == b"unchanged content"
+
+
+def test_edited_file_with_unchanged_size_and_mtime_is_not_reused(tmp_path: Path) -> None:
+    import os
+
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    source = raw / "file"
+    source.write_bytes(b"one")
+    before = source.stat()
+    first, second = tmp_path / "first", tmp_path / "second"
+    pack_tree(raw, first, stamp("2026-10-01"))
+    source.write_bytes(b"two")
+    os.utime(source, ns=(before.st_atime_ns, before.st_mtime_ns))
+    pack_tree(raw, second, stamp("2026-10-02"), previous=first)
+    assert (first / "file.zst").stat().st_ino != (second / "file.zst").stat().st_ino
+    restored = tmp_path / "restored"
+    restore_snapshot(second, restored)
+    assert (restored / "file").read_bytes() == b"two"
+
+
+def test_corrupt_previous_payload_is_rebuilt(tmp_path: Path) -> None:
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    (raw / "file").write_bytes(b"good source")
+    first, second = tmp_path / "first", tmp_path / "second"
+    pack_tree(raw, first, stamp("2026-10-01"))
+    (first / "file.zst").write_bytes(b"bad backup")
+    pack_tree(raw, second, stamp("2026-10-02"), previous=first)
+    verify_snapshot(second)
+    assert (first / "file.zst").read_bytes() == b"bad backup"
+    assert (first / "file.zst").stat().st_ino != (second / "file.zst").stat().st_ino
+
+
+def test_local_copy_exclusions_and_symlinks_without_rsync(
+    config: BackupConfig,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from soju_extras.backup.runner import copy_sources
+
+    source = config.export_directory
+    for name in (
+        "main.db",
+        "nested/main.db",
+        "logs/.export.lock",
+        "other/.export.lock",
+        "nested/__pycache__/skip.pyc",
+        "cache.txt",
+        "nested/test.tmp",
+        ".git/config",
+    ):
+        path = source / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"content")
+    (source / "nested/link").symlink_to("../main.db")
+    source_config = config.model_copy(
+        update={
+            "sources": [
+                CopySource(
+                    source=source,
+                    destination="soju",
+                    excludes=["/main.db", "/logs/.export.lock", "__pycache__/", ".git/", "*.tmp"],
+                )
+            ]
+        }
+    )
+
+    def unexpected(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("Local copy launched an external command")
+
+    monkeypatch.setattr("soju_extras.backup.runner.run", unexpected)
+    staged = tmp_path / "stage"
+    copy_sources(source_config, staged)
+    assert not (staged / "soju/main.db").exists()
+    assert not (staged / "soju/logs/.export.lock").exists()
+    assert not (staged / "soju/nested/__pycache__").exists()
+    assert not (staged / "soju/.git").exists()
+    assert not (staged / "soju/nested/test.tmp").exists()
+    assert (staged / "soju/nested/main.db").read_bytes() == b"content"
+    assert (staged / "soju/other/.export.lock").read_bytes() == b"content"
+    assert (staged / "soju/nested/link").readlink() == Path("../main.db")
