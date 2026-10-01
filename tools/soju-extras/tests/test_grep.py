@@ -1,97 +1,58 @@
-"""Tests for sojugrep and FTS5 sanitizer."""
+"""Search semantics and CLI errors with the real FTS table and triggers."""
 
-from __future__ import annotations
-
-import sqlite3
 from pathlib import Path
 
 import pytest
-import sqlite_utils
-from pydantic import ValidationError
 
-from soju_extras.grep.cli import execute_search, print_result
-from soju_extras.grep.sanitizer import sanitize_fts5_query
-from soju_extras.models import SearchQuery, SearchResult
+from soju_extras.grep.cli import execute_search, main
+from soju_extras.models import SearchQuery
+from tests.conftest import add_message
 
 
-def test_sanitize_fts5_query_edge_cases() -> None:
-    conn = sqlite3.connect(":memory:")
-    conn.execute("CREATE VIRTUAL TABLE test_fts USING fts5(content);")
-    conn.execute("INSERT INTO test_fts (content) VALUES ('hello world c++ test');")
-
-    nasty_inputs = [
-        "",
-        "   ",
-        '"',
-        '"""',
-        "AND",
-        "OR NOT",
-        "(((",
-        ")))",
-        "***word***",
-        "https://example.com/path?arg=1&val=2",
-        "foo:bar",
-        "c++ OR (rust AND NOT java",
-        "hello 'world'",
-    ]
-
-    for raw in nasty_inputs:
-        sanitized = sanitize_fts5_query(raw)
-        if not sanitized:
-            continue
-        try:
-            cursor = conn.execute("SELECT * FROM test_fts WHERE test_fts MATCH ?", (sanitized,))
-            cursor.fetchall()
-        except sqlite3.OperationalError as e:
-            msg = f"Sanitized query failed in FTS5: {sanitized!r} (from {raw!r}): {e}"
-            raise AssertionError(msg) from e
+@pytest.mark.parametrize(
+    "pattern",
+    [
+        "foo;bar",
+        "foo[bar]",
+        "(NOT foo)",
+        "foo AND (bar OR)",
+        "https://example.com",
+        '"hello"',
+        "c++",
+    ],
+)
+def test_literal_search_accepts_punctuation(soju_db: Path, pattern: str) -> None:
+    add_message(soju_db, pattern)
+    assert len(execute_search(SearchQuery(pattern=pattern, db_path=soju_db))) == 1
 
 
-def test_execute_search_mock(tmp_path: Path) -> None:
-    db_file = tmp_path / "soju.db"
-    db = sqlite_utils.Database(db_file)
-    db.table("Network").insert({"id": 1, "name": "libera"})
-    db.table("MessageTarget").insert({"id": 10, "network": 1, "target": "#test"})
-    db.table("Message").insert(
-        {
-            "id": 100,
-            "target": 10,
-            "time": "2026-09-30T12:00:00Z",
-            "sender": "alice",
-            "text": "hello world",
-            "raw": "dummy",
-        }
+def test_search_filters_order_and_limit(soju_db: Path) -> None:
+    add_message(soju_db, "hello first")
+    add_message(soju_db, "hello second")
+    query = SearchQuery(
+        pattern="hello", target="#python", network="libera", limit=1, db_path=soju_db
     )
-    db.execute(
-        "CREATE VIRTUAL TABLE MessageFTS USING fts5(sender, target, body, tokenize='porter unicode61');"
-    )
-    db.execute(
-        "INSERT INTO MessageFTS (rowid, sender, target, body) VALUES (100, 'alice', '#test', 'hello world');"
-    )
+    assert "second" in execute_search(query)[0].text
+    assert execute_search(query.model_copy(update={"target": "#other"})) == []
 
-    query = SearchQuery(pattern="world", db_path=db_file)
-    results = execute_search(query)
+
+def test_cli_exit_codes_and_redirected_output(
+    soju_db: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    add_message(soju_db)
+    assert main(["world", "-d", str(soju_db)]) == 0
+    output = capsys.readouterr().out
+    assert "hello world" in output
+    assert "\x1b" not in output
+    assert main(["absent", "-d", str(soju_db)]) == 1
+    assert main(["world", "-d", str(tmp_path / "missing")]) == 2
+    assert main(["world", "--limit", "0", "-d", str(soju_db)]) == 2
+    assert main(["foo AND (", "--raw-fts", "-d", str(soju_db)]) == 2
+
+
+def test_raw_boolean_search(soju_db: Path) -> None:
+    add_message(soju_db, "hello world")
+    add_message(soju_db, "hello again")
+    results = execute_search(SearchQuery(pattern="hello NOT world", raw_fts=True, db_path=soju_db))
     assert len(results) == 1
-    assert results[0].sender_nick == "alice"
-    assert results[0].network == "libera"
-    assert results[0].target == "#test"
-
-
-def test_search_query_validation() -> None:
-    with pytest.raises(ValidationError):
-        SearchQuery(pattern="")
-
-
-def test_print_result(capsys: pytest.CaptureFixture[str]) -> None:
-    res = SearchResult(
-        message_id=1,
-        timestamp_str="2026-09-30T12:00:00Z",
-        network="libera",
-        target="#test",
-        sender_nick="alice",
-        text="hello \x01world\x02 test",
-    )
-    print_result(res)
-    captured = capsys.readouterr().out
-    assert "alice" in captured
-    assert "libera" in captured
+    assert "again" in results[0].text

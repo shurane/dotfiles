@@ -1,31 +1,28 @@
-"""Tests for SojuTargetResolver."""
+"""Resolution never invents accounts or enabled server connections."""
 
-from __future__ import annotations
+from pathlib import Path
 
-import sqlite_utils
+import pytest
 
+from soju_extras.db import execute, open_soju_db, transaction
 from soju_extras.resolver import SojuTargetResolver
 
 
-def test_resolver_create_and_cache() -> None:
-    db = sqlite_utils.Database(memory=True)
-    db.table("User").create({"id": int, "username": str, "admin": int}, pk="id")
-    db.table("Network").create(
-        {"id": int, "user": int, "name": str, "addr": str, "nick": str, "enabled": int},
-        pk="id",
-    )
-    db.table("MessageTarget").create({"id": int, "network": int, "target": str}, pk="id")
+def test_resolver_existing_identities(soju_db: Path) -> None:
+    with open_soju_db(soju_db) as db, transaction(db):
+        resolver = SojuTargetResolver(db)
+        assert resolver.resolve_user("shurane") == 1
+        assert resolver.resolve_network(1, "libera") == 1
+        assert resolver.resolve_network(1, "irc.libera.chat:6697") == 1
+        target = resolver.get_or_create_target(1, "#new")
+        assert resolver.get_or_create_target(1, "#new") == target
+        with pytest.raises(ValueError):
+            resolver.resolve_user("unknown")
+        with pytest.raises(ValueError):
+            resolver.resolve_network(1, "unknown")
 
-    resolver = SojuTargetResolver(db)
 
-    u1 = resolver.get_or_create_user("shurane")
-    u2 = resolver.get_or_create_user("shurane")
-    assert u1 == u2
-
-    n1 = resolver.get_or_create_network(u1, "libera")
-    n2 = resolver.get_or_create_network(u1, "libera")
-    assert n1 == n2
-
-    t1 = resolver.get_or_create_target(n1, "#python")
-    t2 = resolver.get_or_create_target(n1, "#python")
-    assert t1 == t2
+def test_unnamed_network_by_address(soju_db: Path) -> None:
+    with open_soju_db(soju_db) as db:
+        execute(db, "UPDATE Network SET name = NULL")
+        assert SojuTargetResolver(db).resolve_network(1, "irc.libera.chat:6697") == 1

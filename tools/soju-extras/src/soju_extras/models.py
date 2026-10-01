@@ -2,19 +2,19 @@
 
 from __future__ import annotations
 
-import datetime
 import re
 from enum import StrEnum
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field
+from whenever import Instant
+
+from soju_extras.time import parse_timestamp
 
 # Regex patterns for WeeChat log parsing
-LOG_FILENAME_RE = re.compile(r"^irc\.(?P<network>[^.]+)\.(?P<target>.+)\.weechatlog(?:\.gz)?$")
-TIMESTAMP_RE = re.compile(
-    r"^(?P<date>\d{4}-\d{2}-\d{2})\s+(?P<time>\d{2}:\d{2}:\d{2})(?:\.\d+)?(?:Z)?"
+LOG_FILENAME_RE = re.compile(
+    r"^irc\.(?P<network>[^.]+)\.(?P<target>.+)\.weechatlog(?:\.[1-9][0-9]*)?(?:\.gz|\.zst)?$"
 )
-
 # Strips ANSI escape codes, WeeChat color/format codes, and IRC color codes
 COLOR_STRIP_RE = re.compile(
     r"\x1b\[[0-9;]*[a-zA-Z]|\x19(?:\d{2}|F\d{2}|B\d{2}|\*|\-|\/|b|i|u|r|v)?|"
@@ -35,19 +35,19 @@ class MessageKind(StrEnum):
 class WeeChatLogRecord(BaseModel):
     """Parsed single line from a WeeChat log file."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
 
     raw_timestamp: str
     prefix: str
     content: str
-    parsed_datetime: datetime.datetime
+    parsed_datetime: Instant
     kind: MessageKind
     sender_nick: str
     sender_hostmask: str | None = None
     clean_text: str
 
     @classmethod
-    def parse_line(cls, line: str) -> WeeChatLogRecord | None:
+    def parse_line(cls, line: str, *, timezone: str = "UTC") -> WeeChatLogRecord | None:
         line = line.rstrip("\r\n")
         if not line:
             return None
@@ -61,16 +61,7 @@ class WeeChatLogRecord(BaseModel):
         prefix = parts[1].strip()
         content = parts[2] if len(parts) > 2 else ""
 
-        m_ts = TIMESTAMP_RE.match(ts_raw)
-        if not m_ts:
-            return None
-
-        date_str = m_ts.group("date")
-        time_str = m_ts.group("time")
-        try:
-            dt = datetime.datetime.fromisoformat(f"{date_str}T{time_str}+00:00")
-        except ValueError:
-            return None
+        dt = parse_timestamp(ts_raw, timezone)
 
         sender_hostmask: str | None = None
 
@@ -145,7 +136,7 @@ class WeeChatLogRecord(BaseModel):
 class SojuTargetFile(BaseModel):
     """Metadata representing a WeeChat log file targeted for import."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
 
     source_path: Path
     network: str
@@ -159,14 +150,14 @@ class SojuTargetFile(BaseModel):
         return cls(
             source_path=path,
             network=match.group("network").lower(),
-            target=match.group("target").lower(),
+            target=match.group("target"),
         )
 
 
 class SojuMessage(BaseModel):
     """Record representing a message in Soju's SQLite Message table."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
 
     id: int | None = None
     target_id: int
@@ -179,13 +170,13 @@ class SojuMessage(BaseModel):
 class ExportedLogRecord(BaseModel):
     """Record extracted from Soju database for filesystem export."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
 
     msg_id: int
     username: str
     network: str
     target: str
-    timestamp: datetime.datetime
+    timestamp: Instant
     kind: MessageKind
     sender: str
     content: str
@@ -194,7 +185,7 @@ class ExportedLogRecord(BaseModel):
 class SearchQuery(BaseModel):
     """Parameters for an FTS5 search query."""
 
-    model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
+    model_config = ConfigDict(frozen=True, strict=True, extra="forbid", str_strip_whitespace=True)
 
     pattern: str = Field(min_length=1, description="Search query string or FTS5 phrase")
     target: str | None = Field(default=None, description="Optional channel or nickname")
@@ -203,13 +194,14 @@ class SearchQuery(BaseModel):
         default=Path("/var/lib/soju/main.db"),
         description="Path to Soju SQLite database",
     )
+    raw_fts: bool = False
     limit: int = Field(default=100, ge=1, le=10000, description="Max results")
 
 
 class SearchResult(BaseModel):
     """A single matched IRC message from SQLite FTS5."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
 
     message_id: int
     timestamp_str: str
@@ -217,3 +209,18 @@ class SearchResult(BaseModel):
     target: str
     sender_nick: str
     text: str
+
+
+class DatabaseMessage(BaseModel):
+    """Unmodified database values, validated before parsing or formatting."""
+
+    model_config = ConfigDict(frozen=True, strict=True, extra="forbid")
+
+    msg_id: int
+    username: str
+    network: str
+    target: str
+    time: str
+    raw: str
+    sender: str
+    text: str | None

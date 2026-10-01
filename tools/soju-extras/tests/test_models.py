@@ -1,45 +1,57 @@
-"""Unit tests for models in soju package."""
+"""Timestamp boundaries include offset conversion, precision and DST ambiguity."""
 
-from __future__ import annotations
-
-import datetime
 from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
+from whenever import Instant
 
-from soju_extras.models import MessageKind, SojuTargetFile, WeeChatLogRecord
+from soju_extras.models import SojuTargetFile, WeeChatLogRecord
+from soju_extras.time import soju_timestamp
 
 
-def test_weechat_log_record_parse_privmsg() -> None:
-    line = "2026-09-30 10:00:00\tshurane\thello world"
-    rec = WeeChatLogRecord.parse_line(line)
+@pytest.mark.parametrize(
+    ("timestamp", "timezone", "expected"),
+    [
+        ("2026-09-30 10:00:00", "UTC", "2026-09-30T10:00:00.000Z"),
+        ("2026-09-30 10:00:00", "America/Chicago", "2026-09-30T15:00:00.000Z"),
+        ("2026-01-30 10:00:00", "America/Chicago", "2026-01-30T16:00:00.000Z"),
+        ("2026-09-30 10:00:00.123456789-05:00", "UTC", "2026-09-30T15:00:00.123Z"),
+        ("2026-09-30 23:30:00-05:00", "UTC", "2026-10-01T04:30:00.000Z"),
+        ("2026-09-30 10:00:00.123Z", "America/Chicago", "2026-09-30T10:00:00.123Z"),
+    ],
+)
+def test_timestamp(timestamp: str, timezone: str, expected: str) -> None:
+    rec = WeeChatLogRecord.parse_line(f"{timestamp}\talice\thello", timezone=timezone)
     assert rec is not None
-    assert rec.kind == MessageKind.PRIVMSG
-    assert rec.sender_nick == "shurane"
-    assert rec.clean_text == "hello world"
+    assert isinstance(rec.parsed_datetime, Instant)
+    assert soju_timestamp(rec.parsed_datetime) == expected
 
 
-def test_weechat_log_record_immutability() -> None:
-    rec = WeeChatLogRecord(
-        raw_timestamp="2026-09-30 10:00:00",
-        prefix="shurane",
-        content="hello world",
-        parsed_datetime=datetime.datetime(2026, 9, 30, 10, 0, 0, tzinfo=datetime.UTC),
-        kind=MessageKind.PRIVMSG,
-        sender_nick="shurane",
-        clean_text="hello world",
-    )
+@pytest.mark.parametrize(
+    "timestamp",
+    [
+        "2026-03-08 02:30:00",
+        "2026-11-01 01:30:00",
+        "2026-09-30 10:00:00garbage",
+        "2026-02-30 10:00:00",
+    ],
+)
+def test_reject_invalid_or_ambiguous_time(timestamp: str) -> None:
+    with pytest.raises(ValueError):
+        WeeChatLogRecord.parse_line(f"{timestamp}\talice\thello", timezone="America/Chicago")
+
+
+def test_frozen_record() -> None:
+    rec = WeeChatLogRecord.parse_line("2026-09-30 10:00:00\talice\thi")
+    assert rec is not None
     with pytest.raises(ValidationError):
-        attr = "sender_nick"
-        setattr(rec, attr, "modified")
+        attribute = "sender_nick"
+        setattr(rec, attribute, "bob")
 
 
-def test_soju_target_file_validation() -> None:
-    valid = SojuTargetFile.from_path(Path("/var/log/irc.libera.#python.weechatlog"))
-    assert valid is not None
-    assert valid.network == "libera"
-    assert valid.target == "#python"
-
-    invalid = SojuTargetFile.from_path(Path("random_log.txt"))
-    assert invalid is None
+def test_filename() -> None:
+    target = SojuTargetFile.from_path(Path("irc.libera.#Python.weechatlog.gz"))
+    assert target is not None
+    assert target.target == "#Python"
+    assert SojuTargetFile.from_path(Path("unrelated.txt")) is None
