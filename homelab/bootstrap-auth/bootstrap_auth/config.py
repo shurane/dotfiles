@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-AUTH_ENV = Path(os.environ.get("AUTH_ENV", ROOT / "homelab.env"))
+AUTH_ENV = Path(os.environ.get("AUTH_ENV", ROOT / ".env"))
 
 QBITTORRENT_URL = os.environ.get("QBITTORRENT_URL", "http://qbittorrent:8080").rstrip("/")
 QUI_URL = os.environ.get("QUI_URL", "http://qui:7476").rstrip("/")

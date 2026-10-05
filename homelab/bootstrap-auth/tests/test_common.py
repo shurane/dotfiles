@@ -8,7 +8,7 @@ from bootstrap_auth.models import ServiceName
 
 
 def test_load_env_parses_simple_quoted_and_ignored_lines(tmp_path: Path) -> None:
-    env_file = tmp_path / "homelab.env"
+    env_file = tmp_path / ".env"
     env_file.write_text(
         """
         # ignored
