@@ -1,6 +1,6 @@
 services:
   caddy:
-    image: lucaslorentz/caddy-docker-proxy:ci
+    build: .
     restart: unless-stopped
     ports:
       - "80:80"
@@ -8,6 +8,17 @@ services:
       - "443:443/udp"
     environment:
       CADDY_INGRESS_NETWORKS: proxy-tier
+      ACME_EMAIL: ${ACME_EMAIL}
+      PORKBUN_API_KEY: ${PORKBUN_API_KEY}
+      PORKBUN_API_SECRET_KEY: ${PORKBUN_API_SECRET_KEY}
+    labels:
+      caddy: ""
+      caddy.email: "{env.ACME_EMAIL}"
+      caddy.cert_issuer_0: acme
+      caddy.cert_issuer_0.dns: porkbun
+      caddy.cert_issuer_0.dns.api_key: "{env.PORKBUN_API_KEY}"
+      caddy.cert_issuer_0.dns.api_secret_key: "{env.PORKBUN_API_SECRET_KEY}"
+      caddy.cert_issuer_1: internal
     networks:
       - proxy-tier
     volumes:
