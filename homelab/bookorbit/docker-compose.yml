@@ -17,6 +17,7 @@ services:
       PUID: "1000"
       PGID: "1000"
       NODE_MAX_OLD_SPACE_SIZE: "256"
+      NODE_OPTIONS: "--title=bookorbit"
       LIBRARY_BROWSE_ROOT: /books
     depends_on:
       bookorbit-postgres:
