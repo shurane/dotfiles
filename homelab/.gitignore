@@ -1,6 +1,5 @@
 /\.env
 /\.env.global
-/homelab.env
 /arcane/.env
 /arcane/backups/
 /arcane/builds/
