@@ -30,7 +30,6 @@ services:
       start_period: 30s
     labels:
       caddy: jellyfin.${HOSTNAME_BASE:?err}, jellyfin.${HOSTNAME_ALIAS_BASE:-m.lan}
-      caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8096}}"
 
 networks:

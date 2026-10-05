@@ -16,7 +16,6 @@ services:
       start_period: 20s
     labels:
       caddy: retroarch.${HOSTNAME_BASE:?err}, retroarch.${HOSTNAME_ALIAS_BASE:-m.lan}
-      caddy.tls: internal
       caddy.reverse_proxy: "{{upstreams 8080}}"
 
 networks:
