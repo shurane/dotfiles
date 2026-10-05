@@ -1,0 +1,3 @@
+# Local test artifacts, temporary dumps, or export handoffs
+tmp/
+*.tmp

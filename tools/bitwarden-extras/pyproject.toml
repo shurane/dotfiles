@@ -1,0 +1,54 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bitwarden-extras"
+version = "0.1.0"
+description = "Modern Python 3.14 toolkit for Bitwarden (in-memory SQLite, safe sanitized exports, smart sync, vault cleaner)"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "pydantic>=2.10.0",
+    "pyyaml>=6.0.2",
+    "rich>=13.7.0",
+    "typer>=0.12.5",
+    "types-pyyaml>=6.0.12.20240917",
+]
+
+[project.scripts]
+bw-vault = "bitwarden_extras.cli:main"
+bitwarden-vault = "bitwarden_extras.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bitwarden_extras"]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.414",
+    "pytest>=8.0.0",
+    "ruff>=0.9.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "ANN"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ANN"]
+
+[tool.pyright]
+pythonVersion = "3.14"
+typeCheckingMode = "basic"
+include = ["src"]
