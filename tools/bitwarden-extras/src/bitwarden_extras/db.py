@@ -141,6 +141,24 @@ def run_repl(
         )
     )
 
+    try:
+        import atexit
+        import readline
+        from pathlib import Path
+
+        hist_dir = Path.home() / ".local" / "state" / "bw-vault"
+        hist_file = hist_dir / "history"
+        try:
+            hist_dir.mkdir(parents=True, exist_ok=True)
+            if hist_file.exists():
+                readline.read_history_file(str(hist_file))
+            readline.set_history_length(1000)
+            atexit.register(readline.write_history_file, str(hist_file))
+        except OSError:
+            pass
+    except ImportError:
+        pass
+
     current_conn = conn
     while True:
         try:
