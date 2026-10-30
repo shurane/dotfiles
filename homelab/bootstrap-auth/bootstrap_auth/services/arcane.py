@@ -101,6 +101,14 @@ def verify_arcane(auth: HomelabAuth) -> None:
         raise RuntimeError("Arcane username did not update")
 
 
+def check_arcane(auth: HomelabAuth) -> bool:
+    with httpx.Client(timeout=5) as client:
+        try:
+            return arcane_login(client, auth.username, auth.password)
+        except Exception:
+            return False
+
+
 def apply_and_verify_arcane(auth: HomelabAuth) -> None:
     with httpx.Client(timeout=15) as client:
         apply_arcane(client, auth)

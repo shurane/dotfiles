@@ -299,6 +299,24 @@ def verify_jellyfin(auth: HomelabAuth) -> None:
         raise RuntimeError("Jellyfin username did not match")
 
 
+def check_jellyfin(auth: HomelabAuth) -> bool:
+    with httpx.Client(timeout=5) as client:
+        try:
+            if jellyfin_login(client, auth.username, auth.password) is not None:
+                return True
+        except Exception:
+            pass
+    db_path = ROOT / "jellyfin" / "config" / "data" / "jellyfin.db"
+    if db_path.exists():
+        try:
+            with sqlite3.connect(db_path) as db:
+                row = db.execute("select Username from Users where Username = ?", (auth.username,)).fetchone()
+                return row is not None
+        except Exception:
+            pass
+    return False
+
+
 def apply_and_verify_jellyfin(auth: HomelabAuth, options: BootstrapOptions) -> None:
     apply_jellyfin(auth, options)
     verify_jellyfin(auth)

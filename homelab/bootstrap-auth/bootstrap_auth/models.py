@@ -21,6 +21,7 @@ class HomelabAuth(BaseModel):
 
 
 class BootstrapOptions(BaseModel):
+    apply: bool = False
     parallel: bool = False
     skip_backup: bool = False
     services: tuple[ServiceName, ...]

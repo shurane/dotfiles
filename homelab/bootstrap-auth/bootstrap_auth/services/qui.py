@@ -69,6 +69,18 @@ def verify_qui(auth: HomelabAuth) -> None:
         raise RuntimeError("Qui username did not update")
 
 
+def check_qui(auth: HomelabAuth) -> bool:
+    db_path = ROOT / "qui" / "config" / "qui.db"
+    if not db_path.exists():
+        return False
+    try:
+        with sqlite3.connect(db_path) as db:
+            row: tuple[str] | None = db.execute("select username from user where id = 1").fetchone()
+            return row is not None and row[0] == auth.username
+    except Exception:
+        return False
+
+
 def apply_and_verify_qui(auth: HomelabAuth) -> None:
     apply_qui(auth)
     verify_qui(auth)
