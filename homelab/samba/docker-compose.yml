@@ -13,6 +13,8 @@ services:
       FAIL_FAST: "1"
       ACCOUNT_share: "${SAMBA_SHARE_PASSWORD:?err}"
       UID_share: "1000"
+      ACCOUNT_ehtesh: "${SAMBA_EHTESH_PASSWORD:-${SAMBA_SHARE_PASSWORD}}"
+      UID_ehtesh: "1001"
       SAMBA_CONF_MAP_TO_GUEST: "Bad User"
       SAMBA_VOLUME_CONFIG_mango: |
         [mango]
