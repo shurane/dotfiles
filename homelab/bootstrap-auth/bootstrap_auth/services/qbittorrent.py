@@ -80,6 +80,14 @@ def verify_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
         raise RuntimeError("qBittorrent username did not update")
 
 
+def check_qbittorrent(auth: HomelabAuth) -> bool:
+    with httpx.Client(timeout=5) as client:
+        try:
+            return qbittorrent_login(client, auth.username, auth.password)
+        except Exception:
+            return False
+
+
 def apply_and_verify_qbittorrent(auth: HomelabAuth) -> None:
     with httpx.Client(timeout=15) as client:
         apply_qbittorrent(client, auth)

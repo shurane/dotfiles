@@ -10,6 +10,22 @@ from .config import ROOT
 from .models import SERVICE_NAMES, BootstrapOptions, ServiceName
 
 
+def format_path(path: Path | None) -> str:
+    """Format path relative to user's home directory (e.g. ~/dotfiles/...) if applicable."""
+    if path is None:
+        return "<none>"
+    try:
+        resolved = path.resolve()
+        home = Path.home().resolve()
+        if resolved == home:
+            return "~"
+        if resolved.is_relative_to(home):
+            return f"~/{resolved.relative_to(home)}"
+    except (ValueError, RuntimeError):
+        pass
+    return str(path)
+
+
 def load_env(path: Path) -> dict[str, str]:
     env: dict[str, str] = {}
     for raw_line in path.read_text().splitlines():
@@ -61,7 +77,12 @@ def wait_for_sqlite_table(db_path: Path, table_name: str, timeout_seconds: int =
     raise RuntimeError(f"timed out waiting for table {table_name!r} in {db_path}")
 
 
-def build_options(skip_backup: bool, parallel: bool, services_value: str) -> BootstrapOptions:
+def build_options(
+    skip_backup: bool,
+    parallel: bool,
+    services_value: str,
+    apply: bool = False,
+) -> BootstrapOptions:
     service_values = tuple(service.strip().lower() for service in services_value.split(",") if service.strip())
     unknown_services = sorted(set(service_values) - set(SERVICE_NAMES))
     if unknown_services:
@@ -69,6 +90,7 @@ def build_options(skip_backup: bool, parallel: bool, services_value: str) -> Boo
     if not service_values:
         raise typer.BadParameter("must include at least one service", param_hint="--services")
     return BootstrapOptions(
+        apply=apply,
         parallel=parallel,
         skip_backup=skip_backup,
         services=tuple(ServiceName(service) for service in service_values),
