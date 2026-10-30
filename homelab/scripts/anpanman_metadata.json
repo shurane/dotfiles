@@ -1,0 +1,7136 @@
+{
+  "0001a": {
+    "episode": 1,
+    "segment": "a",
+    "title_ja": "アンパンマン誕生",
+    "title_ro": "Anpanman Tanjou"
+  },
+  "0002a": {
+    "episode": 2,
+    "segment": "a",
+    "title_ja": "アンパンマンとばいきんまん",
+    "title_ro": "Anpanman to Baikinman"
+  },
+  "0002b": {
+    "episode": 2,
+    "segment": "b",
+    "title_ja": "アンパンマンとカレーパンマン",
+    "title_ro": "Anpanman to Kareepanman"
+  },
+  "0003a": {
+    "episode": 3,
+    "segment": "a",
+    "title_ja": "アンパンマンとはみがきまん",
+    "title_ro": "Anpanman to Hamigakiman"
+  },
+  "0003b": {
+    "episode": 3,
+    "segment": "b",
+    "title_ja": "アンパンマンとしょくぱんまん",
+    "title_ro": "Anpanman to Shokupanman"
+  },
+  "0004a": {
+    "episode": 4,
+    "segment": "a",
+    "title_ja": "アンパンマンとらくがきこぞう",
+    "title_ro": "Anpanman to Rakugakikozou"
+  },
+  "0004b": {
+    "episode": 4,
+    "segment": "b",
+    "title_ja": "アンパンマンとおむすびまん",
+    "title_ro": "Anpanman to Omusubiman"
+  },
+  "0005a": {
+    "episode": 5,
+    "segment": "a",
+    "title_ja": "アンパンマンとひのたまこぞう",
+    "title_ro": "Anpanman to Hinotamakozou"
+  },
+  "0005b": {
+    "episode": 5,
+    "segment": "b",
+    "title_ja": "アンパンマンとらーめんてんし",
+    "title_ro": "Anpanman to Raamentenshi"
+  },
+  "0006a": {
+    "episode": 6,
+    "segment": "a",
+    "title_ja": "アンパンマンとたこやきまん",
+    "title_ro": "Anpanman to Takoyakiman"
+  },
+  "0006b": {
+    "episode": 6,
+    "segment": "b",
+    "title_ja": "アンパンマンとみるくぼうや",
+    "title_ro": "Anpanman to Mirukubouya"
+  },
+  "0007a": {
+    "episode": 7,
+    "segment": "a",
+    "title_ja": "アンパンマンとぶたまんまん",
+    "title_ro": "Anpanman to Butamanman"
+  },
+  "0007b": {
+    "episode": 7,
+    "segment": "b",
+    "title_ja": "アンパンマンとかぜこんこん",
+    "title_ro": "Anpanman to Kazekonkon"
+  },
+  "0008a": {
+    "episode": 8,
+    "segment": "a",
+    "title_ja": "アンパンマンとたんこぶまん",
+    "title_ro": "Anpanman to Tankobuman"
+  },
+  "0008b": {
+    "episode": 8,
+    "segment": "b",
+    "title_ja": "アンパンマンとかいじゅうアンコラ",
+    "title_ro": "Anpanman to Kaijuu Ankora"
+  },
+  "0009a": {
+    "episode": 9,
+    "segment": "a",
+    "title_ja": "アンパンマンとそっくりぱん",
+    "title_ro": "Anpanman to Sokkuripan"
+  },
+  "0009b": {
+    "episode": 9,
+    "segment": "b",
+    "title_ja": "アンパンマンとかみなりピカタン",
+    "title_ro": "Anpanman to Kaminari Pikatan"
+  },
+  "0010a": {
+    "episode": 10,
+    "segment": "a",
+    "title_ja": "アンパンマンとつみきのしろ",
+    "title_ro": "Anpanman to Tsumikinoshiro"
+  },
+  "0010b": {
+    "episode": 10,
+    "segment": "b",
+    "title_ja": "アンパンマンとポットちゃん",
+    "title_ro": "Anpanman to Potto Chan"
+  },
+  "0011a": {
+    "episode": 11,
+    "segment": "a",
+    "title_ja": "アンパンマンとイタイノトンデケダケ",
+    "title_ro": "Anpanman to Itainotondekedake"
+  },
+  "0011b": {
+    "episode": 11,
+    "segment": "b",
+    "title_ja": "アンパンマンとぴいちくもり",
+    "title_ro": "Anpanman to Piichikumori"
+  },
+  "0012a": {
+    "episode": 12,
+    "segment": "a",
+    "title_ja": "消えたサンタクロース",
+    "title_ro": "Kie Ta Santakuroosu"
+  },
+  "0013a": {
+    "episode": 13,
+    "segment": "a",
+    "title_ja": "アンパンマンとドキンちゃん",
+    "title_ro": "Anpanman to Dokin Chan"
+  },
+  "0013b": {
+    "episode": 13,
+    "segment": "b",
+    "title_ja": "アンパンマンとリンゴちゃん",
+    "title_ro": "Anpanman to Ringo Chan"
+  },
+  "0014a": {
+    "episode": 14,
+    "segment": "a",
+    "title_ja": "アンパンマンとみえないまん",
+    "title_ro": "Anpanman to Mienaiman"
+  },
+  "0014b": {
+    "episode": 14,
+    "segment": "b",
+    "title_ja": "アンパンマンとナンカヘンダー",
+    "title_ro": "Anpanman to Nankahendaa"
+  },
+  "0015a": {
+    "episode": 15,
+    "segment": "a",
+    "title_ja": "アンパンマンとみずうみひめ",
+    "title_ro": "Anpanman to Mizuumihime"
+  },
+  "0015b": {
+    "episode": 15,
+    "segment": "b",
+    "title_ja": "アンパンマンとへどろまん",
+    "title_ro": "Anpanman to Hedoroman"
+  },
+  "0016a": {
+    "episode": 16,
+    "segment": "a",
+    "title_ja": "アンパンマンとだだんだん",
+    "title_ro": "Anpanman to Dadandan"
+  },
+  "0016b": {
+    "episode": 16,
+    "segment": "b",
+    "title_ja": "アンパンマンとぱんどろぼう",
+    "title_ro": "Anpanman to Pandorobou"
+  },
+  "0017a": {
+    "episode": 17,
+    "segment": "a",
+    "title_ja": "アンパンマンとうみのあくま",
+    "title_ro": "Anpanman to Uminoakuma"
+  },
+  "0017b": {
+    "episode": 17,
+    "segment": "b",
+    "title_ja": "かえってきたおむすびまん",
+    "title_ro": "Kaettekitaomusubiman"
+  },
+  "0018a": {
+    "episode": 18,
+    "segment": "a",
+    "title_ja": "アンパンマンまじょのくにへ",
+    "title_ro": "Anpanman Majonokunihe"
+  },
+  "0018b": {
+    "episode": 18,
+    "segment": "b",
+    "title_ja": "アンパンマンとやかんまん",
+    "title_ro": "Anpanman to Yakanman"
+  },
+  "0019a": {
+    "episode": 19,
+    "segment": "a",
+    "title_ja": "アンパンマンともぐりん",
+    "title_ro": "Anpanman to Mogurin"
+  },
+  "0020a": {
+    "episode": 20,
+    "segment": "a",
+    "title_ja": "アンパンマンとおばけのもり",
+    "title_ro": "Anpanman to Obakenomori"
+  },
+  "0020b": {
+    "episode": 20,
+    "segment": "b",
+    "title_ja": "アンパンマンとなめくじら",
+    "title_ro": "Anpanman to Namekujira"
+  },
+  "0021a": {
+    "episode": 21,
+    "segment": "a",
+    "title_ja": "アンパンマンとバイキンロボット",
+    "title_ro": "Anpanman to Baikinrobotto"
+  },
+  "0021b": {
+    "episode": 21,
+    "segment": "b",
+    "title_ja": "アンパンマンとおそうじまん",
+    "title_ro": "Anpanman to Osoujiman"
+  },
+  "0022a": {
+    "episode": 22,
+    "segment": "a",
+    "title_ja": "アンパンマンとちくりん",
+    "title_ro": "Anpanman to Chikurin"
+  },
+  "0022b": {
+    "episode": 22,
+    "segment": "b",
+    "title_ja": "アンパンマンとまいごのうちゅうじん",
+    "title_ro": "Anpanman to Maigonouchuujin"
+  },
+  "0023a": {
+    "episode": 23,
+    "segment": "a",
+    "title_ja": "アンパンマンとあくびどり",
+    "title_ro": "Anpanman to Akubidori"
+  },
+  "0023b": {
+    "episode": 23,
+    "segment": "b",
+    "title_ja": "アンパンマンとソフトクリームマン",
+    "title_ro": "Anpanman to Sofutokuriimuman"
+  },
+  "0024a": {
+    "episode": 24,
+    "segment": "a",
+    "title_ja": "アンパンマンとこぞうのジャンボ",
+    "title_ro": "Anpanman to Kozouno Janbo"
+  },
+  "0024b": {
+    "episode": 24,
+    "segment": "b",
+    "title_ja": "アンパンマンとかびるんるん",
+    "title_ro": "Anpanman to Kabirunrun"
+  },
+  "0025a": {
+    "episode": 25,
+    "segment": "a",
+    "title_ja": "アンパンマンとぽんぽんじま",
+    "title_ro": "Anpanman to Ponponjima"
+  },
+  "0025b": {
+    "episode": 25,
+    "segment": "b",
+    "title_ja": "バタコさんのたんじょう日",
+    "title_ro": "Batako Sannotanjou Nichi"
+  },
+  "0026a": {
+    "episode": 26,
+    "segment": "a",
+    "title_ja": "アンパンマンとバイキンせんにん",
+    "title_ro": "Anpanman to Baikin Sennin"
+  },
+  "0026b": {
+    "episode": 26,
+    "segment": "b",
+    "title_ja": "アンパンマンとてんどん母さん",
+    "title_ro": "Anpanman to Tendon Kaasan"
+  },
+  "0027a": {
+    "episode": 27,
+    "segment": "a",
+    "title_ja": "アンパンマンとおかしのくに",
+    "title_ro": "Anpanman to Okashinokuni"
+  },
+  "0027b": {
+    "episode": 27,
+    "segment": "b",
+    "title_ja": "アンパンマンとあかちゃんまん",
+    "title_ro": "Anpanman to Akachanman"
+  },
+  "0028a": {
+    "episode": 28,
+    "segment": "a",
+    "title_ja": "アンパンマンとタイヤキごう",
+    "title_ro": "Anpanman to Taiyaki Gou"
+  },
+  "0028b": {
+    "episode": 28,
+    "segment": "b",
+    "title_ja": "アンパンマンとどじょうおじさん",
+    "title_ro": "Anpanman to Dojouojisan"
+  },
+  "0029a": {
+    "episode": 29,
+    "segment": "a",
+    "title_ja": "アンパンマンとスグダスマン",
+    "title_ro": "Anpanman to Sugudasuman"
+  },
+  "0029b": {
+    "episode": 29,
+    "segment": "b",
+    "title_ja": "アンパンマンとクリームパンマン",
+    "title_ro": "Anpanman to Kuriimupanman"
+  },
+  "0030a": {
+    "episode": 30,
+    "segment": "a",
+    "title_ja": "アンパンマンとまほうのランプ",
+    "title_ro": "Anpanman to Mahouno Ranpu"
+  },
+  "0030b": {
+    "episode": 30,
+    "segment": "b",
+    "title_ja": "アンパンマンとハンバーガーキッド",
+    "title_ro": "Anpanman to Hanbaagaakiddo"
+  },
+  "0031a": {
+    "episode": 31,
+    "segment": "a",
+    "title_ja": "アンパンマンとホットドッグ",
+    "title_ro": "Anpanman to Hottodoggu"
+  },
+  "0031b": {
+    "episode": 31,
+    "segment": "b",
+    "title_ja": "アンパンマンとふけつまん",
+    "title_ro": "Anpanman to Fuketsuman"
+  },
+  "0032a": {
+    "episode": 32,
+    "segment": "a",
+    "title_ja": "アンパンマンとまじゅつしドロンガ",
+    "title_ro": "Anpanman to Majutsushi Doronga"
+  },
+  "0032b": {
+    "episode": 32,
+    "segment": "b",
+    "title_ja": "アンパンマンとカレンのもり",
+    "title_ro": "Anpanman to Karen no Mori"
+  },
+  "0033a": {
+    "episode": 33,
+    "segment": "a",
+    "title_ja": "アンパンマンとピラミッドののろい",
+    "title_ro": "Anpanman to Piramiddo no Noroi"
+  },
+  "0033b": {
+    "episode": 33,
+    "segment": "b",
+    "title_ja": "アンパンマンとサンドイッチマン",
+    "title_ro": "Anpanman to Sandoitchiman"
+  },
+  "0034a": {
+    "episode": 34,
+    "segment": "a",
+    "title_ja": "アンパンマンとタータン",
+    "title_ro": "Anpanman to Taatan"
+  },
+  "0035a": {
+    "episode": 35,
+    "segment": "a",
+    "title_ja": "アンパンマンとドドのしま",
+    "title_ro": "Anpanman to Dodo no Shima"
+  },
+  "0035b": {
+    "episode": 35,
+    "segment": "b",
+    "title_ja": "アンパンマンとナマズマン",
+    "title_ro": "Anpanman to Namazuman"
+  },
+  "0036a": {
+    "episode": 36,
+    "segment": "a",
+    "title_ja": "アンパンマンとパズルどり",
+    "title_ro": "Anpanman to Pazuru Dori"
+  },
+  "0036b": {
+    "episode": 36,
+    "segment": "b",
+    "title_ja": "アンパンマンとペッパーけいぶ",
+    "title_ro": "Anpanman to Peppaa Keibu"
+  },
+  "0037a": {
+    "episode": 37,
+    "segment": "a",
+    "title_ja": "アンパンマンとくじらのクータン",
+    "title_ro": "Anpanman to Kujirano Kuutan"
+  },
+  "0037b": {
+    "episode": 37,
+    "segment": "b",
+    "title_ja": "アンパンマンとなぞのブラック",
+    "title_ro": "Anpanman to Nazono Burakku"
+  },
+  "0038a": {
+    "episode": 38,
+    "segment": "a",
+    "title_ja": "かえってきたあかちゃんまん",
+    "title_ro": "Kaettekitaakachanman"
+  },
+  "0038b": {
+    "episode": 38,
+    "segment": "b",
+    "title_ja": "アンパンマンとみかづきまん",
+    "title_ro": "Anpanman to Mikazukiman"
+  },
+  "0039a": {
+    "episode": 39,
+    "segment": "a",
+    "title_ja": "アンパンマンとバイキンおんど",
+    "title_ro": "Anpanman to Baikin Ondo"
+  },
+  "0039b": {
+    "episode": 39,
+    "segment": "b",
+    "title_ja": "アンパンマンとゆうきのはな",
+    "title_ro": "Anpanman to Yuukinohana"
+  },
+  "0040a": {
+    "episode": 40,
+    "segment": "a",
+    "title_ja": "アンパンマンとどんぶりまんトリオ",
+    "title_ro": "Anpanman to Donburiman Torio"
+  },
+  "0041a": {
+    "episode": 41,
+    "segment": "a",
+    "title_ja": "アンパンマンとかいじんドクロマン",
+    "title_ro": "Anpanman to Kaijin Dokuroman"
+  },
+  "0041b": {
+    "episode": 41,
+    "segment": "b",
+    "title_ja": "アンパンマンとドキンちゃんのゆめ",
+    "title_ro": "Anpanman to Dokin Channoyume"
+  },
+  "0042a": {
+    "episode": 42,
+    "segment": "a",
+    "title_ja": "アンパンマンと雲のもくちゃん",
+    "title_ro": "Anpanman to Kumo Nomokuchan"
+  },
+  "0042b": {
+    "episode": 42,
+    "segment": "b",
+    "title_ja": "アンパンマンとはなびまん",
+    "title_ro": "Anpanman to Hanabiman"
+  },
+  "0043a": {
+    "episode": 43,
+    "segment": "a",
+    "title_ja": "アンパンマンとにじのくに",
+    "title_ro": "Anpanman to Nijinokuni"
+  },
+  "0043b": {
+    "episode": 43,
+    "segment": "b",
+    "title_ja": "アンパンマンとおばけぼうや",
+    "title_ro": "Anpanman to Obakebouya"
+  },
+  "0044a": {
+    "episode": 44,
+    "segment": "a",
+    "title_ja": "アンパンマンとくらげまん",
+    "title_ro": "Anpanman to Kurageman"
+  },
+  "0044b": {
+    "episode": 44,
+    "segment": "b",
+    "title_ja": "アンパンマンとカレーまつり",
+    "title_ro": "Anpanman to Karee Matsuri"
+  },
+  "0045a": {
+    "episode": 45,
+    "segment": "a",
+    "title_ja": "アンパンマンとすなおとこ",
+    "title_ro": "Anpanman to Sunaotoko"
+  },
+  "0045b": {
+    "episode": 45,
+    "segment": "b",
+    "title_ja": "アンパンマンとモグラドン",
+    "title_ro": "Anpanman to Moguradon"
+  },
+  "0046a": {
+    "episode": 46,
+    "segment": "a",
+    "title_ja": "アンパンマンと鉄火のマキちゃん",
+    "title_ro": "Anpanman to Tekka no Maki Chan"
+  },
+  "0046b": {
+    "episode": 46,
+    "segment": "b",
+    "title_ja": "アンパンマンとドーナツマン",
+    "title_ro": "Anpanman to Doonatsuman"
+  },
+  "0047a": {
+    "episode": 47,
+    "segment": "a",
+    "title_ja": "アンパンマンとママザウルス",
+    "title_ro": "Anpanman to Mamazaurusu"
+  },
+  "0047b": {
+    "episode": 47,
+    "segment": "b",
+    "title_ja": "アンパンマンとくろゆきひめ",
+    "title_ro": "Anpanman to Kuroyukihime"
+  },
+  "0048a": {
+    "episode": 48,
+    "segment": "a",
+    "title_ja": "アンパンマンとねこのくに",
+    "title_ro": "Anpanman to Nekonokuni"
+  },
+  "0048b": {
+    "episode": 48,
+    "segment": "b",
+    "title_ja": "アンパンマンととぶ木馬",
+    "title_ro": "Anpanman to Tobu Mokuba"
+  },
+  "0049a": {
+    "episode": 49,
+    "segment": "a",
+    "title_ja": "アンパンマンとソーセージショー",
+    "title_ro": "Anpanman to Sooseejishoo"
+  },
+  "0049b": {
+    "episode": 49,
+    "segment": "b",
+    "title_ja": "アンパンマンとちいさなバイオリン",
+    "title_ro": "Anpanman to Chiisana Baiorin"
+  },
+  "0050a": {
+    "episode": 50,
+    "segment": "a",
+    "title_ja": "アンパンマンとゴミラ",
+    "title_ro": "Anpanman to Gomira"
+  },
+  "0051a": {
+    "episode": 51,
+    "segment": "a",
+    "title_ja": "アンパンマンとサカサマ島",
+    "title_ro": "Anpanman to Sakasama Shima"
+  },
+  "0051b": {
+    "episode": 51,
+    "segment": "b",
+    "title_ja": "アンパンマンときのこちゃん",
+    "title_ro": "Anpanman to Kinokochan"
+  },
+  "0052a": {
+    "episode": 52,
+    "segment": "a",
+    "title_ja": "アンパンマンとセイウチおじさん",
+    "title_ro": "Anpanman to Seiuchi Ojisan"
+  },
+  "0052b": {
+    "episode": 52,
+    "segment": "b",
+    "title_ja": "アンパンマンとコロリン谷",
+    "title_ro": "Anpanman to Kororin Tani"
+  },
+  "0053a": {
+    "episode": 53,
+    "segment": "a",
+    "title_ja": "アンパンマンとイルカの星",
+    "title_ro": "Anpanman to Iruka no Hoshi"
+  },
+  "0053b": {
+    "episode": 53,
+    "segment": "b",
+    "title_ja": "アンパンマンとアリンコキッド",
+    "title_ro": "Anpanman to Arinkokiddo"
+  },
+  "0054a": {
+    "episode": 54,
+    "segment": "a",
+    "title_ja": "アンパンマンとドン・キ・ホタテ",
+    "title_ro": "Anpanman to Don・ki・hotate"
+  },
+  "0054b": {
+    "episode": 54,
+    "segment": "b",
+    "title_ja": "アンパンマンと毛虫のケムタン",
+    "title_ro": "Anpanman to Kemushi no Kemutan"
+  },
+  "0055a": {
+    "episode": 55,
+    "segment": "a",
+    "title_ja": "アンパンマンとマスカット姫",
+    "title_ro": "Anpanman to Masukatto Hime"
+  },
+  "0055b": {
+    "episode": 55,
+    "segment": "b",
+    "title_ja": "アンパンマンとオニオン鬼",
+    "title_ro": "Anpanman to Onion Oni"
+  },
+  "0056a": {
+    "episode": 56,
+    "segment": "a",
+    "title_ja": "アンパンマンとまいごのマイマイ",
+    "title_ro": "Anpanman to Maigono Maimai"
+  },
+  "0057a": {
+    "episode": 57,
+    "segment": "a",
+    "title_ja": "アンパンマンとまくらこぞう",
+    "title_ro": "Anpanman to Makurakozou"
+  },
+  "0057b": {
+    "episode": 57,
+    "segment": "b",
+    "title_ja": "アンパンマンとまじょのマジカちゃん",
+    "title_ro": "Anpanman to Majono Majika Chan"
+  },
+  "0058a": {
+    "episode": 58,
+    "segment": "a",
+    "title_ja": "アンパンマンとこくばんまん",
+    "title_ro": "Anpanman to Kokubanman"
+  },
+  "0058b": {
+    "episode": 58,
+    "segment": "b",
+    "title_ja": "アンパンマンとかつぶしまん",
+    "title_ro": "Anpanman to Katsubushiman"
+  },
+  "0059a": {
+    "episode": 59,
+    "segment": "a",
+    "title_ja": "アンパンマンとダンゴのタンゴ",
+    "title_ro": "Anpanman to Dango no Tango"
+  },
+  "0059b": {
+    "episode": 59,
+    "segment": "b",
+    "title_ja": "アンパンマンとシャボンダマン",
+    "title_ro": "Anpanman to Shabondaman"
+  },
+  "0060a": {
+    "episode": 60,
+    "segment": "a",
+    "title_ja": "アンパンマンと雪こんこん",
+    "title_ro": "Anpanman to Yuki Konkon"
+  },
+  "0060b": {
+    "episode": 60,
+    "segment": "b",
+    "title_ja": "アンパンマンとかんづめカン太郎",
+    "title_ro": "Anpanman to Kanzume Kan Tarou"
+  },
+  "0061a": {
+    "episode": 61,
+    "segment": "a",
+    "title_ja": "アンパンマンとへんしんだぬき",
+    "title_ro": "Anpanman to Henshindanuki"
+  },
+  "0061b": {
+    "episode": 61,
+    "segment": "b",
+    "title_ja": "アンパンマンとようせいバックちゃん",
+    "title_ro": "Anpanman to Yousei Bakku Chan"
+  },
+  "0062a": {
+    "episode": 62,
+    "segment": "a",
+    "title_ja": "アンパンマンとSLマン",
+    "title_ro": "Anpanman to Sl Man"
+  },
+  "0062b": {
+    "episode": 62,
+    "segment": "b",
+    "title_ja": "アンパンマンとカルイシマン",
+    "title_ro": "Anpanman to Karuishiman"
+  },
+  "0063a": {
+    "episode": 63,
+    "segment": "a",
+    "title_ja": "アンパンマンとクリスマスの谷",
+    "title_ro": "Anpanman to Kurisumasu no Tani"
+  },
+  "0064a": {
+    "episode": 64,
+    "segment": "a",
+    "title_ja": "アンパンマンとカレンダーマン",
+    "title_ro": "Anpanman to Karendaaman"
+  },
+  "0064b": {
+    "episode": 64,
+    "segment": "b",
+    "title_ja": "アンパンマンとコンニャクおしょう",
+    "title_ro": "Anpanman to Konnyaku Oshou"
+  },
+  "0065a": {
+    "episode": 65,
+    "segment": "a",
+    "title_ja": "アンパンマンとフーセンカバさん",
+    "title_ro": "Anpanman to Fuusenkaba San"
+  },
+  "0065b": {
+    "episode": 65,
+    "segment": "b",
+    "title_ja": "アンパンマンとナマイキナマコ",
+    "title_ro": "Anpanman to Namaikinamako"
+  },
+  "0066a": {
+    "episode": 66,
+    "segment": "a",
+    "title_ja": "アンパンマンとエンピツぼうや",
+    "title_ro": "Anpanman to Enpitsu Bouya"
+  },
+  "0066b": {
+    "episode": 66,
+    "segment": "b",
+    "title_ja": "アンパンマンとトンカチどり",
+    "title_ro": "Anpanman to Tonkachi Dori"
+  },
+  "0067a": {
+    "episode": 67,
+    "segment": "a",
+    "title_ja": "アンパンマンとハサミどり",
+    "title_ro": "Anpanman to Hasami Dori"
+  },
+  "0067b": {
+    "episode": 67,
+    "segment": "b",
+    "title_ja": "アンパンマンと毛糸ぐも",
+    "title_ro": "Anpanman to Keito Gumo"
+  },
+  "0068a": {
+    "episode": 68,
+    "segment": "a",
+    "title_ja": "アンパンマンとシュークリームひめ",
+    "title_ro": "Anpanman to Shuukuriimu Hime"
+  },
+  "0068b": {
+    "episode": 68,
+    "segment": "b",
+    "title_ja": "アンパンマンとトンガラシ",
+    "title_ro": "Anpanman to Tongarashi"
+  },
+  "0069a": {
+    "episode": 69,
+    "segment": "a",
+    "title_ja": "アンパンマンのバレンタインデー",
+    "title_ro": "Anpanman no Barentaindee"
+  },
+  "0069b": {
+    "episode": 69,
+    "segment": "b",
+    "title_ja": "アンパンマンとえのぐぼうや",
+    "title_ro": "Anpanman to Enogubouya"
+  },
+  "0070a": {
+    "episode": 70,
+    "segment": "a",
+    "title_ja": "アンパンマンとチャンピオンダルマン",
+    "title_ro": "Anpanman to Chanpiondaruman"
+  },
+  "0070b": {
+    "episode": 70,
+    "segment": "b",
+    "title_ja": "アンパンマンとキューピッドちゃん",
+    "title_ro": "Anpanman to Kyuupiddo Chan"
+  },
+  "0071a": {
+    "episode": 71,
+    "segment": "a",
+    "title_ja": "アンパンマンとかげぼうや",
+    "title_ro": "Anpanman to Kagebouya"
+  },
+  "0071b": {
+    "episode": 71,
+    "segment": "b",
+    "title_ja": "アンパンマンとパラソルマン",
+    "title_ro": "Anpanman to Parasoruman"
+  },
+  "0072a": {
+    "episode": 72,
+    "segment": "a",
+    "title_ja": "アンパンマンと夕焼けまん",
+    "title_ro": "Anpanman to Yuuyake Man"
+  },
+  "0072b": {
+    "episode": 72,
+    "segment": "b",
+    "title_ja": "アンパンマンとニンジャのニャンジャ",
+    "title_ro": "Anpanman to Ninja no Nyanja"
+  },
+  "0073a": {
+    "episode": 73,
+    "segment": "a",
+    "title_ja": "アンパンマンとトランプマン",
+    "title_ro": "Anpanman to Toranpuman"
+  },
+  "0073b": {
+    "episode": 73,
+    "segment": "b",
+    "title_ja": "アンパンマンとアイロンタンク",
+    "title_ro": "Anpanman to Airontanku"
+  },
+  "0074a": {
+    "episode": 74,
+    "segment": "a",
+    "title_ja": "アンパンマンとブックマン",
+    "title_ro": "Anpanman to Bukkuman"
+  },
+  "0074b": {
+    "episode": 74,
+    "segment": "b",
+    "title_ja": "アンパンマンとたまごちゃん",
+    "title_ro": "Anpanman to Tamagochan"
+  },
+  "0075a": {
+    "episode": 75,
+    "segment": "a",
+    "title_ja": "アンパンマンとおせんべまん",
+    "title_ro": "Anpanman to Osenbeman"
+  },
+  "0075b": {
+    "episode": 75,
+    "segment": "b",
+    "title_ja": "アンパンマンとケンダマン",
+    "title_ro": "Anpanman to Kendaman"
+  },
+  "0076a": {
+    "episode": 76,
+    "segment": "a",
+    "title_ja": "アンパンマンとそらとぶピクルス",
+    "title_ro": "Anpanman to Soratobu Pikurusu"
+  },
+  "0076b": {
+    "episode": 76,
+    "segment": "b",
+    "title_ja": "アンパンマンとムッシュ・フランスパン",
+    "title_ro": "Anpanman to Musshu・furansupan"
+  },
+  "0077a": {
+    "episode": 77,
+    "segment": "a",
+    "title_ja": "アンパンマンとパール王子",
+    "title_ro": "Anpanman to Paaru Ouji"
+  },
+  "0077b": {
+    "episode": 77,
+    "segment": "b",
+    "title_ja": "アンパンマンとまいごのレッドくん",
+    "title_ro": "Anpanman to Maigono Reddo Kun"
+  },
+  "0078a": {
+    "episode": 78,
+    "segment": "a",
+    "title_ja": "アンパンマンとかいじゅうモカ",
+    "title_ro": "Anpanman to Kaijuu Moka"
+  },
+  "0078b": {
+    "episode": 78,
+    "segment": "b",
+    "title_ja": "アンパンマンとピアノマン",
+    "title_ro": "Anpanman to Pianoman"
+  },
+  "0079a": {
+    "episode": 79,
+    "segment": "a",
+    "title_ja": "アンパンマンとカメラのパチリくん",
+    "title_ro": "Anpanman to Kamera no Pachiri Kun"
+  },
+  "0079b": {
+    "episode": 79,
+    "segment": "b",
+    "title_ja": "アンパンマンとねんどのネンコちゃん",
+    "title_ro": "Anpanman to Nendono Nenko Chan"
+  },
+  "0080a": {
+    "episode": 80,
+    "segment": "a",
+    "title_ja": "アンパンマンとセニョール・マカロニーノ",
+    "title_ro": "Anpanman to Senyooru・makaroniino"
+  },
+  "0080b": {
+    "episode": 80,
+    "segment": "b",
+    "title_ja": "アンパンマンとティーポットマン",
+    "title_ro": "Anpanman to Teiipottoman"
+  },
+  "0081a": {
+    "episode": 81,
+    "segment": "a",
+    "title_ja": "アンパンマンとめざましくん",
+    "title_ro": "Anpanman to Mezamashikun"
+  },
+  "0081b": {
+    "episode": 81,
+    "segment": "b",
+    "title_ja": "アンパンマンとおもちゃ天使",
+    "title_ro": "Anpanman to Omocha Tenshi"
+  },
+  "0082a": {
+    "episode": 82,
+    "segment": "a",
+    "title_ja": "アンパンマンとけむりのケムケム",
+    "title_ro": "Anpanman to Kemurino Kemukemu"
+  },
+  "0082b": {
+    "episode": 82,
+    "segment": "b",
+    "title_ja": "アンパンマンとあかちゃんスプレー",
+    "title_ro": "Anpanman to Akachan Supuree"
+  },
+  "0083a": {
+    "episode": 83,
+    "segment": "a",
+    "title_ja": "アンパンマンとおりがみまん",
+    "title_ro": "Anpanman to Origamiman"
+  },
+  "0083b": {
+    "episode": 83,
+    "segment": "b",
+    "title_ja": "アンパンマンととうだいまん",
+    "title_ro": "Anpanman to Toudaiman"
+  },
+  "0084a": {
+    "episode": 84,
+    "segment": "a",
+    "title_ja": "アンパンマンとおむすびじま",
+    "title_ro": "Anpanman to Omusubijima"
+  },
+  "0084b": {
+    "episode": 84,
+    "segment": "b",
+    "title_ja": "アンパンマンといたずらラッパ",
+    "title_ro": "Anpanman to Itazura Rappa"
+  },
+  "0085a": {
+    "episode": 85,
+    "segment": "a",
+    "title_ja": "アンパンマンとてるてるぼうずまん",
+    "title_ro": "Anpanman to Teruterubouzuman"
+  },
+  "0085b": {
+    "episode": 85,
+    "segment": "b",
+    "title_ja": "アンパンマンとかさおばけ",
+    "title_ro": "Anpanman to Kasaobake"
+  },
+  "0086a": {
+    "episode": 86,
+    "segment": "a",
+    "title_ja": "おかしな自動車レース",
+    "title_ro": "Okashina Jidousha Reesu"
+  },
+  "0087a": {
+    "episode": 87,
+    "segment": "a",
+    "title_ja": "アンパンマンとうずまきぱんた",
+    "title_ro": "Anpanman to Uzumakipanta"
+  },
+  "0087b": {
+    "episode": 87,
+    "segment": "b",
+    "title_ja": "アンパンマンとドライヤーのドラくん",
+    "title_ro": "Anpanman to Doraiyaa no Dora Kun"
+  },
+  "0088a": {
+    "episode": 88,
+    "segment": "a",
+    "title_ja": "おむすびまんとどうくつかいじん",
+    "title_ro": "Omusubimantodoukutsukaijin"
+  },
+  "0088b": {
+    "episode": 88,
+    "segment": "b",
+    "title_ja": "レモンちゃんとジューサーくん",
+    "title_ro": "Remon Chanto Juusaa Kun"
+  },
+  "0089a": {
+    "episode": 89,
+    "segment": "a",
+    "title_ja": "アンパンマンともろこし村のコーンくん",
+    "title_ro": "Anpanman to Morokoshi Mura no Koon Kun"
+  },
+  "0089b": {
+    "episode": 89,
+    "segment": "b",
+    "title_ja": "アンパンマンとマリオネットちゃん",
+    "title_ro": "Anpanman to Marionetto Chan"
+  },
+  "0090a": {
+    "episode": 90,
+    "segment": "a",
+    "title_ja": "アンパンマンとアイスマントリオ",
+    "title_ro": "Anpanman to Aisumantorio"
+  },
+  "0090b": {
+    "episode": 90,
+    "segment": "b",
+    "title_ja": "アンパンマンとしんじゅひめ",
+    "title_ro": "Anpanman to Shinjuhime"
+  },
+  "0091a": {
+    "episode": 91,
+    "segment": "a",
+    "title_ja": "アンパンマンとめいろんろん",
+    "title_ro": "Anpanman to Meironron"
+  },
+  "0091b": {
+    "episode": 91,
+    "segment": "b",
+    "title_ja": "アンパンマンとおこさまランチくん",
+    "title_ro": "Anpanman to Okosama Ranchi Kun"
+  },
+  "0092a": {
+    "episode": 92,
+    "segment": "a",
+    "title_ja": "アンパンマンとかぼちゃのかぼちゃん",
+    "title_ro": "Anpanman to Kabochanokabochan"
+  },
+  "0092b": {
+    "episode": 92,
+    "segment": "b",
+    "title_ja": "アンパンマンとせんたくカメさん",
+    "title_ro": "Anpanman to Sentaku Kame San"
+  },
+  "0093a": {
+    "episode": 93,
+    "segment": "a",
+    "title_ja": "アンパンマンとカキゴーリラ",
+    "title_ro": "Anpanman to Kakigoorira"
+  },
+  "0093b": {
+    "episode": 93,
+    "segment": "b",
+    "title_ja": "アンパンマンとゲンコツくん",
+    "title_ro": "Anpanman to Genkotsu Kun"
+  },
+  "0094a": {
+    "episode": 94,
+    "segment": "a",
+    "title_ja": "アンパンマンと夏まつり",
+    "title_ro": "Anpanman to Natsu Matsuri"
+  },
+  "0095a": {
+    "episode": 95,
+    "segment": "a",
+    "title_ja": "アンパンマンとバイキンヘリコプター",
+    "title_ro": "Anpanman to Baikinherikoputaa"
+  },
+  "0095b": {
+    "episode": 95,
+    "segment": "b",
+    "title_ja": "ナイフとフォークとスプーンさん",
+    "title_ro": "Naifu to Fooku to Supuun San"
+  },
+  "0096a": {
+    "episode": 96,
+    "segment": "a",
+    "title_ja": "アンパンマンとせみたろう",
+    "title_ro": "Anpanman to Semitarou"
+  },
+  "0096b": {
+    "episode": 96,
+    "segment": "b",
+    "title_ja": "オルゴールマンとバレリーナ",
+    "title_ro": "Orugooruman to Bareriina"
+  },
+  "0097a": {
+    "episode": 97,
+    "segment": "a",
+    "title_ja": "アンパンマンとピーナッツブラザーズ",
+    "title_ro": "Anpanman to Piinattsuburazaazu"
+  },
+  "0097b": {
+    "episode": 97,
+    "segment": "b",
+    "title_ja": "かつぶしまんと鉄火のマキちゃん",
+    "title_ro": "Katsubushimanto Tekka no Maki Chan"
+  },
+  "0098a": {
+    "episode": 98,
+    "segment": "a",
+    "title_ja": "アンパンマンとリボンへび",
+    "title_ro": "Anpanman to Ribon Hebi"
+  },
+  "0098b": {
+    "episode": 98,
+    "segment": "b",
+    "title_ja": "アンパンマンとホウタイマン",
+    "title_ro": "Anpanman to Houtaiman"
+  },
+  "0099a": {
+    "episode": 99,
+    "segment": "a",
+    "title_ja": "アンパンマンと台風ぼうや",
+    "title_ro": "Anpanman to Taifuu Bouya"
+  },
+  "0099b": {
+    "episode": 99,
+    "segment": "b",
+    "title_ja": "アンパンマンとびっくりビクちゃん",
+    "title_ro": "Anpanman to Bikkuri Biku Chan"
+  },
+  "0100a": {
+    "episode": 100,
+    "segment": "a",
+    "title_ja": "新しいしょくぱんまん号誕生",
+    "title_ro": "Atarashii Shokupanman Gou Tanjou"
+  },
+  "0101a": {
+    "episode": 101,
+    "segment": "a",
+    "title_ja": "アンパンマンとつみきまん",
+    "title_ro": "Anpanman to Tsumikiman"
+  },
+  "0101b": {
+    "episode": 101,
+    "segment": "b",
+    "title_ja": "アンパンマンとわたあめじいさん",
+    "title_ro": "Anpanman to Wataamejiisan"
+  },
+  "0102a": {
+    "episode": 102,
+    "segment": "a",
+    "title_ja": "アンパンマンとあめふりおに",
+    "title_ro": "Anpanman to Amefurioni"
+  },
+  "0102b": {
+    "episode": 102,
+    "segment": "b",
+    "title_ja": "アンパンマンとしあわせの木",
+    "title_ro": "Anpanman to Shiawaseno Ki"
+  },
+  "0103a": {
+    "episode": 103,
+    "segment": "a",
+    "title_ja": "アンパンマンときりふきせんにん",
+    "title_ro": "Anpanman to Kirifukisennin"
+  },
+  "0103b": {
+    "episode": 103,
+    "segment": "b",
+    "title_ja": "アンパンマンとゆかいなメンドーくん",
+    "title_ro": "Anpanman to Yukaina Mendoo Kun"
+  },
+  "0104a": {
+    "episode": 104,
+    "segment": "a",
+    "title_ja": "アンパンマンとキララちゃん",
+    "title_ro": "Anpanman to Kirara Chan"
+  },
+  "0104b": {
+    "episode": 104,
+    "segment": "b",
+    "title_ja": "アンパンマンとかぜこぞう",
+    "title_ro": "Anpanman to Kazekozou"
+  },
+  "0105a": {
+    "episode": 105,
+    "segment": "a",
+    "title_ja": "アンパンマンとへんしんカード",
+    "title_ro": "Anpanman to Henshin Kaado"
+  },
+  "0105b": {
+    "episode": 105,
+    "segment": "b",
+    "title_ja": "アンパンマンとかきくけこちゃん",
+    "title_ro": "Anpanman to Kakikukekochan"
+  },
+  "0106a": {
+    "episode": 106,
+    "segment": "a",
+    "title_ja": "アンパンマンとハロウィンマン",
+    "title_ro": "Anpanman to Harouinman"
+  },
+  "0106b": {
+    "episode": 106,
+    "segment": "b",
+    "title_ja": "アンパンマンとまほうのロープ",
+    "title_ro": "Anpanman to Mahouno Roopu"
+  },
+  "0107a": {
+    "episode": 107,
+    "segment": "a",
+    "title_ja": "アンパンマンとなかゆび姫",
+    "title_ro": "Anpanman to Nakayubi Hime"
+  },
+  "0108a": {
+    "episode": 108,
+    "segment": "a",
+    "title_ja": "アンパンマンとチョコレートパンマン",
+    "title_ro": "Anpanman to Chokoreetopanman"
+  },
+  "0108b": {
+    "episode": 108,
+    "segment": "b",
+    "title_ja": "アンパンマンとぎんいろまん",
+    "title_ro": "Anpanman to Gin'iroman"
+  },
+  "0109a": {
+    "episode": 109,
+    "segment": "a",
+    "title_ja": "あかちゃんまんと土星ちゃん",
+    "title_ro": "Akachanmanto Dosei Chan"
+  },
+  "0109b": {
+    "episode": 109,
+    "segment": "b",
+    "title_ja": "ドキンちゃんの大変身!",
+    "title_ro": "Dokin Channo Taihen Mi !"
+  },
+  "0110a": {
+    "episode": 110,
+    "segment": "a",
+    "title_ja": "カッパラスをやっつけろ!",
+    "title_ro": "Kapparasu Woyattsukero !"
+  },
+  "0110b": {
+    "episode": 110,
+    "segment": "b",
+    "title_ja": "アンパンマンとちゅうしゃき先生",
+    "title_ro": "Anpanman to Chuushaki Sensei"
+  },
+  "0111a": {
+    "episode": 111,
+    "segment": "a",
+    "title_ja": "アンパンマンとクロワッサン姫",
+    "title_ro": "Anpanman to Kurowassan Hime"
+  },
+  "0111b": {
+    "episode": 111,
+    "segment": "b",
+    "title_ja": "エクレアさんとプリンちゃん",
+    "title_ro": "Ekurea Santo Purin Chan"
+  },
+  "0112a": {
+    "episode": 112,
+    "segment": "a",
+    "title_ja": "アンパンマンと糸まきおばさん",
+    "title_ro": "Anpanman to Ito Makiobasan"
+  },
+  "0112b": {
+    "episode": 112,
+    "segment": "b",
+    "title_ja": "アンパンマンとガマグチへび",
+    "title_ro": "Anpanman to Gamaguchi Hebi"
+  },
+  "0113a": {
+    "episode": 113,
+    "segment": "a",
+    "title_ja": "アンパンマンとクレヨンマン",
+    "title_ro": "Anpanman to Kureyonman"
+  },
+  "0113b": {
+    "episode": 113,
+    "segment": "b",
+    "title_ja": "アンパンマンとヘンテコけむりいぬ",
+    "title_ro": "Anpanman to Henteko Kemuriinu"
+  },
+  "0114a": {
+    "episode": 114,
+    "segment": "a",
+    "title_ja": "光れ!ぼくらのクリスマスツリー",
+    "title_ro": "Hikare ! Bokurano Kurisumasutsurii"
+  },
+  "0115a": {
+    "episode": 115,
+    "segment": "a",
+    "title_ja": "アンパンマンとアメダマぼうや",
+    "title_ro": "Anpanman to Amedama Bouya"
+  },
+  "0115b": {
+    "episode": 115,
+    "segment": "b",
+    "title_ja": "アンパンマンとあきかんまん",
+    "title_ro": "Anpanman to Akikanman"
+  },
+  "0116a": {
+    "episode": 116,
+    "segment": "a",
+    "title_ja": "アンパンマンとランドセル島",
+    "title_ro": "Anpanman to Randoseru Shima"
+  },
+  "0116b": {
+    "episode": 116,
+    "segment": "b",
+    "title_ja": "アンパンマンとそっくりおばけ",
+    "title_ro": "Anpanman to Sokkuriobake"
+  },
+  "0117a": {
+    "episode": 117,
+    "segment": "a",
+    "title_ja": "アンパンマンとニンニクおしょう",
+    "title_ro": "Anpanman to Ninniku Oshou"
+  },
+  "0117b": {
+    "episode": 117,
+    "segment": "b",
+    "title_ja": "アンパンマンとゆかいなトランクマン",
+    "title_ro": "Anpanman to Yukaina Torankuman"
+  },
+  "0118a": {
+    "episode": 118,
+    "segment": "a",
+    "title_ja": "アンパンマンとムーン姫",
+    "title_ro": "Anpanman to Muun Hime"
+  },
+  "0118b": {
+    "episode": 118,
+    "segment": "b",
+    "title_ja": "アンパンマンとオニオン鬼のなみだ",
+    "title_ro": "Anpanman to Onion Oni Nonamida"
+  },
+  "0119a": {
+    "episode": 119,
+    "segment": "a",
+    "title_ja": "アンパンマンとおかしなクシャミマン",
+    "title_ro": "Anpanman to Okashina Kushamiman"
+  },
+  "0119b": {
+    "episode": 119,
+    "segment": "b",
+    "title_ja": "アンパンマンとふたごの流れ星",
+    "title_ro": "Anpanman to Futagono Nagareboshi"
+  },
+  "0120a": {
+    "episode": 120,
+    "segment": "a",
+    "title_ja": "消えたバレンタインチョコ",
+    "title_ro": "Kie Ta Barentainchoko"
+  },
+  "0120b": {
+    "episode": 120,
+    "segment": "b",
+    "title_ja": "アンパンマンと恐怖のこおり鬼",
+    "title_ro": "Anpanman to Kyoufu Nokoori Oni"
+  },
+  "0121a": {
+    "episode": 121,
+    "segment": "a",
+    "title_ja": "アンパンマンとナンドバット",
+    "title_ro": "Anpanman to Nandobatto"
+  },
+  "0122a": {
+    "episode": 122,
+    "segment": "a",
+    "title_ja": "アンパンマンとこむすびまん",
+    "title_ro": "Anpanman to Komusubiman"
+  },
+  "0122b": {
+    "episode": 122,
+    "segment": "b",
+    "title_ja": "アンパンマンとはるのしろ",
+    "title_ro": "Anpanman to Harunoshiro"
+  },
+  "0123a": {
+    "episode": 123,
+    "segment": "a",
+    "title_ja": "アンパンマンと木の精みどりちゃん",
+    "title_ro": "Anpanman to Ki no Sei Midorichan"
+  },
+  "0123b": {
+    "episode": 123,
+    "segment": "b",
+    "title_ja": "アンパンマンとナプキンさん",
+    "title_ro": "Anpanman to Napukin San"
+  },
+  "0124a": {
+    "episode": 124,
+    "segment": "a",
+    "title_ja": "アンパンマンともぐらの国",
+    "title_ro": "Anpanman to Mogurano Kuni"
+  },
+  "0124b": {
+    "episode": 124,
+    "segment": "b",
+    "title_ja": "アンパンマンとからくちカレーパンマン",
+    "title_ro": "Anpanman to Karakuchi Kareepanman"
+  },
+  "0125a": {
+    "episode": 125,
+    "segment": "a",
+    "title_ja": "帰ってきたゴミラ",
+    "title_ro": "Kaetsu Tekita Gomira"
+  },
+  "0125b": {
+    "episode": 125,
+    "segment": "b",
+    "title_ja": "アンパンマンとハンバーガーウェスタン",
+    "title_ro": "Anpanman to Hanbaagaauesutan"
+  },
+  "0126a": {
+    "episode": 126,
+    "segment": "a",
+    "title_ja": "忍者のニャンジャと鉄火のマキちゃん",
+    "title_ro": "Ninja no Nyanja to Tekka no Maki Chan"
+  },
+  "0126b": {
+    "episode": 126,
+    "segment": "b",
+    "title_ja": "赤ちゃんまんとベビードーナツ",
+    "title_ro": "Akachan Manto Bebiidoonatsu"
+  },
+  "0127a": {
+    "episode": 127,
+    "segment": "a",
+    "title_ja": "お誕生日は大さわぎ!",
+    "title_ro": "o Tanjoubi Ha Taisa Wagi !"
+  },
+  "0127b": {
+    "episode": 127,
+    "segment": "b",
+    "title_ja": "アンパンマンと雪の天使フルフル",
+    "title_ro": "Anpanman to Yuki no Tenshi Furufuru"
+  },
+  "0128a": {
+    "episode": 128,
+    "segment": "a",
+    "title_ja": "アンパンマンとデコレーションマン",
+    "title_ro": "Anpanman to Dekoreeshonman"
+  },
+  "0128b": {
+    "episode": 128,
+    "segment": "b",
+    "title_ja": "アンパンマンとカレンの花畑",
+    "title_ro": "Anpanman to Karen no Hanahata"
+  },
+  "0129a": {
+    "episode": 129,
+    "segment": "a",
+    "title_ja": "アンパンマンとピザパイむすめ",
+    "title_ro": "Anpanman to Pizapai Musume"
+  },
+  "0129b": {
+    "episode": 129,
+    "segment": "b",
+    "title_ja": "アンパンマンとトランプ四銃士",
+    "title_ro": "Anpanman to Toranpu Shi Juushi"
+  },
+  "0130a": {
+    "episode": 130,
+    "segment": "a",
+    "title_ja": "帰ってきたあくびどり",
+    "title_ro": "Kaetsu Tekitaakubidori"
+  },
+  "0130b": {
+    "episode": 130,
+    "segment": "b",
+    "title_ja": "カツドンマンとたまごどんまん",
+    "title_ro": "Katsudonman to Tamagodonman"
+  },
+  "0131a": {
+    "episode": 131,
+    "segment": "a",
+    "title_ja": "つばき姫とこどもまつり",
+    "title_ro": "Tsubaki Hime Tokodomomatsuri"
+  },
+  "0132a": {
+    "episode": 132,
+    "segment": "a",
+    "title_ja": "アンパンマンとめいろのくに",
+    "title_ro": "Anpanman to Meironokuni"
+  },
+  "0132b": {
+    "episode": 132,
+    "segment": "b",
+    "title_ja": "アンパンマンと森のひみつ",
+    "title_ro": "Anpanman to Mori Nohimitsu"
+  },
+  "0133a": {
+    "episode": 133,
+    "segment": "a",
+    "title_ja": "アンパンマンとレンズぼうや",
+    "title_ro": "Anpanman to Renzu Bouya"
+  },
+  "0133b": {
+    "episode": 133,
+    "segment": "b",
+    "title_ja": "アンパンマンとマヨネーズくん",
+    "title_ro": "Anpanman to Mayoneezu Kun"
+  },
+  "0134a": {
+    "episode": 134,
+    "segment": "a",
+    "title_ja": "アンパンマンともえるSLマン",
+    "title_ro": "Anpanman to Moeru Sl Man"
+  },
+  "0134b": {
+    "episode": 134,
+    "segment": "b",
+    "title_ja": "アンパンマンとホッチンワニ",
+    "title_ro": "Anpanman to Hotchinwani"
+  },
+  "0135a": {
+    "episode": 135,
+    "segment": "a",
+    "title_ja": "アンパンマンとかいじゅうクモラ",
+    "title_ro": "Anpanman to Kaijuu Kumora"
+  },
+  "0135b": {
+    "episode": 135,
+    "segment": "b",
+    "title_ja": "なべこさんとどんぶりトリオ",
+    "title_ro": "Nabekosantodonburi Torio"
+  },
+  "0136a": {
+    "episode": 136,
+    "segment": "a",
+    "title_ja": "かいじゅうアンコラとカレーナ",
+    "title_ro": "Kaijuu Ankora to Kareena"
+  },
+  "0136b": {
+    "episode": 136,
+    "segment": "b",
+    "title_ja": "アンパンマンとなき虫わらい虫おこり虫",
+    "title_ro": "Anpanman to Naki Mushi Warai Mushi Okori Mushi"
+  },
+  "0137a": {
+    "episode": 137,
+    "segment": "a",
+    "title_ja": "アンパンマンとみみせんせい",
+    "title_ro": "Anpanman to Mimisensei"
+  },
+  "0137b": {
+    "episode": 137,
+    "segment": "b",
+    "title_ja": "アンパンマンとイチゴ仮面",
+    "title_ro": "Anpanman to Ichigo Kamen"
+  },
+  "0138a": {
+    "episode": 138,
+    "segment": "a",
+    "title_ja": "すなおとことスコップマン",
+    "title_ro": "Sunaotokoto Sukoppuman"
+  },
+  "0138b": {
+    "episode": 138,
+    "segment": "b",
+    "title_ja": "ハンバーガーキッドとちくりん",
+    "title_ro": "Hanbaagaakiddo to Chikurin"
+  },
+  "0139a": {
+    "episode": 139,
+    "segment": "a",
+    "title_ja": "アンパンマンとザーマス・ボンド",
+    "title_ro": "Anpanman to Zaamasu・bondo"
+  },
+  "0139b": {
+    "episode": 139,
+    "segment": "b",
+    "title_ja": "アンパンマンとお茶づけサクサクさん",
+    "title_ro": "Anpanman to o Cha Zuke Sakusaku San"
+  },
+  "0140a": {
+    "episode": 140,
+    "segment": "a",
+    "title_ja": "おむすびまんとこむすびまん",
+    "title_ro": "Omusubimantokomusubiman"
+  },
+  "0140b": {
+    "episode": 140,
+    "segment": "b",
+    "title_ja": "アンパンマンとムシバキンマン",
+    "title_ro": "Anpanman to Mushibakinman"
+  },
+  "0141a": {
+    "episode": 141,
+    "segment": "a",
+    "title_ja": "アンパンマンとペンさきどり",
+    "title_ro": "Anpanman to Pen Sakidori"
+  },
+  "0141b": {
+    "episode": 141,
+    "segment": "b",
+    "title_ja": "アンパンマンとごみぶくろまん",
+    "title_ro": "Anpanman to Gomibukuroman"
+  },
+  "0142a": {
+    "episode": 142,
+    "segment": "a",
+    "title_ja": "あかちゃんまんとてんどん母さん",
+    "title_ro": "Akachanmantotendon Kaasan"
+  },
+  "0142b": {
+    "episode": 142,
+    "segment": "b",
+    "title_ja": "リンゴちゃんとイチゴちゃん",
+    "title_ro": "Ringo Chanto Ichigo Chan"
+  },
+  "0143a": {
+    "episode": 143,
+    "segment": "a",
+    "title_ja": "アンパンマンとストローこうもり",
+    "title_ro": "Anpanman to Sutoroo Koumori"
+  },
+  "0143b": {
+    "episode": 143,
+    "segment": "b",
+    "title_ja": "めいたんていホットドッグ",
+    "title_ro": "Meitantei Hottodoggu"
+  },
+  "0144a": {
+    "episode": 144,
+    "segment": "a",
+    "title_ja": "アンパンマンとパイナップルマン",
+    "title_ro": "Anpanman to Painappuruman"
+  },
+  "0145a": {
+    "episode": 145,
+    "segment": "a",
+    "title_ja": "忍者のニャンジャとフクラマスダコ",
+    "title_ro": "Ninja no Nyanja to Fukuramasudako"
+  },
+  "0145b": {
+    "episode": 145,
+    "segment": "b",
+    "title_ja": "アンパンマンとみずうみの国",
+    "title_ro": "Anpanman to Mizuumino Kuni"
+  },
+  "0146a": {
+    "episode": 146,
+    "segment": "a",
+    "title_ja": "アンパンマンとこんぺいとさん",
+    "title_ro": "Anpanman to Konpeitosan"
+  },
+  "0146b": {
+    "episode": 146,
+    "segment": "b",
+    "title_ja": "アンパンマンとカン太郎兄弟",
+    "title_ro": "Anpanman to Kan Tarou Kyoudai"
+  },
+  "0147a": {
+    "episode": 147,
+    "segment": "a",
+    "title_ja": "こむすびまんとバイキンせんにん",
+    "title_ro": "Komusubimanto Baikin Sennin"
+  },
+  "0147b": {
+    "episode": 147,
+    "segment": "b",
+    "title_ja": "アンパンマンとおまつりトリオ",
+    "title_ro": "Anpanman to Omatsuri Torio"
+  },
+  "0148a": {
+    "episode": 148,
+    "segment": "a",
+    "title_ja": "かいじゅうモカとシュガーぼうや",
+    "title_ro": "Kaijuu Moka to Shugaa Bouya"
+  },
+  "0148b": {
+    "episode": 148,
+    "segment": "b",
+    "title_ja": "くものもくちゃんとかいじゅうクモラ",
+    "title_ro": "Kumonomokuchantokaijuu Kumora"
+  },
+  "0149a": {
+    "episode": 149,
+    "segment": "a",
+    "title_ja": "アンパンマンとマロン姫",
+    "title_ro": "Anpanman to Maron Hime"
+  },
+  "0149b": {
+    "episode": 149,
+    "segment": "b",
+    "title_ja": "アリンコキッドとハンバーガーキッド",
+    "title_ro": "Arinkokiddo to Hanbaagaakiddo"
+  },
+  "0150a": {
+    "episode": 150,
+    "segment": "a",
+    "title_ja": "めざましくんとおじいさん時計",
+    "title_ro": "Mezamashikuntoojiisan Tokei"
+  },
+  "0150b": {
+    "episode": 150,
+    "segment": "b",
+    "title_ja": "アンパンマンとカッパのカピー",
+    "title_ro": "Anpanman to Kappa no Kapii"
+  },
+  "0151a": {
+    "episode": 151,
+    "segment": "a",
+    "title_ja": "アンパンマンとつみきのめいろ",
+    "title_ro": "Anpanman to Tsumikinomeiro"
+  },
+  "0151b": {
+    "episode": 151,
+    "segment": "b",
+    "title_ja": "アンパンマンとおりがみちゃん",
+    "title_ro": "Anpanman to Origamichan"
+  },
+  "0152a": {
+    "episode": 152,
+    "segment": "a",
+    "title_ja": "Tシャツくんとアンパンマン体操",
+    "title_ro": "T Shatsu Kunto Anpanman Taisou"
+  },
+  "0152b": {
+    "episode": 152,
+    "segment": "b",
+    "title_ja": "かまめしどんとバケルくん",
+    "title_ro": "Kamameshidonto Bakeru Kun"
+  },
+  "0153a": {
+    "episode": 153,
+    "segment": "a",
+    "title_ja": "アンパンマンとやきいもまん",
+    "title_ro": "Anpanman to Yakiimoman"
+  },
+  "0153b": {
+    "episode": 153,
+    "segment": "b",
+    "title_ja": "アンパンマンといわおとこ",
+    "title_ro": "Anpanman to Iwaotoko"
+  },
+  "0154a": {
+    "episode": 154,
+    "segment": "a",
+    "title_ja": "りんごちゃんとアプル王子",
+    "title_ro": "Ringochanto Apuru Ouji"
+  },
+  "0154b": {
+    "episode": 154,
+    "segment": "b",
+    "title_ja": "トンボくんと空中レース",
+    "title_ro": "Tonbo Kunto Kuuchuu Reesu"
+  },
+  "0155a": {
+    "episode": 155,
+    "segment": "a",
+    "title_ja": "あかちゃんまんとかきくけこ",
+    "title_ro": "Akachanmantokakikukeko"
+  },
+  "0155b": {
+    "episode": 155,
+    "segment": "b",
+    "title_ja": "アンパンマンとクリスケさん",
+    "title_ro": "Anpanman to Kurisuke San"
+  },
+  "0156a": {
+    "episode": 156,
+    "segment": "a",
+    "title_ja": "アンパンマンとカンテンマン",
+    "title_ro": "Anpanman to Kantenman"
+  },
+  "0156b": {
+    "episode": 156,
+    "segment": "b",
+    "title_ja": "クータンとかいじゅうヌラ",
+    "title_ro": "Kuutan to Kaijuu Nura"
+  },
+  "0157a": {
+    "episode": 157,
+    "segment": "a",
+    "title_ja": "トマトちゃんと怪力コング",
+    "title_ro": "Tomato Chanto Kairiki Kongu"
+  },
+  "0157b": {
+    "episode": 157,
+    "segment": "b",
+    "title_ja": "アンパンマンと氷の女王",
+    "title_ro": "Anpanman to Koori no Joou"
+  },
+  "0158a": {
+    "episode": 158,
+    "segment": "a",
+    "title_ja": "ミットくんとボールくん",
+    "title_ro": "Mitto Kunto Booru Kun"
+  },
+  "0158b": {
+    "episode": 158,
+    "segment": "b",
+    "title_ja": "アンパンマンとまきばのモオさん",
+    "title_ro": "Anpanman to Makibano Moo San"
+  },
+  "0159a": {
+    "episode": 159,
+    "segment": "a",
+    "title_ja": "アンパンマンとホラーマン",
+    "title_ro": "Anpanman to Horaaman"
+  },
+  "0159b": {
+    "episode": 159,
+    "segment": "b",
+    "title_ja": "なみだちゃんとガマンぼうや",
+    "title_ro": "Namidachanto Gaman Bouya"
+  },
+  "0160a": {
+    "episode": 160,
+    "segment": "a",
+    "title_ja": "ゆきだるまんとくろだるまん",
+    "title_ro": "Yukidarumantokurodaruman"
+  },
+  "0160b": {
+    "episode": 160,
+    "segment": "b",
+    "title_ja": "アンパンマンとどろみずまん",
+    "title_ro": "Anpanman to Doromizuman"
+  },
+  "0161a": {
+    "episode": 161,
+    "segment": "a",
+    "title_ja": "アンパンマンとおべんとうまん",
+    "title_ro": "Anpanman to Obentouman"
+  },
+  "0161b": {
+    "episode": 161,
+    "segment": "b",
+    "title_ja": "こむすびまんとうめぼしばあや",
+    "title_ro": "Komusubimantoumeboshibaaya"
+  },
+  "0162a": {
+    "episode": 162,
+    "segment": "a",
+    "title_ja": "ぶたまんまんとあんまんマン",
+    "title_ro": "Butamanmantoanman Man"
+  },
+  "0162b": {
+    "episode": 162,
+    "segment": "b",
+    "title_ja": "アンパンマンとしかくおに",
+    "title_ro": "Anpanman to Shikakuoni"
+  },
+  "0163a": {
+    "episode": 163,
+    "segment": "a",
+    "title_ja": "ふしぎなふしぎなジングルベル",
+    "title_ro": "Fushiginafushigina Jinguruberu"
+  },
+  "0164a": {
+    "episode": 164,
+    "segment": "a",
+    "title_ja": "アンパンマンともちつきまん",
+    "title_ro": "Anpanman to Mochitsukiman"
+  },
+  "0164b": {
+    "episode": 164,
+    "segment": "b",
+    "title_ja": "ベビーアンパンと赤ちゃんばいきん",
+    "title_ro": "Bebiianpan to Akachan Baikin"
+  },
+  "0165a": {
+    "episode": 165,
+    "segment": "a",
+    "title_ja": "アンパンマンとポンポンどり",
+    "title_ro": "Anpanman to Ponpon Dori"
+  },
+  "0165b": {
+    "episode": 165,
+    "segment": "b",
+    "title_ja": "アンパンマンとクズカゴマン",
+    "title_ro": "Anpanman to Kuzukagoman"
+  },
+  "0166a": {
+    "episode": 166,
+    "segment": "a",
+    "title_ja": "アンパンマンとおんぼろヒコーキ",
+    "title_ro": "Anpanman to Onboro Hikooki"
+  },
+  "0166b": {
+    "episode": 166,
+    "segment": "b",
+    "title_ja": "アンパンマンとくらやみまん",
+    "title_ro": "Anpanman to Kurayamiman"
+  },
+  "0167a": {
+    "episode": 167,
+    "segment": "a",
+    "title_ja": "アンパンマンとモヤシ王子",
+    "title_ro": "Anpanman to Moyashi Ouji"
+  },
+  "0167b": {
+    "episode": 167,
+    "segment": "b",
+    "title_ja": "まめおじさんとアンコダマン",
+    "title_ro": "Mameojisanto Ankodaman"
+  },
+  "0168a": {
+    "episode": 168,
+    "segment": "a",
+    "title_ja": "アンパンマンとつららちゃん",
+    "title_ro": "Anpanman to Tsurarachan"
+  },
+  "0168b": {
+    "episode": 168,
+    "segment": "b",
+    "title_ja": "アンパンマンとタワシくん",
+    "title_ro": "Anpanman to Tawashi Kun"
+  },
+  "0169a": {
+    "episode": 169,
+    "segment": "a",
+    "title_ja": "アンパンマンとハッパちゃん",
+    "title_ro": "Anpanman to Happa Chan"
+  },
+  "0169b": {
+    "episode": 169,
+    "segment": "b",
+    "title_ja": "アンパンマンとカンタンシスターズ",
+    "title_ro": "Anpanman to Kantanshisutaazu"
+  },
+  "0170a": {
+    "episode": 170,
+    "segment": "a",
+    "title_ja": "アンパンマンとすいこみどり",
+    "title_ro": "Anpanman to Suikomidori"
+  },
+  "0170b": {
+    "episode": 170,
+    "segment": "b",
+    "title_ja": "ホラーマンとカッパのカピー",
+    "title_ro": "Horaaman to Kappa no Kapii"
+  },
+  "0171a": {
+    "episode": 171,
+    "segment": "a",
+    "title_ja": "プリンちゃんのおかしな誕生日",
+    "title_ro": "Purin Channookashina Tanjoubi"
+  },
+  "0171b": {
+    "episode": 171,
+    "segment": "b",
+    "title_ja": "アンパンマンとながれ星の国",
+    "title_ro": "Anpanman to Nagare Hoshi no Kuni"
+  },
+  "0172a": {
+    "episode": 172,
+    "segment": "a",
+    "title_ja": "アンパンマンとおばけばな",
+    "title_ro": "Anpanman to Obakebana"
+  },
+  "0172b": {
+    "episode": 172,
+    "segment": "b",
+    "title_ja": "アンパンマンとはんぺんさん",
+    "title_ro": "Anpanman to Hanpensan"
+  },
+  "0173a": {
+    "episode": 173,
+    "segment": "a",
+    "title_ja": "ドキンちゃんのマフラー作戦",
+    "title_ro": "Dokin Channo Mafuraa Sakusen"
+  },
+  "0173b": {
+    "episode": 173,
+    "segment": "b",
+    "title_ja": "帰ってきたへどろまん",
+    "title_ro": "Kaetsu Tekitahedoroman"
+  },
+  "0174a": {
+    "episode": 174,
+    "segment": "a",
+    "title_ja": "アンパンマンとフワフワ光線",
+    "title_ro": "Anpanman to Fuwafuwa Kousen"
+  },
+  "0174b": {
+    "episode": 174,
+    "segment": "b",
+    "title_ja": "アンパンマンとサンドイッチ島",
+    "title_ro": "Anpanman to Sandoitchi Shima"
+  },
+  "0175a": {
+    "episode": 175,
+    "segment": "a",
+    "title_ja": "アンパンマンとアリジゴクン",
+    "title_ro": "Anpanman to Arijigokun"
+  },
+  "0175b": {
+    "episode": 175,
+    "segment": "b",
+    "title_ja": "アンパンマンとマシュマロさん",
+    "title_ro": "Anpanman to Mashumaro San"
+  },
+  "0176a": {
+    "episode": 176,
+    "segment": "a",
+    "title_ja": "アンパンマンとミニアンパンマン",
+    "title_ro": "Anpanman to Minianpanman"
+  },
+  "0176b": {
+    "episode": 176,
+    "segment": "b",
+    "title_ja": "アンパンマンとナットーマン",
+    "title_ro": "Anpanman to Nattooman"
+  },
+  "0177a": {
+    "episode": 177,
+    "segment": "a",
+    "title_ja": "アンパンマンとカイトくん",
+    "title_ro": "Anpanman to Kaito Kun"
+  },
+  "0177b": {
+    "episode": 177,
+    "segment": "b",
+    "title_ja": "アンパンマンとシューマイおしょう",
+    "title_ro": "Anpanman to Shuumai Oshou"
+  },
+  "0178a": {
+    "episode": 178,
+    "segment": "a",
+    "title_ja": "アンパンマンとくっつき虫ペタリン",
+    "title_ro": "Anpanman to Kuttsuki Mushi Petarin"
+  },
+  "0178b": {
+    "episode": 178,
+    "segment": "b",
+    "title_ja": "アンパンマンとかいぞくバイキング",
+    "title_ro": "Anpanman to Kaizoku Baikingu"
+  },
+  "0179a": {
+    "episode": 179,
+    "segment": "a",
+    "title_ja": "アンパンマンとふしぎドーム",
+    "title_ro": "Anpanman to Fushigi Doomu"
+  },
+  "0179b": {
+    "episode": 179,
+    "segment": "b",
+    "title_ja": "アンパンマンとジシャクきょうだい",
+    "title_ro": "Anpanman to Jishaku Kyoudai"
+  },
+  "0180a": {
+    "episode": 180,
+    "segment": "a",
+    "title_ja": "アンパンマンとオカリナ姫",
+    "title_ro": "Anpanman to Okarina Hime"
+  },
+  "0180b": {
+    "episode": 180,
+    "segment": "b",
+    "title_ja": "アンパンマンとバケツくん",
+    "title_ro": "Anpanman to Baketsu Kun"
+  },
+  "0181a": {
+    "episode": 181,
+    "segment": "a",
+    "title_ja": "アンパンマンとふうせんガムキッド",
+    "title_ro": "Anpanman to Fuusen Gamukiddo"
+  },
+  "0181b": {
+    "episode": 181,
+    "segment": "b",
+    "title_ja": "アンパンマンとなみだ花",
+    "title_ro": "Anpanman to Namida Hana"
+  },
+  "0182a": {
+    "episode": 182,
+    "segment": "a",
+    "title_ja": "アンパンマンとすなのしろ",
+    "title_ro": "Anpanman to Sunanoshiro"
+  },
+  "0182b": {
+    "episode": 182,
+    "segment": "b",
+    "title_ja": "かつぶしまんとソバオくん",
+    "title_ro": "Katsubushimanto Sobao Kun"
+  },
+  "0183a": {
+    "episode": 183,
+    "segment": "a",
+    "title_ja": "アンパンマンと水の精ルナ",
+    "title_ro": "Anpanman to Mizu no Sei Runa"
+  },
+  "0183b": {
+    "episode": 183,
+    "segment": "b",
+    "title_ja": "アンパンマンとくるまの国",
+    "title_ro": "Anpanman to Kurumano Kuni"
+  },
+  "0184a": {
+    "episode": 184,
+    "segment": "a",
+    "title_ja": "ペンタくんとペンキマン",
+    "title_ro": "Penta Kunto Penkiman"
+  },
+  "0184b": {
+    "episode": 184,
+    "segment": "b",
+    "title_ja": "アンパンマンとカレーパーティー",
+    "title_ro": "Anpanman to Kareepaateii"
+  },
+  "0185a": {
+    "episode": 185,
+    "segment": "a",
+    "title_ja": "アンパンマンとひみつの砂時計",
+    "title_ro": "Anpanman to Himitsuno Sunadokei"
+  },
+  "0186a": {
+    "episode": 186,
+    "segment": "a",
+    "title_ja": "アンパンマンとふでじいさん",
+    "title_ro": "Anpanman to Fudejiisan"
+  },
+  "0186b": {
+    "episode": 186,
+    "segment": "b",
+    "title_ja": "アンパンマンとスタンプぞうさん",
+    "title_ro": "Anpanman to Sutanpu Zousan"
+  },
+  "0187a": {
+    "episode": 187,
+    "segment": "a",
+    "title_ja": "アンパンマンとおんせんくん",
+    "title_ro": "Anpanman to Onsenkun"
+  },
+  "0187b": {
+    "episode": 187,
+    "segment": "b",
+    "title_ja": "アンパンマンとニンジンさん",
+    "title_ro": "Anpanman to Ninjin San"
+  },
+  "0188a": {
+    "episode": 188,
+    "segment": "a",
+    "title_ja": "アンパンマンとぼうしのハットくん",
+    "title_ro": "Anpanman to Boushino Hatto Kun"
+  },
+  "0188b": {
+    "episode": 188,
+    "segment": "b",
+    "title_ja": "アンパンマンと空とぶながれぐも号",
+    "title_ro": "Anpanman to Sora Tobunagaregumo Gou"
+  },
+  "0189a": {
+    "episode": 189,
+    "segment": "a",
+    "title_ja": "てんどんまんとてんどん母さん",
+    "title_ro": "Tendonmantotendon Kaasan"
+  },
+  "0189b": {
+    "episode": 189,
+    "segment": "b",
+    "title_ja": "アンパンマンとめだまやきくん",
+    "title_ro": "Anpanman to Medamayakikun"
+  },
+  "0190a": {
+    "episode": 190,
+    "segment": "a",
+    "title_ja": "アンパンマンとカビとり",
+    "title_ro": "Anpanman to Kabi to Ri"
+  },
+  "0190b": {
+    "episode": 190,
+    "segment": "b",
+    "title_ja": "アンパンマンととびだせパンボン",
+    "title_ro": "Anpanman to Tobidase Panbon"
+  },
+  "0191a": {
+    "episode": 191,
+    "segment": "a",
+    "title_ja": "アンパンマンとはしれポストくん",
+    "title_ro": "Anpanman to Hashire Posuto Kun"
+  },
+  "0191b": {
+    "episode": 191,
+    "segment": "b",
+    "title_ja": "アンパンマンとヨットのセーラーくん",
+    "title_ro": "Anpanman to Yotto no Seeraa Kun"
+  },
+  "0192a": {
+    "episode": 192,
+    "segment": "a",
+    "title_ja": "アンパンマンとトランプの国",
+    "title_ro": "Anpanman to Toranpu no Kuni"
+  },
+  "0192b": {
+    "episode": 192,
+    "segment": "b",
+    "title_ja": "アンパンマンとバナナマン",
+    "title_ro": "Anpanman to Bananaman"
+  },
+  "0193a": {
+    "episode": 193,
+    "segment": "a",
+    "title_ja": "アンパンマンとドレミファ号",
+    "title_ro": "Anpanman to Doremifa Gou"
+  },
+  "0193b": {
+    "episode": 193,
+    "segment": "b",
+    "title_ja": "アンパンマンとおばけの城",
+    "title_ro": "Anpanman to Obakeno Shiro"
+  },
+  "0194a": {
+    "episode": 194,
+    "segment": "a",
+    "title_ja": "ピカリンとやみの女王",
+    "title_ro": "Pikarin to Yamino Joou"
+  },
+  "0194b": {
+    "episode": 194,
+    "segment": "b",
+    "title_ja": "アンパンマンとほたる姫",
+    "title_ro": "Anpanman to Hotaru Hime"
+  },
+  "0195a": {
+    "episode": 195,
+    "segment": "a",
+    "title_ja": "火の玉こぞうとヨウガンリュウ",
+    "title_ro": "Hi no Tama Kozouto Youganryuu"
+  },
+  "0195b": {
+    "episode": 195,
+    "segment": "b",
+    "title_ja": "こむすびまんとたまごどんまん",
+    "title_ro": "Komusubimantotamagodonman"
+  },
+  "0196a": {
+    "episode": 196,
+    "segment": "a",
+    "title_ja": "アンパンマンとふうりんくん",
+    "title_ro": "Anpanman to Fuurinkun"
+  },
+  "0196b": {
+    "episode": 196,
+    "segment": "b",
+    "title_ja": "ホラーマンとピエロマン",
+    "title_ro": "Horaaman to Pieroman"
+  },
+  "0197a": {
+    "episode": 197,
+    "segment": "a",
+    "title_ja": "アンパンマンとうなどんまん",
+    "title_ro": "Anpanman to Unadonman"
+  },
+  "0197b": {
+    "episode": 197,
+    "segment": "b",
+    "title_ja": "アンパンまつりとおめんまん",
+    "title_ro": "Anpan Matsuritoomenman"
+  },
+  "0198a": {
+    "episode": 198,
+    "segment": "a",
+    "title_ja": "月のうさぎ・ハネルくん",
+    "title_ro": "Gatsu Nousagi ・haneru Kun"
+  },
+  "0198b": {
+    "episode": 198,
+    "segment": "b",
+    "title_ja": "こむすびまんとブラックおむすびまん",
+    "title_ro": "Komusubimanto Burakku Omusubiman"
+  },
+  "0199a": {
+    "episode": 199,
+    "segment": "a",
+    "title_ja": "アンパンマンとクレヨンの国",
+    "title_ro": "Anpanman to Kureyon no Kuni"
+  },
+  "0199b": {
+    "episode": 199,
+    "segment": "b",
+    "title_ja": "アンパンマンと空とぶベッドくん",
+    "title_ro": "Anpanman to Sora Tobu Beddo Kun"
+  },
+  "0200a": {
+    "episode": 200,
+    "segment": "a",
+    "title_ja": "メロンパンナちゃん誕生",
+    "title_ro": "Meronpanna Chan Tanjou"
+  },
+  "0201a": {
+    "episode": 201,
+    "segment": "a",
+    "title_ja": "あかちゃんまんとメロンパンナちゃん",
+    "title_ro": "Akachanmanto Meronpanna Chan"
+  },
+  "0201b": {
+    "episode": 201,
+    "segment": "b",
+    "title_ja": "アンパンマンと3ばいばいきんまん",
+    "title_ro": "Anpanman to 3 Baibaikinman"
+  },
+  "0202a": {
+    "episode": 202,
+    "segment": "a",
+    "title_ja": "アンパンマンとバイキンタイムマシン",
+    "title_ro": "Anpanman to Baikintaimumashin"
+  },
+  "0202b": {
+    "episode": 202,
+    "segment": "b",
+    "title_ja": "アンパンマンとバイキンシューズ",
+    "title_ro": "Anpanman to Baikinshuuzu"
+  },
+  "0203a": {
+    "episode": 203,
+    "segment": "a",
+    "title_ja": "メロンパンナとハンバーガーキッド",
+    "title_ro": "Meronpanna to Hanbaagaakiddo"
+  },
+  "0203b": {
+    "episode": 203,
+    "segment": "b",
+    "title_ja": "アンパン三銃士とバイキング",
+    "title_ro": "Anpan Sanjuushi to Baikingu"
+  },
+  "0204a": {
+    "episode": 204,
+    "segment": "a",
+    "title_ja": "ドキンちゃんの誕生日",
+    "title_ro": "Dokin Channo Tanjoubi"
+  },
+  "0204b": {
+    "episode": 204,
+    "segment": "b",
+    "title_ja": "カレーパンマンとハッパちゃん",
+    "title_ro": "Kareepanman to Happa Chan"
+  },
+  "0205a": {
+    "episode": 205,
+    "segment": "a",
+    "title_ja": "かえってきたハロウィンマン",
+    "title_ro": "Kaettekita Harouinman"
+  },
+  "0205b": {
+    "episode": 205,
+    "segment": "b",
+    "title_ja": "アンパンマンとこゆきちゃん",
+    "title_ro": "Anpanman to Koyukichan"
+  },
+  "0206a": {
+    "episode": 206,
+    "segment": "a",
+    "title_ja": "アンパンマンとバイキン大魔王",
+    "title_ro": "Anpanman to Baikin Daimaou"
+  },
+  "0207a": {
+    "episode": 207,
+    "segment": "a",
+    "title_ja": "はみがきまんとアンコラ",
+    "title_ro": "Hamigakimanto Ankora"
+  },
+  "0207b": {
+    "episode": 207,
+    "segment": "b",
+    "title_ja": "アンパンマンとジグソーくん",
+    "title_ro": "Anpanman to Jigusoo Kun"
+  },
+  "0208a": {
+    "episode": 208,
+    "segment": "a",
+    "title_ja": "アンパンマンとクリ・キン・トン",
+    "title_ro": "Anpanman to Kuri・kin・ton"
+  },
+  "0208b": {
+    "episode": 208,
+    "segment": "b",
+    "title_ja": "アンパンマンとおしるこちゃん",
+    "title_ro": "Anpanman to Oshirukochan"
+  },
+  "0209a": {
+    "episode": 209,
+    "segment": "a",
+    "title_ja": "ジャムおじさんとありがとうの日",
+    "title_ro": "Jamu Ojisantoarigatouno Nichi"
+  },
+  "0209b": {
+    "episode": 209,
+    "segment": "b",
+    "title_ja": "アリンコキッドとりんりん谷",
+    "title_ro": "Arinkokiddo to Rinrin Tani"
+  },
+  "0210a": {
+    "episode": 210,
+    "segment": "a",
+    "title_ja": "ヨーカンマダムとふでじいさん",
+    "title_ro": "Yookanmadamu to Fudejiisan"
+  },
+  "0210b": {
+    "episode": 210,
+    "segment": "b",
+    "title_ja": "メロンパンナとシブガキじいさん",
+    "title_ro": "Meronpanna to Shibugaki Jiisan"
+  },
+  "0211a": {
+    "episode": 211,
+    "segment": "a",
+    "title_ja": "アンパンマンとあいうえおランド",
+    "title_ro": "Anpanman to Aiueo Rando"
+  },
+  "0211b": {
+    "episode": 211,
+    "segment": "b",
+    "title_ja": "アンパンマンとカギの子キーちゃん",
+    "title_ro": "Anpanman to Kagi no Ko Kii Chan"
+  },
+  "0212a": {
+    "episode": 212,
+    "segment": "a",
+    "title_ja": "おむすびまんと鉄火のマキちゃん",
+    "title_ro": "Omusubimanto Tekka no Maki Chan"
+  },
+  "0212b": {
+    "episode": 212,
+    "segment": "b",
+    "title_ja": "ドキンちゃんのダンスパーティー",
+    "title_ro": "Dokin Channo Dansupaateii"
+  },
+  "0213a": {
+    "episode": 213,
+    "segment": "a",
+    "title_ja": "とどけ!みんなのクリスマスケーキ",
+    "title_ro": "Todoke ! Minnano Kurisumasukeeki"
+  },
+  "0214a": {
+    "episode": 214,
+    "segment": "a",
+    "title_ja": "かぜこんこんとヤッシーくん",
+    "title_ro": "Kazekonkonto Yasshii Kun"
+  },
+  "0214b": {
+    "episode": 214,
+    "segment": "b",
+    "title_ja": "アンパンマンとさんかくまん",
+    "title_ro": "Anpanman to Sankakuman"
+  },
+  "0215a": {
+    "episode": 215,
+    "segment": "a",
+    "title_ja": "らーめんてんしと中華の国",
+    "title_ro": "Raamentenshito Chuuka no Kuni"
+  },
+  "0215b": {
+    "episode": 215,
+    "segment": "b",
+    "title_ja": "アンパンマンとペーパーくん",
+    "title_ro": "Anpanman to Peepaa Kun"
+  },
+  "0216a": {
+    "episode": 216,
+    "segment": "a",
+    "title_ja": "アンパンマンとおだてどり",
+    "title_ro": "Anpanman to Odatedori"
+  },
+  "0216b": {
+    "episode": 216,
+    "segment": "b",
+    "title_ja": "ちゅうしゃき先生とバイキンマスク",
+    "title_ro": "Chuushaki Sensei to Baikinmasuku"
+  },
+  "0217a": {
+    "episode": 217,
+    "segment": "a",
+    "title_ja": "アンパンマンとまる・さんかく・しかく",
+    "title_ro": "Anpanman to Maru ・ Sankaku ・ Shikaku"
+  },
+  "0217b": {
+    "episode": 217,
+    "segment": "b",
+    "title_ja": "アンパンマンとおさびし山のさびたろう",
+    "title_ro": "Anpanman to Osabishi Yama Nosabitarou"
+  },
+  "0218a": {
+    "episode": 218,
+    "segment": "a",
+    "title_ja": "メロンパンナとチョコレート島",
+    "title_ro": "Meronpanna to Chokoreeto Shima"
+  },
+  "0218b": {
+    "episode": 218,
+    "segment": "b",
+    "title_ja": "アンパンマンといないいないバルーン",
+    "title_ro": "Anpanman to Inaiinai Baruun"
+  },
+  "0219a": {
+    "episode": 219,
+    "segment": "a",
+    "title_ja": "アンパンマンとフライぼうや",
+    "title_ro": "Anpanman to Furai Bouya"
+  },
+  "0219b": {
+    "episode": 219,
+    "segment": "b",
+    "title_ja": "アンパンマンとびっくりカメラ",
+    "title_ro": "Anpanman to Bikkuri Kamera"
+  },
+  "0220a": {
+    "episode": 220,
+    "segment": "a",
+    "title_ja": "てぶくろまんとなだれおに",
+    "title_ro": "Tebukuromantonadareoni"
+  },
+  "0220b": {
+    "episode": 220,
+    "segment": "b",
+    "title_ja": "ばいきんまんのニャンニャン大作戦",
+    "title_ro": "Baikinmanno Nyannyan Daisakusen"
+  },
+  "0221a": {
+    "episode": 221,
+    "segment": "a",
+    "title_ja": "アンパンマンとたのしいひなまつり",
+    "title_ro": "Anpanman to Tanoshiihinamatsuri"
+  },
+  "0221b": {
+    "episode": 221,
+    "segment": "b",
+    "title_ja": "アンパンマンとやさしいばいきんまん",
+    "title_ro": "Anpanman to Yasashiibaikinman"
+  },
+  "0222a": {
+    "episode": 222,
+    "segment": "a",
+    "title_ja": "げんこつくんといしころくん",
+    "title_ro": "Genkotsukuntoishikorokun"
+  },
+  "0222b": {
+    "episode": 222,
+    "segment": "b",
+    "title_ja": "アンパンマンと星の子ヒカルン",
+    "title_ro": "Anpanman to Hoshi no Ko Hikarun"
+  },
+  "0223a": {
+    "episode": 223,
+    "segment": "a",
+    "title_ja": "アンパンマンとヤドカリくん",
+    "title_ro": "Anpanman to Yadokari Kun"
+  },
+  "0223b": {
+    "episode": 223,
+    "segment": "b",
+    "title_ja": "アンパンマンとてんとう虫のくに",
+    "title_ro": "Anpanman to Tentou Mushi Nokuni"
+  },
+  "0224a": {
+    "episode": 224,
+    "segment": "a",
+    "title_ja": "アンパンマンとジャイアントばいきんまん",
+    "title_ro": "Anpanman to Jaianto Baikinman"
+  },
+  "0225a": {
+    "episode": 225,
+    "segment": "a",
+    "title_ja": "アンパンマンとトロロくん",
+    "title_ro": "Anpanman to Tororo Kun"
+  },
+  "0225b": {
+    "episode": 225,
+    "segment": "b",
+    "title_ja": "アンパンマンと花咲かぼうや",
+    "title_ro": "Anpanman to Hanasaki Kabouya"
+  },
+  "0226a": {
+    "episode": 226,
+    "segment": "a",
+    "title_ja": "アンパンマンとランドセルくん",
+    "title_ro": "Anpanman to Randoseru Kun"
+  },
+  "0226b": {
+    "episode": 226,
+    "segment": "b",
+    "title_ja": "アンパンマンとフラワーひめ",
+    "title_ro": "Anpanman to Furawaa Hime"
+  },
+  "0227a": {
+    "episode": 227,
+    "segment": "a",
+    "title_ja": "アンパンマンとスロット男爵",
+    "title_ro": "Anpanman to Surotto Danshaku"
+  },
+  "0227b": {
+    "episode": 227,
+    "segment": "b",
+    "title_ja": "アンパンマンとだるまロボット",
+    "title_ro": "Anpanman to Daruma Robotto"
+  },
+  "0228a": {
+    "episode": 228,
+    "segment": "a",
+    "title_ja": "SLマンともぐりん",
+    "title_ro": "Sl Man to Mogurin"
+  },
+  "0228b": {
+    "episode": 228,
+    "segment": "b",
+    "title_ja": "アンパンマンとシャンプーちゃん",
+    "title_ro": "Anpanman to Shanpuu Chan"
+  },
+  "0229a": {
+    "episode": 229,
+    "segment": "a",
+    "title_ja": "ぶんぶん島の大冒険",
+    "title_ro": "Bunbun Shima no Daibouken"
+  },
+  "0230a": {
+    "episode": 230,
+    "segment": "a",
+    "title_ja": "アンパンマンとさくらもちねえさん",
+    "title_ro": "Anpanman to Sakuramochineesan"
+  },
+  "0230b": {
+    "episode": 230,
+    "segment": "b",
+    "title_ja": "アンパンマンとスポンジマン",
+    "title_ro": "Anpanman to Suponjiman"
+  },
+  "0231a": {
+    "episode": 231,
+    "segment": "a",
+    "title_ja": "かまめしどんとたけのこちゃん",
+    "title_ro": "Kamameshidontotakenokochan"
+  },
+  "0231b": {
+    "episode": 231,
+    "segment": "b",
+    "title_ja": "トマトちゃんとケチャップリン",
+    "title_ro": "Tomato Chanto Kechappurin"
+  },
+  "0232a": {
+    "episode": 232,
+    "segment": "a",
+    "title_ja": "アンパンマンとそよかぜくん",
+    "title_ro": "Anpanman to Soyokazekun"
+  },
+  "0232b": {
+    "episode": 232,
+    "segment": "b",
+    "title_ja": "アンパンマンとでんきなまずまん",
+    "title_ro": "Anpanman to Denkinamazuman"
+  },
+  "0233a": {
+    "episode": 233,
+    "segment": "a",
+    "title_ja": "アンパンマンとうなぎまん",
+    "title_ro": "Anpanman to Unagiman"
+  },
+  "0233b": {
+    "episode": 233,
+    "segment": "b",
+    "title_ja": "アンパンマンとニンニクこぞう",
+    "title_ro": "Anpanman to Ninniku Kozou"
+  },
+  "0234a": {
+    "episode": 234,
+    "segment": "a",
+    "title_ja": "パラソルマンとてるてるぼうずまん",
+    "title_ro": "Parasoruman to Teruterubouzuman"
+  },
+  "0234b": {
+    "episode": 234,
+    "segment": "b",
+    "title_ja": "アンパンマンとクッションマン",
+    "title_ro": "Anpanman to Kusshonman"
+  },
+  "0235a": {
+    "episode": 235,
+    "segment": "a",
+    "title_ja": "アンパンマンとわたあめぼうや",
+    "title_ro": "Anpanman to Wataamebouya"
+  },
+  "0235b": {
+    "episode": 235,
+    "segment": "b",
+    "title_ja": "あかちゃんまんとバイキンロボット",
+    "title_ro": "Akachanmanto Baikinrobotto"
+  },
+  "0236a": {
+    "episode": 236,
+    "segment": "a",
+    "title_ja": "ドキンちゃんとクリスタルひめ",
+    "title_ro": "Dokin Chanto Kurisutaru Hime"
+  },
+  "0236b": {
+    "episode": 236,
+    "segment": "b",
+    "title_ja": "アンパンマンとイカめしまん",
+    "title_ro": "Anpanman to Ika Meshiman"
+  },
+  "0237a": {
+    "episode": 237,
+    "segment": "a",
+    "title_ja": "ばいきんまんとへんしんカード",
+    "title_ro": "Baikinman to Henshin Kaado"
+  },
+  "0237b": {
+    "episode": 237,
+    "segment": "b",
+    "title_ja": "ハンバーガーキッドとコロッケキッド",
+    "title_ro": "Hanbaagaakiddo to Korokkekiddo"
+  },
+  "0238a": {
+    "episode": 238,
+    "segment": "a",
+    "title_ja": "ランプくんとこおりおに",
+    "title_ro": "Ranpu Kuntokoorioni"
+  },
+  "0238b": {
+    "episode": 238,
+    "segment": "b",
+    "title_ja": "アンパンマンとマイクマン",
+    "title_ro": "Anpanman to Maikuman"
+  },
+  "0239a": {
+    "episode": 239,
+    "segment": "a",
+    "title_ja": "アンパンマンとバイキン花火",
+    "title_ro": "Anpanman to Baikin Hanabi"
+  },
+  "0239b": {
+    "episode": 239,
+    "segment": "b",
+    "title_ja": "アンパンマンとかざぐるまん",
+    "title_ro": "Anpanman to Kazaguruman"
+  },
+  "0240a": {
+    "episode": 240,
+    "segment": "a",
+    "title_ja": "バイキンサーカスとブラックピエロ",
+    "title_ro": "Baikinsaakasu to Burakkupiero"
+  },
+  "0241a": {
+    "episode": 241,
+    "segment": "a",
+    "title_ja": "アンパンマンといろえんぴつの島",
+    "title_ro": "Anpanman to Iroenpitsuno Shima"
+  },
+  "0241b": {
+    "episode": 241,
+    "segment": "b",
+    "title_ja": "アンパンマンとキュウリのモミモミさん",
+    "title_ro": "Anpanman to Kyuuri no Momimomi San"
+  },
+  "0242a": {
+    "episode": 242,
+    "segment": "a",
+    "title_ja": "ばいきんまんとニンジャの城",
+    "title_ro": "Baikinman to Ninja no Shiro"
+  },
+  "0242b": {
+    "episode": 242,
+    "segment": "b",
+    "title_ja": "アンパンマンとシュガーランド",
+    "title_ro": "Anpanman to Shugaarando"
+  },
+  "0243a": {
+    "episode": 243,
+    "segment": "a",
+    "title_ja": "アンパンマンとキャラメルママ",
+    "title_ro": "Anpanman to Kyaramerumama"
+  },
+  "0243b": {
+    "episode": 243,
+    "segment": "b",
+    "title_ja": "アンパンマンとオオカビ男",
+    "title_ro": "Anpanman to Ookabi Otoko"
+  },
+  "0244a": {
+    "episode": 244,
+    "segment": "a",
+    "title_ja": "ばいきんまんとブック先生",
+    "title_ro": "Baikinman to Bukku Sensei"
+  },
+  "0244b": {
+    "episode": 244,
+    "segment": "b",
+    "title_ja": "ホラーマンとまくらこぞう",
+    "title_ro": "Horaaman to Makurakozou"
+  },
+  "0245a": {
+    "episode": 245,
+    "segment": "a",
+    "title_ja": "アンパンマンとあかちゃん魔王",
+    "title_ro": "Anpanman to Akachan Maou"
+  },
+  "0246a": {
+    "episode": 246,
+    "segment": "a",
+    "title_ja": "エンピツぼうやとカバオくん",
+    "title_ro": "Enpitsu Bouyato Kabao Kun"
+  },
+  "0246b": {
+    "episode": 246,
+    "segment": "b",
+    "title_ja": "トンボくんとメガネざるくん",
+    "title_ro": "Tonbo Kunto Megane Zarukun"
+  },
+  "0247a": {
+    "episode": 247,
+    "segment": "a",
+    "title_ja": "アンパンマンとデンチくん",
+    "title_ro": "Anpanman to Denchi Kun"
+  },
+  "0247b": {
+    "episode": 247,
+    "segment": "b",
+    "title_ja": "かえってきたザーマス・ボンド",
+    "title_ro": "Kaettekita Zaamasu・bondo"
+  },
+  "0248a": {
+    "episode": 248,
+    "segment": "a",
+    "title_ja": "おこのみやきまんとたこやきまん",
+    "title_ro": "Okonomiyakimantotakoyakiman"
+  },
+  "0248b": {
+    "episode": 248,
+    "segment": "b",
+    "title_ja": "ドン・キ・ホタテの宝さがし",
+    "title_ro": "Don・ki・hotate no Takara Sagashi"
+  },
+  "0249a": {
+    "episode": 249,
+    "segment": "a",
+    "title_ja": "ばいきんまんと魔法のホウキ",
+    "title_ro": "Baikinman to Mahou no Houki"
+  },
+  "0249b": {
+    "episode": 249,
+    "segment": "b",
+    "title_ja": "メロンパンナとストーンマン",
+    "title_ro": "Meronpanna to Sutoonman"
+  },
+  "0250a": {
+    "episode": 250,
+    "segment": "a",
+    "title_ja": "消えたジャムおじさん",
+    "title_ro": "Kie Ta Jamu Ojisan"
+  },
+  "0251a": {
+    "episode": 251,
+    "segment": "a",
+    "title_ja": "アンパンマンとくろこぞう",
+    "title_ro": "Anpanman to Kurokozou"
+  },
+  "0251b": {
+    "episode": 251,
+    "segment": "b",
+    "title_ja": "アンパンマンとスプレーくん",
+    "title_ro": "Anpanman to Supuree Kun"
+  },
+  "0252a": {
+    "episode": 252,
+    "segment": "a",
+    "title_ja": "アンパンマンと魔法のハンマー",
+    "title_ro": "Anpanman to Mahou no Hanmaa"
+  },
+  "0252b": {
+    "episode": 252,
+    "segment": "b",
+    "title_ja": "かまぼこくんとわさびさん",
+    "title_ro": "Kamabokokuntowasabisan"
+  },
+  "0253a": {
+    "episode": 253,
+    "segment": "a",
+    "title_ja": "カレーパンマンとラッキョウくん",
+    "title_ro": "Kareepanman to Rakkyou Kun"
+  },
+  "0253b": {
+    "episode": 253,
+    "segment": "b",
+    "title_ja": "アンパンマンとにんぎょのサニー姫",
+    "title_ro": "Anpanman to Ningyono Sanii Hime"
+  },
+  "0254a": {
+    "episode": 254,
+    "segment": "a",
+    "title_ja": "アンパンマンとドロンコくん",
+    "title_ro": "Anpanman to Doronko Kun"
+  },
+  "0254b": {
+    "episode": 254,
+    "segment": "b",
+    "title_ja": "かまめしどんとカメエモンさん",
+    "title_ro": "Kamameshidonto Kameemon San"
+  },
+  "0255a": {
+    "episode": 255,
+    "segment": "a",
+    "title_ja": "レインボー王子とにじのくに",
+    "title_ro": "Reinboo Ouji Tonijinokuni"
+  },
+  "0256a": {
+    "episode": 256,
+    "segment": "a",
+    "title_ja": "こむすびまんとうなどんまん",
+    "title_ro": "Komusubimantounadonman"
+  },
+  "0256b": {
+    "episode": 256,
+    "segment": "b",
+    "title_ja": "アンパンマンとどんぐりコロちゃん",
+    "title_ro": "Anpanman to Donguri Koro Chan"
+  },
+  "0257a": {
+    "episode": 257,
+    "segment": "a",
+    "title_ja": "ばいきんまんとかさおばけ",
+    "title_ro": "Baikinman to Kasaobake"
+  },
+  "0257b": {
+    "episode": 257,
+    "segment": "b",
+    "title_ja": "ナシオとペアコとクリスケさん",
+    "title_ro": "Nashio to Peako to Kurisuke San"
+  },
+  "0258a": {
+    "episode": 258,
+    "segment": "a",
+    "title_ja": "アンパンマンと水たまりのくに",
+    "title_ro": "Anpanman to Mizu Tamarinokuni"
+  },
+  "0258b": {
+    "episode": 258,
+    "segment": "b",
+    "title_ja": "カレーパンマンとおしるこちゃん",
+    "title_ro": "Kareepanman to Oshirukochan"
+  },
+  "0259a": {
+    "episode": 259,
+    "segment": "a",
+    "title_ja": "ほしがきおじさんとかきくけこちゃん",
+    "title_ro": "Hoshigakiojisantokakikukekochan"
+  },
+  "0259b": {
+    "episode": 259,
+    "segment": "b",
+    "title_ja": "アサリどんとシジミさん",
+    "title_ro": "Asari Donto Shijimi San"
+  },
+  "0260a": {
+    "episode": 260,
+    "segment": "a",
+    "title_ja": "ドクター・ヒヤリとおばけの城",
+    "title_ro": "Dokutaa・hiyari to Obakeno Shiro"
+  },
+  "0261a": {
+    "episode": 261,
+    "segment": "a",
+    "title_ja": "アンパンマンとけいとだまん",
+    "title_ro": "Anpanman to Keitodaman"
+  },
+  "0261b": {
+    "episode": 261,
+    "segment": "b",
+    "title_ja": "ばいきんまんとへんしんだぬき",
+    "title_ro": "Baikinman to Henshindanuki"
+  },
+  "0262a": {
+    "episode": 262,
+    "segment": "a",
+    "title_ja": "南の島のホワイトクリスマス",
+    "title_ro": "Minami no Shima no Howaitokurisumasu"
+  },
+  "0263a": {
+    "episode": 263,
+    "segment": "a",
+    "title_ja": "あかかぶさんとしろかぶさん",
+    "title_ro": "Akakabusantoshirokabusan"
+  },
+  "0263b": {
+    "episode": 263,
+    "segment": "b",
+    "title_ja": "アンパンマンとてんぐぼうや",
+    "title_ro": "Anpanman to Tengubouya"
+  },
+  "0264a": {
+    "episode": 264,
+    "segment": "a",
+    "title_ja": "アンパンマンともちおばさん",
+    "title_ro": "Anpanman to Mochiobasan"
+  },
+  "0264b": {
+    "episode": 264,
+    "segment": "b",
+    "title_ja": "アンパンマンとサッカーぼうや",
+    "title_ro": "Anpanman to Sakkaa Bouya"
+  },
+  "0265a": {
+    "episode": 265,
+    "segment": "a",
+    "title_ja": "あかちゃんまんとユキダルマン",
+    "title_ro": "Akachanmanto Yukidaruman"
+  },
+  "0265b": {
+    "episode": 265,
+    "segment": "b",
+    "title_ja": "かつぶしまんと忍者のニャンジャ",
+    "title_ro": "Katsubushimanto Ninja no Nyanja"
+  },
+  "0266a": {
+    "episode": 266,
+    "segment": "a",
+    "title_ja": "アンパンマンとふりかけフリコ",
+    "title_ro": "Anpanman to Furikake Furiko"
+  },
+  "0266b": {
+    "episode": 266,
+    "segment": "b",
+    "title_ja": "アンパンマンとらんぼうや",
+    "title_ro": "Anpanman to Ranbouya"
+  },
+  "0267a": {
+    "episode": 267,
+    "segment": "a",
+    "title_ja": "アンパンマンと夕日のキャットマン",
+    "title_ro": "Anpanman to Yuuhi no Kyattoman"
+  },
+  "0267b": {
+    "episode": 267,
+    "segment": "b",
+    "title_ja": "切手ライオンとフートーどり",
+    "title_ro": "Kitte Raion to Fuutoo Dori"
+  },
+  "0268a": {
+    "episode": 268,
+    "segment": "a",
+    "title_ja": "こむすびまんといなりずしのみこと",
+    "title_ro": "Komusubimantoinarizushinomikoto"
+  },
+  "0268b": {
+    "episode": 268,
+    "segment": "b",
+    "title_ja": "カレーパンマンとトンガラシ",
+    "title_ro": "Kareepanman to Tongarashi"
+  },
+  "0269a": {
+    "episode": 269,
+    "segment": "a",
+    "title_ja": "チョコレートマンとバレンタインデー",
+    "title_ro": "Chokoreetoman to Barentaindee"
+  },
+  "0269b": {
+    "episode": 269,
+    "segment": "b",
+    "title_ja": "しょくぱんまんとにせしょくぱんまん",
+    "title_ro": "Shokupanman to Niseshokupanman"
+  },
+  "0270a": {
+    "episode": 270,
+    "segment": "a",
+    "title_ja": "しょくぱんまんとおべんとうまん",
+    "title_ro": "Shokupanman to Obentouman"
+  },
+  "0270b": {
+    "episode": 270,
+    "segment": "b",
+    "title_ja": "ハンバーガーキッドとサボテンマン",
+    "title_ro": "Hanbaagaakiddo to Sabotenman"
+  },
+  "0271a": {
+    "episode": 271,
+    "segment": "a",
+    "title_ja": "アンパンマンとおでん一座",
+    "title_ro": "Anpanman to Oden Ichiza"
+  },
+  "0271b": {
+    "episode": 271,
+    "segment": "b",
+    "title_ja": "アンパンマンと金色のさかな",
+    "title_ro": "Anpanman to Kin'iro Nosakana"
+  },
+  "0272a": {
+    "episode": 272,
+    "segment": "a",
+    "title_ja": "アンパンマンとホネホネザウルス",
+    "title_ro": "Anpanman to Honehonezaurusu"
+  },
+  "0272b": {
+    "episode": 272,
+    "segment": "b",
+    "title_ja": "アンパンマンとまんまるマシュマロさん",
+    "title_ro": "Anpanman to Manmaru Mashumaro San"
+  },
+  "0273a": {
+    "episode": 273,
+    "segment": "a",
+    "title_ja": "ドキンちゃんと紙ふうせんポンポン",
+    "title_ro": "Dokin Chanto Kamifuusen Ponpon"
+  },
+  "0273b": {
+    "episode": 273,
+    "segment": "b",
+    "title_ja": "アンパンマンとれんこんまん",
+    "title_ro": "Anpanman to Renkonman"
+  },
+  "0274a": {
+    "episode": 274,
+    "segment": "a",
+    "title_ja": "アンパンマンとイモ男爵",
+    "title_ro": "Anpanman to Imo Danshaku"
+  },
+  "0274b": {
+    "episode": 274,
+    "segment": "b",
+    "title_ja": "アンパンマンと空飛ぶパイの国",
+    "title_ro": "Anpanman to Kuuhi Bu Pai no Kuni"
+  },
+  "0275a": {
+    "episode": 275,
+    "segment": "a",
+    "title_ja": "メロンパンナとバイキン仙人",
+    "title_ro": "Meronpanna to Baikin Sennin"
+  },
+  "0275b": {
+    "episode": 275,
+    "segment": "b",
+    "title_ja": "アンパンマンとカツドンマン",
+    "title_ro": "Anpanman to Katsudonman"
+  },
+  "0276a": {
+    "episode": 276,
+    "segment": "a",
+    "title_ja": "メロンパンナとはるかぜさん",
+    "title_ro": "Meronpanna to Harukazesan"
+  },
+  "0276b": {
+    "episode": 276,
+    "segment": "b",
+    "title_ja": "アンパンマンとタイヤくん",
+    "title_ro": "Anpanman to Taiya Kun"
+  },
+  "0277a": {
+    "episode": 277,
+    "segment": "a",
+    "title_ja": "すすめ!アンパンマン号",
+    "title_ro": "Susume ! Anpanman Gou"
+  },
+  "0278a": {
+    "episode": 278,
+    "segment": "a",
+    "title_ja": "やかんまんとケトルマン",
+    "title_ro": "Yakanmanto Ketoruman"
+  },
+  "0278b": {
+    "episode": 278,
+    "segment": "b",
+    "title_ja": "ナットーマンとトロロくん",
+    "title_ro": "Nattooman to Tororo Kun"
+  },
+  "0279a": {
+    "episode": 279,
+    "segment": "a",
+    "title_ja": "こむすびまんとてんぐぼうや",
+    "title_ro": "Komusubimantotengubouya"
+  },
+  "0279b": {
+    "episode": 279,
+    "segment": "b",
+    "title_ja": "アンパンマンとヨーヨーマン",
+    "title_ro": "Anpanman to Yooyooman"
+  },
+  "0280a": {
+    "episode": 280,
+    "segment": "a",
+    "title_ja": "メロンパンナとクレヨンの国",
+    "title_ro": "Meronpanna to Kureyon no Kuni"
+  },
+  "0280b": {
+    "episode": 280,
+    "segment": "b",
+    "title_ja": "アンパンマンとチビケロくん",
+    "title_ro": "Anpanman to Chibikero Kun"
+  },
+  "0281a": {
+    "episode": 281,
+    "segment": "a",
+    "title_ja": "アンパンマンとサラコちゃん",
+    "title_ro": "Anpanman to Sarako Chan"
+  },
+  "0281b": {
+    "episode": 281,
+    "segment": "b",
+    "title_ja": "アンパンマンとバイキンびっくりばこ",
+    "title_ro": "Anpanman to Baikin Bikkuribako"
+  },
+  "0282a": {
+    "episode": 282,
+    "segment": "a",
+    "title_ja": "アンパンマンとタケトンボマン",
+    "title_ro": "Anpanman to Taketonboman"
+  },
+  "0282b": {
+    "episode": 282,
+    "segment": "b",
+    "title_ja": "らーめんてんしとペッパーけいぶ",
+    "title_ro": "Raamentenshito Peppaa Keibu"
+  },
+  "0283a": {
+    "episode": 283,
+    "segment": "a",
+    "title_ja": "アンパンマンとおすしのくに",
+    "title_ro": "Anpanman to Osushinokuni"
+  },
+  "0284a": {
+    "episode": 284,
+    "segment": "a",
+    "title_ja": "はみがきまんとムシバキンマン",
+    "title_ro": "Hamigakimanto Mushibakinman"
+  },
+  "0284b": {
+    "episode": 284,
+    "segment": "b",
+    "title_ja": "ばいきんまんとパラソルマン",
+    "title_ro": "Baikinman to Parasoruman"
+  },
+  "0285a": {
+    "episode": 285,
+    "segment": "a",
+    "title_ja": "アンパンマンとチャツミちゃん",
+    "title_ro": "Anpanman to Chatsumi Chan"
+  },
+  "0285b": {
+    "episode": 285,
+    "segment": "b",
+    "title_ja": "アンパンマンとツンツンどり",
+    "title_ro": "Anpanman to Tsuntsun Dori"
+  },
+  "0286a": {
+    "episode": 286,
+    "segment": "a",
+    "title_ja": "ドキンちゃんとヘルスメーターマン",
+    "title_ro": "Dokin Chanto Herusumeetaaman"
+  },
+  "0286b": {
+    "episode": 286,
+    "segment": "b",
+    "title_ja": "オムライスくんとケチャップリン",
+    "title_ro": "Omuraisu Kunto Kechappurin"
+  },
+  "0287a": {
+    "episode": 287,
+    "segment": "a",
+    "title_ja": "かつぶしまんとカステラ男爵",
+    "title_ro": "Katsubushimanto Kasutera Danshaku"
+  },
+  "0287b": {
+    "episode": 287,
+    "segment": "b",
+    "title_ja": "アンパンマンとモモコちゃん",
+    "title_ro": "Anpanman to Momoko Chan"
+  },
+  "0288a": {
+    "episode": 288,
+    "segment": "a",
+    "title_ja": "シュガーぼうやとしおぼうや",
+    "title_ro": "Shugaa Bouyatoshiobouya"
+  },
+  "0288b": {
+    "episode": 288,
+    "segment": "b",
+    "title_ja": "ガマグチへびとバイキンメガネ",
+    "title_ro": "Gamaguchi Hebito Baikinmegane"
+  },
+  "0289a": {
+    "episode": 289,
+    "segment": "a",
+    "title_ja": "アンパンマンとねがい星かなえ星",
+    "title_ro": "Anpanman to Negai Hoshi Kanae Hoshi"
+  },
+  "0289b": {
+    "episode": 289,
+    "segment": "b",
+    "title_ja": "アンパンマンとスイカくん",
+    "title_ro": "Anpanman to Suika Kun"
+  },
+  "0290a": {
+    "episode": 290,
+    "segment": "a",
+    "title_ja": "アンパンマンとジグソーパズルの国",
+    "title_ro": "Anpanman to Jigusoopazuru no Kuni"
+  },
+  "0291a": {
+    "episode": 291,
+    "segment": "a",
+    "title_ja": "ホットドッグとカッパのカピー",
+    "title_ro": "Hottodoggu to Kappa no Kapii"
+  },
+  "0291b": {
+    "episode": 291,
+    "segment": "b",
+    "title_ja": "アンパンマンとウキワくん",
+    "title_ro": "Anpanman to Ukiwa Kun"
+  },
+  "0292a": {
+    "episode": 292,
+    "segment": "a",
+    "title_ja": "アンパンマンとジョウロぼうや",
+    "title_ro": "Anpanman to Jouro Bouya"
+  },
+  "0292b": {
+    "episode": 292,
+    "segment": "b",
+    "title_ja": "アンパンマンとうめたろう",
+    "title_ro": "Anpanman to Umetarou"
+  },
+  "0293a": {
+    "episode": 293,
+    "segment": "a",
+    "title_ja": "アンパンマンとひょうたんくん",
+    "title_ro": "Anpanman to Hyoutankun"
+  },
+  "0293b": {
+    "episode": 293,
+    "segment": "b",
+    "title_ja": "アンパンマンとコルクぼうや",
+    "title_ro": "Anpanman to Koruku Bouya"
+  },
+  "0294a": {
+    "episode": 294,
+    "segment": "a",
+    "title_ja": "青い海をすくえ!チビマリンの大冒険",
+    "title_ro": "Aoi Umi Wosukue ! Chibimarin no Daibouken"
+  },
+  "0295a": {
+    "episode": 295,
+    "segment": "a",
+    "title_ja": "メロンパンナとアイスマントリオ",
+    "title_ro": "Meronpanna to Aisumantorio"
+  },
+  "0295b": {
+    "episode": 295,
+    "segment": "b",
+    "title_ja": "ばいきんまんとへんしんマシーン",
+    "title_ro": "Baikinman to Henshin Mashiin"
+  },
+  "0296a": {
+    "episode": 296,
+    "segment": "a",
+    "title_ja": "クータンとバイキンくじら",
+    "title_ro": "Kuutan to Baikin Kujira"
+  },
+  "0296b": {
+    "episode": 296,
+    "segment": "b",
+    "title_ja": "ニンニクこぞうとギョーザくん",
+    "title_ro": "Ninniku Kozouto Gyooza Kun"
+  },
+  "0297a": {
+    "episode": 297,
+    "segment": "a",
+    "title_ja": "こむすびまんとバイキン強盗団",
+    "title_ro": "Komusubimanto Baikin Goutou Dan"
+  },
+  "0298a": {
+    "episode": 298,
+    "segment": "a",
+    "title_ja": "メロンパンナとおかしの国",
+    "title_ro": "Meronpanna to Okashino Kuni"
+  },
+  "0298b": {
+    "episode": 298,
+    "segment": "b",
+    "title_ja": "ベビードーナツのおつかい",
+    "title_ro": "Bebiidoonatsu no Otsukai"
+  },
+  "0299a": {
+    "episode": 299,
+    "segment": "a",
+    "title_ja": "SLマンとバイキンじいさん",
+    "title_ro": "Sl Man to Baikin Jiisan"
+  },
+  "0299b": {
+    "episode": 299,
+    "segment": "b",
+    "title_ja": "うずまきぱんたとクッキーキャット",
+    "title_ro": "Uzumakipantato Kukkiikyatto"
+  },
+  "0300a": {
+    "episode": 300,
+    "segment": "a",
+    "title_ja": "ロールパンナのひみつ",
+    "title_ro": "Roorupanna no Himitsu"
+  },
+  "0301a": {
+    "episode": 301,
+    "segment": "a",
+    "title_ja": "ロールパンナとメロンパンナ",
+    "title_ro": "Roorupanna to Meronpanna"
+  },
+  "0301b": {
+    "episode": 301,
+    "segment": "b",
+    "title_ja": "タクトマンとゆかいなコーラス",
+    "title_ro": "Takutoman to Yukaina Koorasu"
+  },
+  "0302a": {
+    "episode": 302,
+    "segment": "a",
+    "title_ja": "ショウガナイさんとナスコさん",
+    "title_ro": "Shouganai Santo Nasuko San"
+  },
+  "0302b": {
+    "episode": 302,
+    "segment": "b",
+    "title_ja": "ばいきんまんといなりずしのみこと",
+    "title_ro": "Baikinman to Inarizushinomikoto"
+  },
+  "0303a": {
+    "episode": 303,
+    "segment": "a",
+    "title_ja": "アンパンマンとくすだまん",
+    "title_ro": "Anpanman to Kusudaman"
+  },
+  "0303b": {
+    "episode": 303,
+    "segment": "b",
+    "title_ja": "しょうゆくんとソースくん",
+    "title_ro": "Shouyukunto Soosu Kun"
+  },
+  "0304a": {
+    "episode": 304,
+    "segment": "a",
+    "title_ja": "アンパンマンとバイキン占い",
+    "title_ro": "Anpanman to Baikin Uranai"
+  },
+  "0304b": {
+    "episode": 304,
+    "segment": "b",
+    "title_ja": "アンパンマンとテープかたつむり",
+    "title_ro": "Anpanman to Teepu Katatsumuri"
+  },
+  "0305a": {
+    "episode": 305,
+    "segment": "a",
+    "title_ja": "ゴミラとバイキンゴミラ",
+    "title_ro": "Gomira to Baikingomira"
+  },
+  "0306a": {
+    "episode": 306,
+    "segment": "a",
+    "title_ja": "ドクロ谷のロールパンナ",
+    "title_ro": "Dokuro Tani no Roorupanna"
+  },
+  "0306b": {
+    "episode": 306,
+    "segment": "b",
+    "title_ja": "メロンパンナとトランプマン",
+    "title_ro": "Meronpanna to Toranpuman"
+  },
+  "0307a": {
+    "episode": 307,
+    "segment": "a",
+    "title_ja": "ばいきんまんとシャボンダマン",
+    "title_ro": "Baikinman to Shabondaman"
+  },
+  "0307b": {
+    "episode": 307,
+    "segment": "b",
+    "title_ja": "プリンちゃんのおくりもの",
+    "title_ro": "Purin Channookurimono"
+  },
+  "0308a": {
+    "episode": 308,
+    "segment": "a",
+    "title_ja": "アンパンマンとたらのめタラちゃん",
+    "title_ro": "Anpanman to Taranome Tara Chan"
+  },
+  "0308b": {
+    "episode": 308,
+    "segment": "b",
+    "title_ja": "メロンパンナとふしぎなタマゴ",
+    "title_ro": "Meronpanna to Fushigina Tamago"
+  },
+  "0309a": {
+    "episode": 309,
+    "segment": "a",
+    "title_ja": "アンパンマンとジュエリーちゃん",
+    "title_ro": "Anpanman to Juerii Chan"
+  },
+  "0309b": {
+    "episode": 309,
+    "segment": "b",
+    "title_ja": "アンパンマンとマロンくん",
+    "title_ro": "Anpanman to Maron Kun"
+  },
+  "0310a": {
+    "episode": 310,
+    "segment": "a",
+    "title_ja": "アンパンマンとグルグルぼうや",
+    "title_ro": "Anpanman to Guruguru Bouya"
+  },
+  "0310b": {
+    "episode": 310,
+    "segment": "b",
+    "title_ja": "ばいきんまんとてんぐのみの",
+    "title_ro": "Baikinman to Tengunomino"
+  },
+  "0311a": {
+    "episode": 311,
+    "segment": "a",
+    "title_ja": "アンパンマンとバイキンジャングル",
+    "title_ro": "Anpanman to Baikinjanguru"
+  },
+  "0311b": {
+    "episode": 311,
+    "segment": "b",
+    "title_ja": "アンパンマンとカラクリぐんない",
+    "title_ro": "Anpanman to Karakuri Gunnai"
+  },
+  "0312a": {
+    "episode": 312,
+    "segment": "a",
+    "title_ja": "おむすびまんとノリノリのりへい",
+    "title_ro": "Omusubimanto Norinori no Rihei"
+  },
+  "0312b": {
+    "episode": 312,
+    "segment": "b",
+    "title_ja": "アンパンマンとペロペロこぞう",
+    "title_ro": "Anpanman to Peropero Kozou"
+  },
+  "0313a": {
+    "episode": 313,
+    "segment": "a",
+    "title_ja": "ふたりのパンナのクリスマス",
+    "title_ro": "Futarino Panna no Kurisumasu"
+  },
+  "0314a": {
+    "episode": 314,
+    "segment": "a",
+    "title_ja": "砂の魔王と虹のピラミッド",
+    "title_ro": "Suna no Maou to Niji no Piramiddo"
+  },
+  "0315a": {
+    "episode": 315,
+    "segment": "a",
+    "title_ja": "アンパンマンと草もちおしょう",
+    "title_ro": "Anpanman to Kusa Mochioshou"
+  },
+  "0315b": {
+    "episode": 315,
+    "segment": "b",
+    "title_ja": "アンパンマンとバイキン雪まつり",
+    "title_ro": "Anpanman to Baikin Yuki Matsuri"
+  },
+  "0316a": {
+    "episode": 316,
+    "segment": "a",
+    "title_ja": "バイキンおにとオニオンおに",
+    "title_ro": "Baikin Onito Onion Oni"
+  },
+  "0316b": {
+    "episode": 316,
+    "segment": "b",
+    "title_ja": "ドキンちゃんのカレンダーガール",
+    "title_ro": "Dokin Channo Karendaagaaru"
+  },
+  "0317a": {
+    "episode": 317,
+    "segment": "a",
+    "title_ja": "あかちゃんまんとおかゆちゃん",
+    "title_ro": "Akachanmantookayuchan"
+  },
+  "0317b": {
+    "episode": 317,
+    "segment": "b",
+    "title_ja": "アンパンマンとカンナくん",
+    "title_ro": "Anpanman to Kanna Kun"
+  },
+  "0318a": {
+    "episode": 318,
+    "segment": "a",
+    "title_ja": "バレンタインとチョコおばけ",
+    "title_ro": "Barentain to Choko Obake"
+  },
+  "0318b": {
+    "episode": 318,
+    "segment": "b",
+    "title_ja": "アンパンマンとはぐるまのくに",
+    "title_ro": "Anpanman to Hagurumanokuni"
+  },
+  "0319a": {
+    "episode": 319,
+    "segment": "a",
+    "title_ja": "おすみちゃんと火ばちじいさん",
+    "title_ro": "Osumichanto Hi Bachijiisan"
+  },
+  "0319b": {
+    "episode": 319,
+    "segment": "b",
+    "title_ja": "アンパンマンとしょうかきくん",
+    "title_ro": "Anpanman to Shoukakikun"
+  },
+  "0320a": {
+    "episode": 320,
+    "segment": "a",
+    "title_ja": "メロンパンナとのぎくちゃん",
+    "title_ro": "Meronpanna to Nogikuchan"
+  },
+  "0320b": {
+    "episode": 320,
+    "segment": "b",
+    "title_ja": "アンパンマンとアリンコのくに",
+    "title_ro": "Anpanman to Arinko no Kuni"
+  },
+  "0321a": {
+    "episode": 321,
+    "segment": "a",
+    "title_ja": "アンパンマンとふしぎなクルルン",
+    "title_ro": "Anpanman to Fushigina Kururun"
+  },
+  "0322a": {
+    "episode": 322,
+    "segment": "a",
+    "title_ja": "ロールパンナとあかちゃんまん",
+    "title_ro": "Roorupanna to Akachanman"
+  },
+  "0322b": {
+    "episode": 322,
+    "segment": "b",
+    "title_ja": "しょくぱんまんとホラーマン",
+    "title_ro": "Shokupanman to Horaaman"
+  },
+  "0323a": {
+    "episode": 323,
+    "segment": "a",
+    "title_ja": "アンパンマンとらいおんこたつ",
+    "title_ro": "Anpanman to Raionkotatsu"
+  },
+  "0323b": {
+    "episode": 323,
+    "segment": "b",
+    "title_ja": "ロールパンナとなだれおに",
+    "title_ro": "Roorupanna to Nadareoni"
+  },
+  "0324a": {
+    "episode": 324,
+    "segment": "a",
+    "title_ja": "ばいきんまんとナンカヘンダー",
+    "title_ro": "Baikinman to Nankahendaa"
+  },
+  "0324b": {
+    "episode": 324,
+    "segment": "b",
+    "title_ja": "ロールパンナとおむすびまん",
+    "title_ro": "Roorupanna to Omusubiman"
+  },
+  "0325a": {
+    "episode": 325,
+    "segment": "a",
+    "title_ja": "アンパンマンとみどり島",
+    "title_ro": "Anpanman to Midori Shima"
+  },
+  "0326a": {
+    "episode": 326,
+    "segment": "a",
+    "title_ja": "アンパンマンとバイキンSLマン",
+    "title_ro": "Anpanman to Baikin Sl Man"
+  },
+  "0326b": {
+    "episode": 326,
+    "segment": "b",
+    "title_ja": "ハッパちゃんのおたんじょう日",
+    "title_ro": "Happa Channootanjou Nichi"
+  },
+  "0327a": {
+    "episode": 327,
+    "segment": "a",
+    "title_ja": "かんづめカン太郎とビンビンビンの助",
+    "title_ro": "Kanzume Kan Tarou to Binbinbin no Jo"
+  },
+  "0327b": {
+    "episode": 327,
+    "segment": "b",
+    "title_ja": "ばいきんまんとツボミちゃん",
+    "title_ro": "Baikinman to Tsubomi Chan"
+  },
+  "0328a": {
+    "episode": 328,
+    "segment": "a",
+    "title_ja": "",
+    "title_ro": ""
+  },
+  "0329a": {
+    "episode": 329,
+    "segment": "a",
+    "title_ja": "カレーパンマンとあめだまぼうや",
+    "title_ro": "Kareepanman to Amedamabouya"
+  },
+  "0329b": {
+    "episode": 329,
+    "segment": "b",
+    "title_ja": "ロールパンナとハンバーガーキッド",
+    "title_ro": "Roorupanna to Hanbaagaakiddo"
+  },
+  "0330a": {
+    "episode": 330,
+    "segment": "a",
+    "title_ja": "こむすびまんとかみなりぴかたん",
+    "title_ro": "Komusubimantokaminaripikatan"
+  },
+  "0330b": {
+    "episode": 330,
+    "segment": "b",
+    "title_ja": "ばいきんまんとタケトンボマン",
+    "title_ro": "Baikinman to Taketonboman"
+  },
+  "0331a": {
+    "episode": 331,
+    "segment": "a",
+    "title_ja": "ナプキンさんとホウタイマン",
+    "title_ro": "Napukin Santo Houtaiman"
+  },
+  "0331b": {
+    "episode": 331,
+    "segment": "b",
+    "title_ja": "アンパンマンとおそうじばいきんまん",
+    "title_ro": "Anpanman to Osoujibaikinman"
+  },
+  "0332a": {
+    "episode": 332,
+    "segment": "a",
+    "title_ja": "ロールパンナと鉄火のマキちゃん",
+    "title_ro": "Roorupanna to Tekka no Maki Chan"
+  },
+  "0332b": {
+    "episode": 332,
+    "segment": "b",
+    "title_ja": "アンパンマンとウニおじさん",
+    "title_ro": "Anpanman to Uni Ojisan"
+  },
+  "0333a": {
+    "episode": 333,
+    "segment": "a",
+    "title_ja": "アンパンマンとオルゴールマン",
+    "title_ro": "Anpanman to Orugooruman"
+  },
+  "0333b": {
+    "episode": 333,
+    "segment": "b",
+    "title_ja": "ドン・キ・ホタテとあじさいさん",
+    "title_ro": "Don・ki・hotate to Ajisaisan"
+  },
+  "0334a": {
+    "episode": 334,
+    "segment": "a",
+    "title_ja": "メロンパンナはおおいそがし",
+    "title_ro": "Meronpanna Haooisogashi"
+  },
+  "0334b": {
+    "episode": 334,
+    "segment": "b",
+    "title_ja": "アンパンマンとふろしきおじさん",
+    "title_ro": "Anpanman to Furoshikiojisan"
+  },
+  "0335a": {
+    "episode": 335,
+    "segment": "a",
+    "title_ja": "アンパンマンとくらやみ谷",
+    "title_ro": "Anpanman to Kurayami Tani"
+  },
+  "0336a": {
+    "episode": 336,
+    "segment": "a",
+    "title_ja": "アンパンマンとアンモナイトくん",
+    "title_ro": "Anpanman to Anmonaito Kun"
+  },
+  "0336b": {
+    "episode": 336,
+    "segment": "b",
+    "title_ja": "ばいきんまんとみずたま姫",
+    "title_ro": "Baikinman to Mizutama Hime"
+  },
+  "0337a": {
+    "episode": 337,
+    "segment": "a",
+    "title_ja": "わかばちゃんとそよかぜくん",
+    "title_ro": "Wakabachantosoyokazekun"
+  },
+  "0337b": {
+    "episode": 337,
+    "segment": "b",
+    "title_ja": "くものモクちゃんとアマグモラ",
+    "title_ro": "Kumono Moku Chanto Amagumora"
+  },
+  "0338a": {
+    "episode": 338,
+    "segment": "a",
+    "title_ja": "アンパンマンとデザインマン",
+    "title_ro": "Anpanman to Dezainman"
+  },
+  "0338b": {
+    "episode": 338,
+    "segment": "b",
+    "title_ja": "メロンパンナとかげろうちゃん",
+    "title_ro": "Meronpanna to Kagerouchan"
+  },
+  "0339a": {
+    "episode": 339,
+    "segment": "a",
+    "title_ja": "アンパンマンとこおりのしろ",
+    "title_ro": "Anpanman to Koorinoshiro"
+  },
+  "0340a": {
+    "episode": 340,
+    "segment": "a",
+    "title_ja": "アンパンマンとほらがい男爵",
+    "title_ro": "Anpanman to Horagai Danshaku"
+  },
+  "0340b": {
+    "episode": 340,
+    "segment": "b",
+    "title_ja": "ばいきんまんとロボコック",
+    "title_ro": "Baikinman to Robokokku"
+  },
+  "0341a": {
+    "episode": 341,
+    "segment": "a",
+    "title_ja": "ロールパンナとピーター",
+    "title_ro": "Roorupanna to Piitaa"
+  },
+  "0341b": {
+    "episode": 341,
+    "segment": "b",
+    "title_ja": "ばいきんまんとてんどんまん",
+    "title_ro": "Baikinman to Tendonman"
+  },
+  "0342a": {
+    "episode": 342,
+    "segment": "a",
+    "title_ja": "ロールパンナとオカリナひめ",
+    "title_ro": "Roorupanna to Okarina Hime"
+  },
+  "0342b": {
+    "episode": 342,
+    "segment": "b",
+    "title_ja": "アンパンマンとはんごうくん",
+    "title_ro": "Anpanman to Hangoukun"
+  },
+  "0343a": {
+    "episode": 343,
+    "segment": "a",
+    "title_ja": "ウチワちゃんとセンスくん",
+    "title_ro": "Uchiwa Chanto Sensu Kun"
+  },
+  "0343b": {
+    "episode": 343,
+    "segment": "b",
+    "title_ja": "アンパンマンとそうめんおしょう",
+    "title_ro": "Anpanman to Soumen'oshou"
+  },
+  "0344a": {
+    "episode": 344,
+    "segment": "a",
+    "title_ja": "ロールパンナとほたるひめ",
+    "title_ro": "Roorupanna to Hotaruhime"
+  },
+  "0344b": {
+    "episode": 344,
+    "segment": "b",
+    "title_ja": "フラッペちゃんととんかちどり",
+    "title_ro": "Furappe Chantotonkachidori"
+  },
+  "0345a": {
+    "episode": 345,
+    "segment": "a",
+    "title_ja": "コーヒーパンマンとかいじゅうモカ",
+    "title_ro": "Koohiipanman to Kaijuu Moka"
+  },
+  "0345b": {
+    "episode": 345,
+    "segment": "b",
+    "title_ja": "アンパンマンとういろうまん",
+    "title_ro": "Anpanman to Uirouman"
+  },
+  "0346a": {
+    "episode": 346,
+    "segment": "a",
+    "title_ja": "ばいきんまんとふでじいさん",
+    "title_ro": "Baikinman to Fudejiisan"
+  },
+  "0346b": {
+    "episode": 346,
+    "segment": "b",
+    "title_ja": "チーズとコアンコラ",
+    "title_ro": "Chiizu to Koankora"
+  },
+  "0347a": {
+    "episode": 347,
+    "segment": "a",
+    "title_ja": "かつぶしまんと鉄火のマキちゃん",
+    "title_ro": "Katsubushimanto Tekka no Maki Chan"
+  },
+  "0347b": {
+    "episode": 347,
+    "segment": "b",
+    "title_ja": "アンパンマンととうふくん",
+    "title_ro": "Anpanman to Toufukun"
+  },
+  "0348a": {
+    "episode": 348,
+    "segment": "a",
+    "title_ja": "アンパンマンとすすきちゃん",
+    "title_ro": "Anpanman to Susukichan"
+  },
+  "0348b": {
+    "episode": 348,
+    "segment": "b",
+    "title_ja": "ばいきんまんとおんせんくん",
+    "title_ro": "Baikinman to Onsenkun"
+  },
+  "0349a": {
+    "episode": 349,
+    "segment": "a",
+    "title_ja": "おりがみまんとタケトンボマン",
+    "title_ro": "Origamimanto Taketonboman"
+  },
+  "0349b": {
+    "episode": 349,
+    "segment": "b",
+    "title_ja": "やきいもまんとバロンヤッキー",
+    "title_ro": "Yakiimomanto Baronyakkii"
+  },
+  "0350a": {
+    "episode": 350,
+    "segment": "a",
+    "title_ja": "アンパンマンのサンサンたいそう",
+    "title_ro": "Anpanman no Sansan Taisou"
+  },
+  "0350b": {
+    "episode": 350,
+    "segment": "b",
+    "title_ja": "ロールパンナとバイキン仙人",
+    "title_ro": "Roorupanna to Baikin Sennin"
+  },
+  "0351a": {
+    "episode": 351,
+    "segment": "a",
+    "title_ja": "アンパンマンとタオルくん",
+    "title_ro": "Anpanman to Taoru Kun"
+  },
+  "0351b": {
+    "episode": 351,
+    "segment": "b",
+    "title_ja": "アンパンマンとだいこん役者",
+    "title_ro": "Anpanman to Daikon Yakusha"
+  },
+  "0352a": {
+    "episode": 352,
+    "segment": "a",
+    "title_ja": "アンパンマンとキノコの森",
+    "title_ro": "Anpanman to Kinoko no Mori"
+  },
+  "0352b": {
+    "episode": 352,
+    "segment": "b",
+    "title_ja": "しょくぱんまんのたからもの",
+    "title_ro": "Shokupanmannotakaramono"
+  },
+  "0353a": {
+    "episode": 353,
+    "segment": "a",
+    "title_ja": "ロールパンナとハロウィンマン",
+    "title_ro": "Roorupanna to Harouinman"
+  },
+  "0353b": {
+    "episode": 353,
+    "segment": "b",
+    "title_ja": "アンパンマンとさかさまんのもり",
+    "title_ro": "Anpanman to Sakasamannomori"
+  },
+  "0354a": {
+    "episode": 354,
+    "segment": "a",
+    "title_ja": "アンパンマンとマグぼうや",
+    "title_ro": "Anpanman to Magu Bouya"
+  },
+  "0354b": {
+    "episode": 354,
+    "segment": "b",
+    "title_ja": "アンパンマンとキンコちゃん",
+    "title_ro": "Anpanman to Kinko Chan"
+  },
+  "0355a": {
+    "episode": 355,
+    "segment": "a",
+    "title_ja": "まつたけまんとしめじまん",
+    "title_ro": "Matsutakemantoshimejiman"
+  },
+  "0355b": {
+    "episode": 355,
+    "segment": "b",
+    "title_ja": "たわらクンとライスちゃん",
+    "title_ro": "Tawara Kun to Raisu Chan"
+  },
+  "0356a": {
+    "episode": 356,
+    "segment": "a",
+    "title_ja": "ばいきんまんとザーマスボンド",
+    "title_ro": "Baikinman to Zaamasubondo"
+  },
+  "0356b": {
+    "episode": 356,
+    "segment": "b",
+    "title_ja": "アンパンマンとミノムシくん",
+    "title_ro": "Anpanman to Minomushi Kun"
+  },
+  "0357a": {
+    "episode": 357,
+    "segment": "a",
+    "title_ja": "アンパンマンとナベぶぎょう",
+    "title_ro": "Anpanman to Nabe Bugyou"
+  },
+  "0357b": {
+    "episode": 357,
+    "segment": "b",
+    "title_ja": "ロールパンナとかぜこぞう",
+    "title_ro": "Roorupanna to Kazekozou"
+  },
+  "0358a": {
+    "episode": 358,
+    "segment": "a",
+    "title_ja": "ばいきんまんとシチューおばさん",
+    "title_ro": "Baikinman to Shichuu Obasan"
+  },
+  "0358b": {
+    "episode": 358,
+    "segment": "b",
+    "title_ja": "ロールパンナとリボンヘビ",
+    "title_ro": "Roorupanna to Ribonhebi"
+  },
+  "0359a": {
+    "episode": 359,
+    "segment": "a",
+    "title_ja": "アンパンマンとカッターくん",
+    "title_ro": "Anpanman to Kattaa Kun"
+  },
+  "0359b": {
+    "episode": 359,
+    "segment": "b",
+    "title_ja": "アンパンマンとチャーハン王子",
+    "title_ro": "Anpanman to Chaahan Ouji"
+  },
+  "0360a": {
+    "episode": 360,
+    "segment": "a",
+    "title_ja": "アンパンマンとキャロットぼうや",
+    "title_ro": "Anpanman to Kyarotto Bouya"
+  },
+  "0360b": {
+    "episode": 360,
+    "segment": "b",
+    "title_ja": "ばいきんまんとゆきこんこん",
+    "title_ro": "Baikinman to Yukikonkon"
+  },
+  "0361a": {
+    "episode": 361,
+    "segment": "a",
+    "title_ja": "カイトくんとやっこだこくん",
+    "title_ro": "Kaito Kuntoyakkodakokun"
+  },
+  "0361b": {
+    "episode": 361,
+    "segment": "b",
+    "title_ja": "アンパンマンとみそおじさん",
+    "title_ro": "Anpanman to Misoojisan"
+  },
+  "0362a": {
+    "episode": 362,
+    "segment": "a",
+    "title_ja": "ミカンぼうやとこつぶちゃん",
+    "title_ro": "Mikan Bouyatokotsubuchan"
+  },
+  "0362b": {
+    "episode": 362,
+    "segment": "b",
+    "title_ja": "アンパンマンととんこつ大人",
+    "title_ro": "Anpanman to Tonkotsu Otona"
+  },
+  "0363a": {
+    "episode": 363,
+    "segment": "a",
+    "title_ja": "空飛ぶパン工場",
+    "title_ro": "Kuuhi Bu Pan Koujou"
+  },
+  "0363b": {
+    "episode": 363,
+    "segment": "b",
+    "title_ja": "ロールパンナとてんどんかあさん",
+    "title_ro": "Roorupanna to Tendonkaasan"
+  },
+  "0364a": {
+    "episode": 364,
+    "segment": "a",
+    "title_ja": "でんでん一座とだいこん役者",
+    "title_ro": "Denden Ichiza Todaikon Yakusha"
+  },
+  "0365a": {
+    "episode": 365,
+    "segment": "a",
+    "title_ja": "おしるこちゃんとのれんちゃん",
+    "title_ro": "Oshirukochantonorenchan"
+  },
+  "0365b": {
+    "episode": 365,
+    "segment": "b",
+    "title_ja": "にんじゃのニャンジャとやきのりくん",
+    "title_ro": "Ninjano Nyanja to Yakinorikun"
+  },
+  "0366a": {
+    "episode": 366,
+    "segment": "a",
+    "title_ja": "ドキンちゃんのバレンタインデー",
+    "title_ro": "Dokin Channo Barentaindee"
+  },
+  "0366b": {
+    "episode": 366,
+    "segment": "b",
+    "title_ja": "アンパンマンともなかちゃん",
+    "title_ro": "Anpanman to Monakachan"
+  },
+  "0367a": {
+    "episode": 367,
+    "segment": "a",
+    "title_ja": "アンパンマンとてつの星",
+    "title_ro": "Anpanman to Tetsuno Hoshi"
+  },
+  "0368a": {
+    "episode": 368,
+    "segment": "a",
+    "title_ja": "ひなの里のひなまつり",
+    "title_ro": "Hinano Sato Nohinamatsuri"
+  },
+  "0368b": {
+    "episode": 368,
+    "segment": "b",
+    "title_ja": "れんこんまんとどじょうおやこ",
+    "title_ro": "Renkonmantodojouoyako"
+  },
+  "0369a": {
+    "episode": 369,
+    "segment": "a",
+    "title_ja": "ばいきんまんとしょうかきくん",
+    "title_ro": "Baikinman to Shoukakikun"
+  },
+  "0369b": {
+    "episode": 369,
+    "segment": "b",
+    "title_ja": "どんぶりトリオとかめえもん",
+    "title_ro": "Donburi Torio to Kameemon"
+  },
+  "0370a": {
+    "episode": 370,
+    "segment": "a",
+    "title_ja": "エチケットマンとドキンちゃん",
+    "title_ro": "Echikettoman to Dokin Chan"
+  },
+  "0370b": {
+    "episode": 370,
+    "segment": "b",
+    "title_ja": "ふでじいさんと万年じいさん",
+    "title_ro": "Fudejiisanto Mannen Jiisan"
+  },
+  "0371a": {
+    "episode": 371,
+    "segment": "a",
+    "title_ja": "ホットケーキマンとシロップちゃん",
+    "title_ro": "Hottokeekiman to Shiroppu Chan"
+  },
+  "0371b": {
+    "episode": 371,
+    "segment": "b",
+    "title_ja": "ドキンちゃんとホラーマン",
+    "title_ro": "Dokin Chanto Horaaman"
+  },
+  "0372a": {
+    "episode": 372,
+    "segment": "a",
+    "title_ja": "アンパンマンとふしぎなラッピちゃん",
+    "title_ro": "Anpanman to Fushigina Rappi Chan"
+  },
+  "0372b": {
+    "episode": 372,
+    "segment": "b",
+    "title_ja": "アンパンマンとシャーロくん",
+    "title_ro": "Anpanman to Shaaro Kun"
+  },
+  "0373a": {
+    "episode": 373,
+    "segment": "a",
+    "title_ja": "アンパンマンとさくらちゃん",
+    "title_ro": "Anpanman to Sakurachan"
+  },
+  "0373b": {
+    "episode": 373,
+    "segment": "b",
+    "title_ja": "アンパンマンと巨人のくに",
+    "title_ro": "Anpanman to Kyojin Nokuni"
+  },
+  "0374a": {
+    "episode": 374,
+    "segment": "a",
+    "title_ja": "カレーパンマンととんかつひめ",
+    "title_ro": "Kareepanman to Tonkatsuhime"
+  },
+  "0374b": {
+    "episode": 374,
+    "segment": "b",
+    "title_ja": "アンパンマンとさといもちゃん",
+    "title_ro": "Anpanman to Satoimochan"
+  },
+  "0375a": {
+    "episode": 375,
+    "segment": "a",
+    "title_ja": "アンパンマンとフランケンロボくん",
+    "title_ro": "Anpanman to Furankenrobo Kun"
+  },
+  "0376a": {
+    "episode": 376,
+    "segment": "a",
+    "title_ja": "ばいきんまんといずみのせい",
+    "title_ro": "Baikinman to Izuminosei"
+  },
+  "0376b": {
+    "episode": 376,
+    "segment": "b",
+    "title_ja": "アンパンマンとアップリケちゃん",
+    "title_ro": "Anpanman to Appurike Chan"
+  },
+  "0377a": {
+    "episode": 377,
+    "segment": "a",
+    "title_ja": "チーズとレアチーズちゃん",
+    "title_ro": "Chiizu to Reachiizu Chan"
+  },
+  "0377b": {
+    "episode": 377,
+    "segment": "b",
+    "title_ja": "てんそばくんとうどんちゃん",
+    "title_ro": "Tensobakuntoudonchan"
+  },
+  "0378a": {
+    "episode": 378,
+    "segment": "a",
+    "title_ja": "ロールパンナのふたつのこころ",
+    "title_ro": "Roorupanna no Futatsunokokoro"
+  },
+  "0378b": {
+    "episode": 378,
+    "segment": "b",
+    "title_ja": "アンパンマンとそらまめおばさん",
+    "title_ro": "Anpanman to Soramameobasan"
+  },
+  "0379a": {
+    "episode": 379,
+    "segment": "a",
+    "title_ja": "アンパンマンとマイマイ王国",
+    "title_ro": "Anpanman to Maimai Oukoku"
+  },
+  "0379b": {
+    "episode": 379,
+    "segment": "b",
+    "title_ja": "ういろうまんとヨーカンマダム",
+    "title_ro": "Uiroumanto Yookanmadamu"
+  },
+  "0380a": {
+    "episode": 380,
+    "segment": "a",
+    "title_ja": "はしれ!チーズ",
+    "title_ro": "Hashire ! Chiizu"
+  },
+  "0380b": {
+    "episode": 380,
+    "segment": "b",
+    "title_ja": "おむすびまんとへどろまん",
+    "title_ro": "Omusubimantohedoroman"
+  },
+  "0381a": {
+    "episode": 381,
+    "segment": "a",
+    "title_ja": "はみがきまんとバイキンスプレー",
+    "title_ro": "Hamigakimanto Baikinsupuree"
+  },
+  "0381b": {
+    "episode": 381,
+    "segment": "b",
+    "title_ja": "アンパンマンとパラソルひこうせん",
+    "title_ro": "Anpanman to Parasoru Hikousen"
+  },
+  "0382a": {
+    "episode": 382,
+    "segment": "a",
+    "title_ja": "ハンバーガーキッドとホーレンソウチーフ",
+    "title_ro": "Hanbaagaakiddo to Hoorensouchiifu"
+  },
+  "0382b": {
+    "episode": 382,
+    "segment": "b",
+    "title_ja": "アンパンマンとほおずきちゃん",
+    "title_ro": "Anpanman to Hoozukichan"
+  },
+  "0383a": {
+    "episode": 383,
+    "segment": "a",
+    "title_ja": "ばいきんまんとてっこつホラーマン",
+    "title_ro": "Baikinman to Tekkotsu Horaaman"
+  },
+  "0383b": {
+    "episode": 383,
+    "segment": "b",
+    "title_ja": "ばいきんまんとすなおとこ",
+    "title_ro": "Baikinman to Sunaotoko"
+  },
+  "0384a": {
+    "episode": 384,
+    "segment": "a",
+    "title_ja": "アンパンマンとカブタン",
+    "title_ro": "Anpanman to Kabutan"
+  },
+  "0384b": {
+    "episode": 384,
+    "segment": "b",
+    "title_ja": "アンパンマンとひまわりちゃん",
+    "title_ro": "Anpanman to Himawarichan"
+  },
+  "0385a": {
+    "episode": 385,
+    "segment": "a",
+    "title_ja": "アンパンマンとおばけの池",
+    "title_ro": "Anpanman to Obakeno Ike"
+  },
+  "0385b": {
+    "episode": 385,
+    "segment": "b",
+    "title_ja": "アンパンマンとドレミファ島",
+    "title_ro": "Anpanman to Doremifa Shima"
+  },
+  "0386a": {
+    "episode": 386,
+    "segment": "a",
+    "title_ja": "てっかのマキちゃんとおすしパーティー",
+    "title_ro": "Tekkano Maki Chantoosushi Paateii"
+  },
+  "0387a": {
+    "episode": 387,
+    "segment": "a",
+    "title_ja": "ばいきんまんとおばけパン",
+    "title_ro": "Baikinman to Obake Pan"
+  },
+  "0387b": {
+    "episode": 387,
+    "segment": "b",
+    "title_ja": "せいろくんとちまきくん",
+    "title_ro": "Seirokuntochimakikun"
+  },
+  "0388a": {
+    "episode": 388,
+    "segment": "a",
+    "title_ja": "メロンパンナの大冒険",
+    "title_ro": "Meronpanna no Daibouken"
+  },
+  "0388b": {
+    "episode": 388,
+    "segment": "b",
+    "title_ja": "アンパンマンとかいじゅうグモラ",
+    "title_ro": "Anpanman to Kaijuu Gumora"
+  },
+  "0389a": {
+    "episode": 389,
+    "segment": "a",
+    "title_ja": "アンパンマンとロールパンナ",
+    "title_ro": "Anpanman to Roorupanna"
+  },
+  "0389b": {
+    "episode": 389,
+    "segment": "b",
+    "title_ja": "スパナくんとペンチくん",
+    "title_ro": "Supana Kunto Penchi Kun"
+  },
+  "0390a": {
+    "episode": 390,
+    "segment": "a",
+    "title_ja": "バタコさんとロールパンナ",
+    "title_ro": "Batako Santo Roorupanna"
+  },
+  "0390b": {
+    "episode": 390,
+    "segment": "b",
+    "title_ja": "ブロッコリィちゃんとアスパラくん",
+    "title_ro": "Burokkorii Chanto Asupara Kun"
+  },
+  "0391a": {
+    "episode": 391,
+    "segment": "a",
+    "title_ja": "アンパンマンと黒バラ女王",
+    "title_ro": "Anpanman to Kuro Bara Joou"
+  },
+  "0391b": {
+    "episode": 391,
+    "segment": "b",
+    "title_ja": "るすばんチーズとレアチーズ",
+    "title_ro": "Rusuban Chiizu to Reachiizu"
+  },
+  "0392a": {
+    "episode": 392,
+    "segment": "a",
+    "title_ja": "あめトリオと夏祭り",
+    "title_ro": "Ame Torio to Natsumatsuri"
+  },
+  "0392b": {
+    "episode": 392,
+    "segment": "b",
+    "title_ja": "がんばれ!メロンパンナちゃん",
+    "title_ro": "Ganbare ! Meronpanna Chan"
+  },
+  "0393a": {
+    "episode": 393,
+    "segment": "a",
+    "title_ja": "フルーツ島をすくえ!",
+    "title_ro": "Furuutsu Shima Wosukue !"
+  },
+  "0394a": {
+    "episode": 394,
+    "segment": "a",
+    "title_ja": "くものもくちゃんとたいふうぼうや",
+    "title_ro": "Kumonomokuchantotaifuubouya"
+  },
+  "0394b": {
+    "episode": 394,
+    "segment": "b",
+    "title_ja": "かまめしどんとさといもちゃん",
+    "title_ro": "Kamameshidontosatoimochan"
+  },
+  "0395a": {
+    "episode": 395,
+    "segment": "a",
+    "title_ja": "くらげまんとこくらげまん",
+    "title_ro": "Kuragemantokokurageman"
+  },
+  "0395b": {
+    "episode": 395,
+    "segment": "b",
+    "title_ja": "あかちゃんまんとバイキン仙人",
+    "title_ro": "Akachanmanto Baikin Sennin"
+  },
+  "0396a": {
+    "episode": 396,
+    "segment": "a",
+    "title_ja": "ロールパンナのローリングハリケーン",
+    "title_ro": "Roorupanna no Rooringuharikeen"
+  },
+  "0396b": {
+    "episode": 396,
+    "segment": "b",
+    "title_ja": "うなぎまんとうなどんまん",
+    "title_ro": "Unagimantounadonman"
+  },
+  "0397a": {
+    "episode": 397,
+    "segment": "a",
+    "title_ja": "ロールパンナとかぜこんこん",
+    "title_ro": "Roorupanna to Kazekonkon"
+  },
+  "0397b": {
+    "episode": 397,
+    "segment": "b",
+    "title_ja": "アンパンマンとゆげせんにん",
+    "title_ro": "Anpanman to Yugesennin"
+  },
+  "0398a": {
+    "episode": 398,
+    "segment": "a",
+    "title_ja": "アンパンマンと海賊ロブスター(前編)",
+    "title_ro": "Anpanman to Kaizoku Robusutaa"
+  },
+  "0399a": {
+    "episode": 399,
+    "segment": "a",
+    "title_ja": "アンパンマンと海賊ロブスター(後編)",
+    "title_ro": "Anpanman to Kaizoku Robusutaa"
+  },
+  "0400a": {
+    "episode": 400,
+    "segment": "a",
+    "title_ja": "ばいきんまんとまほうのランプ",
+    "title_ro": "Baikinman to Mahouno Ranpu"
+  },
+  "0400b": {
+    "episode": 400,
+    "segment": "b",
+    "title_ja": "ドーナツマンとコアンコラ",
+    "title_ro": "Doonatsuman to Koankora"
+  },
+  "0401a": {
+    "episode": 401,
+    "segment": "a",
+    "title_ja": "アンパンマンと化石の魔王",
+    "title_ro": "Anpanman to Kaseki no Maou"
+  },
+  "0401b": {
+    "episode": 401,
+    "segment": "b",
+    "title_ja": "カレーパンマンとしょくぱんまん",
+    "title_ro": "Kareepanman to Shokupanman"
+  },
+  "0402a": {
+    "episode": 402,
+    "segment": "a",
+    "title_ja": "アンパンマンとまほうのもくば",
+    "title_ro": "Anpanman to Mahounomokuba"
+  },
+  "0402b": {
+    "episode": 402,
+    "segment": "b",
+    "title_ja": "カレーパンマンとりんごちゃん",
+    "title_ro": "Kareepanman to Ringochan"
+  },
+  "0403a": {
+    "episode": 403,
+    "segment": "a",
+    "title_ja": "らーめんてんしとチャーハン王子",
+    "title_ro": "Raamentenshito Chaahan Ouji"
+  },
+  "0403b": {
+    "episode": 403,
+    "segment": "b",
+    "title_ja": "かつぶしまんとかまあげうどんさん",
+    "title_ro": "Katsubushimantokamaageudonsan"
+  },
+  "0404a": {
+    "episode": 404,
+    "segment": "a",
+    "title_ja": "アンパンマンとはいおに",
+    "title_ro": "Anpanman to Haioni"
+  },
+  "0404b": {
+    "episode": 404,
+    "segment": "b",
+    "title_ja": "てんどんまんとてんぷらおしょう",
+    "title_ro": "Tendonmantotenpuraoshou"
+  },
+  "0405a": {
+    "episode": 405,
+    "segment": "a",
+    "title_ja": "ドキンちゃんとバイキン仙人",
+    "title_ro": "Dokin Chanto Baikin Sennin"
+  },
+  "0405b": {
+    "episode": 405,
+    "segment": "b",
+    "title_ja": "カレーパンマンとぶたまんまん",
+    "title_ro": "Kareepanman to Butamanman"
+  },
+  "0406a": {
+    "episode": 406,
+    "segment": "a",
+    "title_ja": "ロールパンナと黒バラ女王",
+    "title_ro": "Roorupanna to Kuro Bara Joou"
+  },
+  "0406b": {
+    "episode": 406,
+    "segment": "b",
+    "title_ja": "アンパンマンとふうせんまん",
+    "title_ro": "Anpanman to Fuusenman"
+  },
+  "0407a": {
+    "episode": 407,
+    "segment": "a",
+    "title_ja": "まじゅつしドロンガとドロロンくん",
+    "title_ro": "Majutsushi Doronga to Dororon Kun"
+  },
+  "0407b": {
+    "episode": 407,
+    "segment": "b",
+    "title_ja": "アンパンマンとまりもくん",
+    "title_ro": "Anpanman to Marimokun"
+  },
+  "0408a": {
+    "episode": 408,
+    "segment": "a",
+    "title_ja": "アンパンマンとブラッククリスマス(前編)",
+    "title_ro": "Anpanman to Burakkukurisumasu"
+  },
+  "0409a": {
+    "episode": 409,
+    "segment": "a",
+    "title_ja": "アンパンマンとブラッククリスマス(後編)",
+    "title_ro": "Anpanman to Burakkukurisumasu"
+  },
+  "0410a": {
+    "episode": 410,
+    "segment": "a",
+    "title_ja": "アンパンマンとびいだまん",
+    "title_ro": "Anpanman to Biidaman"
+  },
+  "0410b": {
+    "episode": 410,
+    "segment": "b",
+    "title_ja": "アンパンマンとはみがきやま",
+    "title_ro": "Anpanman to Hamigakiyama"
+  },
+  "0411a": {
+    "episode": 411,
+    "segment": "a",
+    "title_ja": "アンパンマンとみずのしろ",
+    "title_ro": "Anpanman to Mizunoshiro"
+  },
+  "0411b": {
+    "episode": 411,
+    "segment": "b",
+    "title_ja": "アンパンマンとモグリンめいろ",
+    "title_ro": "Anpanman to Mogurin Meiro"
+  },
+  "0412a": {
+    "episode": 412,
+    "segment": "a",
+    "title_ja": "ばいきんまんとSLマン",
+    "title_ro": "Baikinman to Sl Man"
+  },
+  "0412b": {
+    "episode": 412,
+    "segment": "b",
+    "title_ja": "らーめんてんしとトリオ・デ・グー",
+    "title_ro": "Raamentenshito Torio・de・guu"
+  },
+  "0413a": {
+    "episode": 413,
+    "segment": "a",
+    "title_ja": "チーズのおたんじょうび",
+    "title_ro": "Chiizu no Otanjoubi"
+  },
+  "0413b": {
+    "episode": 413,
+    "segment": "b",
+    "title_ja": "アンパンマンとゆめのくに",
+    "title_ro": "Anpanman to Yumenokuni"
+  },
+  "0414a": {
+    "episode": 414,
+    "segment": "a",
+    "title_ja": "アンパンマンとバイキンフルート",
+    "title_ro": "Anpanman to Baikinfuruuto"
+  },
+  "0414b": {
+    "episode": 414,
+    "segment": "b",
+    "title_ja": "いそべえとのりのりのりへい",
+    "title_ro": "Isobeetonorinorinorihei"
+  },
+  "0415a": {
+    "episode": 415,
+    "segment": "a",
+    "title_ja": "アンパンマンとハーモニカくん",
+    "title_ro": "Anpanman to Haamonika Kun"
+  },
+  "0415b": {
+    "episode": 415,
+    "segment": "b",
+    "title_ja": "メロンパンナとあんずちゃん",
+    "title_ro": "Meronpanna to Anzuchan"
+  },
+  "0416a": {
+    "episode": 416,
+    "segment": "a",
+    "title_ja": "化石の魔王とアンモナイトくん",
+    "title_ro": "Kaseki no Maou to Anmonaito Kun"
+  },
+  "0416b": {
+    "episode": 416,
+    "segment": "b",
+    "title_ja": "アンパンマンとパスタおばさん",
+    "title_ro": "Anpanman to Pasuta Obasan"
+  },
+  "0417a": {
+    "episode": 417,
+    "segment": "a",
+    "title_ja": "アンパンマンとオーロラ姫",
+    "title_ro": "Anpanman to Oorora Hime"
+  },
+  "0417b": {
+    "episode": 417,
+    "segment": "b",
+    "title_ja": "ホラーマンとはるかぜさん",
+    "title_ro": "Horaaman to Harukazesan"
+  },
+  "0418a": {
+    "episode": 418,
+    "segment": "a",
+    "title_ja": "ロールパンナのおともだち",
+    "title_ro": "Roorupanna no Otomodachi"
+  },
+  "0418b": {
+    "episode": 418,
+    "segment": "b",
+    "title_ja": "ゴマすり和尚とスリコギ坊主",
+    "title_ro": "Goma Suri Oshou to Surikogi Bouzu"
+  },
+  "0419a": {
+    "episode": 419,
+    "segment": "a",
+    "title_ja": "おむすびまんとかつぶしまん",
+    "title_ro": "Omusubimantokatsubushiman"
+  },
+  "0419b": {
+    "episode": 419,
+    "segment": "b",
+    "title_ja": "アンパンマンとかみしばいさん",
+    "title_ro": "Anpanman to Kamishibaisan"
+  },
+  "0420a": {
+    "episode": 420,
+    "segment": "a",
+    "title_ja": "アンモナイトくんと海の化石",
+    "title_ro": "Anmonaito Kunto Umi no Kaseki"
+  },
+  "0420b": {
+    "episode": 420,
+    "segment": "b",
+    "title_ja": "アンパンマンとカビンちゃん",
+    "title_ro": "Anpanman to Kabin Chan"
+  },
+  "0421a": {
+    "episode": 421,
+    "segment": "a",
+    "title_ja": "アンパンマンとでかこ母さん",
+    "title_ro": "Anpanman to Dekako Kaasan"
+  },
+  "0421b": {
+    "episode": 421,
+    "segment": "b",
+    "title_ja": "アンパンマンとクルクルおコマちゃん",
+    "title_ro": "Anpanman to Kurukuru o Koma Chan"
+  },
+  "0422a": {
+    "episode": 422,
+    "segment": "a",
+    "title_ja": "アンパンマンとちびぞうくん",
+    "title_ro": "Anpanman to Chibizoukun"
+  },
+  "0422b": {
+    "episode": 422,
+    "segment": "b",
+    "title_ja": "アンパンマンとどんぶり山",
+    "title_ro": "Anpanman to Donburi Yama"
+  },
+  "0423a": {
+    "episode": 423,
+    "segment": "a",
+    "title_ja": "アンパンマンとそらとぶだだんだん",
+    "title_ro": "Anpanman to Soratobudadandan"
+  },
+  "0423b": {
+    "episode": 423,
+    "segment": "b",
+    "title_ja": "ふでじいさんとおんせんくん",
+    "title_ro": "Fudejiisantoonsenkun"
+  },
+  "0424a": {
+    "episode": 424,
+    "segment": "a",
+    "title_ja": "ばいきんまんとちびぞうくん",
+    "title_ro": "Baikinman to Chibizoukun"
+  },
+  "0424b": {
+    "episode": 424,
+    "segment": "b",
+    "title_ja": "アンパンマンとバイキンビイダマン",
+    "title_ro": "Anpanman to Baikinbiidaman"
+  },
+  "0425a": {
+    "episode": 425,
+    "segment": "a",
+    "title_ja": "チーズとちびぞうくん",
+    "title_ro": "Chiizu to Chibizoukun"
+  },
+  "0425b": {
+    "episode": 425,
+    "segment": "b",
+    "title_ja": "しょくぱんまんとトースターマン",
+    "title_ro": "Shokupanman to Toosutaaman"
+  },
+  "0426a": {
+    "episode": 426,
+    "segment": "a",
+    "title_ja": "アンパンマンとてっこつホラーマン",
+    "title_ro": "Anpanman to Tekkotsu Horaaman"
+  },
+  "0426b": {
+    "episode": 426,
+    "segment": "b",
+    "title_ja": "ほのおくんとキャンドルちゃん",
+    "title_ro": "Honookunto Kyandoru Chan"
+  },
+  "0427a": {
+    "episode": 427,
+    "segment": "a",
+    "title_ja": "メロンパンナのねむり姫",
+    "title_ro": "Meronpanna no Nemuri Hime"
+  },
+  "0428a": {
+    "episode": 428,
+    "segment": "a",
+    "title_ja": "ちびぞうくんとまほうの木馬",
+    "title_ro": "Chibizoukuntomahouno Mokuba"
+  },
+  "0428b": {
+    "episode": 428,
+    "segment": "b",
+    "title_ja": "ばいきんまんとプリンちゃん",
+    "title_ro": "Baikinman to Purin Chan"
+  },
+  "0429a": {
+    "episode": 429,
+    "segment": "a",
+    "title_ja": "おむすびまんとアングリラ",
+    "title_ro": "Omusubimanto Angurira"
+  },
+  "0429b": {
+    "episode": 429,
+    "segment": "b",
+    "title_ja": "かびるんるんとチビもぐりん",
+    "title_ro": "Kabirunrunto Chibi Mogurin"
+  },
+  "0430a": {
+    "episode": 430,
+    "segment": "a",
+    "title_ja": "ドクターヒヤリとゴーストハウス",
+    "title_ro": "Dokutaahiyari to Goosutohausu"
+  },
+  "0430b": {
+    "episode": 430,
+    "segment": "b",
+    "title_ja": "ちびぞうくんとはちみつおじさん",
+    "title_ro": "Chibizoukuntohachimitsuojisan"
+  },
+  "0431a": {
+    "episode": 431,
+    "segment": "a",
+    "title_ja": "アンパンマンとローソク島",
+    "title_ro": "Anpanman to Roosoku Shima"
+  },
+  "0431b": {
+    "episode": 431,
+    "segment": "b",
+    "title_ja": "アンパンマンとキャベツマン",
+    "title_ro": "Anpanman to Kyabetsuman"
+  },
+  "0432a": {
+    "episode": 432,
+    "segment": "a",
+    "title_ja": "おむすびまんときりふき仙人",
+    "title_ro": "Omusubimantokirifuki Sennin"
+  },
+  "0432b": {
+    "episode": 432,
+    "segment": "b",
+    "title_ja": "アンパンマンとおてんきはかせ",
+    "title_ro": "Anpanman to Otenkihakase"
+  },
+  "0433a": {
+    "episode": 433,
+    "segment": "a",
+    "title_ja": "タータンと化石の魔王",
+    "title_ro": "Taatan to Kaseki no Maou"
+  },
+  "0434a": {
+    "episode": 434,
+    "segment": "a",
+    "title_ja": "アンパンマンとふしぎ沼",
+    "title_ro": "Anpanman to Fushigi Numa"
+  },
+  "0434b": {
+    "episode": 434,
+    "segment": "b",
+    "title_ja": "ピーターとタンバリンマン",
+    "title_ro": "Piitaa to Tanbarinman"
+  },
+  "0435a": {
+    "episode": 435,
+    "segment": "a",
+    "title_ja": "ちびぞうくんと空飛ぶじゅうたん",
+    "title_ro": "Chibizoukunto Kuuhi Bujuutan"
+  },
+  "0435b": {
+    "episode": 435,
+    "segment": "b",
+    "title_ja": "しょくぱんまんとSLマン",
+    "title_ro": "Shokupanman to Sl Man"
+  },
+  "0436a": {
+    "episode": 436,
+    "segment": "a",
+    "title_ja": "あかちゃんまんとちびぞうくん",
+    "title_ro": "Akachanmantochibizoukun"
+  },
+  "0436b": {
+    "episode": 436,
+    "segment": "b",
+    "title_ja": "アンパンマンとサニー姫",
+    "title_ro": "Anpanman to Sanii Hime"
+  },
+  "0437a": {
+    "episode": 437,
+    "segment": "a",
+    "title_ja": "アンパンマンとところてんまん",
+    "title_ro": "Anpanman to Tokorotenman"
+  },
+  "0437b": {
+    "episode": 437,
+    "segment": "b",
+    "title_ja": "やまねこだいおうとキャットマン",
+    "title_ro": "Yamanekodaiouto Kyattoman"
+  },
+  "0438a": {
+    "episode": 438,
+    "segment": "a",
+    "title_ja": "ちびぞうくんとまほうのランプ",
+    "title_ro": "Chibizoukuntomahouno Ranpu"
+  },
+  "0438b": {
+    "episode": 438,
+    "segment": "b",
+    "title_ja": "ハンバーガーキッドとコーンくん",
+    "title_ro": "Hanbaagaakiddo to Koon Kun"
+  },
+  "0439a": {
+    "episode": 439,
+    "segment": "a",
+    "title_ja": "バイキンビイダマンの逆襲",
+    "title_ro": "Baikinbiidaman no Gyakushuu"
+  },
+  "0439b": {
+    "episode": 439,
+    "segment": "b",
+    "title_ja": "ちびぞうくんとくじらのクータン",
+    "title_ro": "Chibizoukuntokujirano Kuutan"
+  },
+  "0440a": {
+    "episode": 440,
+    "segment": "a",
+    "title_ja": "SLマンとアリンコキッド",
+    "title_ro": "Sl Man to Arinkokiddo"
+  },
+  "0440b": {
+    "episode": 440,
+    "segment": "b",
+    "title_ja": "アンパンマンとおそうじトリオ",
+    "title_ro": "Anpanman to Osouji Torio"
+  },
+  "0441a": {
+    "episode": 441,
+    "segment": "a",
+    "title_ja": "SLマンとでかこ母さん",
+    "title_ro": "Sl Man to Dekako Kaasan"
+  },
+  "0441b": {
+    "episode": 441,
+    "segment": "b",
+    "title_ja": "ドキンちゃんといとまきおばさん",
+    "title_ro": "Dokin Chantoitomakiobasan"
+  },
+  "0442a": {
+    "episode": 442,
+    "segment": "a",
+    "title_ja": "アンパンマンとたくわん和尚",
+    "title_ro": "Anpanman to Takuwan Oshou"
+  },
+  "0442b": {
+    "episode": 442,
+    "segment": "b",
+    "title_ja": "カレーパンマンとクルミちゃん",
+    "title_ro": "Kareepanman to Kurumi Chan"
+  },
+  "0443a": {
+    "episode": 443,
+    "segment": "a",
+    "title_ja": "ちびぞうくんとちゅうしゃき先生",
+    "title_ro": "Chibizoukuntochuushaki Sensei"
+  },
+  "0443b": {
+    "episode": 443,
+    "segment": "b",
+    "title_ja": "ばいきんまんと黒バラ女王",
+    "title_ro": "Baikinman to Kuro Bara Joou"
+  },
+  "0444a": {
+    "episode": 444,
+    "segment": "a",
+    "title_ja": "こむすびまんとかつぶしまん",
+    "title_ro": "Komusubimantokatsubushiman"
+  },
+  "0445a": {
+    "episode": 445,
+    "segment": "a",
+    "title_ja": "アンパンマンとてっこつばいきんまん",
+    "title_ro": "Anpanman to Tekkotsubaikinman"
+  },
+  "0445b": {
+    "episode": 445,
+    "segment": "b",
+    "title_ja": "カレーパンマンとオニオン鬼",
+    "title_ro": "Kareepanman to Onion Oni"
+  },
+  "0446a": {
+    "episode": 446,
+    "segment": "a",
+    "title_ja": "アンパンマンとメレンゲシスターズ",
+    "title_ro": "Anpanman to Merengeshisutaazu"
+  },
+  "0446b": {
+    "episode": 446,
+    "segment": "b",
+    "title_ja": "バタコさんと空飛ぶマフラー",
+    "title_ro": "Batako Santo Kuuhi Bu Mafuraa"
+  },
+  "0447a": {
+    "episode": 447,
+    "segment": "a",
+    "title_ja": "アンパンマンとパクパク竜",
+    "title_ro": "Anpanman to Pakupaku Ryuu"
+  },
+  "0448a": {
+    "episode": 448,
+    "segment": "a",
+    "title_ja": "アンパンマンとわくわくレース",
+    "title_ro": "Anpanman to Wakuwaku Reesu"
+  },
+  "0449a": {
+    "episode": 449,
+    "segment": "a",
+    "title_ja": "ナンドバットとまじゅつしドロンガ",
+    "title_ro": "Nandobatto to Majutsushi Doronga"
+  },
+  "0450a": {
+    "episode": 450,
+    "segment": "a",
+    "title_ja": "ホラーマンとハロウィンマン",
+    "title_ro": "Horaaman to Harouinman"
+  },
+  "0450b": {
+    "episode": 450,
+    "segment": "b",
+    "title_ja": "アンパンマンともみじの国",
+    "title_ro": "Anpanman to Momijino Kuni"
+  },
+  "0451a": {
+    "episode": 451,
+    "segment": "a",
+    "title_ja": "アンパンマンとぎゅうどんまん",
+    "title_ro": "Anpanman to Gyuudonman"
+  },
+  "0452a": {
+    "episode": 452,
+    "segment": "a",
+    "title_ja": "ぼくのアンパンマン",
+    "title_ro": "Bokuno Anpanman"
+  },
+  "0452b": {
+    "episode": 452,
+    "segment": "b",
+    "title_ja": "しょくぱんまんとユッキー",
+    "title_ro": "Shokupanman to Yukkii"
+  },
+  "0453a": {
+    "episode": 453,
+    "segment": "a",
+    "title_ja": "ジャムおじさんと黄金のこむぎ",
+    "title_ro": "Jamu Ojisanto Ougon Nokomugi"
+  },
+  "0454a": {
+    "episode": 454,
+    "segment": "a",
+    "title_ja": "アンパンマンとグレートばいきんまん",
+    "title_ro": "Anpanman to Gureeto Baikinman"
+  },
+  "0454b": {
+    "episode": 454,
+    "segment": "b",
+    "title_ja": "おむすびまんとこおり鬼",
+    "title_ro": "Omusubimantokoori Oni"
+  },
+  "0455a": {
+    "episode": 455,
+    "segment": "a",
+    "title_ja": "アンパンマンと空飛ぶSLマン",
+    "title_ro": "Anpanman to Kuuhi Bu Sl Man"
+  },
+  "0456a": {
+    "episode": 456,
+    "segment": "a",
+    "title_ja": "ちびぞうくんとでかこ母さん",
+    "title_ro": "Chibizoukuntodekako Kaasan"
+  },
+  "0456b": {
+    "episode": 456,
+    "segment": "b",
+    "title_ja": "ばいきんまんとゴロンゴロ",
+    "title_ro": "Baikinman to Gorongoro"
+  },
+  "0457a": {
+    "episode": 457,
+    "segment": "a",
+    "title_ja": "シャーロくんと怪盗グルグルパン",
+    "title_ro": "Shaaro Kunto Kaitou Gurugurupan"
+  },
+  "0458a": {
+    "episode": 458,
+    "segment": "a",
+    "title_ja": "アンパンマンとゆきだるまん",
+    "title_ro": "Anpanman to Yukidaruman"
+  },
+  "0458b": {
+    "episode": 458,
+    "segment": "b",
+    "title_ja": "アンパンマンとはるまきぼうや",
+    "title_ro": "Anpanman to Harumakibouya"
+  },
+  "0459a": {
+    "episode": 459,
+    "segment": "a",
+    "title_ja": "ハンバーガーキッドと氷の女王",
+    "title_ro": "Hanbaagaakiddo to Koori no Joou"
+  },
+  "0460a": {
+    "episode": 460,
+    "segment": "a",
+    "title_ja": "アンパンマンとたぬきおに",
+    "title_ro": "Anpanman to Tanukioni"
+  },
+  "0460b": {
+    "episode": 460,
+    "segment": "b",
+    "title_ja": "アンパンマンとバイキンチーズ",
+    "title_ro": "Anpanman to Baikinchiizu"
+  },
+  "0461a": {
+    "episode": 461,
+    "segment": "a",
+    "title_ja": "アンパンマンとヨウガンリュウ",
+    "title_ro": "Anpanman to Youganryuu"
+  },
+  "0461b": {
+    "episode": 461,
+    "segment": "b",
+    "title_ja": "おべんとうまんとでかこ母さん",
+    "title_ro": "Obentoumantodekako Kaasan"
+  },
+  "0462a": {
+    "episode": 462,
+    "segment": "a",
+    "title_ja": "こむすびまんとおダンゴちゃん",
+    "title_ro": "Komusubimantoo Dango Chan"
+  },
+  "0462b": {
+    "episode": 462,
+    "segment": "b",
+    "title_ja": "アンパンマンとレンガくん",
+    "title_ro": "Anpanman to Renga Kun"
+  },
+  "0463a": {
+    "episode": 463,
+    "segment": "a",
+    "title_ja": "ドン・キ・ホタテとフラワー姫",
+    "title_ro": "Don・ki・hotate to Furawaa Hime"
+  },
+  "0463b": {
+    "episode": 463,
+    "segment": "b",
+    "title_ja": "ホラーマンとちびぞうくん",
+    "title_ro": "Horaaman to Chibizoukun"
+  },
+  "0464a": {
+    "episode": 464,
+    "segment": "a",
+    "title_ja": "かつぶしまんとハンバーガーキッド",
+    "title_ro": "Katsubushimanto Hanbaagaakiddo"
+  },
+  "0465a": {
+    "episode": 465,
+    "segment": "a",
+    "title_ja": "アンパンマンとブラックロールパンナ",
+    "title_ro": "Anpanman to Burakkuroorupanna"
+  },
+  "0466a": {
+    "episode": 466,
+    "segment": "a",
+    "title_ja": "アンパンマンとひやりんりん",
+    "title_ro": "Anpanman to Hiyarinrin"
+  },
+  "0466b": {
+    "episode": 466,
+    "segment": "b",
+    "title_ja": "アンパンマンとマーボドーフのマーボー",
+    "title_ro": "Anpanman to Maabodoofu no Maaboo"
+  },
+  "0467a": {
+    "episode": 467,
+    "segment": "a",
+    "title_ja": "帰ってきたふうせんガムキッド",
+    "title_ro": "Kaetsu Tekitafuusen Gamukiddo"
+  },
+  "0467b": {
+    "episode": 467,
+    "segment": "b",
+    "title_ja": "ちびぞうくんとピーマン",
+    "title_ro": "Chibizoukunto Piiman"
+  },
+  "0468a": {
+    "episode": 468,
+    "segment": "a",
+    "title_ja": "ばいきんまんとシーボーズ2号",
+    "title_ro": "Baikinman to Shiiboozu 2 Gou"
+  },
+  "0468b": {
+    "episode": 468,
+    "segment": "b",
+    "title_ja": "あかちゃんまんとかみなりピカタン",
+    "title_ro": "Akachanmantokaminari Pikatan"
+  },
+  "0469a": {
+    "episode": 469,
+    "segment": "a",
+    "title_ja": "アンパンマンとクリームパンダ",
+    "title_ro": "Anpanman to Kuriimupanda"
+  },
+  "0470a": {
+    "episode": 470,
+    "segment": "a",
+    "title_ja": "アンモナイトくんと黄金の谷",
+    "title_ro": "Anmonaito Kunto Ougon no Tani"
+  },
+  "0471a": {
+    "episode": 471,
+    "segment": "a",
+    "title_ja": "ばいきんまんとゴミラ",
+    "title_ro": "Baikinman to Gomira"
+  },
+  "0471b": {
+    "episode": 471,
+    "segment": "b",
+    "title_ja": "アンパンマンとシュガーぼうや",
+    "title_ro": "Anpanman to Shugaa Bouya"
+  },
+  "0472a": {
+    "episode": 472,
+    "segment": "a",
+    "title_ja": "クリームパンダとメロンパンナ",
+    "title_ro": "Kuriimupanda to Meronpanna"
+  },
+  "0472b": {
+    "episode": 472,
+    "segment": "b",
+    "title_ja": "ドキンちゃんとまじょの森",
+    "title_ro": "Dokin Chantomajono Mori"
+  },
+  "0473a": {
+    "episode": 473,
+    "segment": "a",
+    "title_ja": "とうだいまんとパイナップル島",
+    "title_ro": "Toudaimanto Painappuru Shima"
+  },
+  "0473b": {
+    "episode": 473,
+    "segment": "b",
+    "title_ja": "ヨーヨーマンとケンダマン",
+    "title_ro": "Yooyooman to Kendaman"
+  },
+  "0474a": {
+    "episode": 474,
+    "segment": "a",
+    "title_ja": "ばいきんまんとでかこ母さん",
+    "title_ro": "Baikinman to Dekako Kaasan"
+  },
+  "0474b": {
+    "episode": 474,
+    "segment": "b",
+    "title_ja": "ばいきんまんとこくばんまん",
+    "title_ro": "Baikinman to Kokubanman"
+  },
+  "0475a": {
+    "episode": 475,
+    "segment": "a",
+    "title_ja": "ロールパンナとクリームパンダ",
+    "title_ro": "Roorupanna to Kuriimupanda"
+  },
+  "0476a": {
+    "episode": 476,
+    "segment": "a",
+    "title_ja": "しょくぱんまんとクリームパンダ",
+    "title_ro": "Shokupanman to Kuriimupanda"
+  },
+  "0476b": {
+    "episode": 476,
+    "segment": "b",
+    "title_ja": "ばいきんまんとワッフルちゃん",
+    "title_ro": "Baikinman to Waffuru Chan"
+  },
+  "0477a": {
+    "episode": 477,
+    "segment": "a",
+    "title_ja": "カレーパンマンとクリームパンダ",
+    "title_ro": "Kareepanman to Kuriimupanda"
+  },
+  "0477b": {
+    "episode": 477,
+    "segment": "b",
+    "title_ja": "ピーターとちびぞうくん",
+    "title_ro": "Piitaa to Chibizoukun"
+  },
+  "0478a": {
+    "episode": 478,
+    "segment": "a",
+    "title_ja": "バタコさんとたぬきおに",
+    "title_ro": "Batako Santotanukioni"
+  },
+  "0478b": {
+    "episode": 478,
+    "segment": "b",
+    "title_ja": "アンパンマンとドリアン王女",
+    "title_ro": "Anpanman to Dorian Oujo"
+  },
+  "0479a": {
+    "episode": 479,
+    "segment": "a",
+    "title_ja": "クリームパンダとちびぞうくん",
+    "title_ro": "Kuriimupanda to Chibizoukun"
+  },
+  "0479b": {
+    "episode": 479,
+    "segment": "b",
+    "title_ja": "ドキンちゃんのドキドキ先生",
+    "title_ro": "Dokin Channo Dokidoki Sensei"
+  },
+  "0480a": {
+    "episode": 480,
+    "segment": "a",
+    "title_ja": "アンパンマンとヘリコプタン",
+    "title_ro": "Anpanman to Herikoputan"
+  },
+  "0480b": {
+    "episode": 480,
+    "segment": "b",
+    "title_ja": "アンパンマンとハムレッド",
+    "title_ro": "Anpanman to Hamureddo"
+  },
+  "0481a": {
+    "episode": 481,
+    "segment": "a",
+    "title_ja": "ジャムおじさんとジャムばいきんまん",
+    "title_ro": "Jamu Ojisanto Jamu Baikinman"
+  },
+  "0481b": {
+    "episode": 481,
+    "segment": "b",
+    "title_ja": "ばいきんまんとチンゲンサイ",
+    "title_ro": "Baikinman to Chingensai"
+  },
+  "0482a": {
+    "episode": 482,
+    "segment": "a",
+    "title_ja": "ドクター・ヒヤリとくしゃみおばけ",
+    "title_ro": "Dokutaa・hiyari to Kushamiobake"
+  },
+  "0482b": {
+    "episode": 482,
+    "segment": "b",
+    "title_ja": "アンパンマンとバオバブおじさん",
+    "title_ro": "Anpanman to Baobabu Ojisan"
+  },
+  "0483a": {
+    "episode": 483,
+    "segment": "a",
+    "title_ja": "アンパンマンとリトルジョーカー",
+    "title_ro": "Anpanman to Ritorujookaa"
+  },
+  "0483b": {
+    "episode": 483,
+    "segment": "b",
+    "title_ja": "ばいきんまんとへんそうジャムおじさん",
+    "title_ro": "Baikinman to Hensou Jamu Ojisan"
+  },
+  "0484a": {
+    "episode": 484,
+    "segment": "a",
+    "title_ja": "ばいきんまんとかびるんるん",
+    "title_ro": "Baikinman to Kabirunrun"
+  },
+  "0484b": {
+    "episode": 484,
+    "segment": "b",
+    "title_ja": "シャーロくんとホラーマン",
+    "title_ro": "Shaaro Kunto Horaaman"
+  },
+  "0485a": {
+    "episode": 485,
+    "segment": "a",
+    "title_ja": "そうめんおしょうとみょうがちゃん",
+    "title_ro": "Soumen'oshoutomyougachan"
+  },
+  "0485b": {
+    "episode": 485,
+    "segment": "b",
+    "title_ja": "アンパンマンとたいやきまん",
+    "title_ro": "Anpanman to Taiyakiman"
+  },
+  "0486a": {
+    "episode": 486,
+    "segment": "a",
+    "title_ja": "クリームパンダとアリンコキッド",
+    "title_ro": "Kuriimupanda to Arinkokiddo"
+  },
+  "0487a": {
+    "episode": 487,
+    "segment": "a",
+    "title_ja": "アンパンマンとちょうちん平次",
+    "title_ro": "Anpanman to Chouchin Heiji"
+  },
+  "0487b": {
+    "episode": 487,
+    "segment": "b",
+    "title_ja": "ばいきんまんとニンジャの里",
+    "title_ro": "Baikinman to Ninja no Sato"
+  },
+  "0488a": {
+    "episode": 488,
+    "segment": "a",
+    "title_ja": "アンパンマンとカステラの城",
+    "title_ro": "Anpanman to Kasutera no Shiro"
+  },
+  "0489a": {
+    "episode": 489,
+    "segment": "a",
+    "title_ja": "リトルジョーカーとトランプの国",
+    "title_ro": "Ritorujookaa to Toranpu no Kuni"
+  },
+  "0490a": {
+    "episode": 490,
+    "segment": "a",
+    "title_ja": "あかちゃんまんとあくびどり",
+    "title_ro": "Akachanmantoakubidori"
+  },
+  "0490b": {
+    "episode": 490,
+    "segment": "b",
+    "title_ja": "チーズのおねがい",
+    "title_ro": "Chiizu no Onegai"
+  },
+  "0491a": {
+    "episode": 491,
+    "segment": "a",
+    "title_ja": "アンパンマンとニガウリマン",
+    "title_ro": "Anpanman to Nigauriman"
+  },
+  "0491b": {
+    "episode": 491,
+    "segment": "b",
+    "title_ja": "ばいきんまんとおくらちゃん",
+    "title_ro": "Baikinman to Okurachan"
+  },
+  "0492a": {
+    "episode": 492,
+    "segment": "a",
+    "title_ja": "ばいきんまんとランドセル島",
+    "title_ro": "Baikinman to Randoseru Shima"
+  },
+  "0492b": {
+    "episode": 492,
+    "segment": "b",
+    "title_ja": "くものモクちゃんとモクモク女王",
+    "title_ro": "Kumono Moku Chanto Mokumoku Joou"
+  },
+  "0493a": {
+    "episode": 493,
+    "segment": "a",
+    "title_ja": "ちびぞうくんとモグリン",
+    "title_ro": "Chibizoukunto Mogurin"
+  },
+  "0493b": {
+    "episode": 493,
+    "segment": "b",
+    "title_ja": "アンパンマンとグラタンちゃん",
+    "title_ro": "Anpanman to Guratan Chan"
+  },
+  "0494a": {
+    "episode": 494,
+    "segment": "a",
+    "title_ja": "しょくぱんまんと3ばいドキンちゃん",
+    "title_ro": "Shokupanman to 3 Bai Dokin Chan"
+  },
+  "0494b": {
+    "episode": 494,
+    "segment": "b",
+    "title_ja": "アンパンマンときんぴら和尚",
+    "title_ro": "Anpanman to Kinpira Oshou"
+  },
+  "0495a": {
+    "episode": 495,
+    "segment": "a",
+    "title_ja": "クリームパンダとこむすびまん",
+    "title_ro": "Kuriimupanda to Komusubiman"
+  },
+  "0495b": {
+    "episode": 495,
+    "segment": "b",
+    "title_ja": "ドキンちゃんと妖精バック",
+    "title_ro": "Dokin Chanto Yousei Bakku"
+  },
+  "0496a": {
+    "episode": 496,
+    "segment": "a",
+    "title_ja": "クリームパンダとSLマン",
+    "title_ro": "Kuriimupanda to Sl Man"
+  },
+  "0496b": {
+    "episode": 496,
+    "segment": "b",
+    "title_ja": "ドキンちゃんとドリアン王女",
+    "title_ro": "Dokin Chanto Dorian Oujo"
+  },
+  "0497a": {
+    "episode": 497,
+    "segment": "a",
+    "title_ja": "ばいきんまんとタンバリンマン",
+    "title_ro": "Baikinman to Tanbarinman"
+  },
+  "0497b": {
+    "episode": 497,
+    "segment": "b",
+    "title_ja": "ドキンちゃんとなまいきナマコ",
+    "title_ro": "Dokin Chantonamaiki Namako"
+  },
+  "0498a": {
+    "episode": 498,
+    "segment": "a",
+    "title_ja": "アンパンマンとしろかぶくん",
+    "title_ro": "Anpanman to Shirokabukun"
+  },
+  "0498b": {
+    "episode": 498,
+    "segment": "b",
+    "title_ja": "ばいきんまんとケーキコンクール",
+    "title_ro": "Baikinman to Keekikonkuuru"
+  },
+  "0499a": {
+    "episode": 499,
+    "segment": "a",
+    "title_ja": "クリームパンダとはみがきまん",
+    "title_ro": "Kuriimupanda to Hamigakiman"
+  },
+  "0499b": {
+    "episode": 499,
+    "segment": "b",
+    "title_ja": "アンパンマンとゆきんこゆきちゃん",
+    "title_ro": "Anpanman to Yukinkoyukichan"
+  },
+  "0500a": {
+    "episode": 500,
+    "segment": "a",
+    "title_ja": "アンパンマンのひみつ",
+    "title_ro": "Anpanman no Himitsu"
+  },
+  "0501a": {
+    "episode": 501,
+    "segment": "a",
+    "title_ja": "クリームパンダとあかちゃんまん",
+    "title_ro": "Kuriimupanda to Akachanman"
+  },
+  "0501b": {
+    "episode": 501,
+    "segment": "b",
+    "title_ja": "ばいきんまんとうめたろう",
+    "title_ro": "Baikinman to Umetarou"
+  },
+  "0502a": {
+    "episode": 502,
+    "segment": "a",
+    "title_ja": "アンパンマンとつばさくん",
+    "title_ro": "Anpanman to Tsubasakun"
+  },
+  "0502b": {
+    "episode": 502,
+    "segment": "b",
+    "title_ja": "ばいきんまんとキララちゃん",
+    "title_ro": "Baikinman to Kirara Chan"
+  },
+  "0503a": {
+    "episode": 503,
+    "segment": "a",
+    "title_ja": "ユッキーとSLマン",
+    "title_ro": "Yukkii to Sl Man"
+  },
+  "0503b": {
+    "episode": 503,
+    "segment": "b",
+    "title_ja": "メロンパンナとゆず姫",
+    "title_ro": "Meronpanna to Yuzu Hime"
+  },
+  "0504a": {
+    "episode": 504,
+    "segment": "a",
+    "title_ja": "アンパンマンとアロエくん",
+    "title_ro": "Anpanman to Aroe Kun"
+  },
+  "0504b": {
+    "episode": 504,
+    "segment": "b",
+    "title_ja": "チーズとチーズバケット号",
+    "title_ro": "Chiizu to Chiizubaketto Gou"
+  },
+  "0505a": {
+    "episode": 505,
+    "segment": "a",
+    "title_ja": "アンパンマンとやきそばパンマン",
+    "title_ro": "Anpanman to Yakisoba Panman"
+  },
+  "0505b": {
+    "episode": 505,
+    "segment": "b",
+    "title_ja": "クリームパンダとプリンちゃん",
+    "title_ro": "Kuriimupanda to Purin Chan"
+  },
+  "0506a": {
+    "episode": 506,
+    "segment": "a",
+    "title_ja": "しろかぶくんとでんでん一座",
+    "title_ro": "Shirokabukuntodenden Ichiza"
+  },
+  "0507a": {
+    "episode": 507,
+    "segment": "a",
+    "title_ja": "アンパンマンとピロシキおじさん",
+    "title_ro": "Anpanman to Piroshiki Ojisan"
+  },
+  "0507b": {
+    "episode": 507,
+    "segment": "b",
+    "title_ja": "クリームパンダとドキンちゃん",
+    "title_ro": "Kuriimupanda to Dokin Chan"
+  },
+  "0508a": {
+    "episode": 508,
+    "segment": "a",
+    "title_ja": "アンパンマンとやきそばかすちゃん",
+    "title_ro": "Anpanman to Yakisobakasuchan"
+  },
+  "0508b": {
+    "episode": 508,
+    "segment": "b",
+    "title_ja": "アンパンマンとウーロンさん",
+    "title_ro": "Anpanman to Uuron San"
+  },
+  "0509a": {
+    "episode": 509,
+    "segment": "a",
+    "title_ja": "アンパンマンとマグマン",
+    "title_ro": "Anpanman to Maguman"
+  },
+  "0509b": {
+    "episode": 509,
+    "segment": "b",
+    "title_ja": "アンパンマンとセニョール・タコス",
+    "title_ro": "Anpanman to Senyooru・takosu"
+  },
+  "0510a": {
+    "episode": 510,
+    "segment": "a",
+    "title_ja": "カレーパンマンとふとまきくん",
+    "title_ro": "Kareepanman to Futomakikun"
+  },
+  "0510b": {
+    "episode": 510,
+    "segment": "b",
+    "title_ja": "アンパンマンとドライヤーじいさん",
+    "title_ro": "Anpanman to Doraiyaa Jiisan"
+  },
+  "0511a": {
+    "episode": 511,
+    "segment": "a",
+    "title_ja": "ばいきんまんとてんむすちゃん",
+    "title_ro": "Baikinman to Tenmusuchan"
+  },
+  "0511b": {
+    "episode": 511,
+    "segment": "b",
+    "title_ja": "アンパンマンとアーモンド王子",
+    "title_ro": "Anpanman to Aamondo Ouji"
+  },
+  "0512a": {
+    "episode": 512,
+    "segment": "a",
+    "title_ja": "アンパンマンとカレーどんまん",
+    "title_ro": "Anpanman to Karee Donman"
+  },
+  "0512b": {
+    "episode": 512,
+    "segment": "b",
+    "title_ja": "アンパンマンとわんこちゃん",
+    "title_ro": "Anpanman to Wankochan"
+  },
+  "0513a": {
+    "episode": 513,
+    "segment": "a",
+    "title_ja": "アンパンマンとかいけつナガネギマン",
+    "title_ro": "Anpanman to Kaiketsu Naganegiman"
+  },
+  "0513b": {
+    "episode": 513,
+    "segment": "b",
+    "title_ja": "ばいきんまんとおしんこちゃん",
+    "title_ro": "Baikinman to Oshinkochan"
+  },
+  "0514a": {
+    "episode": 514,
+    "segment": "a",
+    "title_ja": "ばいきんまんとバッテラさん",
+    "title_ro": "Baikinman to Battera San"
+  },
+  "0514b": {
+    "episode": 514,
+    "segment": "b",
+    "title_ja": "アンパンマンとスパイス王子",
+    "title_ro": "Anpanman to Supaisu Ouji"
+  },
+  "0515a": {
+    "episode": 515,
+    "segment": "a",
+    "title_ja": "カレーパンマンとカレーどんまん",
+    "title_ro": "Kareepanman to Karee Donman"
+  },
+  "0515b": {
+    "episode": 515,
+    "segment": "b",
+    "title_ja": "ちびぞうくんとすずらん姫",
+    "title_ro": "Chibizoukuntosuzuran Hime"
+  },
+  "0516a": {
+    "episode": 516,
+    "segment": "a",
+    "title_ja": "アンパンマンとちゃきんくん",
+    "title_ro": "Anpanman to Chakinkun"
+  },
+  "0516b": {
+    "episode": 516,
+    "segment": "b",
+    "title_ja": "アンパンマンとゆめのこうま",
+    "title_ro": "Anpanman to Yumenokouma"
+  },
+  "0517a": {
+    "episode": 517,
+    "segment": "a",
+    "title_ja": "こむすびまんとてんむすちゃん",
+    "title_ro": "Komusubimantotenmusuchan"
+  },
+  "0517b": {
+    "episode": 517,
+    "segment": "b",
+    "title_ja": "ドキンちゃんとあったかホラーパン",
+    "title_ro": "Dokin Chantoattaka Horaapan"
+  },
+  "0518a": {
+    "episode": 518,
+    "segment": "a",
+    "title_ja": "アンパンマンとちゃわんむしまろ",
+    "title_ro": "Anpanman to Chawanmushimaro"
+  },
+  "0518b": {
+    "episode": 518,
+    "segment": "b",
+    "title_ja": "ドキンちゃんとハーブちゃん",
+    "title_ro": "Dokin Chanto Haabu Chan"
+  },
+  "0519a": {
+    "episode": 519,
+    "segment": "a",
+    "title_ja": "アンパンマンといしうす和尚",
+    "title_ro": "Anpanman to Ishiusu Oshou"
+  },
+  "0519b": {
+    "episode": 519,
+    "segment": "b",
+    "title_ja": "メロンパンナと鉄火のマキちゃん",
+    "title_ro": "Meronpanna to Tekka no Maki Chan"
+  },
+  "0520a": {
+    "episode": 520,
+    "segment": "a",
+    "title_ja": "アンパンマンとハヤシライスマン",
+    "title_ro": "Anpanman to Hayashiraisuman"
+  },
+  "0520b": {
+    "episode": 520,
+    "segment": "b",
+    "title_ja": "てんどんまんとてんむすちゃん",
+    "title_ro": "Tendonmantotenmusuchan"
+  },
+  "0521a": {
+    "episode": 521,
+    "segment": "a",
+    "title_ja": "アンパンマンとどんぶり星人",
+    "title_ro": "Anpanman to Donburi Seijin"
+  },
+  "0521b": {
+    "episode": 521,
+    "segment": "b",
+    "title_ja": "アロエくんとバイキンアロエ",
+    "title_ro": "Aroe Kunto Baikin'aroe"
+  },
+  "0522a": {
+    "episode": 522,
+    "segment": "a",
+    "title_ja": "ばいきんまんとチーズバケット号",
+    "title_ro": "Baikinman to Chiizubaketto Gou"
+  },
+  "0522b": {
+    "episode": 522,
+    "segment": "b",
+    "title_ja": "アンパンマンとちゅうか丼まん",
+    "title_ro": "Anpanman to Chuuka Donburi Man"
+  },
+  "0523a": {
+    "episode": 523,
+    "segment": "a",
+    "title_ja": "しろかぶくん故郷へかえる",
+    "title_ro": "Shirokabukun Furusatohe Kaeru"
+  },
+  "0524a": {
+    "episode": 524,
+    "segment": "a",
+    "title_ja": "ちびぞうくんとクツベラー",
+    "title_ro": "Chibizoukunto Kutsuberaa"
+  },
+  "0524b": {
+    "episode": 524,
+    "segment": "b",
+    "title_ja": "ドキンちゃんとオルゴールマン",
+    "title_ro": "Dokin Chanto Orugooruman"
+  },
+  "0525a": {
+    "episode": 525,
+    "segment": "a",
+    "title_ja": "アンパンマンとバームクーヘンさん",
+    "title_ro": "Anpanman to Baamukuuhen San"
+  },
+  "0525b": {
+    "episode": 525,
+    "segment": "b",
+    "title_ja": "カレーパンマンとやきそばパンマン",
+    "title_ro": "Kareepanman to Yakisoba Panman"
+  },
+  "0526a": {
+    "episode": 526,
+    "segment": "a",
+    "title_ja": "アンパンマンとけんちん和尚",
+    "title_ro": "Anpanman to Kenchin Oshou"
+  },
+  "0526b": {
+    "episode": 526,
+    "segment": "b",
+    "title_ja": "らーめんてんしとリャンメンさん",
+    "title_ro": "Raamentenshito Ryanmen San"
+  },
+  "0527a": {
+    "episode": 527,
+    "segment": "a",
+    "title_ja": "クリームパンダとハンバーガーキッド",
+    "title_ro": "Kuriimupanda to Hanbaagaakiddo"
+  },
+  "0528a": {
+    "episode": 528,
+    "segment": "a",
+    "title_ja": "ベビードーナツとクリームパンダ",
+    "title_ro": "Bebiidoonatsu to Kuriimupanda"
+  },
+  "0528b": {
+    "episode": 528,
+    "segment": "b",
+    "title_ja": "アンパンマンとシューズマン",
+    "title_ro": "Anpanman to Shuuzuman"
+  },
+  "0529a": {
+    "episode": 529,
+    "segment": "a",
+    "title_ja": "クリームパンダとホラーマン",
+    "title_ro": "Kuriimupanda to Horaaman"
+  },
+  "0529b": {
+    "episode": 529,
+    "segment": "b",
+    "title_ja": "かがやけ!かまめしどん",
+    "title_ro": "Kagayake ! Kamameshidon"
+  },
+  "0530a": {
+    "episode": 530,
+    "segment": "a",
+    "title_ja": "ちびぞうくんとチビマリン",
+    "title_ro": "Chibizoukunto Chibimarin"
+  },
+  "0530b": {
+    "episode": 530,
+    "segment": "b",
+    "title_ja": "バタコさんとおかしの国",
+    "title_ro": "Batako Santookashino Kuni"
+  },
+  "0531a": {
+    "episode": 531,
+    "segment": "a",
+    "title_ja": "いくら姫とおすしの国",
+    "title_ro": "Ikura Hime Toosushino Kuni"
+  },
+  "0532a": {
+    "episode": 532,
+    "segment": "a",
+    "title_ja": "アンパンマンとホラーだんしゃく",
+    "title_ro": "Anpanman to Horaa Danshaku"
+  },
+  "0532b": {
+    "episode": 532,
+    "segment": "b",
+    "title_ja": "すてきなしょくぱんまん",
+    "title_ro": "Sutekinashokupanman"
+  },
+  "0533a": {
+    "episode": 533,
+    "segment": "a",
+    "title_ja": "SLマンとマイマイ王国",
+    "title_ro": "Sl Man to Maimai Oukoku"
+  },
+  "0534a": {
+    "episode": 534,
+    "segment": "a",
+    "title_ja": "しょくぱんまんとあざみちゃん",
+    "title_ro": "Shokupanman to Azamichan"
+  },
+  "0534b": {
+    "episode": 534,
+    "segment": "b",
+    "title_ja": "あかちゃんまんとねむねむおじさん",
+    "title_ro": "Akachanmantonemunemuojisan"
+  },
+  "0535a": {
+    "episode": 535,
+    "segment": "a",
+    "title_ja": "ばいきんまんとちゃわんむしまろ",
+    "title_ro": "Baikinman to Chawanmushimaro"
+  },
+  "0535b": {
+    "episode": 535,
+    "segment": "b",
+    "title_ja": "チーズバケット号とフルーツ島",
+    "title_ro": "Chiizubaketto Gou to Furuutsu Shima"
+  },
+  "0536a": {
+    "episode": 536,
+    "segment": "a",
+    "title_ja": "ロールパンナとやきそばパンマン",
+    "title_ro": "Roorupanna to Yakisoba Panman"
+  },
+  "0537a": {
+    "episode": 537,
+    "segment": "a",
+    "title_ja": "フランケンロボととうだいまん",
+    "title_ro": "Furankenrobo to Toudaiman"
+  },
+  "0537b": {
+    "episode": 537,
+    "segment": "b",
+    "title_ja": "おしんこちゃんとこむすびまん",
+    "title_ro": "Oshinkochantokomusubiman"
+  },
+  "0538a": {
+    "episode": 538,
+    "segment": "a",
+    "title_ja": "おだんごちゃんとだんごのタンゴ",
+    "title_ro": "Odangochantodangono Tango"
+  },
+  "0538b": {
+    "episode": 538,
+    "segment": "b",
+    "title_ja": "ばいきんまんとにこにこカレーパンマン",
+    "title_ro": "Baikinman to Nikoniko Kareepanman"
+  },
+  "0539a": {
+    "episode": 539,
+    "segment": "a",
+    "title_ja": "ばいきんまんとからくりランド",
+    "title_ro": "Baikinman to Karakuri Rando"
+  },
+  "0539b": {
+    "episode": 539,
+    "segment": "b",
+    "title_ja": "ロールパンナとでかこ母さん",
+    "title_ro": "Roorupanna to Dekako Kaasan"
+  },
+  "0540a": {
+    "episode": 540,
+    "segment": "a",
+    "title_ja": "チーズとれんこんまん",
+    "title_ro": "Chiizu to Renkonman"
+  },
+  "0540b": {
+    "episode": 540,
+    "segment": "b",
+    "title_ja": "ばいきんまんとパスタおばさん",
+    "title_ro": "Baikinman to Pasuta Obasan"
+  },
+  "0541a": {
+    "episode": 541,
+    "segment": "a",
+    "title_ja": "化石の魔王と氷の国",
+    "title_ro": "Kaseki no Maou to Koori no Kuni"
+  },
+  "0542a": {
+    "episode": 542,
+    "segment": "a",
+    "title_ja": "やきそばパンマン流れ旅",
+    "title_ro": "Yakisoba Panman Nagare Tabi"
+  },
+  "0542b": {
+    "episode": 542,
+    "segment": "b",
+    "title_ja": "アンパンマンとカップラーメンマン",
+    "title_ro": "Anpanman to Kappuraamenman"
+  },
+  "0543a": {
+    "episode": 543,
+    "segment": "a",
+    "title_ja": "ロールパンナと氷の女王",
+    "title_ro": "Roorupanna to Koori no Joou"
+  },
+  "0544a": {
+    "episode": 544,
+    "segment": "a",
+    "title_ja": "アンパンマンとクラッカーくん",
+    "title_ro": "Anpanman to Kurakkaa Kun"
+  },
+  "0544b": {
+    "episode": 544,
+    "segment": "b",
+    "title_ja": "アンパンマンとじょんがらくん",
+    "title_ro": "Anpanman to Jongarakun"
+  },
+  "0545a": {
+    "episode": 545,
+    "segment": "a",
+    "title_ja": "黒バラ女王とクロワッサン星",
+    "title_ro": "Kuro Bara Joou to Kurowassan Hoshi"
+  },
+  "0546a": {
+    "episode": 546,
+    "segment": "a",
+    "title_ja": "アンパンマンとキャンディ姫",
+    "title_ro": "Anpanman to Kyandi Hime"
+  },
+  "0546b": {
+    "episode": 546,
+    "segment": "b",
+    "title_ja": "アンパンマンとおことちゃん",
+    "title_ro": "Anpanman to Okotochan"
+  },
+  "0547a": {
+    "episode": 547,
+    "segment": "a",
+    "title_ja": "アンパンマンとしらたき姫",
+    "title_ro": "Anpanman to Shirataki Hime"
+  },
+  "0547b": {
+    "episode": 547,
+    "segment": "b",
+    "title_ja": "ばいきんまんとクリームパンダ",
+    "title_ro": "Baikinman to Kuriimupanda"
+  },
+  "0548a": {
+    "episode": 548,
+    "segment": "a",
+    "title_ja": "アンパンマンとおでん三姉妹",
+    "title_ro": "Anpanman to Oden Sanshimai"
+  },
+  "0549a": {
+    "episode": 549,
+    "segment": "a",
+    "title_ja": "アンパンマンとギョーザくん",
+    "title_ro": "Anpanman to Gyooza Kun"
+  },
+  "0549b": {
+    "episode": 549,
+    "segment": "b",
+    "title_ja": "ナガネギマンとしらたき姫",
+    "title_ro": "Naganegiman to Shirataki Hime"
+  },
+  "0550a": {
+    "episode": 550,
+    "segment": "a",
+    "title_ja": "ホラーマンとおことちゃん",
+    "title_ro": "Horaaman to Okotochan"
+  },
+  "0550b": {
+    "episode": 550,
+    "segment": "b",
+    "title_ja": "うなどんまんとぎゅうどんまん",
+    "title_ro": "Unadonmantogyuudonman"
+  },
+  "0551a": {
+    "episode": 551,
+    "segment": "a",
+    "title_ja": "クリームパンダとらんぼうや",
+    "title_ro": "Kuriimupanda to Ranbouya"
+  },
+  "0551b": {
+    "episode": 551,
+    "segment": "b",
+    "title_ja": "おむすびまんとホラーマン",
+    "title_ro": "Omusubimanto Horaaman"
+  },
+  "0552a": {
+    "episode": 552,
+    "segment": "a",
+    "title_ja": "ばいきんまんとタータン",
+    "title_ro": "Baikinman to Taatan"
+  },
+  "0552b": {
+    "episode": 552,
+    "segment": "b",
+    "title_ja": "プリンちゃんとまほうのお城",
+    "title_ro": "Purin Chantomahounoo Shiro"
+  },
+  "0553a": {
+    "episode": 553,
+    "segment": "a",
+    "title_ja": "やきそばパンマンとおこのみやきまん",
+    "title_ro": "Yakisoba Panman to Okonomiyakiman"
+  },
+  "0553b": {
+    "episode": 553,
+    "segment": "b",
+    "title_ja": "ナットーマンとおくらちゃん",
+    "title_ro": "Nattooman to Okurachan"
+  },
+  "0554a": {
+    "episode": 554,
+    "segment": "a",
+    "title_ja": "クリームパンダとリトルジョーカー",
+    "title_ro": "Kuriimupanda to Ritorujookaa"
+  },
+  "0554b": {
+    "episode": 554,
+    "segment": "b",
+    "title_ja": "バタコさんとワッフルちゃん",
+    "title_ro": "Batako Santo Waffuru Chan"
+  },
+  "0555a": {
+    "episode": 555,
+    "segment": "a",
+    "title_ja": "アンパンマンのマーチ",
+    "title_ro": "Anpanman no Maachi"
+  },
+  "0556a": {
+    "episode": 556,
+    "segment": "a",
+    "title_ja": "しょくぱん王子とてんどん姫",
+    "title_ro": "Shokupan Ouji Totendon Hime"
+  },
+  "0557a": {
+    "episode": 557,
+    "segment": "a",
+    "title_ja": "ばいきんまんとフルーツパフェちゃん",
+    "title_ro": "Baikinman to Furuutsupafe Chan"
+  },
+  "0557b": {
+    "episode": 557,
+    "segment": "b",
+    "title_ja": "だいすき!アンパンマン",
+    "title_ro": "Daisuki ! Anpanman"
+  },
+  "0558a": {
+    "episode": 558,
+    "segment": "a",
+    "title_ja": "クリームパンダとつみきの城",
+    "title_ro": "Kuriimupanda to Tsumikino Shiro"
+  },
+  "0559a": {
+    "episode": 559,
+    "segment": "a",
+    "title_ja": "クリームパンダとはるかぜさん",
+    "title_ro": "Kuriimupanda to Harukazesan"
+  },
+  "0559b": {
+    "episode": 559,
+    "segment": "b",
+    "title_ja": "おしんこちゃんとちゃわんむしまろ",
+    "title_ro": "Oshinkochantochawanmushimaro"
+  },
+  "0560a": {
+    "episode": 560,
+    "segment": "a",
+    "title_ja": "おしるこちゃんとどんぶりまんトリオ",
+    "title_ro": "Oshirukochantodonburiman Torio"
+  },
+  "0560b": {
+    "episode": 560,
+    "segment": "b",
+    "title_ja": "ぼくのロールパンナおねえちゃん",
+    "title_ro": "Bokuno Roorupanna Oneechan"
+  },
+  "0561a": {
+    "episode": 561,
+    "segment": "a",
+    "title_ja": "ホラーマンとゴミラ",
+    "title_ro": "Horaaman to Gomira"
+  },
+  "0561b": {
+    "episode": 561,
+    "segment": "b",
+    "title_ja": "アンパンマンとタンポポちゃん",
+    "title_ro": "Anpanman to Tanpopo Chan"
+  },
+  "0562a": {
+    "episode": 562,
+    "segment": "a",
+    "title_ja": "カレーパンマンとニガウリマン",
+    "title_ro": "Kareepanman to Nigauriman"
+  },
+  "0562b": {
+    "episode": 562,
+    "segment": "b",
+    "title_ja": "ジャムおじさんのひみつ",
+    "title_ro": "Jamu Ojisannohimitsu"
+  },
+  "0563a": {
+    "episode": 563,
+    "segment": "a",
+    "title_ja": "しょくぱんまんとふでじいさん",
+    "title_ro": "Shokupanman to Fudejiisan"
+  },
+  "0563b": {
+    "episode": 563,
+    "segment": "b",
+    "title_ja": "ばいきんまんとなみだちゃん",
+    "title_ro": "Baikinman to Namidachan"
+  },
+  "0564a": {
+    "episode": 564,
+    "segment": "a",
+    "title_ja": "ホラーマンとたぬきおに",
+    "title_ro": "Horaaman to Tanukioni"
+  },
+  "0564b": {
+    "episode": 564,
+    "segment": "b",
+    "title_ja": "アンパンマンとジャスミンさん",
+    "title_ro": "Anpanman to Jasumin San"
+  },
+  "0565a": {
+    "episode": 565,
+    "segment": "a",
+    "title_ja": "クリームパンダとかしわもちまん",
+    "title_ro": "Kuriimupanda to Kashiwamochiman"
+  },
+  "0565b": {
+    "episode": 565,
+    "segment": "b",
+    "title_ja": "アンモナイトくんと砂男",
+    "title_ro": "Anmonaito Kunto Sunaotoko"
+  },
+  "0566a": {
+    "episode": 566,
+    "segment": "a",
+    "title_ja": "しらたき姫とどんぶりまんトリオ",
+    "title_ro": "Shirataki Hime Todonburiman Torio"
+  },
+  "0566b": {
+    "episode": 566,
+    "segment": "b",
+    "title_ja": "ドキンちゃんとカレンちゃん",
+    "title_ro": "Dokin Chanto Karen Chan"
+  },
+  "0567a": {
+    "episode": 567,
+    "segment": "a",
+    "title_ja": "クリームパンダとやみるんるん",
+    "title_ro": "Kuriimupanda to Yamirunrun"
+  },
+  "0567b": {
+    "episode": 567,
+    "segment": "b",
+    "title_ja": "あかちゃんまんとたぬきおに",
+    "title_ro": "Akachanmantotanukioni"
+  },
+  "0568a": {
+    "episode": 568,
+    "segment": "a",
+    "title_ja": "てんどんまんのてんどん先生",
+    "title_ro": "Tendonmannotendon Sensei"
+  },
+  "0568b": {
+    "episode": 568,
+    "segment": "b",
+    "title_ja": "ドクター・ヒヤリとスケテルマン",
+    "title_ro": "Dokutaa・hiyari to Suketeruman"
+  },
+  "0569a": {
+    "episode": 569,
+    "segment": "a",
+    "title_ja": "かつぶしまんとおばけねこ",
+    "title_ro": "Katsubushimantoobakeneko"
+  },
+  "0569b": {
+    "episode": 569,
+    "segment": "b",
+    "title_ja": "ばいきんまんとピカルンルン",
+    "title_ro": "Baikinman to Pikarunrun"
+  },
+  "0570a": {
+    "episode": 570,
+    "segment": "a",
+    "title_ja": "おしんこちゃんとたくわん和尚",
+    "title_ro": "Oshinkochantotakuwan Oshou"
+  },
+  "0570b": {
+    "episode": 570,
+    "segment": "b",
+    "title_ja": "メロンパンナのひみつの花畑",
+    "title_ro": "Meronpanna no Himitsuno Hanahata"
+  },
+  "0571a": {
+    "episode": 571,
+    "segment": "a",
+    "title_ja": "あかちゃんまんとナガネギマン",
+    "title_ro": "Akachanmanto Naganegiman"
+  },
+  "0571b": {
+    "episode": 571,
+    "segment": "b",
+    "title_ja": "ナットーマンとノリノリのりへい",
+    "title_ro": "Nattooman to Norinori no Rihei"
+  },
+  "0572a": {
+    "episode": 572,
+    "segment": "a",
+    "title_ja": "アンパンマンとびいたん",
+    "title_ro": "Anpanman to Biitan"
+  },
+  "0572b": {
+    "episode": 572,
+    "segment": "b",
+    "title_ja": "カレーパンマンとプリンちゃん",
+    "title_ro": "Kareepanman to Purin Chan"
+  },
+  "0573a": {
+    "episode": 573,
+    "segment": "a",
+    "title_ja": "ニガウリマンとかまめしどん",
+    "title_ro": "Nigauriman to Kamameshidon"
+  },
+  "0573b": {
+    "episode": 573,
+    "segment": "b",
+    "title_ja": "ドキンちゃんとあじさいさん",
+    "title_ro": "Dokin Chantoajisaisan"
+  },
+  "0574a": {
+    "episode": 574,
+    "segment": "a",
+    "title_ja": "ドキンちゃんとまほうのランプ",
+    "title_ro": "Dokin Chantomahouno Ranpu"
+  },
+  "0574b": {
+    "episode": 574,
+    "segment": "b",
+    "title_ja": "ホラーマンとバイキン仙人",
+    "title_ro": "Horaaman to Baikin Sennin"
+  },
+  "0575a": {
+    "episode": 575,
+    "segment": "a",
+    "title_ja": "こむすびまんとびいたん",
+    "title_ro": "Komusubimantobiitan"
+  },
+  "0575b": {
+    "episode": 575,
+    "segment": "b",
+    "title_ja": "カツドンマンとカツサンドくん",
+    "title_ro": "Katsudonman to Katsusando Kun"
+  },
+  "0576a": {
+    "episode": 576,
+    "segment": "a",
+    "title_ja": "ハンバーガーキッドとカップラーメンマン",
+    "title_ro": "Hanbaagaakiddo to Kappuraamenman"
+  },
+  "0576b": {
+    "episode": 576,
+    "segment": "b",
+    "title_ja": "クリームパンダとコアンコラ",
+    "title_ro": "Kuriimupanda to Koankora"
+  },
+  "0577a": {
+    "episode": 577,
+    "segment": "a",
+    "title_ja": "SLマンとフラッペちゃん",
+    "title_ro": "Sl Man to Furappe Chan"
+  },
+  "0577b": {
+    "episode": 577,
+    "segment": "b",
+    "title_ja": "鉄火のマキちゃんとちゃわんむしまろ",
+    "title_ro": "Tekka no Maki Chantochawanmushimaro"
+  },
+  "0578a": {
+    "episode": 578,
+    "segment": "a",
+    "title_ja": "ほたる姫とほたる王子",
+    "title_ro": "Hotaru Hime Tohotaru Ouji"
+  },
+  "0578b": {
+    "episode": 578,
+    "segment": "b",
+    "title_ja": "ドキンちゃんとリーナちゃん",
+    "title_ro": "Dokin Chanto Riina Chan"
+  },
+  "0579a": {
+    "episode": 579,
+    "segment": "a",
+    "title_ja": "よわむしおばけのビクビクちゃん",
+    "title_ro": "Yowamushiobakeno Bikubiku Chan"
+  },
+  "0579b": {
+    "episode": 579,
+    "segment": "b",
+    "title_ja": "ばいきんまんとナットーマン",
+    "title_ro": "Baikinman to Nattooman"
+  },
+  "0580a": {
+    "episode": 580,
+    "segment": "a",
+    "title_ja": "ばいきんまんとぶたまんまん",
+    "title_ro": "Baikinman to Butamanman"
+  },
+  "0580b": {
+    "episode": 580,
+    "segment": "b",
+    "title_ja": "クリームパンダとおもちゃてんし",
+    "title_ro": "Kuriimupanda to Omochatenshi"
+  },
+  "0581a": {
+    "episode": 581,
+    "segment": "a",
+    "title_ja": "やきそばパンマンとクリームパンダ",
+    "title_ro": "Yakisoba Panman to Kuriimupanda"
+  },
+  "0581b": {
+    "episode": 581,
+    "segment": "b",
+    "title_ja": "アンパンマンとセロリくん",
+    "title_ro": "Anpanman to Serori Kun"
+  },
+  "0582a": {
+    "episode": 582,
+    "segment": "a",
+    "title_ja": "バイキン仙人とやさしいばいきんまん",
+    "title_ro": "Baikin Sennin Toyasashiibaikinman"
+  },
+  "0582b": {
+    "episode": 582,
+    "segment": "b",
+    "title_ja": "ホラーマンとはみがきまん",
+    "title_ro": "Horaaman to Hamigakiman"
+  },
+  "0583a": {
+    "episode": 583,
+    "segment": "a",
+    "title_ja": "しらたき姫とスキヤキの里",
+    "title_ro": "Shirataki Hime to Sukiyaki no Sato"
+  },
+  "0583b": {
+    "episode": 583,
+    "segment": "b",
+    "title_ja": "ばいきんまんとかみなりピカタン",
+    "title_ro": "Baikinman to Kaminari Pikatan"
+  },
+  "0584a": {
+    "episode": 584,
+    "segment": "a",
+    "title_ja": "ばいきんまんとドリアン王女",
+    "title_ro": "Baikinman to Dorian Oujo"
+  },
+  "0584b": {
+    "episode": 584,
+    "segment": "b",
+    "title_ja": "たぬきおにとけんちん和尚",
+    "title_ro": "Tanukionitokenchin Oshou"
+  },
+  "0585a": {
+    "episode": 585,
+    "segment": "a",
+    "title_ja": "ナンドバットとまほうのランプ",
+    "title_ro": "Nandobatto to Mahouno Ranpu"
+  },
+  "0585b": {
+    "episode": 585,
+    "segment": "b",
+    "title_ja": "ばいきんまんとビスケットちゃん",
+    "title_ro": "Baikinman to Bisuketto Chan"
+  },
+  "0586a": {
+    "episode": 586,
+    "segment": "a",
+    "title_ja": "アンパンマンときのこまん",
+    "title_ro": "Anpanman to Kinokoman"
+  },
+  "0586b": {
+    "episode": 586,
+    "segment": "b",
+    "title_ja": "ゆず姫とめいけんチーズ",
+    "title_ro": "Yuzu Hime Tomeiken Chiizu"
+  },
+  "0587a": {
+    "episode": 587,
+    "segment": "a",
+    "title_ja": "カレーパンマンとピラフちゃん",
+    "title_ro": "Kareepanman to Pirafu Chan"
+  },
+  "0587b": {
+    "episode": 587,
+    "segment": "b",
+    "title_ja": "アンパンマンとマーガレット姫",
+    "title_ro": "Anpanman to Maagaretto Hime"
+  },
+  "0588a": {
+    "episode": 588,
+    "segment": "a",
+    "title_ja": "アンパンマンとピーマントリオ",
+    "title_ro": "Anpanman to Piimantorio"
+  },
+  "0588b": {
+    "episode": 588,
+    "segment": "b",
+    "title_ja": "アンパンマンとバイキンミミ先生",
+    "title_ro": "Anpanman to Baikinmimi Sensei"
+  },
+  "0589a": {
+    "episode": 589,
+    "segment": "a",
+    "title_ja": "やきそばパンマンとニガウリマン",
+    "title_ro": "Yakisoba Panman to Nigauriman"
+  },
+  "0589b": {
+    "episode": 589,
+    "segment": "b",
+    "title_ja": "メロンパンナと妖精リーフ",
+    "title_ro": "Meronpanna to Yousei Riifu"
+  },
+  "0590a": {
+    "episode": 590,
+    "segment": "a",
+    "title_ja": "メロンパンナとアイアンロボ",
+    "title_ro": "Meronpanna to Aianrobo"
+  },
+  "0590b": {
+    "episode": 590,
+    "segment": "b",
+    "title_ja": "アンパンマンとミスター・ヨーグルト",
+    "title_ro": "Anpanman to Misutaa・yooguruto"
+  },
+  "0591a": {
+    "episode": 591,
+    "segment": "a",
+    "title_ja": "あざみちゃんとホラーマン",
+    "title_ro": "Azamichanto Horaaman"
+  },
+  "0591b": {
+    "episode": 591,
+    "segment": "b",
+    "title_ja": "ばいきんまんとチェロヒキーさん",
+    "title_ro": "Baikinman to Cherohikii San"
+  },
+  "0592a": {
+    "episode": 592,
+    "segment": "a",
+    "title_ja": "ウーロンさんとジャスミンさん",
+    "title_ro": "Uuron Santo Jasumin San"
+  },
+  "0592b": {
+    "episode": 592,
+    "segment": "b",
+    "title_ja": "ドキンちゃんとつららちゃん",
+    "title_ro": "Dokin Chantotsurarachan"
+  },
+  "0593a": {
+    "episode": 593,
+    "segment": "a",
+    "title_ja": "しらたき姫とナベぶぎょう",
+    "title_ro": "Shirataki Hime to Nabe Bugyou"
+  },
+  "0593b": {
+    "episode": 593,
+    "segment": "b",
+    "title_ja": "クリームパンダとユキダルマン",
+    "title_ro": "Kuriimupanda to Yukidaruman"
+  },
+  "0594a": {
+    "episode": 594,
+    "segment": "a",
+    "title_ja": "マーガレット姫と黒バラ女王",
+    "title_ro": "Maagaretto Hime to Kuro Bara Joou"
+  },
+  "0594b": {
+    "episode": 594,
+    "segment": "b",
+    "title_ja": "しょくぱんまんとナースちゃん",
+    "title_ro": "Shokupanman to Naasu Chan"
+  },
+  "0595a": {
+    "episode": 595,
+    "segment": "a",
+    "title_ja": "セニョールタコスとだんごのタンゴ",
+    "title_ro": "Senyoorutakosu to Dangono Tango"
+  },
+  "0595b": {
+    "episode": 595,
+    "segment": "b",
+    "title_ja": "ロールパンナとハーモニカくん",
+    "title_ro": "Roorupanna to Haamonika Kun"
+  },
+  "0596a": {
+    "episode": 596,
+    "segment": "a",
+    "title_ja": "アンパンマンとスターフルーツ",
+    "title_ro": "Anpanman to Sutaafuruutsu"
+  },
+  "0597a": {
+    "episode": 597,
+    "segment": "a",
+    "title_ja": "クリームパンダとマゴマジョ",
+    "title_ro": "Kuriimupanda to Magomajo"
+  },
+  "0597b": {
+    "episode": 597,
+    "segment": "b",
+    "title_ja": "ばいきんまんとおこわちゃん",
+    "title_ro": "Baikinman to Okowachan"
+  },
+  "0598a": {
+    "episode": 598,
+    "segment": "a",
+    "title_ja": "クリームパンダとクレヨンの国",
+    "title_ro": "Kuriimupanda to Kureyon no Kuni"
+  },
+  "0598b": {
+    "episode": 598,
+    "segment": "b",
+    "title_ja": "プリンちゃんとめいけんチーズ",
+    "title_ro": "Purin Chantomeiken Chiizu"
+  },
+  "0599a": {
+    "episode": 599,
+    "segment": "a",
+    "title_ja": "カレーパンマンとキャベツマン",
+    "title_ro": "Kareepanman to Kyabetsuman"
+  },
+  "0599b": {
+    "episode": 599,
+    "segment": "b",
+    "title_ja": "メロンパンナとこゆきちゃん",
+    "title_ro": "Meronpanna to Koyukichan"
+  },
+  "0600a": {
+    "episode": 600,
+    "segment": "a",
+    "title_ja": "メロンパンナとオーロラの子馬",
+    "title_ro": "Meronpanna to Oorora no Kouma"
+  },
+  "0601a": {
+    "episode": 601,
+    "segment": "a",
+    "title_ja": "チャーハン王子とピラフちゃん",
+    "title_ro": "Chaahan Ouji to Pirafu Chan"
+  },
+  "0601b": {
+    "episode": 601,
+    "segment": "b",
+    "title_ja": "ばいきんまんとしいたけじいさん",
+    "title_ro": "Baikinman to Shiitakejiisan"
+  },
+  "0602a": {
+    "episode": 602,
+    "segment": "a",
+    "title_ja": "アンパンマンとキビ太郎",
+    "title_ro": "Anpanman to Kibi Tarou"
+  },
+  "0602b": {
+    "episode": 602,
+    "segment": "b",
+    "title_ja": "ばいきんまんとマダム・ナン",
+    "title_ro": "Baikinman to Madamu・nan"
+  },
+  "0603a": {
+    "episode": 603,
+    "segment": "a",
+    "title_ja": "バイキンひしもちロボ",
+    "title_ro": "Baikin Hishimochi Robo"
+  },
+  "0603b": {
+    "episode": 603,
+    "segment": "b",
+    "title_ja": "アンパンマンとはまぐりぼうや",
+    "title_ro": "Anpanman to Hamaguribouya"
+  },
+  "0604a": {
+    "episode": 604,
+    "segment": "a",
+    "title_ja": "アンパンマンともっきんまん",
+    "title_ro": "Anpanman to Mokkinman"
+  },
+  "0604b": {
+    "episode": 604,
+    "segment": "b",
+    "title_ja": "アンパンマンとはるさめさん",
+    "title_ro": "Anpanman to Harusamesan"
+  },
+  "0605a": {
+    "episode": 605,
+    "segment": "a",
+    "title_ja": "メロンパンナとほしのとり",
+    "title_ro": "Meronpanna to Hoshinotori"
+  },
+  "0605b": {
+    "episode": 605,
+    "segment": "b",
+    "title_ja": "カレーパンマンとシチューおばさん",
+    "title_ro": "Kareepanman to Shichuu Obasan"
+  },
+  "0606a": {
+    "episode": 606,
+    "segment": "a",
+    "title_ja": "やきそばパンマンとふうせんガムキッド",
+    "title_ro": "Yakisoba Panman to Fuusen Gamukiddo"
+  },
+  "0606b": {
+    "episode": 606,
+    "segment": "b",
+    "title_ja": "ばいきんまんとだいふく和尚",
+    "title_ro": "Baikinman to Daifuku Oshou"
+  },
+  "0607a": {
+    "episode": 607,
+    "segment": "a",
+    "title_ja": "やきそばパンマンとキャベツマン",
+    "title_ro": "Yakisoba Panman to Kyabetsuman"
+  },
+  "0607b": {
+    "episode": 607,
+    "segment": "b",
+    "title_ja": "あかちゃんまんとベビーカーさん",
+    "title_ro": "Akachanmanto Bebiikaa San"
+  },
+  "0608a": {
+    "episode": 608,
+    "segment": "a",
+    "title_ja": "アンパンマンとリップルちゃん",
+    "title_ro": "Anpanman to Rippuru Chan"
+  },
+  "0608b": {
+    "episode": 608,
+    "segment": "b",
+    "title_ja": "鉄火のマキちゃんとノリノリのりへい",
+    "title_ro": "Tekka no Maki Chanto Norinori no Rihei"
+  },
+  "0609a": {
+    "episode": 609,
+    "segment": "a",
+    "title_ja": "アンパンマンとビビンバくん",
+    "title_ro": "Anpanman to Bibinba Kun"
+  },
+  "0609b": {
+    "episode": 609,
+    "segment": "b",
+    "title_ja": "アンパンマンとケーナちゃん",
+    "title_ro": "Anpanman to Keena Chan"
+  },
+  "0610a": {
+    "episode": 610,
+    "segment": "a",
+    "title_ja": "アンパンマンとナガネギフラメンコ",
+    "title_ro": "Anpanman to Naganegifuramenko"
+  },
+  "0610b": {
+    "episode": 610,
+    "segment": "b",
+    "title_ja": "こむすびまんとかしわもちまん",
+    "title_ro": "Komusubimantokashiwamochiman"
+  },
+  "0611a": {
+    "episode": 611,
+    "segment": "a",
+    "title_ja": "ますずしまん改造UFO・バイキングII世2号",
+    "title_ro": "Masuzushiman Kaizou Ufo ・baikingu Ii Yo 2 Gou"
+  },
+  "0611b": {
+    "episode": 611,
+    "segment": "b",
+    "title_ja": "メロンパンナとしゃぼんだま姫",
+    "title_ro": "Meronpanna to Shabondama Hime"
+  },
+  "0612a": {
+    "episode": 612,
+    "segment": "a",
+    "title_ja": "アンパンマンと鉄骨ホラーマンズ",
+    "title_ro": "Anpanman to Tekkotsu Horaamanzu"
+  },
+  "0612b": {
+    "episode": 612,
+    "segment": "b",
+    "title_ja": "クリームパンダとバケルくん",
+    "title_ro": "Kuriimupanda to Bakeru Kun"
+  },
+  "0613a": {
+    "episode": 613,
+    "segment": "a",
+    "title_ja": "どんぶりまんトリオとねこの国",
+    "title_ro": "Donburiman Torio to Nekono Kuni"
+  },
+  "0613b": {
+    "episode": 613,
+    "segment": "b",
+    "title_ja": "クリームパンダとおくらちゃん",
+    "title_ro": "Kuriimupanda to Okurachan"
+  },
+  "0614a": {
+    "episode": 614,
+    "segment": "a",
+    "title_ja": "やきそばパンマンとめいけんチーズ",
+    "title_ro": "Yakisoba Panman to Meiken Chiizu"
+  },
+  "0614b": {
+    "episode": 614,
+    "segment": "b",
+    "title_ja": "バタコさんとラッピちゃん",
+    "title_ro": "Batako Santo Rappi Chan"
+  },
+  "0615a": {
+    "episode": 615,
+    "segment": "a",
+    "title_ja": "ホラーマンとドン・キ・ホタテ",
+    "title_ro": "Horaaman to Don・ki・hotate"
+  },
+  "0616a": {
+    "episode": 616,
+    "segment": "a",
+    "title_ja": "かびるんるんとチビもぐりん",
+    "title_ro": "Kabirunrunto Chibi Mogurin"
+  },
+  "0616b": {
+    "episode": 616,
+    "segment": "b",
+    "title_ja": "ジャムおじさんとマゴマジョ",
+    "title_ro": "Jamu Ojisanto Magomajo"
+  },
+  "0617a": {
+    "episode": 617,
+    "segment": "a",
+    "title_ja": "カレーパンマンとナガネギマン",
+    "title_ro": "Kareepanman to Naganegiman"
+  },
+  "0617b": {
+    "episode": 617,
+    "segment": "b",
+    "title_ja": "ばいきんまんとみみせんせい",
+    "title_ro": "Baikinman to Mimisensei"
+  },
+  "0618a": {
+    "episode": 618,
+    "segment": "a",
+    "title_ja": "やきそばパンマンとかつぶしまん",
+    "title_ro": "Yakisoba Panman to Katsubushiman"
+  },
+  "0618b": {
+    "episode": 618,
+    "segment": "b",
+    "title_ja": "とべ!ぼくらのうちゅうロケット",
+    "title_ro": "Tobe ! Bokuranouchuu Roketto"
+  },
+  "0619a": {
+    "episode": 619,
+    "segment": "a",
+    "title_ja": "やきそばパンマンとあかちゃんまん",
+    "title_ro": "Yakisoba Panman to Akachanman"
+  },
+  "0619b": {
+    "episode": 619,
+    "segment": "b",
+    "title_ja": "しょくぱんまんとマーガレット姫",
+    "title_ro": "Shokupanman to Maagaretto Hime"
+  },
+  "0620a": {
+    "episode": 620,
+    "segment": "a",
+    "title_ja": "ばいきんまんとおそうじトリオ",
+    "title_ro": "Baikinman to Osouji Torio"
+  },
+  "0620b": {
+    "episode": 620,
+    "segment": "b",
+    "title_ja": "ゆず姫、海へ行く",
+    "title_ro": "Yuzu Hime , Umi e Iku"
+  },
+  "0621a": {
+    "episode": 621,
+    "segment": "a",
+    "title_ja": "ばいきんまんとしろかぶくん",
+    "title_ro": "Baikinman to Shirokabukun"
+  },
+  "0621b": {
+    "episode": 621,
+    "segment": "b",
+    "title_ja": "プリンちゃんとフルーツワンダーランド",
+    "title_ro": "Purin Chanto Furuutsuwandaarando"
+  },
+  "0622a": {
+    "episode": 622,
+    "segment": "a",
+    "title_ja": "アンパンマンとあめふりアメちゃん",
+    "title_ro": "Anpanman to Amefuri Ame Chan"
+  },
+  "0622b": {
+    "episode": 622,
+    "segment": "b",
+    "title_ja": "アンパンマンとかんぴょう三兄弟",
+    "title_ro": "Anpanman to Kanpyou Sankyoudai"
+  },
+  "0623a": {
+    "episode": 623,
+    "segment": "a",
+    "title_ja": "カレーパンマンとスパイス王子",
+    "title_ro": "Kareepanman to Supaisu Ouji"
+  },
+  "0623b": {
+    "episode": 623,
+    "segment": "b",
+    "title_ja": "クリームパンダとシュークリーム姫",
+    "title_ro": "Kuriimupanda to Shuukuriimu Hime"
+  },
+  "0624a": {
+    "episode": 624,
+    "segment": "a",
+    "title_ja": "イルカメカ",
+    "title_ro": "Irukameka"
+  },
+  "0624b": {
+    "episode": 624,
+    "segment": "b",
+    "title_ja": "ぶたまんまんとピザパイむすめ",
+    "title_ro": "Butamanmanto Pizapai Musume"
+  },
+  "0625a": {
+    "episode": 625,
+    "segment": "a",
+    "title_ja": "ロールパンナとめいけんチーズ",
+    "title_ro": "Roorupanna to Meiken Chiizu"
+  },
+  "0626a": {
+    "episode": 626,
+    "segment": "a",
+    "title_ja": "ドキンちゃんとドキドキSL号",
+    "title_ro": "Dokin Chanto Dokidoki Sl Gou"
+  },
+  "0626b": {
+    "episode": 626,
+    "segment": "b",
+    "title_ja": "ナットーマンとおしんこちゃん",
+    "title_ro": "Nattooman to Oshinkochan"
+  },
+  "0627a": {
+    "episode": 627,
+    "segment": "a",
+    "title_ja": "かまめしどんとちゃわんむしまろ",
+    "title_ro": "Kamameshidontochawanmushimaro"
+  },
+  "0627b": {
+    "episode": 627,
+    "segment": "b",
+    "title_ja": "アンパンマンとオオカミおばけ",
+    "title_ro": "Anpanman to Ookami Obake"
+  },
+  "0628a": {
+    "episode": 628,
+    "segment": "a",
+    "title_ja": "アンパンマンとアコーディオンマン",
+    "title_ro": "Anpanman to Akoodionman"
+  },
+  "0628b": {
+    "episode": 628,
+    "segment": "b",
+    "title_ja": "ばいきんまんとざくろおばさん",
+    "title_ro": "Baikinman to Zakuroobasan"
+  },
+  "0629a": {
+    "episode": 629,
+    "segment": "a",
+    "title_ja": "クリームパンダとまほうのぼうし",
+    "title_ro": "Kuriimupanda to Mahounoboushi"
+  },
+  "0629b": {
+    "episode": 629,
+    "segment": "b",
+    "title_ja": "カレーパンマンとハヤシライスマン",
+    "title_ro": "Kareepanman to Hayashiraisuman"
+  },
+  "0630a": {
+    "episode": 630,
+    "segment": "a",
+    "title_ja": "おむすびまんとばいきんまん",
+    "title_ro": "Omusubimantobaikinman"
+  },
+  "0630b": {
+    "episode": 630,
+    "segment": "b",
+    "title_ja": "SLマンとモクモク女王",
+    "title_ro": "Sl Man to Mokumoku Joou"
+  },
+  "0631a": {
+    "episode": 631,
+    "segment": "a",
+    "title_ja": "カツドンマンとフライぼうや",
+    "title_ro": "Katsudonman to Furai Bouya"
+  },
+  "0631b": {
+    "episode": 631,
+    "segment": "b",
+    "title_ja": "ロールパンナとゆず姫",
+    "title_ro": "Roorupanna to Yuzu Hime"
+  },
+  "0632a": {
+    "episode": 632,
+    "segment": "a",
+    "title_ja": "かつぶしまんとジャスミンさん",
+    "title_ro": "Katsubushimanto Jasumin San"
+  },
+  "0632b": {
+    "episode": 632,
+    "segment": "b",
+    "title_ja": "SLマンとなみだちゃん",
+    "title_ro": "Sl Man to Namidachan"
+  },
+  "0633a": {
+    "episode": 633,
+    "segment": "a",
+    "title_ja": "アンパンマンとガブリン",
+    "title_ro": "Anpanman to Gaburin"
+  },
+  "0633b": {
+    "episode": 633,
+    "segment": "b",
+    "title_ja": "鉄火のマキちゃんといなりずしのみこと",
+    "title_ro": "Tekka no Maki Chantoinarizushinomikoto"
+  },
+  "0634a": {
+    "episode": 634,
+    "segment": "a",
+    "title_ja": "バロンヤッキーとイモだんしゃく",
+    "title_ro": "Baronyakkii to Imo Danshaku"
+  },
+  "0634b": {
+    "episode": 634,
+    "segment": "b",
+    "title_ja": "ジャムおじさんとどびんむし姫",
+    "title_ro": "Jamu Ojisantodobinmushi Hime"
+  },
+  "0635a": {
+    "episode": 635,
+    "segment": "a",
+    "title_ja": "ロールパンナとしょくぱんまん",
+    "title_ro": "Roorupanna to Shokupanman"
+  },
+  "0636a": {
+    "episode": 636,
+    "segment": "a",
+    "title_ja": "コチョウランさん",
+    "title_ro": "Kochouran San"
+  },
+  "0636b": {
+    "episode": 636,
+    "segment": "b",
+    "title_ja": "キャロットぼうやとピーマントリオ",
+    "title_ro": "Kyarotto Bouyato Piimantorio"
+  },
+  "0637a": {
+    "episode": 637,
+    "segment": "a",
+    "title_ja": "こむすびまんとちびむすトリオ",
+    "title_ro": "Komusubimantochibimusu Torio"
+  },
+  "0637b": {
+    "episode": 637,
+    "segment": "b",
+    "title_ja": "しょくぱんまんとマダム・ナン",
+    "title_ro": "Shokupanman to Madamu・nan"
+  },
+  "0638a": {
+    "episode": 638,
+    "segment": "a",
+    "title_ja": "ロールパンナとカレーパンマン",
+    "title_ro": "Roorupanna to Kareepanman"
+  },
+  "0639a": {
+    "episode": 639,
+    "segment": "a",
+    "title_ja": "アンパンマンとブラックおむすびまん",
+    "title_ro": "Anpanman to Burakku Omusubiman"
+  },
+  "0639b": {
+    "episode": 639,
+    "segment": "b",
+    "title_ja": "ドキンちゃんとバタコさん",
+    "title_ro": "Dokin Chanto Batako San"
+  },
+  "0640a": {
+    "episode": 640,
+    "segment": "a",
+    "title_ja": "ニガウリマンとこむすびまん",
+    "title_ro": "Nigauriman to Komusubiman"
+  },
+  "0640b": {
+    "episode": 640,
+    "segment": "b",
+    "title_ja": "しょくぱんまんとセニョール・タコス",
+    "title_ro": "Shokupanman to Senyooru・takosu"
+  }
+}
