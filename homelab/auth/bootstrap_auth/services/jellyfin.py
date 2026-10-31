@@ -54,7 +54,11 @@ def jellyfin_auth_headers(token: str | None = None) -> dict[str, str]:
     ]
     if token:
         auth_parts.append(f'Token="{token}"')
-    return {"X-Emby-Authorization": ", ".join(auth_parts)}
+    auth_header = ", ".join(auth_parts)
+    return {
+        "Authorization": auth_header,
+        "X-Emby-Authorization": auth_header,
+    }
 
 
 def jellyfin_login(client: httpx.Client, username: str, password: str) -> JellyfinAuthResponse | None:
