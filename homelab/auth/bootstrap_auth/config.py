@@ -9,16 +9,12 @@ def get_service_url(service_name: str, default_port: int, env_var: str) -> str:
     """Resolve the service HTTP base URL.
 
     1. Uses explicit environment variable override if provided.
-    2. Uses container hostname if running inside a Docker container (/.dockerenv exists).
-    3. Queries local Docker engine for the container's bridge IP on proxy-tier when on host.
-    4. Falls back to http://{service_name}:{default_port}.
+    2. Queries local Docker engine for the container's bridge IP on proxy-tier.
+    3. Falls back to http://{service_name}:{default_port}.
     """
     env_val = os.environ.get(env_var)
     if env_val:
         return env_val.rstrip("/")
-
-    if Path("/.dockerenv").exists():
-        return f"http://{service_name}:{default_port}"
 
     try:
         from .compose import get_container_ip
