@@ -12,6 +12,15 @@
 #   "werkzeug>=3.0.0",
 # ]
 # ///
+"""Homelab Centralized Authentication Bootstrap Manager.
+
+Safely checks and synchronizes shared credentials across:
+1. qBittorrent (Web UI preferences)
+2. Qui (User credentials & password)
+3. Arcane (Docker management login)
+4. Jellyfin (Admin user, password hash, and API token)
+"""
+
 from bootstrap_auth.cli import typer_main
 
 if __name__ == "__main__":
