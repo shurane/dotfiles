@@ -13,7 +13,7 @@ from bootstrap_auth.services.bookorbit import (
 
 @pytest.fixture
 def auth() -> HomelabAuth:
-    return HomelabAuth(HOMELAB_AUTH_USERNAME="testuser", HOMELAB_AUTH_PASSWORD="testpassword123")
+    return HomelabAuth(HOMELAB_USERNAME="testuser", HOMELAB_PASSWORD="testpassword123")
 
 
 def test_bookorbit_service_name_enum() -> None:

@@ -7,17 +7,17 @@ services:
     cap_add:
       - CAP_NET_ADMIN
     environment:
-      MODEL: "Macmini"
-      AVAHI_NAME: "m70q"
-      AVAHI_DISABLE: "true"
-      FAIL_FAST: "1"
-      ACCOUNT_share: "${SAMBA_SHARE_PASSWORD:?err}"
-      UID_share: "1000"
-      ACCOUNT_ehtesh: "${SAMBA_EHTESH_PASSWORD:-${SAMBA_SHARE_PASSWORD}}"
-      UID_ehtesh: "1001"
-      SAMBA_CONF_MAP_TO_GUEST: "Bad User"
-      SAMBA_VOLUME_CONFIG_mango: |
-        [mango]
+      - MODEL=Macmini
+      - AVAHI_NAME=m70q
+      - AVAHI_DISABLE=true
+      - FAIL_FAST=1
+      - SAMBA_CONF_MAP_TO_GUEST=Bad User
+      - ACCOUNT_share=${HOMELAB_PASSWORD:?err}
+      - UID_share=1000
+      - ACCOUNT_${HOMELAB_USERNAME:-ehtesh}=${HOMELAB_PASSWORD:?err}
+      - UID_${HOMELAB_USERNAME:-ehtesh}=1000
+      - |
+        SAMBA_VOLUME_CONFIG_mango=[mango]
         path = /shares/mango
         guest ok = yes
         read only = no
@@ -27,8 +27,8 @@ services:
         create mask = 0664
         directory mask = 0775
         veto files = /lost+found/
-      SAMBA_VOLUME_CONFIG_media: |
-        [media]
+      - |
+        SAMBA_VOLUME_CONFIG_media=[media]
         path = /shares/media
         guest ok = yes
         read only = no
@@ -37,8 +37,8 @@ services:
         force group = share
         create mask = 0664
         directory mask = 0775
-      SAMBA_VOLUME_CONFIG_downloads: |
-        [downloads]
+      - |
+        SAMBA_VOLUME_CONFIG_downloads=[downloads]
         path = /shares/downloads
         guest ok = yes
         read only = no
@@ -47,8 +47,8 @@ services:
         force group = share
         create mask = 0664
         directory mask = 0775
-      SAMBA_VOLUME_CONFIG_retroarch: |
-        [retroarch]
+      - |
+        SAMBA_VOLUME_CONFIG_retroarch=[retroarch]
         path = /shares/retroarch
         guest ok = yes
         read only = no
