@@ -78,8 +78,8 @@ def apply_arcane(client: httpx.Client, auth: HomelabAuth) -> None:
 
     if arcane_login(client, auth.username, auth.password):
         user = arcane_current_user(client)
-        arcane_change_password(client, auth.password, auth)
-        arcane_update_via_api(client, user, auth)
+        if user.username != auth.username:
+            arcane_update_via_api(client, user, auth)
         return
 
     if arcane_login(client, "arcane", "arcane-admin"):
