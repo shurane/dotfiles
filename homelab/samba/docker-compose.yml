@@ -15,7 +15,7 @@ services:
       - ACCOUNT_share=${HOMELAB_PASSWORD:?err}
       - UID_share=1000
       - ACCOUNT_${HOMELAB_USERNAME:-ehtesh}=${HOMELAB_PASSWORD:?err}
-      - UID_${HOMELAB_USERNAME:-ehtesh}=1000
+      - UID_${HOMELAB_USERNAME:-ehtesh}=1001
       - |
         SAMBA_VOLUME_CONFIG_mango=[mango]
         path = /shares/mango
