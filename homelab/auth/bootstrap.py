@@ -3,6 +3,7 @@
 # requires-python = ">=3.14"
 # dependencies = [
 #   "anyio>=4.7.0",
+#   "bcrypt>=4.0.0",
 #   "docker>=7.1.0",
 #   "httpx>=0.27.0",
 #   "pydantic>=2.7.0",
@@ -19,6 +20,7 @@ Safely checks and synchronizes shared credentials across:
 2. Qui (User credentials & password)
 3. Arcane (Docker management login)
 4. Jellyfin (Admin user, password hash, and API token)
+5. BookOrbit (PostgreSQL credentials & Web login)
 """
 
 from bootstrap_auth.cli import typer_main

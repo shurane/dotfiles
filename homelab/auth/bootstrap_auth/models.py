@@ -8,6 +8,7 @@ class ServiceName(StrEnum):
     QUI = "qui"
     ARCANE = "arcane"
     JELLYFIN = "jellyfin"
+    BOOKORBIT = "bookorbit"
 
 
 SERVICE_NAMES = tuple(service.value for service in ServiceName)
