@@ -38,6 +38,8 @@ def __getattr__(name: str) -> str:
             return get_service_url("arcane", 3552, "ARCANE_URL")
         case "JELLYFIN_URL":
             return get_service_url("jellyfin", 8096, "JELLYFIN_URL")
+        case "BOOKORBIT_URL":
+            return get_service_url("bookorbit", 3000, "BOOKORBIT_URL")
         case _:
             raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
 

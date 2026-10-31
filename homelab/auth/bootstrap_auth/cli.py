@@ -10,6 +10,7 @@ from .common import build_options, format_path, load_env
 from .config import AUTH_ENV
 from .models import SERVICE_NAMES, BootstrapOptions, HomelabAuth, ServiceName
 from .services.arcane import apply_and_verify_arcane, check_arcane
+from .services.bookorbit import apply_and_verify_bookorbit, check_bookorbit
 from .services.jellyfin import apply_and_verify_jellyfin, check_jellyfin
 from .services.qbittorrent import apply_and_verify_qbittorrent, check_qbittorrent
 from .services.qui import apply_and_verify_qui, check_qui
@@ -42,6 +43,7 @@ def check_task_definitions(auth: HomelabAuth) -> dict[ServiceName, tuple[str, Ch
         ServiceName.QUI: ("Qui", lambda: check_qui(auth)),
         ServiceName.ARCANE: ("Arcane", lambda: check_arcane(auth)),
         ServiceName.JELLYFIN: ("Jellyfin", lambda: check_jellyfin(auth)),
+        ServiceName.BOOKORBIT: ("BookOrbit", lambda: check_bookorbit(auth)),
     }
 
 
@@ -69,6 +71,7 @@ def task_definitions(auth: HomelabAuth, options: BootstrapOptions) -> dict[Servi
         ServiceName.QUI: ("Qui", lambda: apply_and_verify_qui(auth)),
         ServiceName.ARCANE: ("Arcane", lambda: apply_and_verify_arcane(auth)),
         ServiceName.JELLYFIN: ("Jellyfin", lambda: apply_and_verify_jellyfin(auth, options)),
+        ServiceName.BOOKORBIT: ("BookOrbit", lambda: apply_and_verify_bookorbit(auth)),
     }
 
 
