@@ -31,4 +31,4 @@ Defaults to dry-run verification; pass `--apply` to commit credentials:
 
 Run without `--apply` to verify credentials in dry-run mode.
 
-`HOSTNAME_BASE` is the canonical local domain and `HOSTNAME_ALIAS_BASE` is the mirrored local domain.
+`HOSTNAME_BASE` is the canonical local domain (e.g. `009973.xyz`).

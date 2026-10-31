@@ -3,7 +3,7 @@ services:
     image: ghcr.io/gethomepage/homepage:latest
     restart: unless-stopped
     environment:
-      HOMEPAGE_ALLOWED_HOSTS: homepage.${HOSTNAME_BASE:?err},homepage.${HOSTNAME_ALIAS_BASE:-m.lan}
+      HOMEPAGE_ALLOWED_HOSTS: homepage.${HOSTNAME_BASE:?err}
     networks:
       - proxy-tier
     volumes:
@@ -15,7 +15,7 @@ services:
       retries: 3
       start_period: 20s
     labels:
-      caddy: homepage.${HOSTNAME_BASE:?err}, homepage.${HOSTNAME_ALIAS_BASE:-m.lan}
+      caddy: homepage.${HOSTNAME_BASE:?err}
       caddy.reverse_proxy: "{{upstreams 3000}}"
 
 networks:

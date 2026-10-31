@@ -43,7 +43,7 @@ services:
       - no-new-privileges:true
     stop_grace_period: 30s
     labels:
-      caddy: bookorbit.${HOSTNAME_BASE:?err}, bookorbit.${HOSTNAME_ALIAS_BASE:-m.lan}
+      caddy: bookorbit.${HOSTNAME_BASE:?err}
       caddy.reverse_proxy: "{{upstreams 3000}}"
 
   bookorbit-postgres:
