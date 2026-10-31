@@ -217,22 +217,42 @@ def insert_jellyfin_admin_user(db: sqlite3.Connection, auth: HomelabAuth, passwo
 
 def upsert_jellyfin_admin_permissions(db: sqlite3.Connection, user_id: str) -> None:
     db.execute("delete from Permissions where UserId = ?", (user_id,))
-    db.executemany(
-        """
-        insert into Permissions (Kind, Permission_Permissions_Guid, RowVersion, UserId, Value)
-        values (?, null, 0, ?, ?)
-        """,
-        [(kind, user_id, value) for kind, value in JELLYFIN_PERMISSION_VALUES.items()],
-    )
+    perm_cols = {row[1] for row in db.execute("pragma table_info(Permissions)")}
+    if "Permission_Permissions_Guid" in perm_cols:
+        db.executemany(
+            """
+            insert into Permissions (Kind, Permission_Permissions_Guid, RowVersion, UserId, Value)
+            values (?, null, 0, ?, ?)
+            """,
+            [(kind, user_id, value) for kind, value in JELLYFIN_PERMISSION_VALUES.items()],
+        )
+    else:
+        db.executemany(
+            """
+            insert into Permissions (Kind, RowVersion, UserId, Value)
+            values (?, 0, ?, ?)
+            """,
+            [(kind, user_id, value) for kind, value in JELLYFIN_PERMISSION_VALUES.items()],
+        )
 
     db.execute("delete from Preferences where UserId = ?", (user_id,))
-    db.executemany(
-        """
-        insert into Preferences (Kind, Preference_Preferences_Guid, RowVersion, UserId, Value)
-        values (?, null, 0, ?, '')
-        """,
-        [(kind, user_id) for kind in JELLYFIN_PREFERENCE_KINDS],
-    )
+    pref_cols = {row[1] for row in db.execute("pragma table_info(Preferences)")}
+    if "Preference_Preferences_Guid" in pref_cols:
+        db.executemany(
+            """
+            insert into Preferences (Kind, Preference_Preferences_Guid, RowVersion, UserId, Value)
+            values (?, null, 0, ?, '')
+            """,
+            [(kind, user_id) for kind in JELLYFIN_PREFERENCE_KINDS],
+        )
+    else:
+        db.executemany(
+            """
+            insert into Preferences (Kind, RowVersion, UserId, Value)
+            values (?, 0, ?, '')
+            """,
+            [(kind, user_id) for kind in JELLYFIN_PREFERENCE_KINDS],
+        )
 
 
 def write_jellyfin_admin_user(db_path: Path, auth: HomelabAuth) -> None:
