@@ -25,8 +25,8 @@ docker compose up -d --remove-orphans
 Defaults to dry-run verification; pass `--apply` to commit credentials:
 
 ```bash
-./bootstrap-auth/bootstrap-auth.py --apply
-./bootstrap-auth/bootstrap-auth.py --apply --services jellyfin
+./auth/bootstrap.py --apply
+./auth/bootstrap.py --apply --services jellyfin
 ```
 
 Run without `--apply` to verify credentials in dry-run mode.
