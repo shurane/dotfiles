@@ -12,16 +12,16 @@ def test_load_env_parses_simple_quoted_and_ignored_lines(tmp_path: Path) -> None
     env_file.write_text(
         """
         # ignored
-        HOMELAB_AUTH_USERNAME=ehtesh
-        HOMELAB_AUTH_PASSWORD="password"
+        HOMELAB_USERNAME=username
+        HOMELAB_PASSWORD="password"
         EMPTY_LINE_IGNORED
         SINGLE='value'
         """
     )
 
     assert load_env(env_file) == {
-        "HOMELAB_AUTH_USERNAME": "ehtesh",
-        "HOMELAB_AUTH_PASSWORD": "password",
+        "HOMELAB_USERNAME": "username",
+        "HOMELAB_PASSWORD": "password",
         "SINGLE": "value",
     }
 

@@ -8,8 +8,8 @@ from bootstrap_auth.services.jellyfin import select_jellyfin_user_id, upsert_jel
 def auth() -> HomelabAuth:
     return HomelabAuth.model_validate(
         {
-            "HOMELAB_AUTH_USERNAME": "ehtesh",
-            "HOMELAB_AUTH_PASSWORD": "password",
+            "HOMELAB_USERNAME": "username",
+            "HOMELAB_PASSWORD": "password",
         }
     )
 
