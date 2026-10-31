@@ -1,31 +1,31 @@
 - Services:
     - Arcane:
         icon: arcane.svg
-        href: http://arcane.m.lan
+        href: https://arcane.009973.xyz
         description: Docker manager
         siteMonitor: http://arcane:3552
     - Jellyfin:
         icon: jellyfin.svg
-        href: http://jellyfin.m.lan
+        href: https://jellyfin.009973.xyz
         description: Media library
         siteMonitor: http://jellyfin:8096
     - qBittorrent:
         icon: qbittorrent.svg
-        href: http://qbittorrent.m.lan
+        href: https://qbittorrent.009973.xyz
         description: Torrent WebUI
         siteMonitor: http://qbittorrent:8080
     - Qui:
         icon: qui.svg
-        href: http://qui.m.lan
+        href: https://qui.009973.xyz
         description: Torrent dashboard
         siteMonitor: http://qui:7476
     - BookOrbit:
         icon: bookorbit.svg
-        href: http://bookorbit.m.lan
+        href: https://bookorbit.009973.xyz
         description: Ebook reader
         siteMonitor: http://bookorbit:3000/api/v1/health
     - RetroArch WebDAV:
         icon: rclone.svg
-        href: http://retroarch.m.lan
+        href: https://retroarch.009973.xyz
         description: Save sync files
         siteMonitor: http://rclone-retroarch:8080/manifest.server

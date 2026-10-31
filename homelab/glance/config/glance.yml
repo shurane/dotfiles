@@ -68,7 +68,7 @@ theme:
   contrast-multiplier: 1.1
 
 branding:
-  app-name: m.lan
+  app-name: 009973.xyz
 
 pages:
   - name: Home
@@ -80,44 +80,44 @@ pages:
             groups:
               - links:
                   - title: Arcane
-                    url: http://arcane.m.lan
+                    url: https://arcane.009973.xyz
                     icon: /assets/icons/arcane.svg
                   - title: Jellyfin
-                    url: http://jellyfin.m.lan
+                    url: https://jellyfin.009973.xyz
                     icon: /assets/icons/jellyfin.svg
                   - title: qBittorrent
-                    url: http://qbittorrent.m.lan
+                    url: https://qbittorrent.009973.xyz
                     icon: /assets/icons/qbittorrent.svg
                   - title: Qui
-                    url: http://qui.m.lan
+                    url: https://qui.009973.xyz
                     icon: /assets/icons/qui.svg
                   - title: BookOrbit
-                    url: http://bookorbit.m.lan
+                    url: https://bookorbit.009973.xyz
                     icon: /assets/icons/bookorbit.svg
                   - title: RetroArch WebDAV
-                    url: http://retroarch.m.lan
+                    url: https://retroarch.009973.xyz
                     icon: /assets/icons/rclone.svg
           - type: monitor
             css-class: homelab-monitor
             cache: 1m
             sites:
               - title: Arcane
-                url: http://arcane.m.lan
+                url: https://arcane.009973.xyz
                 check-url: http://arcane:3552
               - title: Jellyfin
-                url: http://jellyfin.m.lan
+                url: https://jellyfin.009973.xyz
                 check-url: http://jellyfin:8096
                 alt-status-codes:
                   - 302
               - title: qBittorrent
-                url: http://qbittorrent.m.lan
+                url: https://qbittorrent.009973.xyz
                 check-url: http://qbittorrent:8080
               - title: Qui
-                url: http://qui.m.lan
+                url: https://qui.009973.xyz
                 check-url: http://qui:7476
               - title: BookOrbit
-                url: http://bookorbit.m.lan
+                url: https://bookorbit.009973.xyz
                 check-url: http://bookorbit:3000/api/v1/health
               - title: RetroArch WebDAV
-                url: http://retroarch.m.lan
+                url: https://retroarch.009973.xyz
                 check-url: http://rclone-retroarch:8080/manifest.server
