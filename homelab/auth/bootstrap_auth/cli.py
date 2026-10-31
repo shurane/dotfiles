@@ -16,7 +16,7 @@ from .services.qui import apply_and_verify_qui, check_qui
 
 console = Console()
 console_err = Console(stderr=True)
-PREFIX = "[bold cyan]\\[bootstrap-auth][/]"
+PREFIX = "[bold cyan]\\[auth/bootstrap][/]"
 
 type BootstrapTask = Callable[[], None]
 type CheckTask = Callable[[], bool]
