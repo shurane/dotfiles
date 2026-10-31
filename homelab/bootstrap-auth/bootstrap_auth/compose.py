@@ -21,15 +21,21 @@ def compose_service(stack: str, service: str | None = None) -> str:
 def compose_containers(stack: str, service: str | None = None) -> list[Container]:
     service = compose_service(stack, service)
     client = docker_client()
-    return client.containers.list(
+    containers = client.containers.list(
         all=True,
-        filters={
-            "label": [
-                f"com.docker.compose.project={stack}",
-                f"com.docker.compose.service={service}",
-            ],
-        },
+        filters={"label": [f"com.docker.compose.service={service}"]},
     )
+    if not containers:
+        containers = client.containers.list(
+            all=True,
+            filters={
+                "label": [
+                    f"com.docker.compose.project={stack}",
+                    f"com.docker.compose.service={service}",
+                ],
+            },
+        )
+    return containers
 
 
 def compose_container(stack: str, service: str | None = None) -> Container:
@@ -54,7 +60,8 @@ def compose_up(stack: str, service: str | None = None) -> None:
 
     # docker-py manages Docker Engine resources, but it does not apply Compose
     # YAML. Keep first creation/reconciliation on the Compose CLI.
-    run(["docker", "compose", "up", "-d", service], cwd=ROOT / stack)
+    cwd = ROOT if (ROOT / "docker-compose.yml").exists() else ROOT / stack
+    run(["docker", "compose", "up", "-d", service], cwd=cwd)
 
 
 def compose_logs(stack: str, service: str | None = None) -> str:
@@ -72,3 +79,22 @@ def compose_exec(stack: str, command: list[str], service: str | None = None) -> 
 def compose_stop(stack: str, service: str | None = None) -> None:
     container = compose_container(stack, service)
     container.stop()
+
+
+def get_container_ip(service: str, network: str = "proxy-tier") -> str | None:
+    """Look up a Compose service container's IPv4 address on the specified Docker network."""
+    try:
+        client = docker_client()
+        containers = client.containers.list(filters={"label": [f"com.docker.compose.service={service}"]})
+        if not containers:
+            return None
+        networks = containers[0].attrs.get("NetworkSettings", {}).get("Networks", {})
+        net_info = networks.get(network)
+        if net_info and net_info.get("IPAddress"):
+            return str(net_info["IPAddress"])
+        for net in networks.values():
+            if net.get("IPAddress"):
+                return str(net["IPAddress"])
+    except Exception:
+        pass
+    return None
