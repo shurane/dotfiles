@@ -76,13 +76,13 @@ async def check_qbittorrent(ctx: StatusContext) -> ServiceResult:
 
             branches = [
                 (
-                    f"📥 Torrents: [bold white]{completed}/{total}[/bold white] completed "
-                    f"[dim]({active} active)[/dim]"
+                    f"📥 Torrents: [bold cyan]{completed:,}[/bold cyan]/[bold cyan]{total:,}[/bold cyan] completed "
+                    f"[dim]([bold cyan]{active:,}[/bold cyan] active)[/dim]"
                 ),
-                f"⚡ Speeds: [bold white]{dl_speed}[/bold white] ↓ [dim]•[/dim] [bold white]{up_speed}[/bold white] ↑",
+                f"⚡ Speeds: [bold green]{dl_speed} ↓[/bold green] [dim]•[/dim] [bold blue]{up_speed} ↑[/bold blue]",
             ]
             if errored > 0:
-                branches.append(f"⚠️ Errored: [bold yellow]{errored}[/bold yellow] torrents")
+                branches.append(f"⚠️ Errored: [bold red]{errored}[/bold red] torrents")
 
             return ServiceResult(
                 service_id=service_id,

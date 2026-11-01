@@ -7,6 +7,7 @@ import json
 import socket
 import ssl
 import time
+from typing import Any
 
 import anyio
 import httpx
@@ -43,48 +44,67 @@ async def check_caddy(ctx: StatusContext) -> ServiceResult:
     t0 = time.perf_counter()
 
     try:
-        # 1. TLS certificate check
-        cert_info, days_left = await anyio.to_thread.run_sync(_check_tls_sync, ctx.base_domain, ctx.http_timeout)
-
-        # 2. Ingress HTTP probe
-        async with httpx.AsyncClient(base_url=f"https://{ctx.base_domain}", timeout=ctx.http_timeout) as client:
-            probe = await client.get("/")
-            if probe.status_code >= 500:
-                elapsed = (time.perf_counter() - t0) * 1000
-                return ServiceResult(
-                    service_id=service_id,
-                    name=name,
-                    container=container,
-                    status=HealthStatus.UNHEALTHY,
-                    latency_ms=elapsed,
-                    summary=f"Root ingress route returned HTTP {probe.status_code}",
-                    branches=[f"[bold red]✖ Root ingress returned HTTP {probe.status_code}[/bold red]"],
-                )
-
-        # 3. Read autosave routes via container exec if Docker available
+        cert_info: dict[str, str] = {}
+        days_left = 999
+        probe_code = 200
         routes_list: list[str] = []
-        code, out = await ctx.exec_container(container, "cat /config/caddy/autosave.json")
-        if code == 0:
+
+        async def _check_tls() -> None:
+            nonlocal cert_info, days_left
+            cert_info, days_left = await anyio.to_thread.run_sync(
+                _check_tls_sync, ctx.base_domain, ctx.http_timeout
+            )
+
+        async def _probe_http() -> None:
+            nonlocal probe_code
             try:
-                cfg = json.loads(out)
-                srv_routes = (
-                    cfg.get("apps", {})
-                    .get("http", {})
-                    .get("servers", {})
-                    .get("srv0", {})
-                    .get("routes", [])
-                )
-                hosts = {
-                    h
-                    for r in srv_routes
-                    for m in r.get("match", [])
-                    for h in m.get("host", [])
-                }
-                routes_list = sorted(hosts)
+                async with httpx.AsyncClient(base_url=f"https://{ctx.base_domain}", timeout=ctx.http_timeout) as client:
+                    probe = await client.get("/")
+                    probe_code = probe.status_code
             except Exception:
-                pass
+                probe_code = 502
+
+        async def _read_routes() -> None:
+            nonlocal routes_list
+            code, out = await ctx.exec_container(container, "cat /config/caddy/autosave.json")
+            if code == 0:
+                try:
+                    cfg: dict[str, Any] = json.loads(out)
+                    srv_routes = (
+                        cfg.get("apps", {})
+                        .get("http", {})
+                        .get("servers", {})
+                        .get("srv0", {})
+                        .get("routes", [])
+                    )
+                    hosts = {
+                        h
+                        for r in srv_routes
+                        for m in r.get("match", [])
+                        for h in m.get("host", [])
+                    }
+                    routes_list = sorted(hosts)
+                except Exception:
+                    pass
+
+        # Execute TLS, HTTP probe, and autosave read concurrently
+        async with anyio.create_task_group() as tg:
+            tg.start_soon(_check_tls)
+            tg.start_soon(_probe_http)
+            tg.start_soon(_read_routes)
 
         elapsed = (time.perf_counter() - t0) * 1000
+
+        if probe_code >= 500:
+            return ServiceResult(
+                service_id=service_id,
+                name=name,
+                container=container,
+                status=HealthStatus.UNHEALTHY,
+                latency_ms=elapsed,
+                summary=f"Root ingress route returned HTTP {probe_code}",
+                branches=[f"[bold red]✖ Root ingress returned HTTP {probe_code}[/bold red]"],
+            )
 
         short_routes = [
             h.replace(f".{ctx.base_domain}", "") if h != ctx.base_domain else h
@@ -97,17 +117,27 @@ async def check_caddy(ctx: StatusContext) -> ServiceResult:
         status = HealthStatus.HEALTHY
         if days_left <= 0:
             status = HealthStatus.UNHEALTHY
+            days_style = "bold red"
         elif days_left <= 14:
             status = HealthStatus.DEGRADED
+            days_style = "bold red"
+        elif days_left <= 30:
+            status = HealthStatus.HEALTHY
+            days_style = "bold yellow"
+        else:
+            status = HealthStatus.HEALTHY
+            days_style = "bold green"
 
+        styled_routes = [f"[bold cyan]{r}[/bold cyan]" for r in short_routes]
         branches = [
             (
-                f"🌐 Reverse Proxy: [bold white]{len(routes_list)} routes[/bold white] "
-                f"[dim]({', '.join(short_routes)})[/dim]"
+                f"🌐 Reverse Proxy: [bold cyan]{len(routes_list)}[/bold cyan] routes "
+                f"({', '.join(styled_routes)})"
             ),
             (
-                f"🔒 TLS Certificate: [bold white]{cert_info.get('issuer')}[/bold white] "
-                f"[dim](valid to {cert_info.get('expires')} • {days_left}d remaining)[/dim]"
+                f"🔒 TLS Certificate: [bold yellow]{cert_info.get('issuer')}[/bold yellow] "
+                f"[dim]•[/dim] valid to [bold white]{cert_info.get('expires')}[/bold white] "
+                f"[dim]([{days_style}]{days_left}d remaining[/{days_style}])[/dim]"
             ),
         ]
 

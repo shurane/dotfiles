@@ -82,13 +82,13 @@ async def check_withings_sync(ctx: StatusContext) -> ServiceResult:
         summary = f"Supercronic active ({health_val}) • last sync: {last_sync_time} ({last_status})"
 
         branches = [
-            f"⏱️ Scheduler: [bold white]Supercronic active[/bold white] [dim]({health_val})[/dim]",
+            f"⏱️ Scheduler: [bold green]Supercronic active[/bold green] [dim]({health_val})[/dim]",
         ]
         if last_sync_time != "Unknown":
             status_style = "bold green" if last_status == "succeeded" else "bold yellow"
             branches.append(
                 f"🔄 Last Sync: [{status_style}]{last_sync_time}[/{status_style}] "
-                f"[dim]({last_status} • schedule: {schedule})[/dim]"
+                f"[dim]({last_status} • schedule: [bold cyan]{schedule}[/bold cyan])[/dim]"
             )
         else:
             branches.append(f"🔄 Cronjob: [dim]{schedule}[/dim]")

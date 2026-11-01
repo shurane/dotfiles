@@ -22,55 +22,70 @@ async def check_samba(ctx: StatusContext) -> ServiceResult:
     t0 = time.perf_counter()
 
     try:
-        # 1. TCP connection probe to port 445 (host network)
-        await anyio.to_thread.run_sync(_check_port_445_sync, ctx.lan_host, ctx.http_timeout)
-
-        # 2. Docker container inspection for shares, accounts, and sessions
         shares: list[str] = []
         accounts: list[str] = []
         active_sessions = 0
+        port_open = False
 
-        code, out = await ctx.exec_container(container, "testparm -s")
-        if code == 0:
-            for line in out.splitlines():
-                line = line.strip()
-                if line.startswith("[") and line.endswith("]"):
-                    sec = line[1:-1]
-                    if sec != "global":
-                        shares.append(sec)
+        async def _check_port() -> None:
+            nonlocal port_open
+            await anyio.to_thread.run_sync(_check_port_445_sync, ctx.lan_host, ctx.http_timeout)
+            port_open = True
 
-        code, out = await ctx.exec_container(container, "pdbedit -L")
-        if code == 0:
-            for line in out.splitlines():
-                if ":" in line:
-                    accounts.append(line.split(":")[0])
+        async def _check_container() -> None:
+            nonlocal shares, accounts, active_sessions
+            cmd = (
+                'sh -c "testparm -s 2>/dev/null; echo \'===SMB_DELIM===\'; '
+                'pdbedit -L 2>/dev/null; echo \'===SMB_DELIM===\'; '
+                'smbstatus -b 2>/dev/null"'
+            )
+            code, out = await ctx.exec_container(container, cmd)
+            if code == 0:
+                parts = out.split("===SMB_DELIM===")
+                if len(parts) >= 1:
+                    for line in parts[0].splitlines():
+                        line = line.strip()
+                        if line.startswith("[") and line.endswith("]"):
+                            sec = line[1:-1]
+                            if sec != "global":
+                                shares.append(sec)
+                if len(parts) >= 2:
+                    for line in parts[1].splitlines():
+                        if ":" in line:
+                            accounts.append(line.split(":")[0])
+                if len(parts) >= 3:
+                    for line in parts[2].splitlines():
+                        line = line.strip()
+                        if line and line[0].isdigit():
+                            active_sessions += 1
 
-        code, out = await ctx.exec_container(container, "smbstatus -b")
-        if code == 0:
-            for line in out.splitlines():
-                line = line.strip()
-                # Lines with PID numbers in the session table
-                if line and line[0].isdigit():
-                    active_sessions += 1
+        # Probe port 445 and inspect container concurrently
+        async with anyio.create_task_group() as tg:
+            tg.start_soon(_check_port)
+            tg.start_soon(_check_container)
 
         elapsed = (time.perf_counter() - t0) * 1000
 
         shares.sort()
         accounts.sort()
-        if active_sessions > 0:
-            session_str = f"{active_sessions} active client session(s)"
-        else:
-            session_str = "0 active client sessions"
+        session_str = (
+            f"[bold cyan]{active_sessions}[/bold cyan] active client session(s)"
+            if active_sessions > 0
+            else "[dim]0 active client sessions[/dim]"
+        )
+
+        styled_shares = [f"[bold magenta]{s}[/bold magenta]" for s in shares]
+        styled_accounts = [f"[bold yellow]{a}[/bold yellow]" for a in accounts]
 
         shares_str = f"{len(shares)} shares ({', '.join(shares)})" if shares else "shares active"
         acc_str = f"accounts: {', '.join(accounts)}" if accounts else "auth ready"
-        summary = f"{shares_str} • {acc_str} • port 445 open ({session_str})"
+        summary = f"{shares_str} • {acc_str} • port 445 open ({active_sessions} sessions)"
 
         branches = [
-            f"📂 Shares: [dim]{', '.join(shares)}[/dim]",
+            f"📂 Shares: [bold cyan]{len(shares)}[/bold cyan] ({', '.join(styled_shares)})",
             (
-                f"👤 Accounts: [dim]{', '.join(accounts)}[/dim] [dim]•[/dim] "
-                f"[bold white]Port 445[/bold white] open [dim]({session_str})[/dim]"
+                f"👤 Accounts: {', '.join(styled_accounts)} [dim]•[/dim] "
+                f"[bold green]Port 445[/bold green] open [dim]({session_str})[/dim]"
             ),
         ]
 

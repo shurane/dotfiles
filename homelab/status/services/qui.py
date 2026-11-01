@@ -56,7 +56,12 @@ async def check_qui(ctx: StatusContext) -> ServiceResult:
                 f'"{i.get("name")}" ({i.get("host")})'
                 for i in instances
             ]
+            styled_inst_desc = [
+                f'"[bold yellow]{i.get("name")}[/bold yellow]" ([cyan]{i.get("host")}[/cyan])'
+                for i in instances
+            ]
             desc_str = ", ".join(inst_desc) if inst_desc else "no instances configured"
+            styled_desc_str = ", ".join(styled_inst_desc) if styled_inst_desc else "no instances configured"
             summary = f"{connected_count}/{len(instances)} instance connected: {desc_str}"
 
             status = HealthStatus.HEALTHY
@@ -65,8 +70,8 @@ async def check_qui(ctx: StatusContext) -> ServiceResult:
 
             branches = [
                 (
-                    f"🔗 Connected Instances: [bold white]{connected_count}/{len(instances)}[/bold white] "
-                    f"[dim]({desc_str})[/dim]"
+                    f"🔗 Connected Instances: [bold cyan]{connected_count}[/bold cyan]/"
+                    f"[bold cyan]{len(instances)}[/bold cyan] ({styled_desc_str})"
                 )
             ]
 
