@@ -1,9 +1,23 @@
-#!/usr/bin/env -S uv run --with pytest
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.14"
+# dependencies = [
+#   "anyio>=4.7.0",
+#   "docker>=7.1.0",
+#   "httpx>=0.27.0",
+#   "paramiko>=3.5.0",
+#   "pytest>=8.0.0",
+#   "python-dotenv>=1.0.0",
+#   "rich>=13.0.0",
+#   "typer>=0.16.0",
+# ]
+# ///
 """Unit tests for homelab status inspector."""
 
 from __future__ import annotations
 
 import json
+import sys
 import xml.etree.ElementTree as ET
 
 from status.config import format_speed
@@ -151,3 +165,10 @@ def test_cli_help() -> None:
     assert "--service" in result.stdout
     assert "--format" in result.stdout
     assert "--json" in result.stdout
+
+
+if __name__ == "__main__":
+    import pytest
+
+    raise SystemExit(pytest.main([__file__, *sys.argv[1:]]))
+
