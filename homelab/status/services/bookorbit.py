@@ -66,14 +66,18 @@ async def check_bookorbit(ctx: StatusContext) -> ServiceResult:
                 fpath = folders[0].get("path", "") if folders else ""
                 if fpath:
                     branches.append(
-                        f'📚 Library "{lname}": [bold white]{bcount}[/bold white] books [dim](in {fpath})[/dim]'
+                        f'📚 Library "[bold yellow]{lname}[/bold yellow]": '
+                        f"[bold cyan]{bcount:,}[/bold cyan] books "
+                        f"[dim](in [bold magenta]{fpath}[/bold magenta])[/dim]"
                     )
                     lib_summaries.append(f'"{lname}": {bcount} in {fpath}')
                 else:
-                    branches.append(f'📚 Library "{lname}": [bold white]{bcount}[/bold white] books')
+                    branches.append(
+                        f'📚 Library "[bold yellow]{lname}[/bold yellow]": [bold cyan]{bcount:,}[/bold cyan] books'
+                    )
                     lib_summaries.append(f'"{lname}": {bcount}')
 
-            branches.append(f"📖 Total Books: [bold white]{total_books}[/bold white]")
+            branches.append(f"📖 Total Books: [bold cyan]{total_books:,}[/bold cyan]")
 
             count_noun = "library" if len(libraries) == 1 else "libraries"
             summary = f"{total_books} books in {len(libraries)} {count_noun} ({', '.join(lib_summaries)})"

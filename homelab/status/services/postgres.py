@@ -37,40 +37,42 @@ async def check_postgres(ctx: StatusContext) -> ServiceResult:
         )
 
     try:
-        # 1. pg_isready check
-        ready_code, ready_out = await ctx.exec_container(container, "pg_isready -U bookorbit -d bookorbit")
-        if ready_code != 0:
-            elapsed = (time.perf_counter() - t0) * 1000
+        cmd = (
+            'sh -c "pg_isready -U bookorbit -d bookorbit && '
+            "psql -U bookorbit -d bookorbit -t -A -F '|' -c "
+            '\\"SELECT count(*), pg_size_pretty(pg_database_size(current_database())) FROM books;\\""'
+        )
+        code, out = await ctx.exec_container(container, cmd)
+        elapsed = (time.perf_counter() - t0) * 1000
+
+        if code != 0:
             return ServiceResult(
                 service_id=service_id,
                 name=name,
                 container=container,
                 status=HealthStatus.UNHEALTHY,
                 latency_ms=elapsed,
-                summary=f"pg_isready failed: {ready_out.strip()}",
-                branches=[f"[bold red]✖ pg_isready failed: {ready_out.strip()}[/bold red]"],
+                summary=f"Database probe failed: {out.strip()}",
+                branches=[f"[bold red]✖ Database probe failed: {out.strip()}[/bold red]"],
             )
 
-        # 2. Query book count in database
-        query_code, query_out = await ctx.exec_container(
-            container, 'psql -U bookorbit -d bookorbit -t -c "SELECT count(*) FROM books;"'
-        )
-        book_count = query_out.strip() if query_code == 0 else "?"
+        book_count = "?"
+        db_size = "?"
+        lines = [line.strip() for line in out.splitlines() if line.strip()]
+        if lines:
+            last_line = lines[-1]
+            if "|" in last_line:
+                parts = last_line.split("|", 1)
+                book_count = parts[0].strip()
+                db_size = parts[1].strip()
 
-        # 3. Query database disk size
-        size_code, size_out = await ctx.exec_container(
-            container, "psql -U bookorbit -d bookorbit -t -c \"SELECT pg_size_pretty(pg_database_size('bookorbit'));\""
-        )
-        db_size = size_out.strip() if size_code == 0 else "?"
-
-        elapsed = (time.perf_counter() - t0) * 1000
         summary = f'PostgreSQL 18 accepting connections • {book_count} books ({db_size}) in database "bookorbit"'
 
         branches = [
-            "🔌 Connection: [bold white]PostgreSQL 18[/bold white] [dim](accepting connections)[/dim]",
+            "🔌 Connection: [bold green]PostgreSQL 18[/bold green] [dim](accepting connections)[/dim]",
             (
-                f"💾 Storage: [bold white]{book_count} books[/bold white] [dim]•[/dim] "
-                f'[bold white]{db_size}[/bold white] in database [dim]"bookorbit"[/dim]'
+                f"💾 Storage: [bold cyan]{book_count}[/bold cyan] books [dim]•[/dim] "
+                f"[bold cyan]{db_size}[/bold cyan] in database [bold yellow]\"bookorbit\"[/bold yellow]"
             ),
         ]
 

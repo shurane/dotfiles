@@ -254,7 +254,7 @@ def main(
             console.print(f"[bold red]Unknown service(s):[/bold red] {', '.join(invalid)}")
             console.print(f"Available services: {', '.join(CHECK_REGISTRY.keys())}")
             sys.exit(1)
-        selected_checks = {k: CHECK_REGISTRY[k] for k in selected_keys}
+        selected_checks = {k: fn for k, fn in CHECK_REGISTRY.items() if k in selected_keys}
     else:
         selected_checks = CHECK_REGISTRY
 
