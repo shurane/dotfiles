@@ -64,13 +64,13 @@ async def check_arcane(ctx: StatusContext) -> ServiceResult:
                 tg.start_soon(_fetch_projects)
 
             elapsed = (time.perf_counter() - t0) * 1000
-            summary = f"{version} • {containers_count} containers, {projects_count} projects on 'm70q'"
+            summary = f'{version} • {containers_count} containers, {projects_count} projects on "{ctx.lan_host.split(".")[0]}"'
 
             branches = [
                 f"🏷️ Version: [bold cyan]{version}[/bold cyan]",
                 (
                     f"📦 Managed: [bold cyan]{containers_count}[/bold cyan] containers, "
-                    f"[bold cyan]{projects_count}[/bold cyan] projects on [bold yellow]'m70q'[/bold yellow]"
+                    f'[bold cyan]{projects_count}[/bold cyan] projects on [bold yellow]"{ctx.lan_host.split(".")[0]}"[/bold yellow]'
                 ),
             ]
 
