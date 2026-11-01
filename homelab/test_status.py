@@ -1,16 +1,15 @@
 #!/usr/bin/env -S uv run --with pytest
-"""Unit tests for homelab/status.py health and content inspector."""
+"""Unit tests for homelab status inspector."""
+
+from __future__ import annotations
 
 import json
 import xml.etree.ElementTree as ET
 
-from status import (
-    CHECK_REGISTRY,
-    HealthStatus,
-    ServiceResult,
-    app,
-    format_speed,
-)
+from status.config import format_speed
+from status.main import app
+from status.models import HealthStatus, ServiceResult
+from status.services import CHECK_REGISTRY
 from typer.testing import CliRunner
 
 runner = CliRunner()
@@ -135,11 +134,14 @@ def test_caddy_autosave_routes_parsing() -> None:
 
 
 def test_service_result_health() -> None:
-    res_ok = ServiceResult("test", "Test", "container-1", HealthStatus.HEALTHY, 12.0, "OK")
+    res_ok = ServiceResult("test", "Test", "container-1", HealthStatus.HEALTHY, 12.0, "OK", branches=["branch 1"])
     assert res_ok.is_healthy is True
 
     res_fail = ServiceResult("test", "Test", "container-1", HealthStatus.UNHEALTHY, 12.0, "Err")
     assert res_fail.is_healthy is False
+
+    res_deg = ServiceResult("test", "Test", "container-1", HealthStatus.DEGRADED, 12.0, "Degraded")
+    assert res_deg.is_healthy is False
 
 
 def test_cli_help() -> None:
@@ -147,4 +149,5 @@ def test_cli_help() -> None:
     assert result.exit_code == 0
     assert "Run deep health & content availability checks" in result.stdout
     assert "--service" in result.stdout
+    assert "--format" in result.stdout
     assert "--json" in result.stdout
