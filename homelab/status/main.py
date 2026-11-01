@@ -214,6 +214,8 @@ def main(
     lan_host: str = typer.Option(
         "m70q.lan",
         "--lan-host",
+        "--host",
+        "-H",
         help="Target LAN host for SMB/Docker connection",
     ),
     timeout: float = typer.Option(
