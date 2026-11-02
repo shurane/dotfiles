@@ -38,9 +38,8 @@ async def check_postgres(ctx: StatusContext) -> ServiceResult:
 
     try:
         cmd = (
-            'sh -c "pg_isready -U bookorbit -d bookorbit && '
             "psql -U bookorbit -d bookorbit -t -A -F '|' -c "
-            '\\"SELECT count(*), pg_size_pretty(pg_database_size(current_database())) FROM books;\\""'
+            '"SELECT count(*), pg_size_pretty(pg_database_size(current_database())) FROM books;"'
         )
         code, out = await ctx.exec_container(container, cmd)
         elapsed = (time.perf_counter() - t0) * 1000

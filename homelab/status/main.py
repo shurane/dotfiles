@@ -371,15 +371,16 @@ def main(
     console.print()
     if all_passed:
         console.print(
-            f"[bold green]✔ All {passed_count}/{total_count} services healthy[/bold green] "
-            f"• Verified logins, content availability & containers in [bold cyan]{total_elapsed:.2f}s[/bold cyan]\n"
+            f"✔ [bold green]All {passed_count}/{total_count} services healthy[/bold green] "
+            f"[dim]•[/dim] [bold white]Total time:[/bold white] [bold cyan]{total_elapsed:.2f}s[/bold cyan] "
+            f"[dim](verified logins, content & containers)[/dim]\n"
         )
         sys.exit(0)
     else:
         failed_count = total_count - passed_count
         console.print(
-            f"[bold red]✖ {failed_count}/{total_count} services unhealthy or degraded[/bold red] "
-            f"• Elapsed: [bold yellow]{total_elapsed:.2f}s[/bold yellow]\n"
+            f"✖ [bold red]{failed_count}/{total_count} services unhealthy or degraded[/bold red] "
+            f"[dim]•[/dim] [bold white]Total time:[/bold white] [bold yellow]{total_elapsed:.2f}s[/bold yellow]\n"
         )
         sys.exit(1)
 

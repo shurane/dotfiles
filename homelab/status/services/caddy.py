@@ -64,17 +64,32 @@ async def check_caddy(ctx: StatusContext) -> ServiceResult:
 
         async def _read_routes() -> None:
             nonlocal routes_list
-            code, out = await ctx.exec_container(container, "cat /config/caddy/autosave.json")
-            if code == 0:
-                try:
-                    cfg: dict[str, Any] = json.loads(out)
-                    srv_routes = (
-                        cfg.get("apps", {}).get("http", {}).get("servers", {}).get("srv0", {}).get("routes", [])
-                    )
-                    hosts = {h for r in srv_routes for m in r.get("match", []) for h in m.get("host", [])}
-                    routes_list = sorted(hosts)
-                except Exception:
-                    pass
+            conts = await ctx.get_all_containers()
+            discovered: set[str] = set()
+            for cont in conts.values():
+                labels = cont.labels or {}
+                for k, v in labels.items():
+                    if (k == "caddy" or k.startswith("caddy_")) and v and not k.startswith("caddy."):
+                        for token in v.replace(",", " ").split():
+                            token = token.strip()
+                            if token and not token.startswith("{"):
+                                host = token.split()[0].split(":")[0]
+                                if "." in host:
+                                    discovered.add(host)
+            if discovered:
+                routes_list = sorted(discovered)
+            else:
+                code, out = await ctx.exec_container(container, "cat /config/caddy/autosave.json")
+                if code == 0:
+                    try:
+                        cfg: dict[str, Any] = json.loads(out)
+                        srv_routes = (
+                            cfg.get("apps", {}).get("http", {}).get("servers", {}).get("srv0", {}).get("routes", [])
+                        )
+                        hosts = {h for r in srv_routes for m in r.get("match", []) for h in m.get("host", [])}
+                        routes_list = sorted(hosts)
+                    except Exception:
+                        pass
 
         # Execute TLS, HTTP probe, and autosave read concurrently
         async with anyio.create_task_group() as tg:
