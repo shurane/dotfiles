@@ -40,7 +40,8 @@ async def check_glance(ctx: StatusContext) -> ServiceResult:
                 f'[dim](title: "[bold yellow]{title}[/bold yellow]")[/dim]'
             ]
 
-            version = await ctx.get_container_version(container)
+            version_match = re.search(r"/releases/tag/(v\d+\.\d+(\.\d+)?)", res.text)
+            version = version_match.group(1) if version_match else await ctx.get_container_version(container)
 
             return ServiceResult(
                 service_id=service_id,

@@ -26,6 +26,7 @@ async def check_samba(ctx: StatusContext) -> ServiceResult:
         accounts: list[str] = []
         active_sessions = 0
         port_open = False
+        version: str | None = None
 
         async def _check_port() -> None:
             nonlocal port_open
@@ -33,11 +34,12 @@ async def check_samba(ctx: StatusContext) -> ServiceResult:
             port_open = True
 
         async def _check_container() -> None:
-            nonlocal shares, accounts, active_sessions
+            nonlocal shares, accounts, active_sessions, version
             cmd = (
                 "sh -c \"testparm -s 2>/dev/null; echo '===SMB_DELIM==='; "
                 "pdbedit -L 2>/dev/null; echo '===SMB_DELIM==='; "
-                'smbstatus -b 2>/dev/null"'
+                "smbstatus -b 2>/dev/null; echo '===SMB_DELIM==='; "
+                'smbd -V 2>/dev/null"'
             )
             code, out = await ctx.exec_container(container, cmd)
             if code == 0:
@@ -58,6 +60,12 @@ async def check_samba(ctx: StatusContext) -> ServiceResult:
                         line = line.strip()
                         if line and line[0].isdigit():
                             active_sessions += 1
+                if len(parts) >= 4:
+                    import re
+
+                    m = re.search(r"(\d+\.\d+(\.\d+)?)", parts[3])
+                    if m:
+                        version = f"v{m.group(1)}"
 
         # Probe port 445 and inspect container concurrently
         async with anyio.create_task_group() as tg:
@@ -89,7 +97,8 @@ async def check_samba(ctx: StatusContext) -> ServiceResult:
             ),
         ]
 
-        version = await ctx.get_container_version(container)
+        if not version:
+            version = await ctx.get_container_version(container)
 
         return ServiceResult(
             service_id=service_id,
