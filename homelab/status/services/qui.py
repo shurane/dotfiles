@@ -52,10 +52,8 @@ async def check_qui(ctx: StatusContext) -> ServiceResult:
             elapsed = (time.perf_counter() - t0) * 1000
 
             connected_count = sum(1 for i in instances if i.get("connected") is True)
-            inst_desc = [f'"{i.get("name")}" ({i.get("host")})' for i in instances]
-            styled_inst_desc = [
-                f'"[bold yellow]{i.get("name")}[/bold yellow]" ([cyan]{i.get("host")}[/cyan])' for i in instances
-            ]
+            inst_desc = [f'"{i.get("name")}"' for i in instances]
+            styled_inst_desc = [f'"[bold yellow]{i.get("name")}[/bold yellow]"' for i in instances]
             desc_str = ", ".join(inst_desc) if inst_desc else "no instances configured"
             styled_desc_str = ", ".join(styled_inst_desc) if styled_inst_desc else "no instances configured"
             summary = f"{connected_count}/{len(instances)} instance connected: {desc_str}"
@@ -71,6 +69,8 @@ async def check_qui(ctx: StatusContext) -> ServiceResult:
                 )
             ]
 
+            version = await ctx.get_container_version(container)
+
             return ServiceResult(
                 service_id=service_id,
                 name=name,
@@ -78,6 +78,7 @@ async def check_qui(ctx: StatusContext) -> ServiceResult:
                 status=status,
                 latency_ms=elapsed,
                 summary=summary,
+                version=version,
                 branches=branches,
                 raw_data={"instances": instances},
             )

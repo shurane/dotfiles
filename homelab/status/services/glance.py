@@ -40,6 +40,8 @@ async def check_glance(ctx: StatusContext) -> ServiceResult:
                 f'[dim](title: "[bold yellow]{title}[/bold yellow]")[/dim]'
             ]
 
+            version = await ctx.get_container_version(container)
+
             return ServiceResult(
                 service_id=service_id,
                 name=name,
@@ -47,6 +49,7 @@ async def check_glance(ctx: StatusContext) -> ServiceResult:
                 status=HealthStatus.HEALTHY,
                 latency_ms=elapsed,
                 summary=summary,
+                version=version,
                 branches=branches,
             )
     except Exception as exc:

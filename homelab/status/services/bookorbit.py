@@ -81,6 +81,7 @@ async def check_bookorbit(ctx: StatusContext) -> ServiceResult:
 
             count_noun = "library" if len(libraries) == 1 else "libraries"
             summary = f"{total_books} books in {len(libraries)} {count_noun} ({', '.join(lib_summaries)})"
+            version = await ctx.get_container_version(container)
 
             return ServiceResult(
                 service_id=service_id,
@@ -89,6 +90,7 @@ async def check_bookorbit(ctx: StatusContext) -> ServiceResult:
                 status=HealthStatus.HEALTHY,
                 latency_ms=elapsed,
                 summary=summary,
+                version=version,
                 branches=branches,
                 raw_data={"libraries": libraries, "total_books": total_books},
             )

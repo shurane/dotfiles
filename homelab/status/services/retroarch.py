@@ -54,6 +54,8 @@ async def check_retroarch(ctx: StatusContext) -> ServiceResult:
             entries_display = ", ".join(styled_entries)
             branches = [f"📁 Sync Directory: [bold cyan]{len(entries)} entries[/bold cyan] ({entries_display})"]
 
+            version = await ctx.get_container_version(container)
+
             return ServiceResult(
                 service_id=service_id,
                 name=name,
@@ -61,6 +63,7 @@ async def check_retroarch(ctx: StatusContext) -> ServiceResult:
                 status=HealthStatus.HEALTHY,
                 latency_ms=elapsed,
                 summary=summary,
+                version=version,
                 branches=branches,
                 raw_data={"entries": entries},
             )

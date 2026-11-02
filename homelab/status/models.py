@@ -28,6 +28,7 @@ class ServiceResult:
     status: HealthStatus
     latency_ms: float
     summary: str
+    version: str | None = None
     branches: list[str] = field(default_factory=list)
     raw_data: dict[str, Any] = field(default_factory=dict)
     error: str | None = None
@@ -113,3 +114,57 @@ class StatusContext:
                     return ""
 
         return await anyio.to_thread.run_sync(_get_logs)
+
+    async def get_container_version(self, container_name: str) -> str | None:
+        """Extract software version from container labels, environment variables, or exec."""
+        if not self.docker_client:
+            return None
+
+        import re
+
+        def _extract() -> str | None:
+            with self._docker_lock:
+                try:
+                    cont = self.docker_client.containers.get(container_name)
+                except Exception:
+                    return None
+
+                labels = cont.labels or {}
+                for k in ("org.opencontainers.image.version", "version", "image.version"):
+                    if (v := labels.get(k)) and v != "nightly":
+                        m = re.match(r"^(\d+\.\d+(\.\d+)?)", v)
+                        if m:
+                            return f"v{m.group(1)}"
+                        return v if v.startswith("v") else f"v{v}"
+
+                env = dict(e.split("=", 1) for e in cont.attrs.get("Config", {}).get("Env", []) if "=" in e)
+                for k in ("APP_VERSION", "PG_VERSION", "CADDY_VERSION", "VERSION"):
+                    if v := env.get(k):
+                        m = re.match(r"^(\d+\.\d+(\.\d+)?)", v)
+                        if m:
+                            return f"v{m.group(1)}"
+                        return v if v.startswith("v") else f"v{v}"
+
+                name = cont.name or container_name
+                if "samba" in name:
+                    try:
+                        res = cont.exec_run("smbd -V")
+                        if res.exit_code == 0:
+                            m = re.search(r"(\d+\.\d+(\.\d+)?)", res.output.decode())
+                            if m:
+                                return f"v{m.group(1)}"
+                    except Exception:
+                        pass
+                elif "glance" in name:
+                    try:
+                        res = cont.exec_run("/app/glance --version")
+                        if res.exit_code == 0:
+                            m = re.search(r"v?(\d+\.\d+(\.\d+)?)", res.output.decode())
+                            if m:
+                                return f"v{m.group(1)}"
+                    except Exception:
+                        pass
+
+                return None
+
+        return await anyio.to_thread.run_sync(_extract)
