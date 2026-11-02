@@ -19,12 +19,14 @@ if "VIRTUAL_ENV" not in os.environ:
     if uv_path and os.path.isfile(uv_path):
         os.execv(uv_path, [uv_path, "run", "--project", str(project_dir), str(__file__), *sys.argv[1:]])
 
+import contextlib
 import datetime
 import json
 import logging
 import time
 from collections import deque
 from dataclasses import asdict
+from typing import Any
 
 import anyio
 import typer
@@ -36,7 +38,7 @@ from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
 
-from config import get_docker_client, load_env, resolve_target_connection
+from config import format_size, get_docker_client, load_env, resolve_target_connection
 from models import HealthStatus, ServiceResult, StatusContext
 from services import CHECK_REGISTRY, CheckFn
 
@@ -103,11 +105,11 @@ async def _run_all_checks(
         completed_count += 1
         if live is not None:
             if res.status == HealthStatus.HEALTHY:
-                icon = "🟢"
+                icon_prefix = ""
             elif res.status == HealthStatus.DEGRADED:
-                icon = "🟡"
+                icon_prefix = "🟡 "
             else:
-                icon = "🔴"
+                icon_prefix = "🔴 "
 
             if res.latency_ms < 100:
                 lat_color = "green"
@@ -118,26 +120,36 @@ async def _run_all_checks(
 
             ver = f" [dim cyan]({res.version})[/dim cyan]" if res.version else ""
             line = (
-                f"{icon} [bold white]{res.name}[/bold white]{ver} "
+                f"{icon_prefix}[bold white]{res.name}[/bold white]{ver} "
                 f"[dim]•[/dim] [{lat_color}]{res.latency_ms:.0f}ms[/{lat_color}]"
             )
             recent.append(line)
             live.update(_render_ticker())
 
+    async def _fetch_disk() -> None:
+        with contextlib.suppress(Exception):
+            await ctx.get_disk_usage()
+
     if show_progress:
         with Live(_render_ticker(), console=console, refresh_per_second=10, transient=True) as live:
             async with anyio.create_task_group() as tg:
+                tg.start_soon(_fetch_disk)
                 for idx, (service_id, fn) in enumerate(check_items):
                     tg.start_soon(_execute, idx, service_id, fn, live)
     else:
         async with anyio.create_task_group() as tg:
+            tg.start_soon(_fetch_disk)
             for idx, (service_id, fn) in enumerate(check_items):
                 tg.start_soon(_execute, idx, service_id, fn, None)
 
     return [r for r in results if r is not None]
 
 
-def render_tree(results: list[ServiceResult], total_elapsed: float) -> None:
+def render_tree(
+    results: list[ServiceResult],
+    total_elapsed: float,
+    disks: list[dict[str, Any]] | None = None,
+) -> None:
     """Render check results as a hierarchical, deep-inspection Rich Tree."""
     all_healthy = all(r.is_healthy for r in results)
     passed_count = sum(1 for r in results if r.is_healthy)
@@ -149,15 +161,50 @@ def render_tree(results: list[ServiceResult], total_elapsed: float) -> None:
         status_tag = f"[bold yellow][{passed_count}/{total_count} healthy][/bold yellow]"
 
     console.print(f"[bold magenta]🔮 Homelab Services[/bold magenta] {status_tag} [dim]({total_elapsed:.2f}s)[/dim]")
+
+    if disks:
+        mango = next((d for d in disks if d.get("mount") == "/mnt/mango"), None)
+        root_d = next((d for d in disks if d.get("mount") == "/"), None)
+        parts = []
+        if mango:
+            used = format_size(mango["used_bytes"])
+            total = format_size(mango["total_bytes"])
+            free = format_size(mango["free_bytes"])
+            pct = mango["use_percent"]
+            pct_color = "red" if pct >= 90 else ("yellow" if pct >= 70 else "green")
+            parts.append(
+                f"💾 [bold white]Storage (/mnt/mango):[/bold white] "
+                f"[bold cyan]{used}[/bold cyan] / [bold cyan]{total}[/bold cyan] "
+                f"([{pct_color}]{pct}%[/{pct_color}]) [dim]•[/dim] "
+                f"[bold green]{free} free[/bold green]"
+            )
+        if root_d:
+            used = format_size(root_d["used_bytes"])
+            total = format_size(root_d["total_bytes"])
+            pct = root_d["use_percent"]
+            pct_color = "red" if pct >= 90 else ("yellow" if pct >= 70 else "green")
+            if mango:
+                parts.append(f"[dim]• System (/): {used} / {total} ({pct}%)[/dim]")
+            else:
+                free = format_size(root_d["free_bytes"])
+                parts.append(
+                    f"💾 [bold white]Storage (/):[/bold white] "
+                    f"[bold cyan]{used}[/bold cyan] / [bold cyan]{total}[/bold cyan] "
+                    f"([{pct_color}]{pct}%[/{pct_color}]) [dim]•[/dim] "
+                    f"[bold green]{free} free[/bold green]"
+                )
+        if parts:
+            console.print(" ".join(parts))
+
     root = Tree("", hide_root=True, guide_style="dim")
 
     for r in results:
         if r.status == HealthStatus.HEALTHY:
-            icon = "🟢"
+            icon_prefix = ""
         elif r.status == HealthStatus.DEGRADED:
-            icon = "🟡"
+            icon_prefix = "🟡 "
         else:
-            icon = "🔴"
+            icon_prefix = "🔴 "
 
         if r.latency_ms < 100:
             lat_str = f"[green]{r.latency_ms:.0f}ms[/green]"
@@ -168,7 +215,7 @@ def render_tree(results: list[ServiceResult], total_elapsed: float) -> None:
 
         ver_str = f" [dim cyan]({r.version})[/dim cyan]" if r.version else ""
         node_header = (
-            f"{icon} [bold white]{r.name}[/bold white] "
+            f"{icon_prefix}[bold white]{r.name}[/bold white] "
             f"[dim cyan]{r.container}[/dim cyan]{ver_str} [dim]•[/dim] {lat_str}"
         )
         branch_node = root.add(node_header)
@@ -302,12 +349,13 @@ def main(
             "base_domain": base_domain,
             "total_elapsed_seconds": round(total_elapsed, 3),
             "all_healthy": all(r.is_healthy for r in results),
+            "disk_usage": ctx._disk_usage or [],
             "services": [asdict(r) for r in results],
         }
         print(json.dumps(out_dict, indent=2))
         sys.exit(0 if all(r.is_healthy for r in results) else 1)
 
-    render_tree(results, total_elapsed)
+    render_tree(results, total_elapsed, ctx._disk_usage)
 
     # Summary footer
     passed_count = sum(1 for r in results if r.is_healthy)

@@ -59,6 +59,7 @@ class StatusContext:
     no_docker: bool = False
     connection: TargetConnection | None = None
     _docker_lock: threading.Lock = field(default_factory=threading.Lock)
+    _disk_usage: list[dict[str, Any]] | None = field(default=None, init=False)
 
     def base_url(self, subdomain: str | None = None) -> str:
         if subdomain:
@@ -168,3 +169,78 @@ class StatusContext:
                 return None
 
         return await anyio.to_thread.run_sync(_extract)
+
+    async def get_disk_usage(self) -> list[dict[str, Any]]:
+        """Fetch disk usage for storage partitions (e.g. /mnt/mango and /)."""
+        if self._disk_usage is not None:
+            return self._disk_usage
+
+        disks: list[dict[str, Any]] = []
+
+        # 1. If running locally on target host:
+        if self.connection and self.connection.is_local:
+            def _local_stat() -> list[dict[str, Any]]:
+                import os
+                found = []
+                targets = ["/mnt/mango", "/"] if os.path.exists("/mnt/mango") else ["/"]
+                for path in targets:
+                    try:
+                        st = os.statvfs(path)
+                        total = st.f_blocks * st.f_frsize
+                        free = st.f_bavail * st.f_frsize
+                        used = total - (st.f_bfree * st.f_frsize)
+                        total_avail = used + free
+                        pct = round(used / total_avail * 100) if total_avail else 0
+                        found.append({
+                            "mount": path,
+                            "total_bytes": total,
+                            "used_bytes": used,
+                            "free_bytes": free,
+                            "use_percent": pct,
+                        })
+                    except Exception:
+                        pass
+                return found
+
+            disks = await anyio.to_thread.run_sync(_local_stat)
+            self._disk_usage = disks
+            return disks
+
+        # 2. If running remotely with docker client:
+        if self.docker_client and not self.no_docker:
+            code, out = await self.exec_container("homelab-qbittorrent-1", "df -k /mnt/mango/torrents /")
+            if code != 0:
+                code, out = await self.exec_container("homelab-samba-1", "df -k /shares/mango /")
+
+            if code == 0:
+                for line in out.strip().splitlines()[1:]:
+                    parts = line.split()
+                    if len(parts) >= 6:
+                        m = parts[5]
+                        if "mango" in m or "downloads" in m:
+                            mount_name = "/mnt/mango"
+                        elif m == "/":
+                            mount_name = "/"
+                        else:
+                            continue
+
+                        if any(d["mount"] == mount_name for d in disks):
+                            continue
+
+                        try:
+                            total = int(parts[1]) * 1024
+                            used = int(parts[2]) * 1024
+                            free = int(parts[3]) * 1024
+                            pct = int(parts[4].rstrip("%"))
+                            disks.append({
+                                "mount": mount_name,
+                                "total_bytes": total,
+                                "used_bytes": used,
+                                "free_bytes": free,
+                                "use_percent": pct,
+                            })
+                        except Exception:
+                            pass
+
+        self._disk_usage = disks
+        return disks

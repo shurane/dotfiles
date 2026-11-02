@@ -30,6 +30,18 @@ def format_speed(bytes_per_sec: float) -> str:
     return f"{bps / (1024 * 1024):.2f} MB/s"
 
 
+def format_size(bytes_val: float) -> str:
+    n = float(bytes_val)
+    if n >= 1024**4:
+        return f"{n / (1024**4):.1f} TB"
+    if n >= 1024**3:
+        gb = n / (1024**3)
+        return f"{gb:.0f} GB" if gb >= 10 else f"{gb:.1f} GB"
+    if n >= 1024**2:
+        return f"{n / (1024**2):.0f} MB"
+    return f"{n / 1024:.0f} KB"
+
+
 def discover_tailscale_suffix() -> str | None:
     """Dynamically discover the Tailscale MagicDNS suffix for the current machine/tailnet."""
     # 1. Fast check: parse /etc/resolv.conf search/domain directive
