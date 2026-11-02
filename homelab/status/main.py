@@ -91,10 +91,8 @@ def render_tree(results: list[ServiceResult], total_elapsed: float) -> None:
     else:
         status_tag = f"[bold yellow][{passed_count}/{total_count} healthy][/bold yellow]"
 
-    root = Tree(
-        f"[bold magenta]🔮 Homelab Services[/bold magenta] {status_tag} [dim]({total_elapsed:.2f}s)[/dim]",
-        guide_style="dim",
-    )
+    console.print(f"[bold magenta]🔮 Homelab Services[/bold magenta] {status_tag} [dim]({total_elapsed:.2f}s)[/dim]")
+    root = Tree("", hide_root=True, guide_style="dim")
 
     for r in results:
         if r.status == HealthStatus.HEALTHY:

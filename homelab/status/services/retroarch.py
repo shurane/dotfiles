@@ -51,7 +51,8 @@ async def check_retroarch(ctx: StatusContext) -> ServiceResult:
             entries.sort()
             styled_entries = [f"[bold magenta]{e}[/bold magenta]" for e in entries]
             summary = f"{len(entries)} entries in /srv/retroarch: {', '.join(entries)}"
-            branches = [f"📁 Sync Directory: [bold cyan]{len(entries)} entries[/bold cyan] ({', '.join(styled_entries)})"]
+            entries_display = ", ".join(styled_entries)
+            branches = [f"📁 Sync Directory: [bold cyan]{len(entries)} entries[/bold cyan] ({entries_display})"]
 
             return ServiceResult(
                 service_id=service_id,
