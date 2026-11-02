@@ -43,24 +43,13 @@ def format_size(bytes_val: float) -> str:
 
 
 def render_sparkbar(pct: float, width: int = 10) -> str:
-    """Render a fractional block sparkline gauge (e.g. [██████▎░░░])."""
-    blocks = ("", "▏", "▎", "▍", "▌", "▋", "▊", "▉")
+    """Render a clean block sparkline gauge with no font gaps (e.g. [██████░░░░])."""
     val = max(0.0, min(1.0, pct)) * width
-    full = int(val)
-    rem = val - full
-    char_idx = round(rem * 8)
-    if char_idx == 8:
-        full += 1
-        part = ""
-    else:
-        part = blocks[char_idx]
-
-    full = min(full, width)
-    if full == width:
-        part = ""
-    empty = max(0, width - full - (1 if part else 0))
+    full = round(val)
+    full = max(0, min(width, full))
+    empty = width - full
     color = "bold red" if pct >= 0.9 else ("bold yellow" if pct >= 0.7 else "bold cyan")
-    filled_str = f"[{color}]" + ("█" * full + part) + f"[/{color}]" if (full or part) else ""
+    filled_str = f"[{color}]{'█' * full}[/{color}]" if full > 0 else ""
     empty_str = f"[dim]{'░' * empty}[/dim]" if empty > 0 else ""
     return f"[{filled_str}{empty_str}]"
 
