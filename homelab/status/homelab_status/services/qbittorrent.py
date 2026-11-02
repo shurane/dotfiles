@@ -58,15 +58,9 @@ async def check_qbittorrent(ctx: StatusContext) -> ServiceResult:
             total = len(torrents)
             completed = sum(1 for t in torrents.values() if t.get("progress", 0) >= 1.0)
             active = sum(
-                1
-                for t in torrents.values()
-                if t.get("state") in ("downloading", "uploading", "stalledUP", "stalledDL")
+                1 for t in torrents.values() if t.get("state") in ("downloading", "uploading", "stalledUP", "stalledDL")
             )
-            errored = sum(
-                1
-                for t in torrents.values()
-                if t.get("state") in ("error", "missingFiles")
-            )
+            errored = sum(1 for t in torrents.values() if t.get("state") in ("error", "missingFiles"))
 
             dl_speed = format_speed(server_state.get("dl_info_speed", 0))
             up_speed = format_speed(server_state.get("up_info_speed", 0))

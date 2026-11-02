@@ -20,8 +20,7 @@ async def check_jellyfin(ctx: StatusContext) -> ServiceResult:
     try:
         async with httpx.AsyncClient(base_url=ctx.base_url("jellyfin"), timeout=ctx.http_timeout) as client:
             auth_header = (
-                'MediaBrowser Client="StatusCheck", Device="m70q", '
-                'DeviceId="homelab-status-check", Version="1.0.0"'
+                'MediaBrowser Client="StatusCheck", Device="m70q", DeviceId="homelab-status-check", Version="1.0.0"'
             )
             login_res = await client.post(
                 "/Users/AuthenticateByName",
@@ -100,10 +99,7 @@ async def check_jellyfin(ctx: StatusContext) -> ServiceResult:
             boxsets = counts_data.get("BoxSetCount", 0)
             items = counts_data.get("ItemCount", 0)
 
-            summary = (
-                f"{movies} movies, {series} series ({episodes:,} eps), "
-                f"{boxsets} boxsets • {items:,} total items"
-            )
+            summary = f"{movies} movies, {series} series ({episodes:,} eps), {boxsets} boxsets • {items:,} total items"
             branches = [
                 f"🎬 Movies: [bold cyan]{movies:,}[/bold cyan]",
                 (

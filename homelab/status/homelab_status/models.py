@@ -38,6 +38,15 @@ class ServiceResult:
 
 
 @dataclass
+class TargetConnection:
+    host: str
+    ip: str
+    route: str  # "local", "lan", "tailscale", "wan"
+    description: str  # "Local Host (UNIX socket)", "Direct LAN", "Tailscale MagicDNS", "WAN / Remote"
+    is_local: bool = False
+
+
+@dataclass
 class StatusContext:
     env: dict[str, str]
     username: str
@@ -47,6 +56,7 @@ class StatusContext:
     docker_client: docker.DockerClient | None
     http_timeout: float = 10.0
     no_docker: bool = False
+    connection: TargetConnection | None = None
     _docker_lock: threading.Lock = field(default_factory=threading.Lock)
 
     def base_url(self, subdomain: str | None = None) -> str:
@@ -98,11 +108,7 @@ class StatusContext:
                 try:
                     c = self.docker_client.containers.get(container_name)
                     raw = c.logs(tail=tail)
-                    return (
-                        raw.decode("utf-8", errors="replace")
-                        if isinstance(raw, (bytes, bytearray))
-                        else str(raw)
-                    )
+                    return raw.decode("utf-8", errors="replace") if isinstance(raw, (bytes, bytearray)) else str(raw)
                 except Exception:
                     return ""
 

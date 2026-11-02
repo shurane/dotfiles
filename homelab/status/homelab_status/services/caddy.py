@@ -51,9 +51,7 @@ async def check_caddy(ctx: StatusContext) -> ServiceResult:
 
         async def _check_tls() -> None:
             nonlocal cert_info, days_left
-            cert_info, days_left = await anyio.to_thread.run_sync(
-                _check_tls_sync, ctx.base_domain, ctx.http_timeout
-            )
+            cert_info, days_left = await anyio.to_thread.run_sync(_check_tls_sync, ctx.base_domain, ctx.http_timeout)
 
         async def _probe_http() -> None:
             nonlocal probe_code
@@ -71,18 +69,9 @@ async def check_caddy(ctx: StatusContext) -> ServiceResult:
                 try:
                     cfg: dict[str, Any] = json.loads(out)
                     srv_routes = (
-                        cfg.get("apps", {})
-                        .get("http", {})
-                        .get("servers", {})
-                        .get("srv0", {})
-                        .get("routes", [])
+                        cfg.get("apps", {}).get("http", {}).get("servers", {}).get("srv0", {}).get("routes", [])
                     )
-                    hosts = {
-                        h
-                        for r in srv_routes
-                        for m in r.get("match", [])
-                        for h in m.get("host", [])
-                    }
+                    hosts = {h for r in srv_routes for m in r.get("match", []) for h in m.get("host", [])}
                     routes_list = sorted(hosts)
                 except Exception:
                     pass
@@ -106,10 +95,7 @@ async def check_caddy(ctx: StatusContext) -> ServiceResult:
                 branches=[f"[bold red]✖ Root ingress returned HTTP {probe_code}[/bold red]"],
             )
 
-        short_routes = [
-            h.replace(f".{ctx.base_domain}", "") if h != ctx.base_domain else h
-            for h in routes_list
-        ]
+        short_routes = [h.replace(f".{ctx.base_domain}", "") if h != ctx.base_domain else h for h in routes_list]
         routes_str = f"{len(routes_list)} routes ({', '.join(short_routes)})" if routes_list else "Ingress active"
         tls_summary = f"TLS: {cert_info.get('issuer')} (valid to {cert_info.get('expires')})"
         summary = f"{routes_str} • {tls_summary}"
@@ -130,10 +116,7 @@ async def check_caddy(ctx: StatusContext) -> ServiceResult:
 
         styled_routes = [f"[bold cyan]{r}[/bold cyan]" for r in short_routes]
         branches = [
-            (
-                f"🌐 Reverse Proxy: [bold cyan]{len(routes_list)}[/bold cyan] routes "
-                f"({', '.join(styled_routes)})"
-            ),
+            (f"🌐 Reverse Proxy: [bold cyan]{len(routes_list)}[/bold cyan] routes ({', '.join(styled_routes)})"),
             (
                 f"🔒 TLS Certificate: [bold yellow]{cert_info.get('issuer')}[/bold yellow] "
                 f"[dim]•[/dim] valid to [bold white]{cert_info.get('expires')}[/bold white] "
