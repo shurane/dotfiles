@@ -40,9 +40,7 @@ async def check_withings_sync(ctx: StatusContext) -> ServiceResult:
     try:
         status_val = c.status
         health_val = c.attrs.get("State", {}).get("Health", {}).get("Status", "none")
-
-        code, _ = await ctx.exec_container(container, "pgrep -f supercronic")
-        has_proc = code == 0
+        has_proc = (health_val == "healthy") or (health_val == "none" and status_val == "running")
 
         elapsed = (time.perf_counter() - t0) * 1000
         if not has_proc or status_val != "running":

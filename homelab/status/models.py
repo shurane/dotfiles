@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
 import threading
 from dataclasses import dataclass, field
 from enum import StrEnum
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import anyio
@@ -61,6 +63,30 @@ class StatusContext:
     _docker_lock: threading.Lock = field(default_factory=threading.Lock)
     _disk_usage: list[dict[str, Any]] | None = field(default=None, init=False)
     _containers_cache: dict[str, Container] | None = field(default=None, init=False)
+    _version_cache: dict[str, str] | None = field(default=None, init=False)
+
+    def _get_version_cache(self) -> dict[str, str]:
+        if self._version_cache is not None:
+            return self._version_cache
+        cache_file = Path.home() / ".cache" / "homelab" / "image_versions.json"
+        if cache_file.exists():
+            try:
+                self._version_cache = json.loads(cache_file.read_text(encoding="utf-8"))
+            except Exception:
+                self._version_cache = {}
+        else:
+            self._version_cache = {}
+        return self._version_cache
+
+    def _save_version_cache(self, image_id: str, version: str) -> None:
+        cache = self._get_version_cache()
+        cache[image_id] = version
+        cache_file = Path.home() / ".cache" / "homelab" / "image_versions.json"
+        try:
+            cache_file.parent.mkdir(parents=True, exist_ok=True)
+            cache_file.write_text(json.dumps(cache, indent=2), encoding="utf-8")
+        except Exception:
+            pass
 
     def base_url(self, subdomain: str | None = None) -> str:
         if subdomain:
@@ -160,21 +186,28 @@ class StatusContext:
         if not cont:
             return None
 
+        img_id = cont.attrs.get("Image", "")
+        vcache = self._get_version_cache()
+        if img_id and img_id in vcache:
+            return vcache[img_id]
+
         labels = cont.labels or {}
         for k in ("org.opencontainers.image.version", "version", "image.version"):
             if (v := labels.get(k)) and v != "nightly":
                 m = re.match(r"^(\d+\.\d+(\.\d+)?)", v)
-                if m:
-                    return f"v{m.group(1)}"
-                return v if v.startswith("v") else f"v{v}"
+                ver = f"v{m.group(1)}" if m else (v if v.startswith("v") else f"v{v}")
+                if img_id:
+                    self._save_version_cache(img_id, ver)
+                return ver
 
         env = dict(e.split("=", 1) for e in cont.attrs.get("Config", {}).get("Env", []) if "=" in e)
         for k in ("APP_VERSION", "PG_VERSION", "CADDY_VERSION", "VERSION"):
             if v := env.get(k):
                 m = re.match(r"^(\d+\.\d+(\.\d+)?)", v)
-                if m:
-                    return f"v{m.group(1)}"
-                return v if v.startswith("v") else f"v{v}"
+                ver = f"v{m.group(1)}" if m else (v if v.startswith("v") else f"v{v}")
+                if img_id:
+                    self._save_version_cache(img_id, ver)
+                return ver
 
         name = cont.name or container_name
         if "samba" in name:
@@ -182,13 +215,19 @@ class StatusContext:
             if code == 0:
                 m = re.search(r"(\d+\.\d+(\.\d+)?)", out)
                 if m:
-                    return f"v{m.group(1)}"
+                    ver = f"v{m.group(1)}"
+                    if img_id:
+                        self._save_version_cache(img_id, ver)
+                    return ver
         elif "glance" in name:
             code, out = await self.exec_container(container_name, "/app/glance --version")
             if code == 0:
                 m = re.search(r"v?(\d+\.\d+(\.\d+)?)", out)
                 if m:
-                    return f"v{m.group(1)}"
+                    ver = f"v{m.group(1)}"
+                    if img_id:
+                        self._save_version_cache(img_id, ver)
+                    return ver
 
         return None
 
