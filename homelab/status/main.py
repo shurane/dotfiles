@@ -38,7 +38,7 @@ from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
 
-from config import format_size, get_docker_client, load_env, resolve_target_connection
+from config import format_size, get_docker_client, load_env, render_sparkbar, resolve_target_connection
 from models import HealthStatus, ServiceResult, StatusContext
 from services import CHECK_REGISTRY, CheckFn
 
@@ -171,26 +171,28 @@ def render_tree(
             total = format_size(mango["total_bytes"])
             free = format_size(mango["free_bytes"])
             pct = mango["use_percent"]
+            spark = render_sparkbar(pct / 100.0, width=10)
             pct_color = "red" if pct >= 90 else ("yellow" if pct >= 70 else "green")
             parts.append(
                 f"💾 [bold white]Storage (/mnt/mango):[/bold white] "
                 f"[bold cyan]{used}[/bold cyan] / [bold cyan]{total}[/bold cyan] "
-                f"([{pct_color}]{pct}%[/{pct_color}]) [dim]•[/dim] "
+                f"{spark} [{pct_color}]{pct}%[/{pct_color}] [dim]•[/dim] "
                 f"[bold green]{free} free[/bold green]"
             )
         if root_d:
             used = format_size(root_d["used_bytes"])
             total = format_size(root_d["total_bytes"])
             pct = root_d["use_percent"]
+            spark = render_sparkbar(pct / 100.0, width=8)
             pct_color = "red" if pct >= 90 else ("yellow" if pct >= 70 else "green")
             if mango:
-                parts.append(f"[dim]• System (/): {used} / {total} ({pct}%)[/dim]")
+                parts.append(f"[dim]• System (/): {used} / {total} {spark} {pct}%[/dim]")
             else:
                 free = format_size(root_d["free_bytes"])
                 parts.append(
                     f"💾 [bold white]Storage (/):[/bold white] "
                     f"[bold cyan]{used}[/bold cyan] / [bold cyan]{total}[/bold cyan] "
-                    f"([{pct_color}]{pct}%[/{pct_color}]) [dim]•[/dim] "
+                    f"{spark} [{pct_color}]{pct}%[/{pct_color}] [dim]•[/dim] "
                     f"[bold green]{free} free[/bold green]"
                 )
         if parts:

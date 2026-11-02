@@ -42,6 +42,29 @@ def format_size(bytes_val: float) -> str:
     return f"{n / 1024:.0f} KB"
 
 
+def render_sparkbar(pct: float, width: int = 10) -> str:
+    """Render a fractional block sparkline gauge (e.g. [██████▎░░░])."""
+    blocks = ("", "▏", "▎", "▍", "▌", "▋", "▊", "▉")
+    val = max(0.0, min(1.0, pct)) * width
+    full = int(val)
+    rem = val - full
+    char_idx = round(rem * 8)
+    if char_idx == 8:
+        full += 1
+        part = ""
+    else:
+        part = blocks[char_idx]
+
+    full = min(full, width)
+    if full == width:
+        part = ""
+    empty = max(0, width - full - (1 if part else 0))
+    color = "bold red" if pct >= 0.9 else ("bold yellow" if pct >= 0.7 else "bold cyan")
+    filled_str = f"[{color}]" + ("█" * full + part) + f"[/{color}]" if (full or part) else ""
+    empty_str = f"[dim]{'░' * empty}[/dim]" if empty > 0 else ""
+    return f"[{filled_str}{empty_str}]"
+
+
 def discover_tailscale_suffix() -> str | None:
     """Dynamically discover the Tailscale MagicDNS suffix for the current machine/tailnet."""
     # 1. Fast check: parse /etc/resolv.conf search/domain directive
