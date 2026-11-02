@@ -35,7 +35,10 @@ async def check_glance(ctx: StatusContext) -> ServiceResult:
             title_match = re.search(r"<title>(.*?)</title>", res.text, re.IGNORECASE)
             title = title_match.group(1).strip() if title_match else "Dashboard"
             summary = f'Dashboard online (HTTP {res.status_code}, title: "{title}")'
-            branches = [f'🖥️ Route: [bold green]HTTP {res.status_code}[/bold green] [dim](title: "[bold yellow]{title}[/bold yellow]")[/dim]']
+            branches = [
+                f'🖥️ Route: [bold green]HTTP {res.status_code}[/bold green] '
+                f'[dim](title: "[bold yellow]{title}[/bold yellow]")[/dim]'
+            ]
 
             return ServiceResult(
                 service_id=service_id,

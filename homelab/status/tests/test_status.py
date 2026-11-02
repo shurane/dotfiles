@@ -1,17 +1,3 @@
-#!/usr/bin/env -S uv run
-# /// script
-# requires-python = ">=3.14"
-# dependencies = [
-#   "anyio>=4.7.0",
-#   "docker>=7.1.0",
-#   "httpx>=0.27.0",
-#   "paramiko>=3.5.0",
-#   "pytest>=8.0.0",
-#   "python-dotenv>=1.0.0",
-#   "rich>=13.0.0",
-#   "typer>=0.16.0",
-# ]
-# ///
 """Unit tests for homelab status inspector."""
 
 from __future__ import annotations
@@ -20,10 +6,10 @@ import json
 import sys
 import xml.etree.ElementTree as ET
 
-from status.config import format_speed, is_target_local, resolve_target_host
-from status.main import app
-from status.models import HealthStatus, ServiceResult
-from status.services import CHECK_REGISTRY
+from homelab_status.config import format_speed, is_target_local, resolve_target_host
+from homelab_status.main import app
+from homelab_status.models import HealthStatus, ServiceResult
+from homelab_status.services import CHECK_REGISTRY
 from typer.testing import CliRunner
 
 runner = CliRunner()
