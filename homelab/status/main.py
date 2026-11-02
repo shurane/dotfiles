@@ -21,7 +21,6 @@ import logging
 import sys
 import time
 from dataclasses import asdict
-from enum import StrEnum
 from pathlib import Path
 
 # Ensure package root is in sys.path when executed directly
@@ -32,30 +31,27 @@ if str(_HOMELAB_DIR) not in sys.path:
 
 import anyio
 import typer
-from rich import box
 from rich.console import Console
 from rich.panel import Panel
-from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
 
-from status.config import get_docker_client, load_env
+from status.config import get_docker_client, load_env, resolve_target_host
 from status.models import HealthStatus, ServiceResult, StatusContext
 from status.services import CHECK_REGISTRY, CheckFn
 
-# Silence verbose SSH/Paramiko noise
-logging.getLogger("paramiko").setLevel(logging.CRITICAL)
+# Silence noisy third-party loggers
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("docker").setLevel(logging.WARNING)
+logging.getLogger("paramiko").setLevel(logging.WARNING)
 
 app = typer.Typer(
     help="Homelab Deep Health & Content Inspector",
     add_completion=False,
 )
 console = Console()
-
-
-class OutputFormat(StrEnum):
-    TREE = "tree"
-    TABLE = "table"
 
 
 async def _run_all_checks(
@@ -135,46 +131,6 @@ def render_tree(results: list[ServiceResult], total_elapsed: float) -> None:
     console.print(root)
 
 
-def render_table(results: list[ServiceResult]) -> None:
-    """Render check results in a responsive tabular format."""
-    is_wide = console.width >= 115
-    table = Table(box=box.ROUNDED, show_header=True, header_style="bold cyan", border_style="dim")
-
-    if is_wide:
-        table.add_column("Service", style="bold white", no_wrap=True)
-        table.add_column("Container", style="cyan dim", no_wrap=True)
-        table.add_column("Status", justify="center", no_wrap=True)
-        table.add_column("Latency", justify="right", no_wrap=True)
-        table.add_column("Deeper Health & Content Availability", style="white")
-    else:
-        table.add_column("Service / Container", style="bold white", no_wrap=True)
-        table.add_column("Status", justify="center", no_wrap=True)
-        table.add_column("Latency", justify="right", no_wrap=True)
-        table.add_column("Deeper Health & Content Availability", style="white")
-
-    for r in results:
-        if r.status == HealthStatus.HEALTHY:
-            status_badge = "[bold green]HEALTHY[/bold green]"
-        elif r.status == HealthStatus.DEGRADED:
-            status_badge = "[bold yellow]DEGRADED[/bold yellow]"
-        else:
-            status_badge = "[bold red]UNHEALTHY[/bold red]"
-
-        if r.latency_ms < 100:
-            lat_str = f"[green]{r.latency_ms:.0f}ms[/green]"
-        elif r.latency_ms < 500:
-            lat_str = f"[yellow]{r.latency_ms:.0f}ms[/yellow]"
-        else:
-            lat_str = f"[red]{r.latency_ms:.0f}ms[/red]"
-
-        if is_wide:
-            table.add_row(r.name, r.container, status_badge, lat_str, r.summary)
-        else:
-            table.add_row(f"{r.name}\n[dim cyan]{r.container}[/dim cyan]", status_badge, lat_str, r.summary)
-
-    console.print(table)
-
-
 @app.command()
 def main(
     services: list[str] = typer.Option(
@@ -182,12 +138,6 @@ def main(
         "--service",
         "-s",
         help="Specific service(s) to check (e.g. -s jellyfin -s bookorbit)",
-    ),
-    format_type: OutputFormat = typer.Option(
-        OutputFormat.TREE,
-        "--format",
-        "-f",
-        help="Visual output format ('tree' or 'table')",
     ),
     json_output: bool = typer.Option(
         False,
@@ -210,12 +160,12 @@ def main(
         "--no-docker",
         help="Skip Docker inspection and execute network/HTTP checks only",
     ),
-    lan_host: str = typer.Option(
-        "m70q.lan",
+    lan_host: str | None = typer.Option(
+        None,
         "--lan-host",
         "--host",
         "-H",
-        help="Target LAN host for SMB/Docker connection",
+        help="Target host for SMB/Docker connection (auto-resolves m70q.lan or m70q on Tailscale)",
     ),
     timeout: float = typer.Option(
         10.0,
@@ -225,7 +175,8 @@ def main(
     ),
 ) -> None:
     """Run deep health & content availability checks across homelab services."""
-    env = load_env(env_file, lan_host)
+    target_host = resolve_target_host(lan_host)
+    env = load_env(env_file, target_host)
     username = env.get("HOMELAB_USERNAME", "ehtesh")
     password = env.get("HOMELAB_PASSWORD", "")
     base_domain = env.get("HOSTNAME_BASE", "009973.xyz")
@@ -234,14 +185,14 @@ def main(
         console.print("[bold red]Error:[/bold red] HOMELAB_PASSWORD not found in .env or environment")
         sys.exit(1)
 
-    docker_client = get_docker_client(docker_host, lan_host, no_docker)
+    docker_client = get_docker_client(docker_host, target_host, no_docker)
 
     ctx = StatusContext(
         env=env,
         username=username,
         password=password,
         base_domain=base_domain,
-        lan_host=lan_host,
+        lan_host=target_host,
         docker_client=docker_client,
         http_timeout=timeout,
         no_docker=no_docker,
@@ -271,7 +222,7 @@ def main(
     if json_output:
         out_dict = {
             "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
-            "target_host": lan_host,
+            "target_host": target_host,
             "base_domain": base_domain,
             "total_elapsed_seconds": round(total_elapsed, 3),
             "all_healthy": all(r.is_healthy for r in results),
@@ -280,17 +231,14 @@ def main(
         print(json.dumps(out_dict, indent=2))
         sys.exit(0 if all(r.is_healthy for r in results) else 1)
 
-    # Terminal UI output mode
+    # Terminal UI output mode (Rich Tree)
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     header_text = Text()
     header_text.append("🔮 Homelab Deep Health & Content Inspector\n", style="bold magenta")
-    header_text.append(f"Target: {lan_host} ({base_domain})  •  Time: {now_str}  •  Auth: {username}", style="dim")
+    header_text.append(f"Target: {target_host} ({base_domain})  •  Time: {now_str}  •  Auth: {username}", style="dim")
     console.print(Panel(header_text, border_style="magenta", expand=False))
 
-    if format_type == OutputFormat.TREE:
-        render_tree(results, total_elapsed)
-    else:
-        render_table(results)
+    render_tree(results, total_elapsed)
 
     # Summary footer
     passed_count = sum(1 for r in results if r.is_healthy)

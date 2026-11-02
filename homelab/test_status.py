@@ -20,7 +20,7 @@ import json
 import sys
 import xml.etree.ElementTree as ET
 
-from status.config import format_speed, is_target_local
+from status.config import format_speed, is_target_local, resolve_target_host
 from status.main import app
 from status.models import HealthStatus, ServiceResult
 from status.services import CHECK_REGISTRY
@@ -39,8 +39,13 @@ def test_format_speed() -> None:
 def test_is_target_local() -> None:
     assert is_target_local("localhost") is True
     assert is_target_local("127.0.0.1") is True
-    # Non-existent or remote hostname shouldn't match local unless named this
     assert is_target_local("nonexistent-host-999.invalid") is False
+
+
+def test_resolve_target_host() -> None:
+    assert resolve_target_host("custom.host") == "custom.host"
+    resolved = resolve_target_host()
+    assert resolved in ("m70q.lan", "m70q")
 
 
 def test_registry_contains_all_services() -> None:
@@ -170,7 +175,7 @@ def test_cli_help() -> None:
     assert result.exit_code == 0
     assert "Run deep health & content availability checks" in result.stdout
     assert "--service" in result.stdout
-    assert "--format" in result.stdout
+    assert "--host" in result.stdout
     assert "--json" in result.stdout
 
 
