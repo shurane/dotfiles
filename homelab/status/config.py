@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING
 
 from dotenv import dotenv_values
 
-from .models import TargetConnection
+from models import TargetConnection
 
 if TYPE_CHECKING:
     import docker
@@ -32,11 +32,7 @@ def format_speed(bytes_per_sec: float) -> str:
 
 def discover_tailscale_suffix() -> str | None:
     """Dynamically discover the Tailscale MagicDNS suffix for the current machine/tailnet."""
-    # 1. Environment variable override
-    if env_suffix := (os.environ.get("HOMELAB_TAILSCALE_SUFFIX") or os.environ.get("TAILSCALE_SUFFIX")):
-        return env_suffix.strip()
-
-    # 2. Fast check: parse /etc/resolv.conf search/domain directive
+    # 1. Fast check: parse /etc/resolv.conf search/domain directive
     resolv = Path("/etc/resolv.conf")
     if resolv.is_file():
         try:
@@ -49,7 +45,7 @@ def discover_tailscale_suffix() -> str | None:
         except Exception:
             pass
 
-    # 3. Fast check: canonical hostname lookup for short name 'm70q'
+    # 2. Fast check: canonical hostname lookup for short name 'm70q'
     try:
         cname, _, _ = socket.gethostbyname_ex("m70q")
         if cname.endswith(".ts.net") and "." in cname:
@@ -57,7 +53,7 @@ def discover_tailscale_suffix() -> str | None:
     except Exception:
         pass
 
-    # 4. Tailscale CLI check (tailscale status --json)
+    # 3. Tailscale CLI check (tailscale status --json)
     for binary in ("tailscale", "tailscale.exe", "/mnt/c/Program Files/Tailscale/tailscale.exe"):
         exe = shutil.which(binary) or (binary if os.path.exists(binary) else None)
         if exe:
@@ -198,9 +194,9 @@ def load_env(
     search_paths = [
         Path.cwd() / ".env",
         Path.cwd() / "homelab" / ".env",
+        Path(__file__).resolve().parent / ".env",
         Path(__file__).resolve().parent.parent / ".env",
-        Path(__file__).resolve().parent.parent.parent / ".env",
-        Path(__file__).resolve().parent.parent.parent / "homelab" / ".env",
+        Path(__file__).resolve().parent.parent / "homelab" / ".env",
         Path.home() / "dotfiles" / "homelab" / ".env",
     ]
     for p in search_paths:

@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 
 import httpx
 
-from ..models import HealthStatus, ServiceResult, StatusContext
+from models import HealthStatus, ServiceResult, StatusContext
 
 
 async def check_retroarch(ctx: StatusContext) -> ServiceResult:

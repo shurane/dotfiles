@@ -1,8 +1,9 @@
 import sqlite3
 
 import pytest
-from bootstrap_auth.models import HomelabAuth
-from bootstrap_auth.services.jellyfin import select_jellyfin_user_id, upsert_jellyfin_admin_permissions
+
+from models import HomelabAuth
+from services.jellyfin import select_jellyfin_user_id, upsert_jellyfin_admin_permissions
 
 
 def auth() -> HomelabAuth:

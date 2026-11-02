@@ -6,8 +6,8 @@ from pathlib import Path
 import httpx
 import typer
 
-from .config import ROOT
-from .models import SERVICE_NAMES, BootstrapOptions, ServiceName
+from config import ROOT
+from models import SERVICE_NAMES, BootstrapOptions, ServiceName
 
 
 def format_path(path: Path | None) -> str:
@@ -21,7 +21,7 @@ def format_path(path: Path | None) -> str:
             return "~"
         if resolved.is_relative_to(home):
             return f"~/{resolved.relative_to(home)}"
-    except (ValueError, RuntimeError):
+    except ValueError, RuntimeError:
         pass
     return str(path)
 

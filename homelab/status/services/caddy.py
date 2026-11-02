@@ -12,7 +12,7 @@ from typing import Any
 import anyio
 import httpx
 
-from ..models import HealthStatus, ServiceResult, StatusContext
+from models import HealthStatus, ServiceResult, StatusContext
 
 
 def _check_tls_sync(base_domain: str, timeout: float) -> tuple[dict[str, str], int]:

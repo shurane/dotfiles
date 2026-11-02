@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
-from bootstrap_auth.compose import compose_service, get_container_ip
-from bootstrap_auth.config import get_service_url
+from compose import compose_service, get_container_ip
+from config import get_service_url
 
 
 def test_compose_service_defaults_to_stack_name() -> None:
@@ -18,30 +18,22 @@ def test_get_service_url_prefers_env_var(monkeypatch: object) -> None:
 
 
 def test_get_service_url_resolves_via_get_container_ip() -> None:
-    with patch("bootstrap_auth.compose.get_container_ip", return_value="172.20.0.99"):
+    with patch("compose.get_container_ip", return_value="172.20.0.99"):
         assert get_service_url("qbittorrent", 8080, "NONEXISTENT_VAR") == "http://172.20.0.99:8080"
 
 
 def test_get_service_url_falls_back_to_default_hostname() -> None:
-    with patch("bootstrap_auth.compose.get_container_ip", return_value=None):
+    with patch("compose.get_container_ip", return_value=None):
         assert get_service_url("qbittorrent", 8080, "NONEXISTENT_VAR") == "http://qbittorrent:8080"
 
 
 def test_get_container_ip_extracts_ip_from_container() -> None:
     mock_container = MagicMock()
-    mock_container.attrs = {
-        "NetworkSettings": {
-            "Networks": {
-                "proxy-tier": {
-                    "IPAddress": "172.20.0.42"
-                }
-            }
-        }
-    }
+    mock_container.attrs = {"NetworkSettings": {"Networks": {"proxy-tier": {"IPAddress": "172.20.0.42"}}}}
     mock_client = MagicMock()
     mock_client.containers.list.return_value = [mock_container]
 
-    with patch("bootstrap_auth.compose.docker_client", return_value=mock_client):
+    with patch("compose.docker_client", return_value=mock_client):
         assert get_container_ip("test-service") == "172.20.0.42"
         mock_client.containers.list.assert_called_once_with(
             filters={"label": ["com.docker.compose.service=test-service"]}
@@ -52,5 +44,5 @@ def test_get_container_ip_returns_none_when_no_container() -> None:
     mock_client = MagicMock()
     mock_client.containers.list.return_value = []
 
-    with patch("bootstrap_auth.compose.docker_client", return_value=mock_client):
+    with patch("compose.docker_client", return_value=mock_client):
         assert get_container_ip("nonexistent") is None

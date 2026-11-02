@@ -9,11 +9,11 @@ from pathlib import Path
 
 import httpx
 
-from ..common import ensure_state_dir
-from ..compose import compose_stop, compose_up
-from ..config import JELLYFIN_URL, ROOT
-from ..http_models import JellyfinAuthRequest, JellyfinAuthResponse
-from ..models import BootstrapOptions, HomelabAuth
+from common import ensure_state_dir
+from compose import compose_stop, compose_up
+from config import JELLYFIN_URL, ROOT
+from http_models import JellyfinAuthRequest, JellyfinAuthResponse
+from models import BootstrapOptions, HomelabAuth
 
 JELLYFIN_PERMISSION_VALUES = {
     0: 1,
@@ -114,10 +114,7 @@ def ensure_jellyfin_files(jellyfin_root: Path, db_path: Path, system_config: Pat
 
 def backup_jellyfin_db(db_path: Path) -> Path:
     backup_root = (
-        ROOT
-        / "jellyfin"
-        / "backups"
-        / f"auth-bootstrap-{time.strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(3)}"
+        ROOT / "jellyfin" / "backups" / f"auth-bootstrap-{time.strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(3)}"
     )
     backup_root.mkdir(parents=True, exist_ok=False)
     for suffix in ("", "-wal", "-shm"):

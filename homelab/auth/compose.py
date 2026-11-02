@@ -3,7 +3,7 @@ import subprocess
 import docker
 from docker.models.containers import Container
 
-from .config import ROOT
+from config import ROOT
 
 
 def run(command: list[str], cwd: object | None = None) -> None:

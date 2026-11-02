@@ -8,7 +8,7 @@ from typing import Any
 import anyio
 import httpx
 
-from ..models import HealthStatus, ServiceResult, StatusContext
+from models import HealthStatus, ServiceResult, StatusContext
 
 
 async def check_jellyfin(ctx: StatusContext) -> ServiceResult:

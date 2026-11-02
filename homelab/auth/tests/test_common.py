@@ -3,8 +3,9 @@ from pathlib import Path
 
 import pytest
 import typer
-from bootstrap_auth.common import build_options, format_path, load_env, wait_for_sqlite_table
-from bootstrap_auth.models import ServiceName
+
+from common import build_options, format_path, load_env, wait_for_sqlite_table
+from models import ServiceName
 
 
 def test_load_env_parses_simple_quoted_and_ignored_lines(tmp_path: Path) -> None:

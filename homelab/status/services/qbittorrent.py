@@ -6,8 +6,8 @@ import time
 
 import httpx
 
-from ..config import format_speed
-from ..models import HealthStatus, ServiceResult, StatusContext
+from config import format_speed
+from models import HealthStatus, ServiceResult, StatusContext
 
 
 async def check_qbittorrent(ctx: StatusContext) -> ServiceResult:

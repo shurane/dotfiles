@@ -7,7 +7,9 @@ import sys
 import xml.etree.ElementTree as ET
 
 import pytest
-from homelab_status.config import (
+from typer.testing import CliRunner
+
+from config import (
     classify_route,
     discover_tailscale_suffix,
     format_speed,
@@ -15,10 +17,9 @@ from homelab_status.config import (
     resolve_target_connection,
     resolve_target_host,
 )
-from homelab_status.main import app
-from homelab_status.models import HealthStatus, ServiceResult
-from homelab_status.services import CHECK_REGISTRY
-from typer.testing import CliRunner
+from main import app
+from models import HealthStatus, ServiceResult
+from services import CHECK_REGISTRY
 
 runner = CliRunner()
 
@@ -69,13 +70,8 @@ def test_classify_route() -> None:
     assert desc == "WAN / Remote"
 
 
-def test_discover_tailscale_suffix(monkeypatch: pytest.MonkeyPatch) -> None:
-    # Test env override
-    monkeypatch.setenv("HOMELAB_TAILSCALE_SUFFIX", "mytest.ts.net")
-    assert discover_tailscale_suffix() == "mytest.ts.net"
-
+def test_discover_tailscale_suffix() -> None:
     # Test dynamic discovery (should return suffix or None without crashing)
-    monkeypatch.delenv("HOMELAB_TAILSCALE_SUFFIX", raising=False)
     suffix = discover_tailscale_suffix()
     if suffix:
         assert suffix.endswith(".ts.net")

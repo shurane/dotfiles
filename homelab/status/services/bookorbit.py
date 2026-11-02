@@ -6,7 +6,7 @@ import time
 
 import httpx
 
-from ..models import HealthStatus, ServiceResult, StatusContext
+from models import HealthStatus, ServiceResult, StatusContext
 
 
 async def check_bookorbit(ctx: StatusContext) -> ServiceResult:

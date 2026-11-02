@@ -5,9 +5,9 @@ import time
 import bcrypt
 import httpx
 
-from ..compose import compose_exec, compose_up
-from ..config import BOOKORBIT_URL
-from ..models import HomelabAuth
+from compose import compose_exec, compose_up
+from config import BOOKORBIT_URL
+from models import HomelabAuth
 
 
 def wait_for_bookorbit(client: httpx.Client, timeout_seconds: int = 60) -> None:
@@ -19,7 +19,7 @@ def wait_for_bookorbit(client: httpx.Client, timeout_seconds: int = 60) -> None:
             response = client.get(url)
             if response.status_code == 200:
                 return
-        except (httpx.HTTPError, ValueError):
+        except httpx.HTTPError, ValueError:
             pass
         time.sleep(2)
     raise RuntimeError(f"timed out waiting for {url}")

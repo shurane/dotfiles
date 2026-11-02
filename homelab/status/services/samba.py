@@ -7,7 +7,7 @@ import time
 
 import anyio
 
-from ..models import HealthStatus, ServiceResult, StatusContext
+from models import HealthStatus, ServiceResult, StatusContext
 
 
 def _check_port_445_sync(lan_host: str, timeout: float) -> None:

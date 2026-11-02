@@ -4,11 +4,11 @@ from typing import Any
 
 import httpx
 
-from ..common import ensure_state_dir
-from ..compose import compose_up
-from ..config import ARCANE_URL, ROOT
-from ..http_models import ArcaneLoginRequest, ArcanePasswordRequest, ArcaneResponse, ArcaneUpdateUserRequest, ArcaneUser
-from ..models import HomelabAuth
+from common import ensure_state_dir
+from compose import compose_up
+from config import ARCANE_URL, ROOT
+from http_models import ArcaneLoginRequest, ArcanePasswordRequest, ArcaneResponse, ArcaneUpdateUserRequest, ArcaneUser
+from models import HomelabAuth
 
 
 def wait_for_arcane(client: httpx.Client, timeout_seconds: int = 60) -> None:
@@ -19,7 +19,7 @@ def wait_for_arcane(client: httpx.Client, timeout_seconds: int = 60) -> None:
             response = client.get(url)
             if response.status_code == 200 and response.json().get("status") == "UP":
                 return
-        except (httpx.HTTPError, ValueError):
+        except httpx.HTTPError, ValueError:
             pass
         time.sleep(2)
     raise RuntimeError(f"timed out waiting for {url}")
