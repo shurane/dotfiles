@@ -1,29 +1,25 @@
-#!/usr/bin/env -S uv run
-# /// script
-# requires-python = ">=3.14"
-# dependencies = [
-#   "anyio>=4.7.0",
-#   "bcrypt>=4.0.0",
-#   "docker>=7.1.0",
-#   "httpx>=0.27.0",
-#   "pydantic>=2.7.0",
-#   "rich>=13.0.0",
-#   "trio>=0.27.0",
-#   "typer>=0.16.0",
-#   "werkzeug>=3.0.0",
-# ]
-# ///
-"""Homelab Centralized Authentication Bootstrap Manager.
+#!/usr/bin/env python3
+"""Homelab Centralized Authentication Bootstrap Manager."""
 
-Safely checks and synchronizes shared credentials across:
-1. qBittorrent (Web UI preferences)
-2. Qui (User credentials & password)
-3. Arcane (Docker management login)
-4. Jellyfin (Admin user, password hash, and API token)
-5. BookOrbit (PostgreSQL credentials & Web login)
-"""
+from __future__ import annotations
 
-from bootstrap_auth.cli import typer_main
+import os
+import shutil
+import sys
+from pathlib import Path
+
+# If executed directly with system Python outside uv, re-exec via uv run --project
+if "VIRTUAL_ENV" not in os.environ:
+    project_dir = Path(__file__).resolve().parent
+    uv_path = shutil.which("uv")
+    if not uv_path:
+        local_uv = Path.home() / ".local" / "bin" / "uv"
+        if local_uv.is_file():
+            uv_path = str(local_uv)
+    if uv_path and os.path.isfile(uv_path):
+        os.execv(uv_path, [uv_path, "run", "--project", str(project_dir), str(__file__), *sys.argv[1:]])
+
+from cli import typer_main
 
 if __name__ == "__main__":
     typer_main()

@@ -18,7 +18,7 @@ from .samba import check_samba
 from .withings_sync import check_withings_sync
 
 if TYPE_CHECKING:
-    from ..models import ServiceResult, StatusContext
+    from models import ServiceResult, StatusContext
 
 CheckFn = Callable[["StatusContext"], Coroutine[Any, Any, "ServiceResult"]]
 

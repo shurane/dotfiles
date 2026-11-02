@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 AUTH_ENV = Path(os.environ.get("AUTH_ENV", ROOT / ".env"))
 
 
@@ -17,7 +17,7 @@ def get_service_url(service_name: str, default_port: int, env_var: str) -> str:
         return env_val.rstrip("/")
 
     try:
-        from .compose import get_container_ip
+        from compose import get_container_ip
 
         ip = get_container_ip(service_name)
         if ip:
@@ -42,4 +42,3 @@ def __getattr__(name: str) -> str:
             return get_service_url("bookorbit", 3000, "BOOKORBIT_URL")
         case _:
             raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
-

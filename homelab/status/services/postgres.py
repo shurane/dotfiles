@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import time
 
-from ..models import HealthStatus, ServiceResult, StatusContext
+from models import HealthStatus, ServiceResult, StatusContext
 
 
 async def check_postgres(ctx: StatusContext) -> ServiceResult:

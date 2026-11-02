@@ -7,7 +7,7 @@ import time
 
 import httpx
 
-from ..models import HealthStatus, ServiceResult, StatusContext
+from models import HealthStatus, ServiceResult, StatusContext
 
 
 async def check_glance(ctx: StatusContext) -> ServiceResult:
