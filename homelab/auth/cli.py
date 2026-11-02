@@ -2,6 +2,7 @@ from collections.abc import Callable
 from typing import Annotated
 
 import anyio
+import anyio.to_thread
 import typer
 from pydantic import ValidationError
 from rich.console import Console
@@ -32,9 +33,8 @@ def dry_run_service(name: str, task: CheckTask) -> bool:
     if matches:
         console.print(f"  [bold green]✓[/] [cyan]{name}[/] credentials already match")
         return True
-    else:
-        console.print(f"  [bold yellow]✗[/] [cyan]{name}[/] credentials need update")
-        return False
+    console.print(f"  [bold yellow]✗[/] [cyan]{name}[/] credentials need update")
+    return False
 
 
 def check_task_definitions(auth: HomelabAuth) -> dict[ServiceName, tuple[str, CheckTask]]:

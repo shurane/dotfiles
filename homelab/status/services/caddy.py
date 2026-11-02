@@ -23,16 +23,34 @@ def _check_tls_sync(base_domain: str, timeout: float) -> tuple[dict[str, str], i
         ssl_ctx.wrap_socket(sock, server_hostname=base_domain) as ssock,
     ):
         cert = ssock.getpeercert()
-        issuer = dict(x[0] for x in cert.get("issuer", []))
-        issuer_org = issuer.get("organizationName") or issuer.get("commonName") or "Valid TLS"
-        not_after = cert.get("notAfter", "")
+        issuer_org = "Valid TLS"
+        expires_str = ""
         days_left = 999
-        try:
-            dt = datetime.datetime.strptime(not_after, "%b %d %H:%M:%S %Y %Z").replace(tzinfo=datetime.UTC)
-            expires_str = dt.strftime("%b %d %Y")
-            days_left = (dt - datetime.datetime.now(datetime.UTC)).days
-        except Exception:
-            expires_str = not_after
+        if cert:
+            raw_issuer = cert.get("issuer")
+            if isinstance(raw_issuer, tuple):
+                org: str | None = None
+                cn: str | None = None
+                for rdn in raw_issuer:
+                    for name, value in rdn:
+                        if isinstance(value, str):
+                            if name == "organizationName":
+                                org = value
+                            elif name == "commonName":
+                                cn = value
+                if org:
+                    issuer_org = org
+                elif cn:
+                    issuer_org = cn
+            raw_not_after = cert.get("notAfter")
+            if isinstance(raw_not_after, str):
+                not_after = raw_not_after
+                try:
+                    dt = datetime.datetime.strptime(not_after, "%b %d %H:%M:%S %Y %Z").replace(tzinfo=datetime.UTC)
+                    expires_str = dt.strftime("%b %d %Y")
+                    days_left = (dt - datetime.datetime.now(datetime.UTC)).days
+                except Exception:
+                    expires_str = not_after
 
         return {"issuer": issuer_org, "expires": expires_str}, days_left
 

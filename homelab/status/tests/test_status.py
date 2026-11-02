@@ -164,10 +164,7 @@ def test_samba_output_parsing() -> None:
     ehtesh:1001:
     share:1000:
     """
-    accounts = []
-    for line in sample_pdbedit.splitlines():
-        if ":" in line:
-            accounts.append(line.split(":")[0].strip())
+    accounts = [line.split(":")[0].strip() for line in sample_pdbedit.splitlines() if ":" in line]
 
     assert accounts == ["ehtesh", "share"]
 

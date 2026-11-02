@@ -36,19 +36,20 @@ async def check_samba(ctx: StatusContext) -> ServiceResult:
             c = await ctx.get_container(container)
             if not c:
                 return
-            env = c.attrs.get("Config", {}).get("Env", [])
+            attrs = c.attrs or {}
+            config = attrs.get("Config") or {}
+            env = config.get("Env") or []
             for e in env:
-                if "=" not in e:
-                    continue
-                k, _ = e.split("=", 1)
-                if k.startswith("SAMBA_VOLUME_CONFIG_"):
-                    sec = k.removeprefix("SAMBA_VOLUME_CONFIG_")
-                    if sec:
-                        shares.append(sec)
-                elif k.startswith("ACCOUNT_"):
-                    acc = k.removeprefix("ACCOUNT_")
-                    if acc:
-                        accounts.append(acc)
+                if isinstance(e, str) and "=" in e:
+                    k, _ = e.split("=", 1)
+                    if k.startswith("SAMBA_VOLUME_CONFIG_"):
+                        sec = k.removeprefix("SAMBA_VOLUME_CONFIG_")
+                        if sec:
+                            shares.append(sec)
+                    elif k.startswith("ACCOUNT_"):
+                        acc = k.removeprefix("ACCOUNT_")
+                        if acc:
+                            accounts.append(acc)
 
         # Probe port 445 and inspect container metadata concurrently
         async with anyio.create_task_group() as tg:

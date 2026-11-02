@@ -355,13 +355,13 @@ def main(
             "base_domain": base_domain,
             "total_elapsed_seconds": round(total_elapsed, 3),
             "all_healthy": all(r.is_healthy for r in results),
-            "disk_usage": ctx._disk_usage or [],
+            "disk_usage": ctx.disk_usage or [],
             "services": [asdict(r) for r in results],
         }
         print(json.dumps(out_dict, indent=2))
         sys.exit(0 if all(r.is_healthy for r in results) else 1)
 
-    render_tree(results, total_elapsed, ctx._disk_usage)
+    render_tree(results, total_elapsed, ctx.disk_usage)
 
     # Summary footer
     passed_count = sum(1 for r in results if r.is_healthy)
