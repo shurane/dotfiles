@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import io
 import os
-from pathlib import Path
 import platform
 import socket
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from dotenv import dotenv_values
