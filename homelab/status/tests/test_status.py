@@ -84,8 +84,13 @@ def test_discover_tailscale_suffix(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_resolve_target_connection() -> None:
     conn = resolve_target_connection("m70q.tail4f594f.ts.net")
     assert conn.host == "m70q.tail4f594f.ts.net"
-    assert conn.route == "tailscale"
-    assert conn.description == "Tailscale MagicDNS"
+    if is_target_local("m70q.tail4f594f.ts.net"):
+        assert conn.route == "local"
+        assert conn.is_local is True
+    else:
+        assert conn.route == "tailscale"
+        assert conn.description == "Tailscale MagicDNS"
+        assert conn.is_local is False
 
 
 def test_registry_contains_all_services() -> None:
