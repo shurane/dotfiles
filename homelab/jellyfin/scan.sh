@@ -14,6 +14,10 @@ if [ -f "$ENV_FILE" ]; then
     if [ -n "$VAL" ]; then
         JELLYFIN_API_KEY="$VAL"
     fi
+    DOMAIN=$(grep -E "^HOSTNAME_BASE=" "$ENV_FILE" | cut -d= -f2- || true)
+    if [ -n "$DOMAIN" ]; then
+        HOSTNAME_BASE="$DOMAIN"
+    fi
 fi
 
 if [ -z "${JELLYFIN_API_KEY:-}" ]; then
@@ -22,15 +26,16 @@ if [ -z "${JELLYFIN_API_KEY:-}" ]; then
 fi
 
 API_KEY="${JELLYFIN_API_KEY}"
-HOST="${JELLYFIN_HOST:-http://127.0.0.1:8096}"
+BASE_URL="https://jellyfin.${HOSTNAME_BASE:-009973.xyz}"
+HOST="${1:-${JELLYFIN_HOST:-$BASE_URL}}"
 
-echo "Triggering Jellyfin library scan..."
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${HOST}/Library/Refresh" \
-    -H "Authorization: MediaBrowser Token=\"${API_KEY}\"")
+echo "Triggering Jellyfin library scan at ${HOST}..."
+STATUS=$(curl -fs -o /dev/null -w "%{http_code}" -X POST "${HOST}/Library/Refresh" \
+    -H "Authorization: MediaBrowser Token=\"${API_KEY}\"" || echo "failed")
 
 if [ "$STATUS" = "204" ]; then
     echo "Library scan triggered successfully (HTTP 204)."
 else
-    echo "Failed to trigger scan. HTTP Status: $STATUS" >&2
+    echo "Failed to trigger scan. Response: $STATUS" >&2
     exit 1
 fi
