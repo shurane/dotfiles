@@ -11,7 +11,6 @@
 #   "typer>=0.16.0",
 # ]
 # ///
-# ruff: noqa: E402
 """Homelab Deep Health & Content Inspector - CLI Entrypoint."""
 
 from __future__ import annotations

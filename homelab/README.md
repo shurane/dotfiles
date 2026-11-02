@@ -38,7 +38,9 @@ Run without `--apply` to verify credentials in dry-run mode.
 Deep health & content inspector that authenticates and queries service state, libraries, torrents, shares, and routes:
 
 ```bash
-./status.py
-./status.py --service jellyfin --service qbittorrent
-./status.py --json
+./status/main.py
+# or
+uv run status/main.py
+uv run status/main.py --service jellyfin --service qbittorrent
+uv run status/main.py --json
 ```
