@@ -124,6 +124,8 @@ async def check_caddy(ctx: StatusContext) -> ServiceResult:
             ),
         ]
 
+        version = await ctx.get_container_version(container)
+
         return ServiceResult(
             service_id=service_id,
             name=name,
@@ -131,6 +133,7 @@ async def check_caddy(ctx: StatusContext) -> ServiceResult:
             status=status,
             latency_ms=elapsed,
             summary=summary,
+            version=version,
             branches=branches,
             raw_data={"routes": routes_list, "cert": cert_info, "days_left": days_left},
         )

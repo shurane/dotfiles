@@ -23,12 +23,16 @@ import datetime
 import json
 import logging
 import time
+from collections import deque
 from dataclasses import asdict
 
 import anyio
 import typer
 from rich.console import Console
+from rich.live import Live
 from rich.panel import Panel
+from rich.spinner import Spinner
+from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
 
@@ -53,16 +57,38 @@ console = Console()
 async def _run_all_checks(
     ctx: StatusContext,
     checks: dict[str, CheckFn],
+    show_progress: bool = True,
 ) -> list[ServiceResult]:
     """Execute all selected checks concurrently using an AnyIO task group."""
     check_items = list(checks.items())
-    results: list[ServiceResult | None] = [None] * len(check_items)
+    total_count = len(check_items)
+    results: list[ServiceResult | None] = [None] * total_count
+    completed_count = 0
+    recent: deque[str] = deque(maxlen=3)
+    t0 = time.perf_counter()
 
-    async def _execute(idx: int, service_id: str, fn: CheckFn) -> None:
+    def _render_ticker() -> Table:
+        tbl = Table.grid(padding=(0, 1))
+        elapsed = time.perf_counter() - t0
+        spinner = Spinner("dots", style="magenta")
+        hdr = Text.assemble(
+            (" Checking services... ", "bold magenta"),
+            (f"{completed_count}/{total_count}", "bold green"),
+            (" completed ", "dim"),
+            (f"({elapsed:.1f}s)", "dim"),
+        )
+        tbl.add_row(spinner, hdr)
+        for item in recent:
+            tbl.add_row("", Text.from_markup(f"  {item}"))
+        return tbl
+
+    async def _execute(idx: int, service_id: str, fn: CheckFn, live: Live | None) -> None:
+        nonlocal completed_count
         try:
-            results[idx] = await fn(ctx)
+            res = await fn(ctx)
+            results[idx] = res
         except Exception as exc:
-            results[idx] = ServiceResult(
+            res = ServiceResult(
                 service_id=service_id,
                 name=service_id.capitalize(),
                 container=f"homelab-{service_id}-1",
@@ -72,10 +98,41 @@ async def _run_all_checks(
                 branches=[f"[bold red]✖ Unexpected check failure: {exc}[/bold red]"],
                 error=str(exc),
             )
+            results[idx] = res
 
-    async with anyio.create_task_group() as tg:
-        for idx, (service_id, fn) in enumerate(check_items):
-            tg.start_soon(_execute, idx, service_id, fn)
+        completed_count += 1
+        if live is not None:
+            if res.status == HealthStatus.HEALTHY:
+                icon = "🟢"
+            elif res.status == HealthStatus.DEGRADED:
+                icon = "🟡"
+            else:
+                icon = "🔴"
+
+            if res.latency_ms < 100:
+                lat_color = "green"
+            elif res.latency_ms < 500:
+                lat_color = "yellow"
+            else:
+                lat_color = "red"
+
+            ver = f" [dim cyan]({res.version})[/dim cyan]" if res.version else ""
+            line = (
+                f"{icon} [bold white]{res.name}[/bold white]{ver} "
+                f"[dim]•[/dim] [{lat_color}]{res.latency_ms:.0f}ms[/{lat_color}]"
+            )
+            recent.append(line)
+            live.update(_render_ticker())
+
+    if show_progress:
+        with Live(_render_ticker(), console=console, refresh_per_second=10, transient=True) as live:
+            async with anyio.create_task_group() as tg:
+                for idx, (service_id, fn) in enumerate(check_items):
+                    tg.start_soon(_execute, idx, service_id, fn, live)
+    else:
+        async with anyio.create_task_group() as tg:
+            for idx, (service_id, fn) in enumerate(check_items):
+                tg.start_soon(_execute, idx, service_id, fn, None)
 
     return [r for r in results if r is not None]
 
@@ -109,8 +166,10 @@ def render_tree(results: list[ServiceResult], total_elapsed: float) -> None:
         else:
             lat_str = f"[red]{r.latency_ms:.0f}ms[/red]"
 
+        ver_str = f" [dim cyan]({r.version})[/dim cyan]" if r.version else ""
         node_header = (
-            f"{icon} [bold white]{r.name}[/bold white] [dim cyan]{r.container}[/dim cyan] [dim]•[/dim] {lat_str}"
+            f"{icon} [bold white]{r.name}[/bold white] "
+            f"[dim cyan]{r.container}[/dim cyan]{ver_str} [dim]•[/dim] {lat_str}"
         )
         branch_node = root.add(node_header)
 
@@ -204,8 +263,30 @@ def main(
     else:
         selected_checks = CHECK_REGISTRY
 
+    # Terminal UI output mode: print header panel immediately before checks
+    if not json_output:
+        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        header_text = Text()
+        header_text.append("🔮 Homelab Deep Health & Content Inspector\n", style="bold magenta")
+
+        if conn.route == "local":
+            route_badge = f"[bold magenta]🏠 {conn.description}[/bold magenta]"
+        elif conn.route == "tailscale":
+            route_badge = f"[bold cyan]🔒 {conn.description}[/bold cyan]"
+        elif conn.route == "lan":
+            route_badge = f"[bold green]🟢 {conn.description}[/bold green]"
+        else:
+            route_badge = f"[bold yellow]🌐 {conn.description}[/bold yellow]"
+
+        ip_info = f" ({conn.ip})" if conn.ip and conn.ip != "unknown" else ""
+        header_text.append(f"Target: {conn.host}{ip_info}  •  Route: ", style="dim")
+        header_text.append_text(Text.from_markup(route_badge))
+        header_text.append(f"\nDomain: {base_domain}  •  Auth: {username}  •  Time: {now_str}", style="dim")
+        console.print(Panel(header_text, border_style="magenta", expand=False))
+
+    show_progress = not json_output and console.is_terminal
     t_start = time.perf_counter()
-    results = anyio.run(_run_all_checks, ctx, selected_checks)
+    results = anyio.run(_run_all_checks, ctx, selected_checks, show_progress)
     total_elapsed = time.perf_counter() - t_start
 
     # Preserve consistent ordering matching CHECK_REGISTRY
@@ -225,26 +306,6 @@ def main(
         }
         print(json.dumps(out_dict, indent=2))
         sys.exit(0 if all(r.is_healthy for r in results) else 1)
-
-    # Terminal UI output mode (Rich Tree)
-    now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    header_text = Text()
-    header_text.append("🔮 Homelab Deep Health & Content Inspector\n", style="bold magenta")
-
-    if conn.route == "local":
-        route_badge = f"[bold magenta]🏠 {conn.description}[/bold magenta]"
-    elif conn.route == "tailscale":
-        route_badge = f"[bold cyan]🔒 {conn.description}[/bold cyan]"
-    elif conn.route == "lan":
-        route_badge = f"[bold green]🟢 {conn.description}[/bold green]"
-    else:
-        route_badge = f"[bold yellow]🌐 {conn.description}[/bold yellow]"
-
-    ip_info = f" ({conn.ip})" if conn.ip and conn.ip != "unknown" else ""
-    header_text.append(f"Target: {conn.host}{ip_info}  •  Route: ", style="dim")
-    header_text.append_text(Text.from_markup(route_badge))
-    header_text.append(f"\nDomain: {base_domain}  •  Auth: {username}  •  Time: {now_str}", style="dim")
-    console.print(Panel(header_text, border_style="magenta", expand=False))
 
     render_tree(results, total_elapsed)
 

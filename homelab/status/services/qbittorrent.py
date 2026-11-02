@@ -78,6 +78,8 @@ async def check_qbittorrent(ctx: StatusContext) -> ServiceResult:
             if errored > 0:
                 branches.append(f"⚠️ Errored: [bold red]{errored}[/bold red] torrents")
 
+            version = await ctx.get_container_version(container)
+
             return ServiceResult(
                 service_id=service_id,
                 name=name,
@@ -85,6 +87,7 @@ async def check_qbittorrent(ctx: StatusContext) -> ServiceResult:
                 status=status,
                 latency_ms=elapsed,
                 summary=summary,
+                version=version,
                 branches=branches,
                 raw_data={"total": total, "completed": completed, "active": active, "errored": errored},
             )

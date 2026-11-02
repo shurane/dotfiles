@@ -53,6 +53,20 @@ async def check_jellyfin(ctx: StatusContext) -> ServiceResult:
 
             counts_data: dict[str, Any] = {}
             active_streams: list[str] = []
+            version: str | None = None
+
+            async def _fetch_version() -> None:
+                nonlocal version
+                try:
+                    info_res = await client.get("/System/Info/Public")
+                    if info_res.status_code == 200:
+                        v = info_res.json().get("Version")
+                        if v:
+                            version = f"v{v}"
+                except Exception:
+                    pass
+                if not version:
+                    version = await ctx.get_container_version(container)
 
             async def _fetch_counts() -> None:
                 nonlocal counts_data
@@ -79,6 +93,7 @@ async def check_jellyfin(ctx: StatusContext) -> ServiceResult:
             async with anyio.create_task_group() as tg:
                 tg.start_soon(_fetch_counts)
                 tg.start_soon(_fetch_sessions)
+                tg.start_soon(_fetch_version)
 
             elapsed = (time.perf_counter() - t0) * 1000
 
@@ -121,6 +136,7 @@ async def check_jellyfin(ctx: StatusContext) -> ServiceResult:
                 status=HealthStatus.HEALTHY,
                 latency_ms=elapsed,
                 summary=summary,
+                version=version,
                 branches=branches,
                 raw_data=counts_data,
             )

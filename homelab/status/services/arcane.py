@@ -65,10 +65,9 @@ async def check_arcane(ctx: StatusContext) -> ServiceResult:
 
             elapsed = (time.perf_counter() - t0) * 1000
             target_name = ctx.lan_host.split(".")[0]
-            summary = f'{version} • {containers_count} containers, {projects_count} projects on "{target_name}"'
+            summary = f'{containers_count} containers, {projects_count} projects on "{target_name}"'
 
             branches = [
-                f"🏷️ Version: [bold cyan]{version}[/bold cyan]",
                 (
                     f"📦 Managed: [bold cyan]{containers_count}[/bold cyan] containers, "
                     f'[bold cyan]{projects_count}[/bold cyan] projects on [bold yellow]"{target_name}"[/bold yellow]'
@@ -82,6 +81,7 @@ async def check_arcane(ctx: StatusContext) -> ServiceResult:
                 status=HealthStatus.HEALTHY,
                 latency_ms=elapsed,
                 summary=summary,
+                version=version,
                 branches=branches,
                 raw_data={"version": version, "containers": containers_count, "projects": projects_count},
             )

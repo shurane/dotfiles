@@ -89,6 +89,8 @@ async def check_samba(ctx: StatusContext) -> ServiceResult:
             ),
         ]
 
+        version = await ctx.get_container_version(container)
+
         return ServiceResult(
             service_id=service_id,
             name=name,
@@ -96,6 +98,7 @@ async def check_samba(ctx: StatusContext) -> ServiceResult:
             status=HealthStatus.HEALTHY,
             latency_ms=elapsed,
             summary=summary,
+            version=version,
             branches=branches,
             raw_data={"shares": shares, "accounts": accounts, "active_sessions": active_sessions},
         )
