@@ -39,7 +39,10 @@ async def check_withings_sync(ctx: StatusContext) -> ServiceResult:
 
     try:
         status_val = c.status
-        health_val = c.attrs.get("State", {}).get("Health", {}).get("Status", "none")
+        attrs = c.attrs or {}
+        state = attrs.get("State") or {}
+        health = state.get("Health") or {}
+        health_val = health.get("Status", "none")
         has_proc = (health_val == "healthy") or (health_val == "none" and status_val == "running")
 
         elapsed = (time.perf_counter() - t0) * 1000

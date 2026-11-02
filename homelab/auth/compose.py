@@ -1,4 +1,5 @@
 import subprocess
+from pathlib import Path
 
 import docker
 from docker.models.containers import Container
@@ -6,7 +7,7 @@ from docker.models.containers import Container
 from config import ROOT
 
 
-def run(command: list[str], cwd: object | None = None) -> None:
+def run(command: list[str], cwd: Path | str | None = None) -> None:
     subprocess.run(command, cwd=cwd, check=True)
 
 

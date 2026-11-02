@@ -88,6 +88,10 @@ class StatusContext:
         except Exception:
             pass
 
+    @property
+    def disk_usage(self) -> list[dict[str, Any]] | None:
+        return self._disk_usage
+
     def base_url(self, subdomain: str | None = None) -> str:
         if subdomain:
             return f"https://{subdomain}.{self.base_domain}"
@@ -102,10 +106,12 @@ class StatusContext:
             self._containers_cache = {}
             return self._containers_cache
 
+        client = self.docker_client
+
         def _fetch() -> dict[str, Container]:
             with self._docker_lock:
                 try:
-                    conts = self.docker_client.containers.list()
+                    conts = client.containers.list()
                     return {c.name.lstrip("/"): c for c in conts}
                 except Exception:
                     return {}
@@ -123,10 +129,12 @@ class StatusContext:
         if not self.docker_client:
             return None
 
+        client = self.docker_client
+
         def _get() -> Container | None:
             with self._docker_lock:
                 try:
-                    return self.docker_client.containers.get(clean_name)
+                    return client.containers.get(clean_name)
                 except Exception:
                     return None
 
@@ -186,7 +194,8 @@ class StatusContext:
         if not cont:
             return None
 
-        img_id = cont.attrs.get("Image", "")
+        attrs = cont.attrs or {}
+        img_id = str(attrs.get("Image", ""))
         vcache = self._get_version_cache()
         if img_id and img_id in vcache:
             return vcache[img_id]
@@ -200,7 +209,9 @@ class StatusContext:
                     self._save_version_cache(img_id, ver)
                 return ver
 
-        env = dict(e.split("=", 1) for e in cont.attrs.get("Config", {}).get("Env", []) if "=" in e)
+        config = attrs.get("Config") or {}
+        raw_env = config.get("Env") or []
+        env = dict(e.split("=", 1) for e in raw_env if isinstance(e, str) and "=" in e)
         for k in ("APP_VERSION", "PG_VERSION", "CADDY_VERSION", "VERSION"):
             if v := env.get(k):
                 m = re.match(r"^(\d+\.\d+(\.\d+)?)", v)
@@ -240,8 +251,10 @@ class StatusContext:
 
         # 1. If running locally on target host:
         if self.connection and self.connection.is_local:
+
             def _local_stat() -> list[dict[str, Any]]:
                 import os
+
                 found = []
                 targets = ["/mnt/mango", "/"] if os.path.exists("/mnt/mango") else ["/"]
                 for path in targets:
@@ -252,13 +265,15 @@ class StatusContext:
                         used = total - (st.f_bfree * st.f_frsize)
                         total_avail = used + free
                         pct = round(used / total_avail * 100) if total_avail else 0
-                        found.append({
-                            "mount": path,
-                            "total_bytes": total,
-                            "used_bytes": used,
-                            "free_bytes": free,
-                            "use_percent": pct,
-                        })
+                        found.append(
+                            {
+                                "mount": path,
+                                "total_bytes": total,
+                                "used_bytes": used,
+                                "free_bytes": free,
+                                "use_percent": pct,
+                            }
+                        )
                     except Exception:
                         pass
                 return found
@@ -293,13 +308,15 @@ class StatusContext:
                             used = int(parts[2]) * 1024
                             free = int(parts[3]) * 1024
                             pct = int(parts[4].rstrip("%"))
-                            disks.append({
-                                "mount": mount_name,
-                                "total_bytes": total,
-                                "used_bytes": used,
-                                "free_bytes": free,
-                                "use_percent": pct,
-                            })
+                            disks.append(
+                                {
+                                    "mount": mount_name,
+                                    "total_bytes": total,
+                                    "used_bytes": used,
+                                    "free_bytes": free,
+                                    "use_percent": pct,
+                                }
+                            )
                         except Exception:
                             pass
 
