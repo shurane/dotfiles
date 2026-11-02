@@ -33,7 +33,7 @@ async def check_samba(ctx: StatusContext) -> ServiceResult:
 
         async def _inspect_metadata() -> None:
             nonlocal shares, accounts
-            c = await ctx.get_container(container)
+            c = await ctx.get_container(container, full=True)
             if not c:
                 return
             attrs = c.attrs or {}

@@ -38,11 +38,18 @@ async def check_withings_sync(ctx: StatusContext) -> ServiceResult:
         )
 
     try:
-        status_val = c.status
         attrs = c.attrs or {}
-        state = attrs.get("State") or {}
-        health = state.get("Health") or {}
-        health_val = health.get("Status", "none")
+        state_obj = attrs.get("State")
+        if isinstance(state_obj, dict):
+            status_val = c.status or str(state_obj.get("Status", "running"))
+            health = state_obj.get("Health") or {}
+            health_val = health.get("Status", "none")
+        else:
+            status_val = c.status or str(attrs.get("State", "running"))
+            raw_stat = str(attrs.get("Status", "")).lower()
+            health_val = (
+                "healthy" if "healthy" in raw_stat else ("none" if "unhealthy" not in raw_stat else "unhealthy")
+            )
         has_proc = (health_val == "healthy") or (health_val == "none" and status_val == "running")
 
         elapsed = (time.perf_counter() - t0) * 1000
