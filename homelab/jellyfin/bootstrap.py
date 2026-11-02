@@ -1,6 +1,6 @@
-#!/usr/bin/env -S uv run --python 3.14
+#!/usr/bin/env -S uv run
 # /// script
-# requires-python = ">=3.14"
+# requires-python = "==3.14.*"
 # dependencies = [
 #     "lxml>=5.3.0",
 #     "rich>=13.0.0",
