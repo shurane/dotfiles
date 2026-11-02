@@ -199,7 +199,9 @@ def load_env(
         Path.cwd() / ".env",
         Path.cwd() / "homelab" / ".env",
         Path(__file__).resolve().parent.parent / ".env",
+        Path(__file__).resolve().parent.parent.parent / ".env",
         Path(__file__).resolve().parent.parent.parent / "homelab" / ".env",
+        Path.home() / "dotfiles" / "homelab" / ".env",
     ]
     for p in search_paths:
         if p.is_file():
