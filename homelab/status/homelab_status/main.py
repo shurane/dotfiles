@@ -17,7 +17,7 @@ from rich.panel import Panel
 from rich.text import Text
 from rich.tree import Tree
 
-from .config import get_docker_client, load_env, resolve_target_host
+from .config import get_docker_client, load_env, resolve_target_connection
 from .models import HealthStatus, ServiceResult, StatusContext
 from .services import CHECK_REGISTRY, CheckFn
 
@@ -97,8 +97,7 @@ def render_tree(results: list[ServiceResult], total_elapsed: float) -> None:
             lat_str = f"[red]{r.latency_ms:.0f}ms[/red]"
 
         node_header = (
-            f"{icon} [bold white]{r.name}[/bold white] "
-            f"[dim cyan]{r.container}[/dim cyan] [dim]•[/dim] {lat_str}"
+            f"{icon} [bold white]{r.name}[/bold white] [dim cyan]{r.container}[/dim cyan] [dim]•[/dim] {lat_str}"
         )
         branch_node = root.add(node_header)
 
@@ -156,8 +155,8 @@ def main(
     ),
 ) -> None:
     """Run deep health & content availability checks across homelab services."""
-    target_host = resolve_target_host(lan_host)
-    env = load_env(env_file, target_host)
+    conn = resolve_target_connection(lan_host)
+    env = load_env(env_file, conn.host)
     username = env.get("HOMELAB_USERNAME", "ehtesh")
     password = env.get("HOMELAB_PASSWORD", "")
     base_domain = env.get("HOSTNAME_BASE", "009973.xyz")
@@ -166,17 +165,18 @@ def main(
         console.print("[bold red]Error:[/bold red] HOMELAB_PASSWORD not found in .env or environment")
         sys.exit(1)
 
-    docker_client = get_docker_client(docker_host, target_host, no_docker)
+    docker_client = get_docker_client(docker_host, conn.host, no_docker)
 
     ctx = StatusContext(
         env=env,
         username=username,
         password=password,
         base_domain=base_domain,
-        lan_host=target_host,
+        lan_host=conn.host,
         docker_client=docker_client,
         http_timeout=timeout,
         no_docker=no_docker,
+        connection=conn,
     )
 
     # Determine which checks to run
@@ -203,7 +203,8 @@ def main(
     if json_output:
         out_dict = {
             "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
-            "target_host": target_host,
+            "connection": asdict(conn),
+            "target_host": conn.host,
             "base_domain": base_domain,
             "total_elapsed_seconds": round(total_elapsed, 3),
             "all_healthy": all(r.is_healthy for r in results),
@@ -216,7 +217,20 @@ def main(
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     header_text = Text()
     header_text.append("🔮 Homelab Deep Health & Content Inspector\n", style="bold magenta")
-    header_text.append(f"Target: {target_host} ({base_domain})  •  Time: {now_str}  •  Auth: {username}", style="dim")
+
+    if conn.route == "local":
+        route_badge = f"[bold magenta]🏠 {conn.description}[/bold magenta]"
+    elif conn.route == "tailscale":
+        route_badge = f"[bold cyan]🔒 {conn.description}[/bold cyan]"
+    elif conn.route == "lan":
+        route_badge = f"[bold green]🟢 {conn.description}[/bold green]"
+    else:
+        route_badge = f"[bold yellow]🌐 {conn.description}[/bold yellow]"
+
+    ip_info = f" ({conn.ip})" if conn.ip and conn.ip != "unknown" else ""
+    header_text.append(f"Target: {conn.host}{ip_info}  •  Route: ", style="dim")
+    header_text.append_text(Text.from_markup(route_badge))
+    header_text.append(f"\nDomain: {base_domain}  •  Auth: {username}  •  Time: {now_str}", style="dim")
     console.print(Panel(header_text, border_style="magenta", expand=False))
 
     render_tree(results, total_elapsed)

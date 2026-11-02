@@ -72,7 +72,7 @@ async def check_postgres(ctx: StatusContext) -> ServiceResult:
             "🔌 Connection: [bold green]PostgreSQL 18[/bold green] [dim](accepting connections)[/dim]",
             (
                 f"💾 Storage: [bold cyan]{book_count}[/bold cyan] books [dim]•[/dim] "
-                f"[bold cyan]{db_size}[/bold cyan] in database [bold yellow]\"bookorbit\"[/bold yellow]"
+                f'[bold cyan]{db_size}[/bold cyan] in database [bold yellow]"bookorbit"[/bold yellow]'
             ),
         ]
 

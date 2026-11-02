@@ -35,8 +35,8 @@ async def check_samba(ctx: StatusContext) -> ServiceResult:
         async def _check_container() -> None:
             nonlocal shares, accounts, active_sessions
             cmd = (
-                'sh -c "testparm -s 2>/dev/null; echo \'===SMB_DELIM===\'; '
-                'pdbedit -L 2>/dev/null; echo \'===SMB_DELIM===\'; '
+                "sh -c \"testparm -s 2>/dev/null; echo '===SMB_DELIM==='; "
+                "pdbedit -L 2>/dev/null; echo '===SMB_DELIM==='; "
                 'smbstatus -b 2>/dev/null"'
             )
             code, out = await ctx.exec_container(container, cmd)

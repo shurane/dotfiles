@@ -6,7 +6,15 @@ import json
 import sys
 import xml.etree.ElementTree as ET
 
-from homelab_status.config import format_speed, is_target_local, resolve_target_host
+import pytest
+from homelab_status.config import (
+    classify_route,
+    discover_tailscale_suffix,
+    format_speed,
+    is_target_local,
+    resolve_target_connection,
+    resolve_target_host,
+)
 from homelab_status.main import app
 from homelab_status.models import HealthStatus, ServiceResult
 from homelab_status.services import CHECK_REGISTRY
@@ -32,6 +40,52 @@ def test_resolve_target_host() -> None:
     assert resolve_target_host("custom.host") == "custom.host"
     resolved = resolve_target_host()
     assert resolved in ("m70q.lan", "m70q")
+
+
+def test_classify_route() -> None:
+    # Local host
+    route, desc = classify_route("localhost", "127.0.0.1", is_local=True)
+    assert route == "local"
+    assert "Local Host" in desc
+
+    # Tailscale IP (RFC 6598 CGNAT block 100.64.0.0/10)
+    route, desc = classify_route("m70q", "100.120.146.29", is_local=False)
+    assert route == "tailscale"
+    assert desc == "Tailscale MagicDNS"
+
+    # Tailscale MagicDNS FQDN
+    route, desc = classify_route("m70q.tail4f594f.ts.net", "100.120.146.29", is_local=False)
+    assert route == "tailscale"
+    assert desc == "Tailscale MagicDNS"
+
+    # Direct LAN (RFC 1918)
+    route, desc = classify_route("m70q.lan", "192.168.8.10", is_local=False)
+    assert route == "lan"
+    assert desc == "Direct LAN"
+
+    # Public WAN
+    route, desc = classify_route("example.com", "93.184.216.34", is_local=False)
+    assert route == "wan"
+    assert desc == "WAN / Remote"
+
+
+def test_discover_tailscale_suffix(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Test env override
+    monkeypatch.setenv("HOMELAB_TAILSCALE_SUFFIX", "mytest.ts.net")
+    assert discover_tailscale_suffix() == "mytest.ts.net"
+
+    # Test dynamic discovery (should return suffix or None without crashing)
+    monkeypatch.delenv("HOMELAB_TAILSCALE_SUFFIX", raising=False)
+    suffix = discover_tailscale_suffix()
+    if suffix:
+        assert suffix.endswith(".ts.net")
+
+
+def test_resolve_target_connection() -> None:
+    conn = resolve_target_connection("m70q.tail4f594f.ts.net")
+    assert conn.host == "m70q.tail4f594f.ts.net"
+    assert conn.route == "tailscale"
+    assert conn.description == "Tailscale MagicDNS"
 
 
 def test_registry_contains_all_services() -> None:
@@ -134,13 +188,7 @@ def test_caddy_autosave_routes_parsing() -> None:
       }
     }"""
     cfg = json.loads(sample_caddy_json)
-    srv_routes = (
-        cfg.get("apps", {})
-        .get("http", {})
-        .get("servers", {})
-        .get("srv0", {})
-        .get("routes", [])
-    )
+    srv_routes = cfg.get("apps", {}).get("http", {}).get("servers", {}).get("srv0", {}).get("routes", [])
     hosts = {h for r in srv_routes for m in r.get("match", []) for h in m.get("host", [])}
     assert sorted(hosts) == ["009973.xyz", "jellyfin.009973.xyz", "qbittorrent.009973.xyz"]
 
@@ -169,4 +217,3 @@ if __name__ == "__main__":
     import pytest
 
     raise SystemExit(pytest.main([__file__, *sys.argv[1:]]))
-
