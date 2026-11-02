@@ -120,20 +120,34 @@ class StatusContext:
             lock = self._docker_lock if self._needs_docker_lock else contextlib.nullcontext()
             with lock:
                 try:
-                    conts = client.containers.list()
-                    return {c.name.lstrip("/"): c for c in conts}
+                    conts = client.containers.list(sparse=True)
+                    result: dict[str, Container] = {}
+                    for c in conts:
+                        names = c.attrs.get("Names") or []
+                        if names and "Name" not in c.attrs:
+                            c.attrs["Name"] = names[0]
+                        if "Config" not in c.attrs:
+                            c.attrs["Config"] = {"Labels": c.attrs.get("Labels", {})}
+                        c_name = names[0].lstrip("/") if names else (c.name or "")
+                        if c_name:
+                            result[c_name] = c
+                    return result
                 except Exception:
                     return {}
 
         self._containers_cache = await anyio.to_thread.run_sync(_fetch)
         return self._containers_cache
 
-    async def get_container(self, name: str) -> Container | None:
+    async def get_container(self, name: str, full: bool = False) -> Container | None:
         """Fetch container by name, checking pre-fetched cache first."""
         clean_name = name.lstrip("/")
         conts = await self.get_all_containers()
         if clean_name in conts:
-            return conts[clean_name]
+            c = conts[clean_name]
+            config = (c.attrs or {}).get("Config") or {}
+            if full and "Env" not in config:
+                await anyio.to_thread.run_sync(c.reload)
+            return c
 
         if not self.docker_client:
             return None
@@ -222,6 +236,11 @@ class StatusContext:
                 return ver
 
         config = attrs.get("Config") or {}
+        if "Env" not in config:
+            with contextlib.suppress(Exception):
+                await anyio.to_thread.run_sync(cont.reload)
+                attrs = cont.attrs or {}
+                config = attrs.get("Config") or {}
         raw_env = config.get("Env") or []
         env = dict(e.split("=", 1) for e in raw_env if isinstance(e, str) and "=" in e)
         for k in ("APP_VERSION", "PG_VERSION", "CADDY_VERSION", "VERSION"):
