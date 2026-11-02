@@ -24,6 +24,25 @@ def format_speed(bytes_per_sec: float) -> str:
     return f"{bps / (1024 * 1024):.2f} MB/s"
 
 
+def resolve_target_host(explicit_host: str | None = None) -> str:
+    """Resolve target host: explicit flag -> env var -> m70q.lan (LAN) -> m70q (Tailscale)."""
+    if explicit_host:
+        return explicit_host
+
+    if env_host := os.environ.get("HOMELAB_HOST"):
+        return env_host
+
+    # Try resolving candidate hostnames: LAN domain first, then Tailscale MagicDNS
+    for candidate in ("m70q.lan", "m70q"):
+        try:
+            socket.gethostbyname(candidate)
+            return candidate
+        except Exception:
+            pass
+
+    return "m70q.lan"
+
+
 def is_target_local(lan_host: str) -> bool:
     """Determine whether the specified lan_host refers to the local machine."""
     if lan_host in ("localhost", "127.0.0.1", "::1"):
