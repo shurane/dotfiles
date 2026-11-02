@@ -60,20 +60,47 @@ class StatusContext:
     connection: TargetConnection | None = None
     _docker_lock: threading.Lock = field(default_factory=threading.Lock)
     _disk_usage: list[dict[str, Any]] | None = field(default=None, init=False)
+    _containers_cache: dict[str, Container] | None = field(default=None, init=False)
 
     def base_url(self, subdomain: str | None = None) -> str:
         if subdomain:
             return f"https://{subdomain}.{self.base_domain}"
         return f"https://{self.base_domain}"
 
+    async def get_all_containers(self) -> dict[str, Container]:
+        """Fetch all running containers in one single Docker API call and cache them."""
+        if self._containers_cache is not None:
+            return self._containers_cache
+
+        if not self.docker_client:
+            self._containers_cache = {}
+            return self._containers_cache
+
+        def _fetch() -> dict[str, Container]:
+            with self._docker_lock:
+                try:
+                    conts = self.docker_client.containers.list()
+                    return {c.name.lstrip("/"): c for c in conts}
+                except Exception:
+                    return {}
+
+        self._containers_cache = await anyio.to_thread.run_sync(_fetch)
+        return self._containers_cache
+
     async def get_container(self, name: str) -> Container | None:
+        """Fetch container by name, checking pre-fetched cache first."""
+        clean_name = name.lstrip("/")
+        conts = await self.get_all_containers()
+        if clean_name in conts:
+            return conts[clean_name]
+
         if not self.docker_client:
             return None
 
         def _get() -> Container | None:
             with self._docker_lock:
                 try:
-                    return self.docker_client.containers.get(name)
+                    return self.docker_client.containers.get(clean_name)
                 except Exception:
                     return None
 
@@ -84,10 +111,13 @@ class StatusContext:
         if not self.docker_client:
             return (-1, "Docker client not available")
 
+        c = await self.get_container(container_name)
+        if not c:
+            return (-1, f"Container {container_name} not found")
+
         def _sync_exec() -> tuple[int, str]:
             with self._docker_lock:
                 try:
-                    c = self.docker_client.containers.get(container_name)
                     res = c.exec_run(cmd)
                     out = (
                         res.output.decode("utf-8", errors="replace")
@@ -105,10 +135,13 @@ class StatusContext:
         if not self.docker_client:
             return ""
 
+        c = await self.get_container(container_name)
+        if not c:
+            return ""
+
         def _get_logs() -> str:
             with self._docker_lock:
                 try:
-                    c = self.docker_client.containers.get(container_name)
                     raw = c.logs(tail=tail)
                     return raw.decode("utf-8", errors="replace") if isinstance(raw, (bytes, bytearray)) else str(raw)
                 except Exception:
@@ -123,52 +156,41 @@ class StatusContext:
 
         import re
 
-        def _extract() -> str | None:
-            with self._docker_lock:
-                try:
-                    cont = self.docker_client.containers.get(container_name)
-                except Exception:
-                    return None
+        cont = await self.get_container(container_name)
+        if not cont:
+            return None
 
-                labels = cont.labels or {}
-                for k in ("org.opencontainers.image.version", "version", "image.version"):
-                    if (v := labels.get(k)) and v != "nightly":
-                        m = re.match(r"^(\d+\.\d+(\.\d+)?)", v)
-                        if m:
-                            return f"v{m.group(1)}"
-                        return v if v.startswith("v") else f"v{v}"
+        labels = cont.labels or {}
+        for k in ("org.opencontainers.image.version", "version", "image.version"):
+            if (v := labels.get(k)) and v != "nightly":
+                m = re.match(r"^(\d+\.\d+(\.\d+)?)", v)
+                if m:
+                    return f"v{m.group(1)}"
+                return v if v.startswith("v") else f"v{v}"
 
-                env = dict(e.split("=", 1) for e in cont.attrs.get("Config", {}).get("Env", []) if "=" in e)
-                for k in ("APP_VERSION", "PG_VERSION", "CADDY_VERSION", "VERSION"):
-                    if v := env.get(k):
-                        m = re.match(r"^(\d+\.\d+(\.\d+)?)", v)
-                        if m:
-                            return f"v{m.group(1)}"
-                        return v if v.startswith("v") else f"v{v}"
+        env = dict(e.split("=", 1) for e in cont.attrs.get("Config", {}).get("Env", []) if "=" in e)
+        for k in ("APP_VERSION", "PG_VERSION", "CADDY_VERSION", "VERSION"):
+            if v := env.get(k):
+                m = re.match(r"^(\d+\.\d+(\.\d+)?)", v)
+                if m:
+                    return f"v{m.group(1)}"
+                return v if v.startswith("v") else f"v{v}"
 
-                name = cont.name or container_name
-                if "samba" in name:
-                    try:
-                        res = cont.exec_run("smbd -V")
-                        if res.exit_code == 0:
-                            m = re.search(r"(\d+\.\d+(\.\d+)?)", res.output.decode())
-                            if m:
-                                return f"v{m.group(1)}"
-                    except Exception:
-                        pass
-                elif "glance" in name:
-                    try:
-                        res = cont.exec_run("/app/glance --version")
-                        if res.exit_code == 0:
-                            m = re.search(r"v?(\d+\.\d+(\.\d+)?)", res.output.decode())
-                            if m:
-                                return f"v{m.group(1)}"
-                    except Exception:
-                        pass
+        name = cont.name or container_name
+        if "samba" in name:
+            code, out = await self.exec_container(container_name, "smbd -V")
+            if code == 0:
+                m = re.search(r"(\d+\.\d+(\.\d+)?)", out)
+                if m:
+                    return f"v{m.group(1)}"
+        elif "glance" in name:
+            code, out = await self.exec_container(container_name, "/app/glance --version")
+            if code == 0:
+                m = re.search(r"v?(\d+\.\d+(\.\d+)?)", out)
+                if m:
+                    return f"v{m.group(1)}"
 
-                return None
-
-        return await anyio.to_thread.run_sync(_extract)
+        return None
 
     async def get_disk_usage(self) -> list[dict[str, Any]]:
         """Fetch disk usage for storage partitions (e.g. /mnt/mango and /)."""

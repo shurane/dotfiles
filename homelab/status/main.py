@@ -132,11 +132,15 @@ async def _run_all_checks(
 
     if show_progress:
         with Live(_render_ticker(), console=console, refresh_per_second=10, transient=True) as live:
+            with contextlib.suppress(Exception):
+                await ctx.get_all_containers()
             async with anyio.create_task_group() as tg:
                 tg.start_soon(_fetch_disk)
                 for idx, (service_id, fn) in enumerate(check_items):
                     tg.start_soon(_execute, idx, service_id, fn, live)
     else:
+        with contextlib.suppress(Exception):
+            await ctx.get_all_containers()
         async with anyio.create_task_group() as tg:
             tg.start_soon(_fetch_disk)
             for idx, (service_id, fn) in enumerate(check_items):
