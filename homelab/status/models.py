@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 import threading
 from dataclasses import dataclass, field
@@ -97,6 +98,13 @@ class StatusContext:
             return f"https://{subdomain}.{self.base_domain}"
         return f"https://{self.base_domain}"
 
+    @property
+    def _needs_docker_lock(self) -> bool:
+        if not self.docker_client:
+            return False
+        base = getattr(self.docker_client.api, "base_url", "")
+        return str(base).startswith("ssh://")
+
     async def get_all_containers(self) -> dict[str, Container]:
         """Fetch all running containers in one single Docker API call and cache them."""
         if self._containers_cache is not None:
@@ -109,7 +117,8 @@ class StatusContext:
         client = self.docker_client
 
         def _fetch() -> dict[str, Container]:
-            with self._docker_lock:
+            lock = self._docker_lock if self._needs_docker_lock else contextlib.nullcontext()
+            with lock:
                 try:
                     conts = client.containers.list()
                     return {c.name.lstrip("/"): c for c in conts}
@@ -132,7 +141,8 @@ class StatusContext:
         client = self.docker_client
 
         def _get() -> Container | None:
-            with self._docker_lock:
+            lock = self._docker_lock if self._needs_docker_lock else contextlib.nullcontext()
+            with lock:
                 try:
                     return client.containers.get(clean_name)
                 except Exception:
@@ -150,7 +160,8 @@ class StatusContext:
             return (-1, f"Container {container_name} not found")
 
         def _sync_exec() -> tuple[int, str]:
-            with self._docker_lock:
+            lock = self._docker_lock if self._needs_docker_lock else contextlib.nullcontext()
+            with lock:
                 try:
                     res = c.exec_run(cmd)
                     out = (
@@ -174,7 +185,8 @@ class StatusContext:
             return ""
 
         def _get_logs() -> str:
-            with self._docker_lock:
+            lock = self._docker_lock if self._needs_docker_lock else contextlib.nullcontext()
+            with lock:
                 try:
                     raw = c.logs(tail=tail)
                     return raw.decode("utf-8", errors="replace") if isinstance(raw, (bytes, bytearray)) else str(raw)

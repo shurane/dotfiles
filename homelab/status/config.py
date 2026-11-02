@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import io
 import ipaddress
 import json
@@ -10,6 +11,7 @@ import platform
 import shutil
 import socket
 import subprocess
+import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -240,25 +242,107 @@ def load_env(
         if p.is_file():
             return {k: v for k, v in dotenv_values(p).items() if v is not None}
 
-    # 3. Fallback to reading remote .env over SFTP from lan_host (if on remote workstation / peer machine)
+    # 3. Fallback to reading remote .env over SSH from lan_host (if on remote workstation / peer machine)
     if not is_target_local(lan_host):
         try:
-            import paramiko
-
-            ssh = paramiko.SSHClient()
-            ssh.load_system_host_keys()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(lan_host, username=ssh_user, timeout=4)
-            sftp = ssh.open_sftp()
-            with sftp.file(f"/home/{ssh_user}/dotfiles/homelab/.env", "r") as f:
-                content = f.read().decode("utf-8")
-            parsed = dotenv_values(stream=io.StringIO(content))
-            return {k: v for k, v in parsed.items() if v is not None}
+            res = subprocess.run(
+                [
+                    "ssh",
+                    "-o",
+                    "BatchMode=yes",
+                    "-o",
+                    "ConnectTimeout=3",
+                    f"{ssh_user}@{lan_host}",
+                    f"cat /home/{ssh_user}/dotfiles/homelab/.env",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=4,
+                check=False,
+            )
+            if res.returncode == 0 and res.stdout:
+                parsed = dotenv_values(stream=io.StringIO(res.stdout))
+                return {k: v for k, v in parsed.items() if v is not None}
         except Exception:
             pass
 
     # 4. OS environment variables
     return dict(os.environ)
+
+
+def _get_ssh_tunnel_client(
+    lan_host: str,
+    ssh_user: str = "ehtesh",
+    timeout: float = 3.0,
+) -> docker.DockerClient | None:
+    """Establish or reuse a native OpenSSH UNIX socket tunnel to remote docker.sock."""
+    import atexit
+
+    import docker
+
+    runtime_dir = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp"))
+    sock_path = runtime_dir / f"homelab-docker-{os.getuid()}.sock"
+    sock_str = str(sock_path)
+
+    # 1. Reuse existing healthy socket if already alive
+    if sock_path.exists():
+        try:
+            c = docker.DockerClient(base_url=f"unix://{sock_str}", timeout=1.0)
+            c.ping()
+            return c
+        except Exception:
+            with contextlib.suppress(OSError):
+                sock_path.unlink(missing_ok=True)
+
+    # 2. Spawn native OpenSSH tunnel in background
+    cmd = [
+        "ssh",
+        "-N",
+        "-o",
+        "ExitOnForwardFailure=yes",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        f"ConnectTimeout={max(int(timeout), 1)}",
+        "-L",
+        f"{sock_str}:/var/run/docker.sock",
+        f"{ssh_user}@{lan_host}",
+    ]
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        return None
+
+    def _cleanup() -> None:
+        try:
+            proc.terminate()
+            proc.wait(timeout=0.3)
+        except Exception:
+            with contextlib.suppress(Exception):
+                proc.kill()
+        with contextlib.suppress(OSError):
+            sock_path.unlink(missing_ok=True)
+
+    atexit.register(_cleanup)
+
+    # Wait for the tunnel socket to be ready
+    t_end = time.perf_counter() + timeout
+    while time.perf_counter() < t_end:
+        if sock_path.exists():
+            try:
+                c = docker.DockerClient(base_url=f"unix://{sock_str}", timeout=1.0)
+                c.ping()
+                return c
+            except Exception:
+                pass
+        time.sleep(0.02)
+
+    _cleanup()
+    return None
 
 
 def get_docker_client(
@@ -267,7 +351,7 @@ def get_docker_client(
     no_docker: bool = False,
     ssh_user: str = "ehtesh",
 ) -> docker.DockerClient | None:
-    """Resolve Docker client using local socket (if target is local) or SSH bridge."""
+    """Resolve Docker client using local socket, OpenSSH tunnel, or SSH bridge."""
     if no_docker:
         return None
 
@@ -300,7 +384,13 @@ def get_docker_client(
             except Exception:
                 pass
 
-    # Remote target host: connect via SSH bridge to target machine
+    # Remote target host:
+    # 1. Prefer native OpenSSH UNIX socket tunnel (high-performance C multiplexing, zero locking)
+    tunnel_client = _get_ssh_tunnel_client(lan_host, ssh_user, timeout=3.0)
+    if tunnel_client:
+        return tunnel_client
+
+    # 2. Fallback to Paramiko SSH URL if OpenSSH tunnel fails
     try:
         c = docker.DockerClient(base_url=f"ssh://{ssh_user}@{lan_host}", timeout=5)
         c.ping()
