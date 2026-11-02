@@ -42,16 +42,29 @@ def format_size(bytes_val: float) -> str:
     return f"{n / 1024:.0f} KB"
 
 
-def render_sparkbar(pct: float, width: int = 10) -> str:
-    """Render a clean block sparkline gauge with no font gaps (e.g. [██████░░░░])."""
+def render_sparkbar(pct: float, width: int = 10, bg: str = "grey27") -> str:
+    """Render a fractional block sparkline gauge with seamless background color alignment."""
+    blocks = ("", "▏", "▎", "▍", "▌", "▋", "▊", "▉")
     val = max(0.0, min(1.0, pct)) * width
-    full = round(val)
-    full = max(0, min(width, full))
-    empty = width - full
-    color = "bold red" if pct >= 0.9 else ("bold yellow" if pct >= 0.7 else "bold cyan")
-    filled_str = f"[{color}]{'█' * full}[/{color}]" if full > 0 else ""
-    empty_str = f"[dim]{'░' * empty}[/dim]" if empty > 0 else ""
-    return f"[{filled_str}{empty_str}]"
+    full = int(val)
+    rem = val - full
+    char_idx = round(rem * 8)
+    if char_idx == 8:
+        full += 1
+        part = ""
+    else:
+        part = blocks[char_idx]
+
+    full = min(full, width)
+    if full == width:
+        part = ""
+    empty = max(0, width - full - (1 if part else 0))
+    fg = "bold red" if pct >= 0.9 else ("bold yellow" if pct >= 0.7 else "bold cyan")
+
+    filled = f"[{fg}]" + ("█" * full) + f"[/{fg}]" if full else ""
+    partial = f"[{fg} on {bg}]{part}[/]" if part else ""
+    unfilled = f"[{bg}]" + ("█" * empty) + f"[/{bg}]" if empty else ""
+    return f"[{filled}{partial}{unfilled}]"
 
 
 def discover_tailscale_suffix() -> str | None:
