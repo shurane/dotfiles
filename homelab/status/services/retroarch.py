@@ -50,8 +50,8 @@ async def check_retroarch(ctx: StatusContext) -> ServiceResult:
 
             entries.sort()
             styled_entries = [f"[bold magenta]{e}[/bold magenta]" for e in entries]
-            summary = f"{len(entries)} shares/entries: {', '.join(entries)}"
-            branches = [f"📁 WebDAV Shares: [bold cyan]{len(entries)}[/bold cyan] ({', '.join(styled_entries)})"]
+            summary = f"{len(entries)} entries in /srv/retroarch: {', '.join(entries)}"
+            branches = [f"📁 Sync Directory: [bold cyan]{len(entries)} entries[/bold cyan] ({', '.join(styled_entries)})"]
 
             return ServiceResult(
                 service_id=service_id,
