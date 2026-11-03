@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import contextlib
 import json
-import threading
 from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
@@ -61,7 +60,6 @@ class StatusContext:
     http_timeout: float = 10.0
     no_docker: bool = False
     connection: TargetConnection | None = None
-    _docker_lock: threading.Lock = field(default_factory=threading.Lock)
     _disk_usage: list[dict[str, Any]] | None = field(default=None, init=False)
     _containers_cache: dict[str, Container] | None = field(default=None, init=False)
     _version_cache: dict[str, str] | None = field(default=None, init=False)
@@ -98,13 +96,6 @@ class StatusContext:
             return f"https://{subdomain}.{self.base_domain}"
         return f"https://{self.base_domain}"
 
-    @property
-    def _needs_docker_lock(self) -> bool:
-        if not self.docker_client:
-            return False
-        base = getattr(self.docker_client.api, "base_url", "")
-        return str(base).startswith("ssh://")
-
     async def get_all_containers(self) -> dict[str, Container]:
         """Fetch all running containers in one single Docker API call and cache them."""
         if self._containers_cache is not None:
@@ -117,23 +108,21 @@ class StatusContext:
         client = self.docker_client
 
         def _fetch() -> dict[str, Container]:
-            lock = self._docker_lock if self._needs_docker_lock else contextlib.nullcontext()
-            with lock:
-                try:
-                    conts = client.containers.list(sparse=True)
-                    result: dict[str, Container] = {}
-                    for c in conts:
-                        names = c.attrs.get("Names") or []
-                        if names and "Name" not in c.attrs:
-                            c.attrs["Name"] = names[0]
-                        if "Config" not in c.attrs:
-                            c.attrs["Config"] = {"Labels": c.attrs.get("Labels", {})}
-                        c_name = names[0].lstrip("/") if names else (c.name or "")
-                        if c_name:
-                            result[c_name] = c
-                    return result
-                except Exception:
-                    return {}
+            try:
+                conts = client.containers.list(sparse=True)
+                result: dict[str, Container] = {}
+                for c in conts:
+                    names = c.attrs.get("Names") or []
+                    if names and "Name" not in c.attrs:
+                        c.attrs["Name"] = names[0]
+                    if "Config" not in c.attrs:
+                        c.attrs["Config"] = {"Labels": c.attrs.get("Labels", {})}
+                    c_name = names[0].lstrip("/") if names else (c.name or "")
+                    if c_name:
+                        result[c_name] = c
+                return result
+            except Exception:
+                return {}
 
         self._containers_cache = await anyio.to_thread.run_sync(_fetch)
         return self._containers_cache
@@ -155,17 +144,15 @@ class StatusContext:
         client = self.docker_client
 
         def _get() -> Container | None:
-            lock = self._docker_lock if self._needs_docker_lock else contextlib.nullcontext()
-            with lock:
-                try:
-                    return client.containers.get(clean_name)
-                except Exception:
-                    return None
+            try:
+                return client.containers.get(clean_name)
+            except Exception:
+                return None
 
         return await anyio.to_thread.run_sync(_get)
 
     async def exec_container(self, container_name: str, cmd: str | list[str]) -> tuple[int, str]:
-        """Safely execute command in container with thread synchronization."""
+        """Execute command in container."""
         if not self.docker_client:
             return (-1, "Docker client not available")
 
@@ -174,23 +161,21 @@ class StatusContext:
             return (-1, f"Container {container_name} not found")
 
         def _sync_exec() -> tuple[int, str]:
-            lock = self._docker_lock if self._needs_docker_lock else contextlib.nullcontext()
-            with lock:
-                try:
-                    res = c.exec_run(cmd)
-                    out = (
-                        res.output.decode("utf-8", errors="replace")
-                        if isinstance(res.output, (bytes, bytearray))
-                        else str(res.output)
-                    )
-                    return (res.exit_code, out)
-                except Exception as exc:
-                    return (-1, str(exc))
+            try:
+                res = c.exec_run(cmd)
+                out = (
+                    res.output.decode("utf-8", errors="replace")
+                    if isinstance(res.output, (bytes, bytearray))
+                    else str(res.output)
+                )
+                return (res.exit_code, out)
+            except Exception as exc:
+                return (-1, str(exc))
 
         return await anyio.to_thread.run_sync(_sync_exec)
 
     async def get_container_logs(self, container_name: str, tail: int = 25) -> str:
-        """Safely fetch recent container logs with thread synchronization."""
+        """Fetch recent container logs."""
         if not self.docker_client:
             return ""
 
@@ -199,13 +184,11 @@ class StatusContext:
             return ""
 
         def _get_logs() -> str:
-            lock = self._docker_lock if self._needs_docker_lock else contextlib.nullcontext()
-            with lock:
-                try:
-                    raw = c.logs(tail=tail)
-                    return raw.decode("utf-8", errors="replace") if isinstance(raw, (bytes, bytearray)) else str(raw)
-                except Exception:
-                    return ""
+            try:
+                raw = c.logs(tail=tail)
+                return raw.decode("utf-8", errors="replace") if isinstance(raw, (bytes, bytearray)) else str(raw)
+            except Exception:
+                return ""
 
         return await anyio.to_thread.run_sync(_get_logs)
 
