@@ -385,17 +385,5 @@ def get_docker_client(
                 pass
 
     # Remote target host:
-    # 1. Prefer native OpenSSH UNIX socket tunnel (high-performance C multiplexing, zero locking)
-    tunnel_client = _get_ssh_tunnel_client(lan_host, ssh_user, timeout=3.0)
-    if tunnel_client:
-        return tunnel_client
-
-    # 2. Fallback to Paramiko SSH URL if OpenSSH tunnel fails
-    try:
-        c = docker.DockerClient(base_url=f"ssh://{ssh_user}@{lan_host}", timeout=5)
-        c.ping()
-        return c
-    except Exception:
-        pass
-
-    return None
+    # Use native OpenSSH UNIX socket tunnel (high-performance C multiplexing, zero locking)
+    return _get_ssh_tunnel_client(lan_host, ssh_user, timeout=3.0)

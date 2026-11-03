@@ -6,10 +6,6 @@
 /bookorbit/.env
 /bookorbit/books/
 /bookorbit/data/
-/homepage/config/custom.css
-/homepage/config/custom.js
-/homepage/config/logs/
-/homepage/config/proxmox.yaml
 /jellyfin/backups/
 /jellyfin/cache/
 /jellyfin/config/
