@@ -12,19 +12,18 @@ services:
       PORKBUN_API_KEY: ${PORKBUN_API_KEY}
       PORKBUN_API_SECRET_KEY: ${PORKBUN_API_SECRET_KEY}
     labels:
-      caddy: ""
       caddy.email: "{env.ACME_EMAIL}"
       caddy.cert_issuer_0: acme
       caddy.cert_issuer_0.dns: porkbun
       caddy.cert_issuer_0.dns.api_key: "{env.PORKBUN_API_KEY}"
       caddy.cert_issuer_0.dns.api_secret_key: "{env.PORKBUN_API_SECRET_KEY}"
       caddy.cert_issuer_1: internal
-      caddy_irc: irc.${HOSTNAME_BASE:?err}
-      caddy_irc.handle_0: /socket*
-      caddy_irc.handle_0.0_reverse_proxy: "192.168.8.10:8080"
-      caddy_irc.handle_1: "*"
-      caddy_irc.handle_1.0_root: "* /var/www/gamja"
-      caddy_irc.handle_1.1_file_server: ""
+      caddy_1: irc.${HOSTNAME_BASE:?err}
+      caddy_1.handle_0: /socket*
+      caddy_1.handle_0.0_reverse_proxy: "192.168.8.10:8080"
+      caddy_1.handle_1: "*"
+      caddy_1.handle_1.0_root: "* /var/www/gamja"
+      caddy_1.handle_1.1_file_server: ""
     networks:
       - proxy-tier
     volumes:
