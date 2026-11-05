@@ -21,12 +21,13 @@ services:
       caddy_1: irc.${HOSTNAME_BASE:?err}
       caddy_1.root: "* /var/www/gamja"
       caddy_1.file_server: ""
-      caddy_1.reverse_proxy: "/socket* 192.168.8.10:8080"
+      caddy_1.reverse_proxy: "/socket* unix//run/soju/http.sock"
     networks:
       - proxy-tier
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /usr/share/webapps/gamja:/var/www/gamja:ro
+      - /run/soju:/run/soju
       - caddy-data:/data
       - caddy-config:/config
     healthcheck:
