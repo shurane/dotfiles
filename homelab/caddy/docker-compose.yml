@@ -19,11 +19,9 @@ services:
       caddy.cert_issuer_0.dns.api_secret_key: "{env.PORKBUN_API_SECRET_KEY}"
       caddy.cert_issuer_1: internal
       caddy_1: irc.${HOSTNAME_BASE:?err}
-      caddy_1.handle_0: /socket*
-      caddy_1.handle_0.0_reverse_proxy: "192.168.8.10:8080"
-      caddy_1.handle_1: "*"
-      caddy_1.handle_1.0_root: "* /var/www/gamja"
-      caddy_1.handle_1.1_file_server: ""
+      caddy_1.root: "* /var/www/gamja"
+      caddy_1.file_server: ""
+      caddy_1.reverse_proxy: "/socket* 192.168.8.10:8080"
     networks:
       - proxy-tier
     volumes:
