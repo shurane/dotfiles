@@ -10,9 +10,6 @@ autoload -Uz compinit && compinit
 # https://superuser.com/questions/458906/zsh-tab-completion-of-git-commands-is-very-slow-how-can-i-turn-it-off, zsh completion kinda slow
 fpath=(~/.zsh $fpath)
 
-# macOS
-export HOMEBREW_NO_ENV_HINTS=1
-eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # matches the style of bashrc with `username@host:dir$`
 # see https://zsh-prompt-generator.site/ and https://stackoverflow.com/questions/689765/how-can-i-change-the-color-of-my-prompt-in-zsh-different-from-normal-text
@@ -26,7 +23,6 @@ export BAT_CONFIG_PATH="$HOME/dotfiles/.bat.conf"
 [[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && export PATH="$HOME/.local/bin:$PATH"
 [[ ":$PATH:" != *":$(go env GOPATH)/bin:"* ]] && export PATH="$PATH:$(go env GOPATH)/bin"
 
-eval "$(fnm env --use-on-cd --shell zsh)"
 
 alias ..="cd .."
 alias ...="cd ../.."
@@ -34,6 +30,11 @@ alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias ......="cd ../../../../.."
 alias .......="cd ../../../../../.."
+
+# macOS
+export HOMEBREW_NO_ENV_HINTS=1
+test -x "$(command -v brew)" && eval "$(/opt/homebrew/bin/brew shellenv)"
+test -x "$(command -v fnm)" && eval "$(fnm env --use-on-cd --shell zsh)"
 
 # alias rm="grm"
 test -x "$(command -v eza)" && alias ls="eza --group-directories-first --sort=extension"
