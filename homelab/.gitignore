@@ -11,5 +11,7 @@
 /jellyfin/config/
 /qbittorrent/config/
 /qui/config/
+/qbittorrent/wireguard.conf
+*.orig
 /withings-sync/.env
 /withings-sync/config/
