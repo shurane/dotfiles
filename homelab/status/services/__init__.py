@@ -9,6 +9,7 @@ from .arcane import check_arcane
 from .bookorbit import check_bookorbit
 from .caddy import check_caddy
 from .glance import check_glance
+from .gluetun import check_gluetun
 from .jellyfin import check_jellyfin
 from .postgres import check_postgres
 from .qbittorrent import check_qbittorrent
@@ -25,6 +26,7 @@ CheckFn = Callable[["StatusContext"], Coroutine[Any, Any, "ServiceResult"]]
 CHECK_REGISTRY: dict[str, CheckFn] = {
     "jellyfin": check_jellyfin,
     "bookorbit": check_bookorbit,
+    "gluetun": check_gluetun,
     "qbittorrent": check_qbittorrent,
     "retroarch": check_retroarch,
     "caddy": check_caddy,
@@ -42,6 +44,7 @@ __all__ = [
     "check_bookorbit",
     "check_caddy",
     "check_glance",
+    "check_gluetun",
     "check_jellyfin",
     "check_postgres",
     "check_qbittorrent",

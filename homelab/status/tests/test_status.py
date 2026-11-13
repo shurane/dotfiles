@@ -93,6 +93,7 @@ def test_registry_contains_all_services() -> None:
     expected = {
         "jellyfin",
         "bookorbit",
+        "gluetun",
         "qbittorrent",
         "retroarch",
         "caddy",
@@ -209,6 +210,74 @@ def test_cli_help() -> None:
     assert "--service" in result.stdout
     assert "--host" in result.stdout
     assert "--json" in result.stdout
+    assert "vpn" in result.stdout
+
+
+def test_cli_vpn_help() -> None:
+    result = runner.invoke(app, ["vpn", "--help"])
+    assert result.exit_code == 0
+    assert "Deep inspection of ProtonVPN tunnel" in result.stdout
+    assert "--json" in result.stdout
+
+
+@pytest.mark.anyio
+async def test_check_qbittorrent_interface_binding() -> None:
+    from unittest.mock import AsyncMock, MagicMock, patch
+
+    from models import StatusContext
+    from services.qbittorrent import check_qbittorrent
+
+    ctx = MagicMock(spec=StatusContext)
+    ctx.base_url = MagicMock(return_value="http://127.0.0.1:8080")
+    ctx.http_timeout = 5.0
+    ctx.username = "username"
+    ctx.password = "secret"
+    ctx.get_container_version = AsyncMock(return_value="v5.0.0")
+
+    def make_mock_client(iface: str, upnp: bool) -> MagicMock:
+        mock_c = AsyncMock()
+        mock_c.__aenter__.return_value = mock_c
+
+        async def _post(url: str, **kwargs: object) -> MagicMock:
+            res = MagicMock()
+            res.status_code = 200
+            res.text = "Ok."
+            return res
+
+        async def _get(url: str, **kwargs: object) -> MagicMock:
+            res = MagicMock()
+            res.status_code = 200
+            if "maindata" in url:
+                res.json.return_value = {"torrents": {}, "server_state": {}}
+            elif "preferences" in url:
+                res.json.return_value = {
+                    "current_network_interface": iface,
+                    "listen_port": 54757,
+                    "upnp": upnp,
+                }
+            return res
+
+        mock_c.post = AsyncMock(side_effect=_post)
+        mock_c.get = AsyncMock(side_effect=_get)
+        return mock_c
+
+    # 1. Healthy: bound to tun0, UPnP disabled
+    with patch("httpx.AsyncClient", return_value=make_mock_client("tun0", False)):
+        res_ok = await check_qbittorrent(ctx)
+    assert res_ok.status == HealthStatus.HEALTHY
+    assert any("tun0" in b for b in res_ok.branches)
+
+    # 2. Unhealthy: unbound interface
+    with patch("httpx.AsyncClient", return_value=make_mock_client("", False)):
+        res_unbound = await check_qbittorrent(ctx)
+    assert res_unbound.status == HealthStatus.UNHEALTHY
+    assert any("UNBOUND" in b for b in res_unbound.branches)
+
+    # 3. Degraded: UPnP enabled
+    with patch("httpx.AsyncClient", return_value=make_mock_client("tun0", True)):
+        res_upnp = await check_qbittorrent(ctx)
+    assert res_upnp.status == HealthStatus.DEGRADED
+    assert any("UPnP" in b for b in res_upnp.branches)
 
 
 if __name__ == "__main__":

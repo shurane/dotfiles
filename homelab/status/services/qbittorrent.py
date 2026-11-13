@@ -75,6 +75,32 @@ async def check_qbittorrent(ctx: StatusContext) -> ServiceResult:
                 ),
                 f"⚡ Speeds: [bold green]{dl_speed} ↓[/bold green] [dim]•[/dim] [bold blue]{up_speed} ↑[/bold blue]",
             ]
+
+            pref_res = await client.get("/api/v2/app/preferences")
+            if pref_res.status_code == 200:
+                prefs = pref_res.json()
+                iface = str(prefs.get("current_network_interface", "")).strip()
+                listen_port = prefs.get("listen_port", 0)
+                upnp_enabled = bool(prefs.get("upnp", False))
+
+                if iface in ("tun0", "wg0"):
+                    branches.append(
+                        f"🔒 Interface: [bold green]{iface}[/bold green] [dim]• Port: {listen_port}[/dim]"
+                    )
+                else:
+                    status = HealthStatus.UNHEALTHY
+                    branches.append(
+                        f"⚠️ Interface: [bold red]{iface or 'ALL (UNBOUND)'}[/bold red] "
+                        f"[dim](Critical: traffic not bound to VPN)[/dim]"
+                    )
+
+                if upnp_enabled:
+                    if status == HealthStatus.HEALTHY:
+                        status = HealthStatus.DEGRADED
+                    branches.append(
+                        "⚠️ UPnP: [bold yellow]ENABLED[/bold yellow] [dim](Should be disabled behind VPN)[/dim]"
+                    )
+
             if errored > 0:
                 branches.append(f"⚠️ Errored: [bold red]{errored}[/bold red] torrents")
 

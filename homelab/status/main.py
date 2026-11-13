@@ -3,29 +3,15 @@
 
 from __future__ import annotations
 
-import os
-import shutil
-import sys
-from pathlib import Path
-
-# If executed directly with system Python outside uv, re-exec via uv run --project
-if "VIRTUAL_ENV" not in os.environ:
-    project_dir = Path(__file__).resolve().parent
-    uv_path = shutil.which("uv")
-    if not uv_path:
-        local_uv = Path.home() / ".local" / "bin" / "uv"
-        if local_uv.is_file():
-            uv_path = str(local_uv)
-    if uv_path and os.path.isfile(uv_path):
-        os.execv(uv_path, [uv_path, "run", "--project", str(project_dir), str(__file__), *sys.argv[1:]])
-
 import contextlib
 import datetime
 import json
 import logging
+import sys
 import time
 from collections import deque
 from dataclasses import asdict
+from pathlib import Path
 from typing import Any
 
 import anyio
@@ -38,6 +24,7 @@ from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
 
+from commands.vpn import vpn_command
 from config import format_size, get_docker_client, load_env, render_sparkbar, resolve_target_connection
 from models import HealthStatus, ServiceResult, StatusContext
 from services import CHECK_REGISTRY, CheckFn
@@ -49,7 +36,7 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger("docker").setLevel(logging.WARNING)
 
 app = typer.Typer(
-    help="Homelab Deep Health & Content Inspector",
+    help="Run deep health & content availability checks on homelab services.",
     add_completion=False,
 )
 console = Console()
@@ -235,8 +222,9 @@ def render_tree(
     console.print(root)
 
 
-@app.command()
+@app.callback(invoke_without_command=True)
 def main(
+    ctx_typer: typer.Context,
     services: list[str] = typer.Option(
         None,
         "--service",
@@ -279,6 +267,9 @@ def main(
     ),
 ) -> None:
     """Run deep health & content availability checks across homelab services."""
+    if ctx_typer.invoked_subcommand is not None:
+        return
+
     conn = resolve_target_connection(lan_host)
     env = load_env(env_file, conn.host)
     username = env.get("HOMELAB_USERNAME", "username")
@@ -382,6 +373,12 @@ def main(
             f"[dim]•[/dim] [bold white]Total time:[/bold white] [bold yellow]{total_elapsed:.2f}s[/bold yellow]\n"
         )
         sys.exit(1)
+
+
+app.command(
+    "vpn",
+    help="Deep inspection of ProtonVPN tunnel, Gluetun kill switch, port forwarding, and qBittorrent.",
+)(vpn_command)
 
 
 if __name__ == "__main__":

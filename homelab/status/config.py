@@ -5,10 +5,8 @@ from __future__ import annotations
 import contextlib
 import io
 import ipaddress
-import json
 import os
 import platform
-import shutil
 import socket
 import subprocess
 import time
@@ -91,19 +89,6 @@ def discover_tailscale_suffix() -> str | None:
             return cname.split(".", 1)[1]
     except Exception:
         pass
-
-    # 3. Tailscale CLI check (tailscale status --json)
-    for binary in ("tailscale", "tailscale.exe", "/mnt/c/Program Files/Tailscale/tailscale.exe"):
-        exe = shutil.which(binary) or (binary if os.path.exists(binary) else None)
-        if exe:
-            try:
-                res = subprocess.run([exe, "status", "--json"], capture_output=True, text=True, timeout=1.5)
-                if res.returncode == 0:
-                    data = json.loads(res.stdout)
-                    if suffix := data.get("MagicDNSSuffix"):
-                        return suffix
-            except Exception:
-                pass
 
     return None
 
