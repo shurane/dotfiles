@@ -1,11 +1,9 @@
 import json
-import re
-import time
 
 import httpx
 
 from common import ensure_state_dir, wait_for_http
-from compose import compose_logs, compose_up
+from compose import compose_up
 from config import QBITTORRENT_URL, ROOT
 from http_models import QbittorrentPreferences, QbittorrentSetPreferencesRequest
 from models import HomelabAuth
@@ -23,26 +21,9 @@ def qbittorrent_login(client: httpx.Client, username: str, password: str) -> boo
     return response.text.strip() == "Ok."
 
 
-def qbittorrent_temporary_password(timeout_seconds: int = 60) -> str | None:
-    deadline = time.monotonic() + timeout_seconds
-    while time.monotonic() < deadline:
-        logs = compose_logs("qbittorrent")
-        match = re.search(r"temporary password[^:]*:\s*(\S+)", logs, flags=re.IGNORECASE)
-        if match is not None:
-            return match.group(1)
-        time.sleep(2)
-    return None
-
-
 def authenticate_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:
-    if qbittorrent_login(client, auth.username, auth.password):
-        return
-
-    temporary_password = qbittorrent_temporary_password()
-    if temporary_password and qbittorrent_login(client, "admin", temporary_password):
-        return
-
-    raise RuntimeError("qBittorrent rejected shared credentials and no working temporary admin password was found")
+    if not qbittorrent_login(client, auth.username, auth.password):
+        raise RuntimeError(f"qBittorrent rejected centralized credentials for user {auth.username!r}")
 
 
 def apply_qbittorrent(client: httpx.Client, auth: HomelabAuth) -> None:

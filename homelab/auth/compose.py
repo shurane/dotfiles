@@ -22,21 +22,10 @@ def compose_service(stack: str, service: str | None = None) -> str:
 def compose_containers(stack: str, service: str | None = None) -> list[Container]:
     service = compose_service(stack, service)
     client = docker_client()
-    containers = client.containers.list(
+    return client.containers.list(
         all=True,
         filters={"label": [f"com.docker.compose.service={service}"]},
     )
-    if not containers:
-        containers = client.containers.list(
-            all=True,
-            filters={
-                "label": [
-                    f"com.docker.compose.project={stack}",
-                    f"com.docker.compose.service={service}",
-                ],
-            },
-        )
-    return containers
 
 
 def compose_container(stack: str, service: str | None = None) -> Container:
@@ -65,10 +54,6 @@ def compose_up(stack: str, service: str | None = None) -> None:
     run(["docker", "compose", "up", "-d", service], cwd=cwd)
 
 
-def compose_logs(stack: str, service: str | None = None) -> str:
-    return compose_container(stack, service).logs(stdout=True, stderr=True).decode(errors="replace")
-
-
 def compose_exec(stack: str, command: list[str], service: str | None = None) -> None:
     service = compose_service(stack, service)
     result = compose_container(stack, service).exec_run(command, stdout=True, stderr=True)
@@ -89,7 +74,12 @@ def get_container_ip(service: str, network: str = "proxy-tier") -> str | None:
         containers = client.containers.list(filters={"label": [f"com.docker.compose.service={service}"]})
         if not containers:
             return None
-        networks = containers[0].attrs.get("NetworkSettings", {}).get("Networks", {})
+        c = containers[0]
+        net_mode = c.attrs.get("HostConfig", {}).get("NetworkMode", "")
+        if net_mode.startswith("container:"):
+            parent_id = net_mode.split("container:", 1)[1]
+            c = client.containers.get(parent_id)
+        networks = c.attrs.get("NetworkSettings", {}).get("Networks", {})
         net_info = networks.get(network)
         if net_info and net_info.get("IPAddress"):
             return str(net_info["IPAddress"])

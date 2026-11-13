@@ -6,21 +6,14 @@ AUTH_ENV = Path(os.environ.get("AUTH_ENV", ROOT / ".env"))
 
 
 def get_service_url(service_name: str, default_port: int, env_var: str) -> str:
-    """Resolve the service HTTP base URL.
-
-    1. Uses explicit environment variable override if provided.
-    2. Queries local Docker engine for the container's bridge IP on proxy-tier.
-    3. Falls back to http://{service_name}:{default_port}.
-    """
-    env_val = os.environ.get(env_var)
-    if env_val:
+    """Resolve the service HTTP base URL."""
+    if env_val := os.environ.get(env_var):
         return env_val.rstrip("/")
 
     try:
         from compose import get_container_ip
 
-        ip = get_container_ip(service_name)
-        if ip:
+        if ip := get_container_ip(service_name):
             return f"http://{ip}:{default_port}"
     except Exception:
         pass
