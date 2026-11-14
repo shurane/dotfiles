@@ -206,7 +206,7 @@ def main() -> None:
         scan_bin = next((p for p in candidates if p.exists()), None)
         if scan_bin:
             console.print(f"[bold cyan]Triggering Jellyfin library scan via [white]{scan_bin}[/white]...[/bold cyan]")
-            proc = subprocess.run([str(scan_bin)], check=False)
+            proc = subprocess.run([str(scan_bin)], check=False)  # noqa: S603
             if proc.returncode == 0:
                 console.print("[bold green]✔ Jellyfin library scan triggered successfully.[/bold green]")
             else:

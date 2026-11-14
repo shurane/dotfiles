@@ -157,7 +157,7 @@ def ensure_hardlink(source_path: Path, target_path: Path) -> bool:
     """Create a hard link at target_path pointing to source_path if not already linked."""
     target_path.parent.mkdir(parents=True, exist_ok=True)
     if target_path.exists():
-        if os.stat(source_path).st_ino == os.stat(target_path).st_ino:
+        if source_path.stat().st_ino == target_path.stat().st_ino:
             return False  # Already linked
         target_path.unlink()  # Different file, re-link
 
@@ -167,8 +167,8 @@ def ensure_hardlink(source_path: Path, target_path: Path) -> bool:
 
 def compute_file_md5(file_path: Path) -> str:
     """Compute MD5 hash of a file by streaming 1MB blocks."""
-    hasher = hashlib.md5()
-    with open(file_path, "rb") as f:
+    hasher = hashlib.md5(usedforsecurity=False)
+    with file_path.open("rb") as f:
         while chunk := f.read(1048576):
             hasher.update(chunk)
     return hasher.hexdigest().lower()
@@ -183,9 +183,9 @@ def load_anpanman_metadata() -> dict[str, Any]:
     for p in candidates:
         if p.exists():
             try:
-                with open(p, encoding="utf-8") as f:
+                with p.open(encoding="utf-8") as f:
                     return json.load(f)
-            except Exception:
+            except OSError, json.JSONDecodeError:
                 pass
     return {}
 
@@ -492,8 +492,11 @@ def print_summary_and_stats(
         f"Total duration: {total_elapsed:.1f}s",
     )
 
+    subtitle = f"Dest: [white]{dest_dir}[/white]"
+    if media_dir:
+        subtitle += f" • Media: [white]{media_dir}[/white]"
     console.print()
-    console.print(Panel(summary_table, border_style="cyan", padding=(1, 2)))
+    console.print(Panel(summary_table, border_style="cyan", padding=(1, 2), subtitle=subtitle))
 
     # 2. Itemized Status Table (What was downloaded and what was not)
     manifest_table = Table(

@@ -8,10 +8,9 @@ import json
 import re
 import sys
 import time
-import urllib.parse
-import urllib.request
 from pathlib import Path
 
+import httpx
 import pykakasi
 from bs4 import BeautifulSoup
 
@@ -59,21 +58,19 @@ def scrape_sections(start_section: int = 2, end_section: int = 8, delay: float =
 
     for sec in range(start_section, end_section + 1):
         print(f"Fetching Wikipedia section {sec}...")
-        params = urllib.parse.urlencode(
-            {
-                "action": "parse",
-                "page": WIKI_PAGE,
-                "prop": "text",
-                "section": sec,
-                "format": "json",
-            }
-        )
-        req = urllib.request.Request(f"{API_URL}?{params}", headers=headers)
+        params = {
+            "action": "parse",
+            "page": WIKI_PAGE,
+            "prop": "text",
+            "section": str(sec),
+            "format": "json",
+        }
 
         try:
-            with urllib.request.urlopen(req) as resp:
-                data = json.load(resp)
-        except Exception as e:
+            resp = httpx.get(API_URL, params=params, headers=headers, timeout=30.0)
+            resp.raise_for_status()
+            data = resp.json()
+        except httpx.HTTPError as e:
             print(f"Error fetching section {sec}: {e}", file=sys.stderr)
             continue
 
@@ -141,7 +138,7 @@ def main() -> None:
         return
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    with open(args.output, "w", encoding="utf-8") as f:
+    with args.output.open("w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     print(f"Saved metadata to {args.output}")
 

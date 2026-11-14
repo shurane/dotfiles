@@ -63,12 +63,27 @@ select = [
   "FURB",   # refurb
   "FLY",    # flynt
   "FA",     # flake8-future-annotations
+  "S",      # flake8-bandit (security)
+  "PTH",    # flake8-use-pathlib (modern pathlib)
+  "ARG",    # flake8-unused-arguments
+  "A",      # flake8-builtins (no shadowing)
+  "TC",     # flake8-type-checking (clean import graph)
 ]
 ignore = [
   "ANN401",    # Any allowed where appropriate for dynamic data/JSON
   "T201",      # CLI console prints are intentional in scripts
   "ASYNC240",  # Synchronous Path operations in CLI scripts are intentional
 ]
+
+[tool.ty.rules]
+missing-direct-dependency = "error"
+blanket-ignore-comment = "error"
+unused-ignore-comment = "error"
+unused-type-ignore-comment = "error"
+unused-awaitable = "error"
+redundant-cast = "error"
+disjoint-cast = "error"
+missing-override-decorator = "error"
 
 [tool.ruff.format]
 quote-style = "double"
