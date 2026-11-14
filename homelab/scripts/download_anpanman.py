@@ -31,7 +31,7 @@ from rich.progress import (
 )
 from rich.table import Table
 
-from jellyfin_scan import trigger_scan
+import jellyfin
 
 console = Console()
 
@@ -691,7 +691,7 @@ async def main_async(args: argparse.Namespace) -> int:
         return 1
 
     if args.scan and media_dir:
-        trigger_scan(console=console)
+        jellyfin.refresh()
 
     return 0
 

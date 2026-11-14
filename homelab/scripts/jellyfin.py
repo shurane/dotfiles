@@ -31,9 +31,9 @@ def get_jellyfin_config(env_file: Path | None = None) -> tuple[str, str] | None:
     return None
 
 
-def trigger_scan(console: Console | None = None) -> bool:
+def refresh(console: Console | None = None) -> bool:
     """Trigger a Jellyfin library refresh directly via REST API."""
-    out = console if console is not None else Console()
+    out = console or Console()
     config = get_jellyfin_config()
     if not config:
         out.print(
@@ -45,23 +45,23 @@ def trigger_scan(console: Console | None = None) -> bool:
     base_url, api_key = config
     url = f"{base_url}/Library/Refresh"
     headers = {"Authorization": f'MediaBrowser Token="{api_key}"'}
-    out.print(f"[bold cyan]Triggering Jellyfin library scan at [white]{url}[/white]...[/bold cyan]")
+    out.print(f"[bold cyan]Triggering Jellyfin library refresh at [white]{url}[/white]...[/bold cyan]")
 
     try:
         resp = httpx.post(url, headers=headers, timeout=10.0)
         if resp.status_code == 204:
-            out.print("[bold green]✔ Jellyfin library scan triggered successfully (HTTP 204).[/bold green]")
+            out.print("[bold green]✔ Jellyfin library refresh triggered successfully (HTTP 204).[/bold green]")
             return True
-        out.print(f"[bold red]✖ Jellyfin scan failed with status {resp.status_code}[/bold red]")
+        out.print(f"[bold red]✖ Jellyfin refresh failed with status {resp.status_code}[/bold red]")
     except httpx.HTTPError as exc:
-        out.print(f"[bold red]✖ Jellyfin scan request failed: {exc}[/bold red]")
+        out.print(f"[bold red]✖ Jellyfin refresh request failed: {exc}[/bold red]")
 
     return False
 
 
 def main() -> None:
-    """CLI entry point to trigger a Jellyfin library scan."""
-    success = trigger_scan()
+    """CLI entry point to trigger a Jellyfin library refresh."""
+    success = refresh()
     sys.exit(0 if success else 1)
 
 
