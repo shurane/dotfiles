@@ -46,6 +46,10 @@ def test_resolve_target_host(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("HOMELAB_HOSTNAME", "")
     monkeypatch.setenv("HOMELAB_HOST", "legacy-node.lan")
     assert resolve_target_host() == "legacy-node.lan"
+    monkeypatch.setenv("HOMELAB_HOST", "")
+    with pytest.raises(SystemExit) as exc_info:
+        resolve_target_host()
+    assert exc_info.value.code == 1
 
 
 def test_get_node_name(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -318,25 +322,61 @@ async def test_check_qbittorrent_interface_binding() -> None:
 
 
 def test_homelab_config_validation() -> None:
-    # 1. Valid configuration
-    cfg = HomelabConfig.model_validate({"HOMELAB_PASSWORD": "secret_password", "HOSTNAME_BASE": "example.com"})
+    # 1. Valid configuration with default ssh_user
+    cfg = HomelabConfig.model_validate({
+        "HOMELAB_PASSWORD": "secret_password",
+        "HOSTNAME_BASE": "example.com",
+        "HOMELAB_LAN_SUBNET": "192.168.1.0/24",
+    })
     assert cfg.password == "secret_password"
     assert cfg.base_domain == "example.com"
+    assert cfg.lan_subnet == "192.168.1.0/24"
     assert cfg.username == "username"
+    assert cfg.effective_ssh_user == "username"
 
-    # 2. Missing password
-    with pytest.raises(ValidationError):
-        HomelabConfig.model_validate({"HOSTNAME_BASE": "example.com"})
+    # 2. SSH user override
+    cfg_ssh = HomelabConfig.model_validate({
+        "HOMELAB_PASSWORD": "secret_password",
+        "HOSTNAME_BASE": "example.com",
+        "HOMELAB_LAN_SUBNET": "192.168.1.0/24",
+        "HOMELAB_USERNAME": "alice",
+        "HOMELAB_SSH_USER": "admin",
+    })
+    assert cfg_ssh.username == "alice"
+    assert cfg_ssh.ssh_user == "admin"
+    assert cfg_ssh.effective_ssh_user == "admin"
 
-    # 3. Missing base domain
+    # 3. Missing password
     with pytest.raises(ValidationError):
-        HomelabConfig.model_validate({"HOMELAB_PASSWORD": "secret_password"})
+        HomelabConfig.model_validate({"HOSTNAME_BASE": "example.com", "HOMELAB_LAN_SUBNET": "192.168.1.0/24"})
 
-    # 4. Empty values
+    # 4. Missing base domain
     with pytest.raises(ValidationError):
-        HomelabConfig.model_validate({"HOMELAB_PASSWORD": "", "HOSTNAME_BASE": "example.com"})
+        HomelabConfig.model_validate({"HOMELAB_PASSWORD": "secret_password", "HOMELAB_LAN_SUBNET": "192.168.1.0/24"})
+
+    # 5. Missing LAN subnet
     with pytest.raises(ValidationError):
-        HomelabConfig.model_validate({"HOMELAB_PASSWORD": "secret_password", "HOSTNAME_BASE": ""})
+        HomelabConfig.model_validate({"HOMELAB_PASSWORD": "secret_password", "HOSTNAME_BASE": "example.com"})
+
+    # 6. Empty values
+    with pytest.raises(ValidationError):
+        HomelabConfig.model_validate({
+            "HOMELAB_PASSWORD": "",
+            "HOSTNAME_BASE": "example.com",
+            "HOMELAB_LAN_SUBNET": "192.168.1.0/24",
+        })
+    with pytest.raises(ValidationError):
+        HomelabConfig.model_validate({
+            "HOMELAB_PASSWORD": "secret_password",
+            "HOSTNAME_BASE": "",
+            "HOMELAB_LAN_SUBNET": "192.168.1.0/24",
+        })
+    with pytest.raises(ValidationError):
+        HomelabConfig.model_validate({
+            "HOMELAB_PASSWORD": "secret_password",
+            "HOSTNAME_BASE": "example.com",
+            "HOMELAB_LAN_SUBNET": "",
+        })
 
 
 if __name__ == "__main__":

@@ -49,10 +49,15 @@ class HomelabConfig(BaseModel):
 
     password: str = Field(alias="HOMELAB_PASSWORD", min_length=1)
     base_domain: str = Field(alias="HOSTNAME_BASE", min_length=1)
+    lan_subnet: str = Field(alias="HOMELAB_LAN_SUBNET", min_length=1)
     username: str = Field(default="username", alias="HOMELAB_USERNAME")
     hostname: str | None = Field(default=None, alias="HOMELAB_HOSTNAME")
     ssh_user: str | None = Field(default=None, alias="HOMELAB_SSH_USER")
-    lan_subnet: str | None = Field(default=None, alias="HOMELAB_LAN_SUBNET")
+
+    @property
+    def effective_ssh_user(self) -> str:
+        """Return explicit SSH user override or fall back to homelab username."""
+        return self.ssh_user or self.username
 
 
 @dataclass

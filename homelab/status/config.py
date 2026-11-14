@@ -163,51 +163,31 @@ def classify_route(host: str, ip: str, is_local: bool) -> tuple[str, str]:
 
 
 def resolve_target_connection(explicit_host: str | None = None) -> TargetConnection:
-    """Resolve target connection with dynamic candidate discovery and route classification.
+    """Resolve target connection from explicit flag or HOMELAB_HOSTNAME.
 
-    Candidate fallback order when no explicit host is provided:
-      1. Explicit flag or HOMELAB_HOSTNAME / HOMELAB_HOST env var
-      2. {HOMELAB_NODE_NAME}.{HOMELAB_LAN_DOMAIN} (Direct LAN)
-      3. {HOMELAB_NODE_NAME}.<magicdns_suffix> (Tailscale MagicDNS)
-      4. {HOMELAB_NODE_NAME} (MagicDNS short name)
+    Fails explicitly if no target host is provided or configured.
     """
-    candidates: list[str] = []
     if explicit_host:
-        candidates = [explicit_host]
+        target_host = explicit_host
     elif env_host := (get_env_setting("HOMELAB_HOSTNAME") or get_env_setting("HOMELAB_HOST")):
-        candidates = [env_host]
+        target_host = env_host
     else:
-        node = get_node_name()
-        lan_domain = get_env_setting("HOMELAB_LAN_DOMAIN", "lan")
-        candidates.append(f"{node}.{lan_domain}")
-        suffix = discover_tailscale_suffix()
-        if suffix:
-            candidates.append(f"{node}.{suffix}")
-        candidates.append(node)
+        console.print(
+            "[bold red]Error:[/bold red] Target host not specified. "
+            "Provide --host / -H or set HOMELAB_HOSTNAME in .env"
+        )
+        sys.exit(1)
 
-    selected_host = candidates[0]
-    resolved_ip = ""
+    try:
+        resolved_ip = socket.gethostbyname(target_host)
+    except Exception:
+        resolved_ip = "unknown"
 
-    for cand in candidates:
-        try:
-            resolved_ip = socket.gethostbyname(cand)
-            selected_host = cand
-            break
-        except Exception:
-            continue
-
-    if not resolved_ip:
-        selected_host = candidates[0]
-        try:
-            resolved_ip = socket.gethostbyname(selected_host)
-        except Exception:
-            resolved_ip = "unknown"
-
-    local = is_target_local(selected_host)
-    route, desc = classify_route(selected_host, resolved_ip, local)
+    local = is_target_local(target_host)
+    route, desc = classify_route(target_host, resolved_ip, local)
 
     return TargetConnection(
-        host=selected_host,
+        host=target_host,
         ip=resolved_ip,
         route=route,
         description=desc,
