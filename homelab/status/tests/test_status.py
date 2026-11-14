@@ -40,8 +40,11 @@ def test_is_target_local() -> None:
 
 def test_resolve_target_host(monkeypatch: pytest.MonkeyPatch) -> None:
     assert resolve_target_host("custom.host") == "custom.host"
-    monkeypatch.setenv("HOMELAB_HOST", "mock-node.lan")
+    monkeypatch.setenv("HOMELAB_HOSTNAME", "mock-node.lan")
     assert resolve_target_host() == "mock-node.lan"
+    monkeypatch.setenv("HOMELAB_HOSTNAME", "")
+    monkeypatch.setenv("HOMELAB_HOST", "legacy-node.lan")
+    assert resolve_target_host() == "legacy-node.lan"
 
 
 def test_get_node_name(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -49,8 +52,12 @@ def test_get_node_name(monkeypatch: pytest.MonkeyPatch) -> None:
     assert get_node_name() == "custom-box"
 
     monkeypatch.setenv("HOMELAB_NODE_NAME", "")
-    monkeypatch.setenv("HOMELAB_HOST", "derived-node.home.arpa")
+    monkeypatch.setenv("HOMELAB_HOSTNAME", "derived-node.home.arpa")
     assert get_node_name() == "derived-node"
+
+    monkeypatch.setenv("HOMELAB_HOSTNAME", "")
+    monkeypatch.setenv("HOMELAB_HOST", "fallback-node.lan")
+    assert get_node_name() == "fallback-node"
 
     monkeypatch.setenv("HOMELAB_HOST", "")
     assert get_node_name() in ("m70q", "server")

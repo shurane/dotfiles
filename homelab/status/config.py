@@ -90,10 +90,10 @@ def get_env_setting(key: str, default: str = "") -> str:
 
 
 def get_node_name() -> str:
-    """Resolve homelab node name from HOMELAB_NODE_NAME, HOMELAB_HOST, or default to 'server'."""
+    """Resolve homelab node name from HOMELAB_NODE_NAME, HOMELAB_HOSTNAME, HOMELAB_HOST, or default to 'server'."""
     if node := get_env_setting("HOMELAB_NODE_NAME"):
         return node
-    if host := get_env_setting("HOMELAB_HOST"):
+    if host := (get_env_setting("HOMELAB_HOSTNAME") or get_env_setting("HOMELAB_HOST")):
         return host.split(".")[0]
     return "server"
 
@@ -161,7 +161,7 @@ def resolve_target_connection(explicit_host: str | None = None) -> TargetConnect
     """Resolve target connection with dynamic candidate discovery and route classification.
 
     Candidate fallback order when no explicit host is provided:
-      1. Explicit flag or HOMELAB_HOST env var
+      1. Explicit flag or HOMELAB_HOSTNAME / HOMELAB_HOST env var
       2. {HOMELAB_NODE_NAME}.{HOMELAB_LAN_DOMAIN} (Direct LAN)
       3. {HOMELAB_NODE_NAME}.<magicdns_suffix> (Tailscale MagicDNS)
       4. {HOMELAB_NODE_NAME} (MagicDNS short name)
@@ -169,7 +169,7 @@ def resolve_target_connection(explicit_host: str | None = None) -> TargetConnect
     candidates: list[str] = []
     if explicit_host:
         candidates = [explicit_host]
-    elif env_host := get_env_setting("HOMELAB_HOST"):
+    elif env_host := (get_env_setting("HOMELAB_HOSTNAME") or get_env_setting("HOMELAB_HOST")):
         candidates = [env_host]
     else:
         node = get_node_name()
@@ -245,7 +245,11 @@ def load_env(
 ) -> dict[str, str]:
     """Load homelab .env file from local disk or via remote SFTP fallback."""
     if ssh_user is None:
-        ssh_user = get_env_setting("HOMELAB_SSH_USER") or os.environ.get("USER", "homelab")
+        ssh_user = (
+            get_env_setting("HOMELAB_SSH_USER")
+            or get_env_setting("HOMELAB_USERNAME")
+            or os.environ.get("USER", "homelab")
+        )
 
     # 1. Explicit path
     if env_path and env_path.is_file():
@@ -303,7 +307,11 @@ def _get_ssh_tunnel_client(
     import docker
 
     if ssh_user is None:
-        ssh_user = get_env_setting("HOMELAB_SSH_USER") or os.environ.get("USER", "homelab")
+        ssh_user = (
+            get_env_setting("HOMELAB_SSH_USER")
+            or get_env_setting("HOMELAB_USERNAME")
+            or os.environ.get("USER", "homelab")
+        )
 
     runtime_dir = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp"))
     sock_path = runtime_dir / f"homelab-docker-{os.getuid()}.sock"
@@ -384,7 +392,11 @@ def get_docker_client(
         lan_host = resolve_target_host()
 
     if ssh_user is None:
-        ssh_user = get_env_setting("HOMELAB_SSH_USER") or os.environ.get("USER", "homelab")
+        ssh_user = (
+            get_env_setting("HOMELAB_SSH_USER")
+            or get_env_setting("HOMELAB_USERNAME")
+            or os.environ.get("USER", "homelab")
+        )
 
     import docker
 

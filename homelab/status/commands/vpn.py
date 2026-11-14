@@ -47,7 +47,7 @@ def vpn_command(
         "--lan-host",
         "--host",
         "-H",
-        help="Target host for VPN connection (auto-resolves from HOMELAB_HOST, LAN, or Tailscale)",
+        help="Target host for VPN connection (auto-resolves from HOMELAB_HOSTNAME, LAN, or Tailscale)",
     ),
     timeout: float = typer.Option(
         10.0,
