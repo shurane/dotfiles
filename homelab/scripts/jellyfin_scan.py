@@ -31,7 +31,7 @@ def get_jellyfin_config(env_file: Path | None = None) -> tuple[str, str] | None:
     return None
 
 
-def trigger_jellyfin_scan(console: Console | None = None) -> bool:
+def trigger_scan(console: Console | None = None) -> bool:
     """Trigger a Jellyfin library refresh directly via REST API."""
     out = console if console is not None else Console()
     config = get_jellyfin_config()
@@ -61,7 +61,7 @@ def trigger_jellyfin_scan(console: Console | None = None) -> bool:
 
 def main() -> None:
     """CLI entry point to trigger a Jellyfin library scan."""
-    success = trigger_jellyfin_scan()
+    success = trigger_scan()
     sys.exit(0 if success else 1)
 
 

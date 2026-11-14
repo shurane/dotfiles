@@ -6,7 +6,7 @@ from pathlib import Path
 
 from rich.console import Console
 
-from jellyfin import trigger_jellyfin_scan
+from jellyfin_scan import trigger_scan
 
 console = Console()
 
@@ -200,7 +200,7 @@ def main() -> None:
             overall_exit_code = rc
 
     if args.scan and overall_exit_code == 0:
-        trigger_jellyfin_scan(console=console)
+        trigger_scan(console=console)
 
     sys.exit(overall_exit_code)
 
