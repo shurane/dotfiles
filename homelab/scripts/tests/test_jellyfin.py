@@ -25,10 +25,7 @@ def test_get_jellyfin_config_from_env_file(tmp_path: Path, monkeypatch: pytest.M
 
     fake_env = tmp_path / ".env"
     fake_env.write_text(
-        "# Homelab Environment\n"
-        "\n"
-        'JELLYFIN_API_KEY="file_secret_abc"\n'
-        "HOSTNAME_BASE='cluster.lan'\n",
+        "# Homelab Environment\n\nJELLYFIN_API_KEY=\"file_secret_abc\"\nHOSTNAME_BASE='cluster.lan'\n",
         encoding="utf-8",
     )
 

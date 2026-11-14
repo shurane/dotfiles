@@ -36,7 +36,10 @@ def parse_seasons(season_spec: str) -> list[int]:
         part = part.strip()
         if "-" in part:
             start_s, end_s = part.split("-", 1)
-            seasons.update(range(int(start_s), int(end_s) + 1))
+            start, end = int(start_s), int(end_s)
+            if start > end:
+                raise ValueError(f"Invalid inverted season range: '{part}' (start {start} must be <= end {end})")
+            seasons.update(range(start, end + 1))
         elif part.isdigit():
             seasons.add(int(part))
         else:

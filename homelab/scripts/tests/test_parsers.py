@@ -21,6 +21,8 @@ def test_sync_maruko_parse_range_invalid() -> None:
         parse_maruko_range("abc")
     with pytest.raises(ValueError, match=r"invalid literal for int"):
         parse_maruko_range("1-foo")
+    with pytest.raises(ValueError, match="Invalid inverted range"):
+        parse_maruko_range("10-5")
 
 
 def test_download_anpanman_parse_range_standard() -> None:
@@ -41,6 +43,8 @@ def test_download_anpanman_parse_range_invalid() -> None:
         parse_anpanman_range("xyz")
     with pytest.raises(ValueError, match=r"invalid literal for int"):
         parse_anpanman_range("1-bar")
+    with pytest.raises(ValueError, match="Invalid inverted range"):
+        parse_anpanman_range("20-1")
 
 
 def test_download_numberblocks_parse_seasons_basic() -> None:
@@ -61,3 +65,5 @@ def test_download_numberblocks_parse_seasons_invalid() -> None:
         parse_seasons("foo")
     with pytest.raises(ValueError, match=r"invalid literal for int"):
         parse_seasons("1-bar")
+    with pytest.raises(ValueError, match="Invalid inverted season range"):
+        parse_seasons("5-2")

@@ -38,7 +38,10 @@ def parse_range_spec(range_str: str) -> set[int]:
             continue
         if "-" in part:
             start_str, end_str = part.split("-", 1)
-            result.update(range(int(start_str), int(end_str) + 1))
+            start, end = int(start_str), int(end_str)
+            if start > end:
+                raise ValueError(f"Invalid inverted range: '{part}' (start {start} must be <= end {end})")
+            result.update(range(start, end + 1))
         else:
             result.add(int(part))
     return result
@@ -274,9 +277,7 @@ def main() -> None:
         )
 
     console.print(table)
-    console.print(
-        f"\n[bold]Summary:[/bold] {links_created} hardlinks created, {nfos_written} NFO sidecars written.\n"
-    )
+    console.print(f"\n[bold]Summary:[/bold] {links_created} hardlinks created, {nfos_written} NFO sidecars written.\n")
 
     if args.scan:
         jellyfin.refresh(console=console, dry_run=args.dry_run)

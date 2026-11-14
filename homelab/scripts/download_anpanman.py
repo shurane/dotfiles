@@ -85,7 +85,10 @@ def parse_range_spec(range_str: str) -> set[int]:
         part = part.strip()
         if "-" in part:
             start_s, end_s = part.split("-", 1)
-            numbers.update(range(int(start_s), int(end_s) + 1))
+            start, end = int(start_s), int(end_s)
+            if start > end:
+                raise ValueError(f"Invalid inverted range: '{part}' (start {start} must be <= end {end})")
+            numbers.update(range(start, end + 1))
         elif part.isdigit():
             numbers.add(int(part))
         else:

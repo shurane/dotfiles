@@ -6,3 +6,8 @@ import pytest
 def kakasi_converter() -> pykakasi.kakasi:
     """Session-scoped pykakasi converter to eliminate dictionary reloading overhead."""
     return pykakasi.kakasi()
+
+
+@pytest.fixture
+def anyio_backend() -> str:
+    return "asyncio"
