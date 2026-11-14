@@ -32,11 +32,11 @@
                 "source": "Windows.Terminal.PowershellCore"
             },
             {
+                "commandline": "wsl.exe -d Ubuntu-20.04 --cd ~",
                 "guid": "{07b52e3e-de2c-5db4-bd2d-ba144ed6c273}",
                 "hidden": false,
                 "name": "Ubuntu-20.04",
-                "source": "Windows.Terminal.Wsl",
-                "startingDirectory": "\\\\wsl$\\Ubuntu-20.04\\home\\ehtesh"
+                "source": "Windows.Terminal.Wsl"
             },
             {
                 "commandline": "powershell.exe",
