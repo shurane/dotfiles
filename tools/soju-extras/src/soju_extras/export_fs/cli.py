@@ -197,7 +197,7 @@ class SojuFSExporter:
                 if entry.backup_path is not None:
                     backup = self._contained_path(entry.backup_path)
                     if backup.exists():
-                        os.replace(backup, path)
+                        backup.replace(path)
                     # No backup means replacement had not started, or a previous
                     # recovery already restored the original via atomic rename.
                     elif not path.exists() or path.stat().st_size != entry.size:
@@ -272,7 +272,8 @@ class SojuFSExporter:
             lines = buffers[path]
             durable_mkdir(path.parent)
             if entry.backup_path is not None:
-                assert entry.replacement_path is not None and entry.sort_path is not None
+                if entry.replacement_path is None or entry.sort_path is None:
+                    raise RuntimeError("Missing replacement or sort path for backup entry")
                 backup = self._contained_path(entry.backup_path)
                 replacement = self._contained_path(entry.replacement_path)
                 sort_file = self._contained_path(entry.sort_path)
@@ -286,10 +287,10 @@ class SojuFSExporter:
                     compress=self.compress,
                     ordered=orders[path].ordered,
                 )
-                os.chmod(replacement, stat.S_IMODE(path.stat().st_mode))
+                replacement.chmod(stat.S_IMODE(path.stat().st_mode))
                 with replacement.open("rb") as stream:
                     os.fsync(stream.fileno())
-                os.replace(replacement, path)
+                replacement.replace(path)
             else:
                 write_log(path, lines, compress=self.compress, append=True)
             sync_directory(path.parent)
@@ -322,7 +323,8 @@ class SojuFSExporter:
             saved = ExportIdentity.model_validate_json(identity_path.read_bytes())
             if saved != identity:
                 raise ValueError(
-                    "Database, checkpoint path or compression changed; use the original options or a fresh output directory"
+                    "Database, checkpoint path or compression changed; "
+                    "use the original options or a fresh output directory"
                 )
         self._recover()
         checkpoint = self.get_last_synced_id()

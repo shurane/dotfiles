@@ -2,7 +2,6 @@
 
 import argparse
 import hashlib
-import os
 from compression import zstd
 from contextlib import ExitStack
 from pathlib import Path
@@ -88,7 +87,7 @@ def prepare_history(
     Memory is bounded by a source file's number of months, not its record count.
     """
     boundary = PlainDateTime.parse_iso(since + "T00:00:00")
-    boundary.assume_tz(timezone, disambiguate="raise")
+    boundary.assume_tz(timezone, disambiguation="raise")
     if since != str(boundary.date()) or not since.endswith("-01"):
         raise ValueError("--since must be the first day of a month, YYYY-MM-01")
     if output.exists() or output.is_symlink():
@@ -169,7 +168,7 @@ def prepare_history(
         (root / "manifest.json").write_text(manifest.model_dump_json(indent=2) + "\n")
         if output.exists() or output.is_symlink():
             raise FileExistsError(output)
-        os.rename(root, output)
+        root.rename(output)
     return manifest
 
 

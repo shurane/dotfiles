@@ -59,7 +59,7 @@ def atomic_write(path: Path, content: str) -> None:
         stream.write(content)
         stream.flush()
         os.fsync(stream.fileno())
-        os.replace(stream.name, path)
+        Path(stream.name).replace(path)
         sync_directory(path.parent)
 
 

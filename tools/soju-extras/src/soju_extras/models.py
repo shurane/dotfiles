@@ -105,7 +105,7 @@ class WeeChatLogRecord(BaseModel):
             sender_hostmask = f"{sender_nick}!~user@unknown"
         else:
             clean_prefix = prefix.lstrip("@+~&%")
-            if content.startswith("/me ") or content.startswith("\x01ACTION "):
+            if content.startswith(("/me ", "\x01ACTION ")):
                 kind = MessageKind.ACTION
                 sender_nick = clean_prefix
                 clean_text = (

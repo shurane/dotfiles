@@ -224,12 +224,12 @@ def test_before_cutoff_excludes_post_cutover_log_messages(soju_db: Path, tmp_pat
         "--before",
         "2026-09-30T05:00:00-05:00",
     ]
-    assert main(args + ["--dry-run"]) == 0
+    assert main([*args, "--dry-run"]) == 0
     assert main(args) == 0
     with closing(sqlite3.connect(soju_db)) as db:
         assert db.execute("SELECT text FROM Message").fetchall() == [("old",)]
     assert main(args) == 0
-    assert main(args[:-1] + ["not-a-time"]) == 2
+    assert main([*args[:-1], "not-a-time"]) == 2
 
 
 def test_since_is_inclusive_and_combines_with_before(soju_db: Path, tmp_path: Path) -> None:
@@ -252,7 +252,7 @@ def test_since_is_inclusive_and_combines_with_before(soju_db: Path, tmp_path: Pa
         "--before",
         "2026-07-01T07:00:02Z",
     ]
-    assert main(args + ["--dry-run"]) == 0
+    assert main([*args, "--dry-run"]) == 0
     assert main(args) == 0
     assert main(args) == 0
     with closing(sqlite3.connect(soju_db)) as db:
@@ -260,7 +260,7 @@ def test_since_is_inclusive_and_combines_with_before(soju_db: Path, tmp_path: Pa
             ("boundary",),
             ("new",),
         ]
-    assert main(args[:-1] + ["2026-07-01T07:00:00Z"]) == 2
+    assert main([*args[:-1], "2026-07-01T07:00:00Z"]) == 2
 
 
 def test_server_and_core_logs_are_explicitly_excluded(

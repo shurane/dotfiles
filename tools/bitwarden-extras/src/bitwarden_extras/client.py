@@ -1,13 +1,15 @@
 """Bitwarden REST API and CLI client."""
 
+import contextlib
 import json
 import os
 import shutil
 import subprocess
 import urllib.error
 import urllib.request
-from datetime import UTC, datetime
 from typing import Any
+
+from whenever import Instant
 
 from bitwarden_extras.models import clean_str
 
@@ -55,12 +57,12 @@ class BitwardenClient:
         """Issue an HTTP request to the local bw serve daemon."""
         data = json.dumps(payload).encode("utf-8") if payload is not None else None
         headers = {"Content-Type": "application/json"} if payload is not None else {}
-        req = urllib.request.Request(url, data=data, headers=headers, method=method)
+        req = urllib.request.Request(url, data=data, headers=headers, method=method)  # noqa: S310
         try:
-            with urllib.request.urlopen(req, timeout=timeout) as resp:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:  # noqa: S310
                 raw = resp.read().decode("utf-8")
                 return json.loads(raw) if raw else {}
-        except urllib.error.URLError, TimeoutError, KeyError, json.JSONDecodeError, OSError:
+        except (urllib.error.URLError, TimeoutError, KeyError, json.JSONDecodeError, OSError):
             return None
 
     def run_bw_cli(self, args: list[str], check: bool = False) -> subprocess.CompletedProcess[str]:
@@ -69,7 +71,7 @@ class BitwardenClient:
         if not bw_bin:
             raise CliNotFoundError("Bitwarden CLI ('bw') executable not found in PATH.")
 
-        res = subprocess.run(
+        res = subprocess.run(  # noqa: S603
             [bw_bin, *args],
             capture_output=True,
             text=True,
@@ -129,16 +131,14 @@ class BitwardenClient:
 
         return None
 
-    def get_last_sync(self, base_url: str) -> datetime | None:
+    def get_last_sync(self, base_url: str) -> Instant | None:
         """Return the UTC timestamp of the last vault sync."""
         res = self.http_request(f"{base_url}/status", timeout=1.0)
         if res:
             raw_sync = res.get("data", {}).get("template", {}).get("lastSync")
             if raw_sync:
-                try:
-                    return datetime.fromisoformat(raw_sync)
-                except ValueError:
-                    pass
+                with contextlib.suppress(ValueError):
+                    return Instant.parse_iso(raw_sync)
         return None
 
     def sync(self, server_url: str | None = None) -> bool:
@@ -208,7 +208,7 @@ class BitwardenClient:
             if not no_sync and not should_sync:
                 last_sync_dt = self.get_last_sync(active_url)
                 if last_sync_dt:
-                    age_seconds = (datetime.now(UTC) - last_sync_dt).total_seconds()
+                    age_seconds = (Instant.now() - last_sync_dt).total("seconds")
                     if age_seconds > auto_sync_seconds:
                         should_sync = True
 
@@ -220,7 +220,7 @@ class BitwardenClient:
                 last_sync_dt = self.get_last_sync(active_url)
                 sync_info = ""
                 if last_sync_dt:
-                    age = int((datetime.now(UTC) - last_sync_dt).total_seconds())
+                    age = int((Instant.now() - last_sync_dt).total("seconds"))
                     sync_info = (
                         f" (synced {age}s ago)" if age < 60 else f" (synced {age // 60}m ago)"
                     )

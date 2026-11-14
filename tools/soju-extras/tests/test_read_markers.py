@@ -78,7 +78,7 @@ def test_cli_validates_markers_before_messages_and_dry_run_does_not_write(
     with closing(sqlite3.connect(soju_db)) as db:
         assert db.execute("SELECT count(*) FROM Message").fetchone()[0] == 0
     source.write_text(document(("libera", "#python", "2026-09-29T00:00:00Z")))
-    assert main(args + ["--dry-run"]) == 0
+    assert main([*args, "--dry-run"]) == 0
     with closing(sqlite3.connect(soju_db)) as db:
         assert db.execute("SELECT count(*) FROM ReadReceipt").fetchone()[0] == 0
     assert main(args) == 0

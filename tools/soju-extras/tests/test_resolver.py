@@ -16,9 +16,9 @@ def test_resolver_existing_identities(soju_db: Path) -> None:
         assert resolver.resolve_network(1, "irc.libera.chat:6697") == 1
         target = resolver.get_or_create_target(1, "#new")
         assert resolver.get_or_create_target(1, "#new") == target
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="does not exist"):
             resolver.resolve_user("unknown")
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="must identify one existing network"):
             resolver.resolve_network(1, "unknown")
 
 

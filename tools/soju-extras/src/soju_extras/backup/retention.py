@@ -1,8 +1,9 @@
 """Keep recent daily, weekly and monthly recovery points; ignore unowned directories."""
 
 import shutil
-from datetime import date
 from pathlib import Path
+
+from whenever import Date
 
 from soju_extras.backup.models import Receipt, Retention, snapshot_name
 from soju_extras.backup.snapshot import MANIFEST, RECEIPT, sha256
@@ -10,10 +11,10 @@ from soju_extras.export_fs.storage import export_lock, sync_directory
 from soju_extras.time import parse_timestamp
 
 
-def snapshot_date(name: str, timezone: str) -> date:
+def snapshot_date(name: str, timezone: str) -> Date:
     snapshot_name(name)
     stamp = f"{name[:13]}:{name[13:15]}:{name[15:17]}Z"
-    return date.fromisoformat(str(parse_timestamp(stamp).to_tz(timezone).date()))
+    return parse_timestamp(stamp).to_tz(timezone).date()
 
 
 def retained(names: list[str], policy: Retention) -> set[str]:
@@ -27,8 +28,8 @@ def retained(names: list[str], policy: Retention) -> set[str]:
     counts = (policy.daily, policy.weekly, policy.monthly)
     for name in sorted(names, reverse=True):
         day = snapshot_date(name, policy.timezone)
-        iso_year, iso_week, _ = day.isocalendar()
-        buckets = ((day.year, day.month, day.day), (iso_year, iso_week), (day.year, day.month))
+        iso = day.iso_week_date()
+        buckets = ((day.year, day.month, day.day), (iso.year, iso.week), (day.year, day.month))
         for bucket, visited, count in zip(buckets, seen, counts, strict=True):
             if bucket not in visited and len(visited) < count:
                 visited.add(bucket)

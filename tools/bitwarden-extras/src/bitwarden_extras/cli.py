@@ -144,14 +144,16 @@ def export_cmd(
             json.dump(output_dict, f, indent=2)
 
     console.print(
-        f"\n[bold green]✓ Success![/bold green] Extracted metadata for [bold]{metadata.total_items}[/bold] items across [bold]{len(metadata.folders)}[/bold] folders."
+        f"\n[bold green]✓ Success![/bold green] Extracted metadata for "
+        f"[bold]{metadata.total_items}[/bold] items across [bold]{len(metadata.folders)}[/bold] folders."
     )
     console.print(f"[dim]Saved to: {output_path}[/dim]")
     if include_notes:
         console.print("[yellow]Notice: Notes are included in this export.[/yellow]")
     else:
         console.print(
-            "[dim green]Verification: NO passwords, TOTP keys, notes, or custom fields are present in this file.[/dim green]"
+            "[dim green]Verification: NO passwords, TOTP keys, notes, "
+            "or custom fields are present in this file.[/dim green]"
         )
 
 
@@ -217,7 +219,7 @@ def query_cmd(
             err_console.print(f"[bold red]Error:[/bold red] File not found: {file_path}")
             sys.exit(1)
         console.print(f"[dim]Querying {file_path.name}...[/dim]")
-        with open(file_path, encoding="utf-8") as f:
+        with file_path.open(encoding="utf-8") as f:
             data = yaml.safe_load(f) if file_path.suffix in (".yaml", ".yml") else json.load(f)
             items_to_load = data.get("items", [])
     else:
@@ -245,7 +247,8 @@ def query_cmd(
                 new_meta = process_vault(f_data, i_data, include_notes=True)
                 new_conn = build_sqlite_db(new_meta.items)
                 console.print(
-                    f"[bold green]✓ REPL database refreshed with latest cloud data ({new_meta.total_items} items).[/bold green]\n"
+                    "[bold green]✓ REPL database refreshed with latest cloud data "
+                    f"({new_meta.total_items} items).[/bold green]\n"
                 )
                 return new_conn
             except Exception as ex:
@@ -347,7 +350,8 @@ def clean_blank_notes_cmd(
             # Critical safety guard: abort if full item could not be retrieved
             if not item_obj or item_obj.get("id") != item_id:
                 err_console.print(
-                    f"\n[bold red]Warning:[/bold red] Failed to fetch full item object for {item_id}; skipping to prevent data loss."
+                    f"\n[bold red]Warning:[/bold red] Failed to fetch full item object for {item_id}; "
+                    "skipping to prevent data loss."
                 )
                 progress.advance(task)
                 continue

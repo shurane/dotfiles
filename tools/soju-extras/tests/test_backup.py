@@ -6,14 +6,13 @@ import sqlite3
 import subprocess
 from compression import zstd
 from contextlib import closing
-from datetime import date, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Literal
 
 import pytest
 from pydantic import ValidationError
-from whenever import Instant
+from whenever import Date, Instant
 
 from soju_extras.backup.models import (
     BackupConfig,
@@ -180,7 +179,7 @@ def test_snapshot_name_validation(value: str) -> None:
 
 
 def test_retention_calendar_buckets_timezone_and_sparse_schedule() -> None:
-    names = [stamp(str(date(2026, 1, 1) + timedelta(days=i))) for i in range(274)]
+    names = [stamp(Date(2026, 1, 1).add(days=i).format_iso()) for i in range(274)]
     keep = retained(names, Retention())
     assert set(names[-7:]) <= keep
     assert len(keep) <= 17
@@ -294,7 +293,7 @@ def test_cli_failure_exit_code(tmp_path: Path) -> None:
 
 def test_config_boundary_rejects_overlapping_paths(config: BackupConfig) -> None:
     data = json.loads(config.model_dump_json())
-    data["sources"].append(dict(source="/outside", destination="soju/logs/nested"))
+    data["sources"].append({"source": "/outside", "destination": "soju/logs/nested"})
     with pytest.raises(ValidationError, match="overlap"):
         BackupConfig.model_validate_json(json.dumps(data))
 

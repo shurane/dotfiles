@@ -221,7 +221,10 @@ class SojuLogImporter:
                             """
                             INSERT INTO Message (target, time, raw, sender, text)
                             SELECT ?, i.time, i.raw, i.sender, i.text
-                            FROM (SELECT *, row_number() OVER (PARTITION BY time, raw ORDER BY seq) AS occurrence FROM incoming) i
+                            FROM (
+                                SELECT *, row_number() OVER (PARTITION BY time, raw ORDER BY seq) AS occurrence
+                                FROM incoming
+                            ) i
                             JOIN existing e ON e.time = i.time AND e.raw = i.raw
                             WHERE i.occurrence > e.count ORDER BY i.seq
                         """,
@@ -249,18 +252,18 @@ class SojuLogImporter:
     def _build_raw_irc(self, rec: WeeChatLogRecord, iso_ts: str, target: str) -> str:
         if rec.kind == MessageKind.PRIVMSG:
             return f"@time={iso_ts} :{rec.sender_hostmask} PRIVMSG {target} :{rec.clean_text}"
-        elif rec.kind == MessageKind.ACTION:
+        if rec.kind == MessageKind.ACTION:
             return (
                 f"@time={iso_ts} :{rec.sender_hostmask} PRIVMSG {target} "
                 f":\x01ACTION {rec.clean_text}\x01"
             )
-        elif rec.kind == MessageKind.JOIN:
+        if rec.kind == MessageKind.JOIN:
             return f"@time={iso_ts} :{rec.sender_hostmask} JOIN {target}"
-        elif rec.kind == MessageKind.PART:
+        if rec.kind == MessageKind.PART:
             return f"@time={iso_ts} :{rec.sender_hostmask} PART {target} :{rec.clean_text}"
-        elif rec.kind == MessageKind.QUIT:
+        if rec.kind == MessageKind.QUIT:
             return f"@time={iso_ts} :{rec.sender_hostmask} QUIT :{rec.clean_text}"
-        elif rec.kind == MessageKind.NOTICE:
+        if rec.kind == MessageKind.NOTICE:
             return f"@time={iso_ts} :{rec.sender_hostmask} NOTICE {target} :{rec.clean_text}"
         return f"@time={iso_ts} :* NOTICE {target} :{rec.clean_text}"
 

@@ -26,15 +26,15 @@ from soju_extras.export_fs.storage import atomic_write, export_lock, sync_direct
 
 
 def run(argv: Sequence[str], *, env: dict[str, str] | None = None) -> str:
-    return subprocess.run(argv, check=True, text=True, stdout=subprocess.PIPE, env=env).stdout
+    return subprocess.run(argv, check=True, text=True, stdout=subprocess.PIPE, env=env).stdout  # noqa: S603
 
 
 def flush_weechat(config: BackupConfig) -> None:
     checkpoint = config.weechat
     if checkpoint is None:
         return
-    result = subprocess.run(
-        ["pgrep", "-u", checkpoint.user, "-x", "weechat"], stdout=subprocess.DEVNULL, check=False
+    result = subprocess.run(  # noqa: S603
+        ["pgrep", "-u", checkpoint.user, "-x", "weechat"], stdout=subprocess.DEVNULL, check=False  # noqa: S607
     )
     if result.returncode == 1:
         return  # Saved configuration remains available while the client is stopped.
@@ -162,7 +162,7 @@ def create_backup(config: BackupConfig) -> Path:
             packed = Path(temporary) / "snapshot"
             pack_tree(raw, packed, name, previous=config.root / previous if previous else None)
             verify_snapshot(packed)
-            os.rename(packed, destination)
+            packed.rename(destination)
             sync_directory(config.root)
         if config.remote:
             deliver(destination, config.remote, previous)
@@ -172,5 +172,5 @@ def create_backup(config: BackupConfig) -> Path:
         if config.success_file:
             atomic_write(config.success_file, name + "\n")
         # Local pruning follows verified remote completion; a failed transfer cannot prune.
-        prune_completed(config.root, names + [name], config.retention, apply=True)
+        prune_completed(config.root, [*names, name], config.retention, apply=True)
         return destination

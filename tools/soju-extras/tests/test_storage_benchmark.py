@@ -7,7 +7,6 @@ from compression import zstd
 from pathlib import Path
 
 import pytest
-
 from benchmarks.storage import Options, main, measure
 
 

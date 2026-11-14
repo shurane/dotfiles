@@ -164,7 +164,7 @@ def sanitize_item(
         item = RawCipherItem.model_validate(item)
 
     raw_name = clean_str(item.name)
-    name = raw_name if raw_name else None
+    name = raw_name or None
 
     folder = folder_map.get(item.folderId) if item.folderId else None
 

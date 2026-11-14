@@ -166,7 +166,7 @@ def pack_file(
     after = source.stat()
     if (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
         raise ValueError(f"Source changed while packing: {source}")
-    os.chmod(destination, 0o600)
+    destination.chmod(0o600)
     os.utime(destination, ns=(before.st_atime_ns, before.st_mtime_ns))
     with destination.open("rb") as stream:
         os.fsync(stream.fileno())
@@ -207,7 +207,7 @@ def pack_tree(
         info = path.lstat()
         mode = stat.S_IMODE(info.st_mode)
         if path.is_symlink():
-            entries.append(SymlinkEntry(path=relative, mode=mode, target=os.readlink(path)))
+            entries.append(SymlinkEntry(path=relative, mode=mode, target=str(path.readlink())))
         elif path.is_dir():
             entries.append(DirectoryEntry(path=relative, mode=mode))
         elif path.is_file():
@@ -306,5 +306,5 @@ def restore_snapshot(root: Path, destination: Path) -> None:
         for entry in reversed(manifest.entries):
             if isinstance(entry, DirectoryEntry):
                 (stage / entry.path).chmod(entry.mode)
-        os.rename(stage, destination)
+        stage.rename(destination)
         sync_directory(destination.parent)

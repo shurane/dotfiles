@@ -1,15 +1,18 @@
 """In-memory SQLite database engine and interactive REPL."""
 
+import contextlib
 import json
 import sqlite3
 from collections.abc import Callable, Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
 from bitwarden_extras.models import SanitizedItem, clean_str
+
+if TYPE_CHECKING:
+    from rich.console import Console
 
 
 def build_sqlite_db(items: Sequence[SanitizedItem | dict[str, Any]]) -> sqlite3.Connection:
@@ -134,30 +137,28 @@ def run_repl(
         Panel(
             "[bold green]Bitwarden In-Memory SQLite REPL[/bold green]\n"
             "Tables/Views: [cyan]vault[/cyan], [cyan]items[/cyan]\n"
-            "Columns: [dim]name, folder, type, username, domains, notes, favorite, id, revision_date, creation_date, raw_json[/dim]\n"
+            "Columns: [dim]name, folder, type, username, domains, notes, "
+            "favorite, id, revision_date, creation_date, raw_json[/dim]\n"
             "Helper Flags in 'vault': [dim]is_unfiled (1/0), is_unnamed (1/0)[/dim]\n"
-            "Commands: [bold cyan].sync[/bold cyan] (refresh from cloud), [bold cyan].schema[/bold cyan], [bold cyan]exit[/bold cyan], [bold cyan]quit[/bold cyan]",
+            "Commands: [bold cyan].sync[/bold cyan] (refresh from cloud), "
+            "[bold cyan].schema[/bold cyan], [bold cyan]exit[/bold cyan], [bold cyan]quit[/bold cyan]",
             border_style="cyan",
         )
     )
 
-    try:
+    with contextlib.suppress(ImportError):
         import atexit
         import readline
         from pathlib import Path
 
         hist_dir = Path.home() / ".local" / "state" / "bw-vault"
         hist_file = hist_dir / "history"
-        try:
+        with contextlib.suppress(OSError):
             hist_dir.mkdir(parents=True, exist_ok=True)
             if hist_file.exists():
                 readline.read_history_file(str(hist_file))
             readline.set_history_length(1000)
             atexit.register(readline.write_history_file, str(hist_file))
-        except OSError:
-            pass
-    except ImportError:
-        pass
 
     current_conn = conn
     while True:
@@ -177,12 +178,14 @@ def run_repl(
                 continue
             if query_str.lower() in (".schema", "schema"):
                 console.print(
-                    "[dim]CREATE TABLE items (name, folder, type, username, domains, notes, favorite, id, revision_date, creation_date, raw_json);\n"
-                    "CREATE VIEW vault AS SELECT *, (folder IS NULL) AS is_unfiled, (name IS NULL OR is_blank(name)) AS is_unnamed FROM items;[/dim]\n"
+                    "[dim]CREATE TABLE items (name, folder, type, username, domains, "
+                    "notes, favorite, id, revision_date, creation_date, raw_json);\n"
+                    "CREATE VIEW vault AS SELECT *, (folder IS NULL) AS is_unfiled, "
+                    "(name IS NULL OR is_blank(name)) AS is_unnamed FROM items;[/dim]\n"
                 )
                 continue
             execute_sql(current_conn, query_str, console=console)
-        except KeyboardInterrupt, EOFError:
+        except (KeyboardInterrupt, EOFError):
             console.print("\n[dim]Exiting...[/dim]")
             break
         except sqlite3.Error as e:
