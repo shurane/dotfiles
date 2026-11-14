@@ -13,6 +13,7 @@ dependencies = [
 
 [project.scripts]
 homelab-status = "main:app"
+status = "main:app"
 
 [build-system]
 requires = ["hatchling"]
