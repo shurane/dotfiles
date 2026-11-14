@@ -1,0 +1,78 @@
+[project]
+name = "homelab-scripts"
+version = "0.1.0"
+requires-python = "==3.14.*"
+dependencies = [
+  "anyio>=4.8.0",
+  "beautifulsoup4>=4.12.0",
+  "httpx>=0.28.1",
+  "pykakasi>=2.3.0",
+  "rich>=13.9.4",
+  "yt-dlp>=2026.10.26",
+  "yt-dlp-ejs>=0.8.0",
+]
+
+[project.scripts]
+download-anpanman = "download_anpanman:main"
+download-numberblocks = "download_numberblocks:main"
+build-anpanman-metadata = "build_anpanman_metadata:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+only-include = [
+  "download_anpanman.py",
+  "download_numberblocks.py",
+  "build_anpanman_metadata.py",
+  "anpanman_metadata.json",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0.0",
+  "ruff>=0.16.1",
+  "ty>=0.0.95",
+]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 120
+src = ["."]
+
+[tool.ruff.lint]
+select = [
+  "E",      # pycodestyle errors
+  "W",      # pycodestyle warnings
+  "F",      # Pyflakes
+  "I",      # isort
+  "UP",     # pyupgrade (Python 3.14 idioms)
+  "B",      # flake8-bugbear
+  "SIM",    # flake8-simplify
+  "C4",     # flake8-comprehensions
+  "PIE",    # flake8-pie
+  "RUF",    # Ruff-specific rules
+  "ANN",    # flake8-annotations
+  "ASYNC",  # flake8-async
+  "PT",     # flake8-pytest-style
+  "RET",    # flake8-return
+  "RSE",    # flake8-raise
+  "SLF",    # flake8-self
+  "PERF",   # Perflint
+  "FURB",   # refurb
+  "FLY",    # flynt
+  "FA",     # flake8-future-annotations
+]
+ignore = [
+  "ANN401",    # Any allowed where appropriate for dynamic data/JSON
+  "T201",      # CLI console prints are intentional in scripts
+  "ASYNC240",  # Synchronous Path operations in CLI scripts are intentional
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true

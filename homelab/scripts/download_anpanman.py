@@ -1,27 +1,17 @@
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = "==3.14.*"
-# dependencies = [
-#     "httpx>=0.28.1",
-#     "anyio>=4.8.0",
-#     "rich>=13.9.4",
-# ]
-# ///
-
 from __future__ import annotations
 
 import argparse
 import asyncio
-from dataclasses import dataclass
-from enum import Enum, auto
 import hashlib
 import json
 import os
-from pathlib import Path
 import re
 import sys
 import time
-from typing import Any, Sequence
+from dataclasses import dataclass
+from enum import Enum, auto
+from pathlib import Path
+from typing import Any
 from urllib.parse import quote
 
 import anyio
@@ -40,7 +30,6 @@ from rich.progress import (
     TransferSpeedColumn,
 )
 from rich.table import Table
-from rich.text import Text
 
 console = Console()
 
@@ -194,7 +183,7 @@ def load_anpanman_metadata() -> dict[str, Any]:
     for p in candidates:
         if p.exists():
             try:
-                with open(p, "r", encoding="utf-8") as f:
+                with open(p, encoding="utf-8") as f:
                     return json.load(f)
             except Exception:
                 pass
@@ -206,7 +195,7 @@ def format_media_filename(file_info: EpisodeFile, metadata: dict[str, Any]) -> s
     key = f"{file_info.episode_number:04d}{file_info.segment or 'a'}"
     entry = metadata.get(key)
     title = entry.get("title_ro", "") if entry else ""
-    seg_str = file_info.segment if file_info.segment else ""
+    seg_str = file_info.segment or ""
     if title:
         return f"Soreike! Anpanman - S{file_info.season:02d}E{file_info.episode_number:02d}{seg_str} - {title}.mp4"
     return f"Soreike! Anpanman - S{file_info.season:02d}E{file_info.episode_number:02d}{seg_str}.mp4"
@@ -233,7 +222,7 @@ def ensure_media_link_and_nfo(
     if not nfo_path.exists() or nfo_path.stat().st_size == 0:
         nfo_content = f"""<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <episodedetails>
-  <title>{title or link_filename.removesuffix('.mp4')}</title>
+  <title>{title or link_filename.removesuffix(".mp4")}</title>
   <originaltitle>{title_ja}</originaltitle>
   <season>{file_info.season}</season>
   <episode>{file_info.episode_number}</episode>
@@ -273,7 +262,8 @@ async def download_episode_with_retry(
                 if actual_md5 != file_info.md5.lower():
                     progress.console.print(
                         f"[dim]{progress_tag}[/dim][bold red]⚠ [CORRUPT][/bold red] "
-                        f"[yellow]{file_info.name} MD5 {actual_md5} != expected {file_info.md5}. Re-downloading.[/yellow]"
+                        f"[yellow]{file_info.name} MD5 {actual_md5} != expected {file_info.md5}. "
+                        "Re-downloading.[/yellow]"
                     )
                     final_path.unlink()
                 else:
@@ -285,9 +275,11 @@ async def download_episode_with_retry(
                     link_filename = ensure_media_link_and_nfo(final_path, media_dir, file_info, metadata)
                     link_display = f" • [dim cyan]🔗 {link_filename}[/dim cyan]"
 
+                size_mb = actual_size / (1024**2)
                 progress.console.print(
                     f"[dim]{progress_tag}[/dim][bold blue]• [NO-OP][/bold blue] "
-                    f"[white]{file_info.name}[/white] [dim]({actual_size / (1024**2):.1f} MB already complete)[/dim]{checksum_note}{link_display}"
+                    f"[white]{file_info.name}[/white] [dim]({size_mb:.1f} MB already complete)[/dim]"
+                    f"{checksum_note}{link_display}"
                 )
                 progress.advance(overall_task_id, advance=file_info.size)
                 return DownloadResult(
@@ -298,7 +290,8 @@ async def download_episode_with_retry(
                 )
         else:
             progress.console.print(
-                f"[dim]{progress_tag}[/dim][yellow]⚠ [MISMATCH] {file_info.name} size {actual_size} != expected {file_info.size}. Re-downloading.[/yellow]"
+                f"[dim]{progress_tag}[/dim][yellow]⚠ [MISMATCH] {file_info.name} "
+                f"size {actual_size} != expected {file_info.size}. Re-downloading.[/yellow]"
             )
             final_path.unlink()
 
@@ -321,7 +314,8 @@ async def download_episode_with_retry(
                 link_display = f" • [dim cyan]🔗 {link_filename}[/dim cyan]"
 
             progress.console.print(
-                f"[dim]{progress_tag}[/dim][bold green]✔ [RECOVERED][/bold green] [white]{file_info.name}[/white] .part file promoted.{link_display}"
+                f"[dim]{progress_tag}[/dim][bold green]✔ [RECOVERED][/bold green] "
+                f"[white]{file_info.name}[/white] .part file promoted.{link_display}"
             )
             progress.advance(overall_task_id, advance=file_info.size)
             return DownloadResult(
@@ -382,14 +376,14 @@ async def download_episode_with_retry(
 
             final_part_size = part_path.stat().st_size
             if final_part_size != file_info.size:
-                raise IOError(f"Downloaded size {final_part_size} != expected {file_info.size}")
+                raise OSError(f"Downloaded size {final_part_size} != expected {file_info.size}")
 
             # Verify MD5 on freshly completed download before promotion
             if file_info.md5:
                 actual_md5 = compute_file_md5(part_path)
                 if actual_md5 != file_info.md5.lower():
                     part_path.unlink()
-                    raise IOError(f"MD5 mismatch: computed {actual_md5} != expected {file_info.md5}")
+                    raise OSError(f"MD5 mismatch: computed {actual_md5} != expected {file_info.md5}")
 
             part_path.rename(final_path)
             progress.remove_task(file_task)
@@ -403,10 +397,11 @@ async def download_episode_with_retry(
                 link_display = f" • [dim cyan]🔗 {link_filename}[/dim cyan]"
 
             status_text = "RESUMED & COMPLETED" if is_resume else "DONE"
+            size_mb = file_info.size / (1024**2)
             progress.console.print(
                 f"[dim]{progress_tag}[/dim][bold green]✔ [{status_text}][/bold green] "
                 f"[bold white]{file_info.name}[/bold white] "
-                f"[green]({file_info.size / (1024**2):.1f} MB in {duration:.1f}s, {speed_mb:.2f} MB/s)[/green]{link_display}"
+                f"[green]({size_mb:.1f} MB in {duration:.1f}s, {speed_mb:.2f} MB/s)[/green]{link_display}"
             )
 
             return DownloadResult(
@@ -427,7 +422,8 @@ async def download_episode_with_retry(
                 await anyio.sleep(2**attempt)
 
     progress.console.print(
-        f"[dim]{progress_tag}[/dim][bold red]✖ [FAILED][/bold red] [red]{file_info.name} after {max_retries} attempts: {last_error}[/red]"
+        f"[dim]{progress_tag}[/dim][bold red]✖ [FAILED][/bold red] "
+        f"[red]{file_info.name} after {max_retries} attempts: {last_error}[/red]"
     )
     return DownloadResult(
         file=file_info,
@@ -445,7 +441,8 @@ def print_summary_and_stats(
     total_elapsed: float,
 ) -> None:
     """Print a rich summary panel, stats table, and itemized breakdown of downloaded vs skipped files."""
-    completed_results = [r for r in results if r.status in (DownloadStatus.COMPLETED, DownloadStatus.RESUMED_AND_COMPLETED)]
+    completed_statuses = (DownloadStatus.COMPLETED, DownloadStatus.RESUMED_AND_COMPLETED)
+    completed_results = [r for r in results if r.status in completed_statuses]
     noop_results = [r for r in results if r.status == DownloadStatus.NO_OP]
     failed_results = [r for r in results if r.status == DownloadStatus.FAILED]
 
@@ -519,7 +516,7 @@ def print_summary_and_stats(
             metrics = f"{r.duration_seconds:.1f}s @ {speed:.1f} MB/s"
         elif r.status == DownloadStatus.RESUMED_AND_COMPLETED:
             status_badge = "[bold yellow]↻ Resumed[/bold yellow]"
-            metrics = f"Resumed & verified"
+            metrics = "Resumed & verified"
         elif r.status == DownloadStatus.NO_OP:
             status_badge = "[bold blue]• Pre-existing[/bold blue]"
             metrics = "Existing copy matched"
@@ -601,17 +598,22 @@ async def main_async(args: argparse.Namespace) -> int:
         scan_table = Table(box=None, show_header=False, expand=True)
         scan_table.add_column("Category", style="bold cyan", width=25)
         scan_table.add_column("Status", style="white")
+        total_mb = total_size_bytes / (1024**2)
+        total_gb = total_size_bytes / (1024**3)
         scan_table.add_row(
             "Batch Target",
-            f"[bold]{total_files}[/bold] files ({total_size_bytes / (1024**2):.1f} MB / {total_size_bytes / (1024**3):.2f} GB)",
+            f"[bold]{total_files}[/bold] files ({total_mb:.1f} MB / {total_gb:.2f} GB)",
         )
+        exist_mb = existing_bytes / (1024**2)
         scan_table.add_row(
             "[green]✔ Already Downloaded[/green]",
-            f"[bold green]{existing_count}[/bold green] files ({existing_bytes / (1024**2):.1f} MB) • [dim]0 bytes needed[/dim]",
+            f"[bold green]{existing_count}[/bold green] files ({exist_mb:.1f} MB) • [dim]0 bytes needed[/dim]",
         )
+        pend_mb = pending_bytes / (1024**2)
+        pend_gb = pending_bytes / (1024**3)
         scan_table.add_row(
             "[yellow]⬇ Pending Download[/yellow]",
-            f"[bold yellow]{pending_count}[/bold yellow] files ({pending_bytes / (1024**2):.1f} MB / {pending_bytes / (1024**3):.2f} GB)",
+            f"[bold yellow]{pending_count}[/bold yellow] files ({pend_mb:.1f} MB / {pend_gb:.2f} GB)",
         )
 
         console.print(
@@ -737,7 +739,7 @@ def main() -> None:
     parser.add_argument(
         "--verify-checksum",
         action="store_true",
-        help="Perform deep MD5 checksum verification on all pre-existing files (Default: false, relies on exact byte size)",
+        help="Perform deep MD5 verification on existing files (Default: false, relies on exact size)",
     )
     parser.add_argument(
         "--scan",

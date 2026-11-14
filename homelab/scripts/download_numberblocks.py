@@ -1,20 +1,9 @@
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = "==3.14.*"
-# dependencies = [
-#     "yt-dlp>=2026.10.26",
-#     "yt-dlp-ejs>=0.8.0",
-#     "rich>=13.9.4",
-# ]
-# ///
-
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 import subprocess
 import sys
-from typing import Any
+from pathlib import Path
 
 from rich.console import Console
 
@@ -34,10 +23,7 @@ SEASON_PLAYLISTS: dict[int, str] = {
 
 
 def get_default_dest_dir() -> Path:
-    script_dir = Path(__file__).resolve().parent
-    if (script_dir / "Season 1").exists() or script_dir.name == "Numberblocks":
-        return script_dir
-    return Path("/mnt/mango/torrents/tv/Numberblocks")
+    return Path("/mnt/mango/media/tv/Numberblocks (2017)")
 
 
 def parse_seasons(season_spec: str) -> list[int]:
@@ -74,15 +60,32 @@ def download_season(
     outtmpl = str(target_dir / f"Numberblocks S{season}E%(playlist_index)02d %(clean_title)s.%(ext)s")
 
     args: list[str] = [
-        "--parse-metadata", "title:(?P<clean_title>[^|]+)",
-        "--replace-in-metadata", "clean_title", r"(?i)\s*-?\s*full episode.*", "",
-        "--replace-in-metadata", "clean_title", r"\baka\b.*", "",
-        "--replace-in-metadata", "clean_title", r"[^\w\s]", "",
-        "--replace-in-metadata", "clean_title", r"^\s+|\s+$", "",
-        "--format", "bestvideo+bestaudio/best",
-        "--merge-output-format", "mkv",
-        "--remux-video", "mkv",
-        "--output", outtmpl,
+        "--parse-metadata",
+        "title:(?P<clean_title>[^|]+)",
+        "--replace-in-metadata",
+        "clean_title",
+        r"(?i)\s*-?\s*full episode.*",
+        "",
+        "--replace-in-metadata",
+        "clean_title",
+        r"\baka\b.*",
+        "",
+        "--replace-in-metadata",
+        "clean_title",
+        r"[^\w\s]",
+        "",
+        "--replace-in-metadata",
+        "clean_title",
+        r"^\s+|\s+$",
+        "",
+        "--format",
+        "bestvideo+bestaudio/best",
+        "--merge-output-format",
+        "mkv",
+        "--remux-video",
+        "mkv",
+        "--output",
+        outtmpl,
     ]
 
     if dry_run:
@@ -104,7 +107,8 @@ def main() -> None:
         description="Download and organize Numberblocks episodes from YouTube using yt-dlp."
     )
     parser.add_argument(
-        "--season", "-s",
+        "--season",
+        "-s",
         type=str,
         default="5",
         help="Season(s) to download: '1', '5', '1-8', '5,6', or 'all' (Default: 5)",
@@ -134,7 +138,9 @@ def main() -> None:
         help="Episode item range, e.g. '1-10' or '1,3,5'",
     )
     parser.add_argument(
-        "--dry-run", "-n", "--simulate",
+        "--dry-run",
+        "-n",
+        "--simulate",
         action="store_true",
         help="Simulate downloads without writing files",
     )
@@ -168,8 +174,9 @@ def main() -> None:
             overall_exit_code = 1
             continue
 
-        target_dir = args.dest_dir / f"Season {season}"
-        target_dir.mkdir(parents=True, exist_ok=True)
+        target_dir = args.dest_dir / f"Season {season:02d}"
+        if not args.dry_run:
+            target_dir.mkdir(parents=True, exist_ok=True)
 
         # 1-line ANSI colored status output
         console.print(
@@ -192,8 +199,12 @@ def main() -> None:
             overall_exit_code = rc
 
     if args.scan and overall_exit_code == 0:
-        scan_bin = Path.home() / ".local/bin/jellyfin-scan"
-        if scan_bin.exists():
+        candidates = [
+            Path.home() / "dotfiles/homelab/jellyfin/scan.sh",
+            Path.home() / ".local/bin/jellyfin-scan",
+        ]
+        scan_bin = next((p for p in candidates if p.exists()), None)
+        if scan_bin:
             console.print(f"[bold cyan]Triggering Jellyfin library scan via [white]{scan_bin}[/white]...[/bold cyan]")
             proc = subprocess.run([str(scan_bin)], check=False)
             if proc.returncode == 0:
