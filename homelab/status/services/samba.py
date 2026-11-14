@@ -236,7 +236,12 @@ async def _gather_samba_raw_data(ctx: StatusContext) -> SambaRawData:
 
     # 2. Concurrently execute network check and container diagnostic commands
     async def _probe_tcp_port() -> None:
-        port_ok, lat = await anyio.to_thread.run_sync(_check_port_445_sync, ctx.lan_host, ctx.http_timeout)
+        target = (
+            ctx.connection.ip
+            if (ctx.connection and ctx.connection.ip and ctx.connection.ip != "unknown")
+            else ctx.lan_host
+        )
+        port_ok, lat = await anyio.to_thread.run_sync(_check_port_445_sync, target, min(2.0, ctx.http_timeout))
         raw.port_445_open = port_ok
         raw.port_445_latency_ms = lat
 
@@ -245,10 +250,13 @@ async def _gather_samba_raw_data(ctx: StatusContext) -> SambaRawData:
             return
         cmd = [
             "smbclient",
-            "//localhost/mango",
+            "//127.0.0.1/mango",
             f"-U{ctx.username}%{ctx.password}",
             "-c",
             "ls",
+            "-t",
+            "2",
+            "--use-kerberos=off",
         ]
         code, out = await ctx.exec_container(container_name, cmd)
         raw.auth_check_code = code
@@ -259,10 +267,13 @@ async def _gather_samba_raw_data(ctx: StatusContext) -> SambaRawData:
             return
         cmd = [
             "smbclient",
-            "//localhost/mango",
+            "//127.0.0.1/mango",
             f"-U{ctx.username}%",
             "-c",
             "ls",
+            "-t",
+            "2",
+            "--use-kerberos=off",
         ]
         code, out = await ctx.exec_container(container_name, cmd)
         raw.empty_pw_check_code = code
@@ -278,7 +289,7 @@ async def _gather_samba_raw_data(ctx: StatusContext) -> SambaRawData:
     async def _fetch_smbstatus() -> None:
         if ctx.no_docker or not raw.container_found:
             return
-        code, out = await ctx.exec_container(container_name, ["smbstatus", "-j"])
+        code, out = await ctx.exec_container(container_name, ["smbstatus", "-j", "-f"])
         raw.smbstatus_code = code
         raw.smbstatus_json = out
         if code == 0 and out.strip():
@@ -367,7 +378,7 @@ def evaluate_samba_report(raw: SambaRawData, connection: TargetConnection | None
             SambaCheckItem(
                 name="SMB Authentication",
                 passed=True,
-                details=f"Authenticated as '{raw.username}' • Share '//localhost/mango' accessible",
+                details=f"Authenticated as '{raw.username}' • Share '//127.0.0.1/mango' accessible",
             )
         )
     else:
