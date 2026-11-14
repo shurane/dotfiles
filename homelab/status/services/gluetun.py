@@ -214,12 +214,12 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
         async def exec_gluetun_local() -> None:
             batch_cmd = (
                 "sh -c '"
-                "echo \"===TUN===\"; ip -s link show dev tun0 2>/dev/null; "
-                "echo \"===RESOLV===\"; cat /etc/resolv.conf 2>/dev/null; "
-                "echo \"===V6===\"; ip -6 route 2>/dev/null; "
-                "echo \"===PORT===\"; cat /tmp/gluetun/forwarded_port 2>/dev/null; "
-                "echo \"===IPTABLES===\"; iptables -nL INPUT 2>/dev/null; "
-                "echo \"===NETSTAT===\"; netstat -tuln 2>/dev/null; "
+                "echo \"===TUN===\"; ip -s link show dev tun0 2>/dev/null; echo \"\"; "
+                "echo \"===RESOLV===\"; cat /etc/resolv.conf 2>/dev/null; echo \"\"; "
+                "echo \"===V6===\"; ip -6 route 2>/dev/null; echo \"\"; "
+                "echo \"===PORT===\"; cat /tmp/gluetun/forwarded_port 2>/dev/null; echo \"\"; "
+                "echo \"===IPTABLES===\"; iptables -nL INPUT 2>/dev/null; echo \"\"; "
+                "echo \"===NETSTAT===\"; netstat -tuln 2>/dev/null; echo \"\"; "
                 "echo \"===END===\""
                 "'"
             )
