@@ -8,6 +8,7 @@ import ipaddress
 import json
 import re
 import socket
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -158,18 +159,24 @@ def normalize_hostname(host: str | None) -> str | None:
     return h or None
 
 
-def _resolve_ip_hostname(ip: str) -> str | None:
-    """Reverse-lookup IP to normalized hostname with short socket timeout."""
-    try:
-        orig = socket.getdefaulttimeout()
-        socket.setdefaulttimeout(0.15)
-        try:
+_PLAYBACK_LOG_PATTERN = re.compile(
+    r"^(?P<user>.+?)\s+is playing\s+(?P<title>.+?)\s+on\s+(?P<device>.+)$"
+)
+
+
+def _resolve_ip_hostname(ip: str, timeout: float = 0.15) -> str | None:
+    """Reverse-lookup IP to normalized hostname via daemon thread with hard timeout."""
+    res: list[str | None] = [None]
+
+    def _worker() -> None:
+        with contextlib.suppress(Exception):
             host, _, _ = socket.gethostbyaddr(ip)
-            return normalize_hostname(host)
-        finally:
-            socket.setdefaulttimeout(orig)
-    except Exception:
-        return None
+            res[0] = normalize_hostname(host)
+
+    t = threading.Thread(target=_worker, daemon=True)
+    t.start()
+    t.join(timeout=timeout)
+    return res[0]
 
 
 def _get_device_cache_path() -> Path:
@@ -774,7 +781,11 @@ def evaluate_jellyfin_report(
         if dev_name.lower() not in device_app_map:
             device_app_map[dev_name.lower()] = app
 
-        # Determine endpoint, route, platform, and hostname
+        dt = _parse_dt(dev.get("DateLastActivity"))
+        if not dt or dt < cutoff_24h:
+            continue
+
+        # Determine endpoint, route, platform, and hostname (only for active 24h devices)
         cached = device_cache.get(dev_id) or {}
         ip = session_endpoints.get(dev_id) or cached.get("endpoint")
         route_name, route_badge = classify_client_route(ip) if ip else ("Unknown", "")
@@ -806,25 +817,23 @@ def evaluate_jellyfin_report(
                 device_cache[dev_id] = new_entry
                 cache_dirty = True
 
-        dt = _parse_dt(dev.get("DateLastActivity"))
-        if dt and dt >= cutoff_24h:
-            key = (effective_device.lower(), app.lower())
-            if key not in seen_devices:
-                seen_devices.add(key)
-                connected_clients.append(
-                    ConnectedClientInfo(
-                        app_name=app,
-                        device_name=effective_device,
-                        username=dev.get("LastUserName", ""),
-                        last_activity=dt.format_iso(),
-                        relative_time=_format_relative_time(dt, now),
-                        app_version=dev.get("AppVersion", ""),
-                        platform=platform,
-                        route=route_name,
-                        endpoint=ip or "",
-                        route_badge=route_badge,
-                    )
+        key = (effective_device.lower(), app.lower())
+        if key not in seen_devices:
+            seen_devices.add(key)
+            connected_clients.append(
+                ConnectedClientInfo(
+                    app_name=app,
+                    device_name=effective_device,
+                    username=dev.get("LastUserName", ""),
+                    last_activity=dt.format_iso(),
+                    relative_time=_format_relative_time(dt, now),
+                    app_version=dev.get("AppVersion", ""),
+                    platform=platform,
+                    route=route_name,
+                    endpoint=ip or "",
+                    route_badge=route_badge,
                 )
+            )
 
     if cache_dirty:
         save_device_cache(device_cache)
@@ -853,7 +862,6 @@ def evaluate_jellyfin_report(
         )
 
     # 12. Playback History & 24h Activity
-    playback_pattern = re.compile(r"^(?P<user>.+?)\s+is playing\s+(?P<title>.+?)\s+on\s+(?P<device>.+)$")
     parsed_history: list[PlaybackHistoryItem] = []
     plays_24h_count = 0
     plays_by_client: dict[str, int] = {}
@@ -861,7 +869,7 @@ def evaluate_jellyfin_report(
     for entry in raw.activity_entries:
         if entry.get("Type") != "VideoPlayback":
             continue
-        m = playback_pattern.match(entry.get("Name", ""))
+        m = _PLAYBACK_LOG_PATTERN.match(entry.get("Name", ""))
         if not m:
             continue
         user = m.group("user").strip()
@@ -1080,8 +1088,9 @@ def render_jellyfin_deep_report(report: JellyfinDeepReport, console: Console) ->
             last_p = report.recent_playback[0]
             cl_str = f" ({last_p.client_name})" if last_p.client_name else ""
             playback_line = (
-                f"\n• [bold]Playback (24h):[/bold] [dim]0 played • Last: '{last_p.media_title}' "
-                f"on {last_p.device_name}{cl_str} ({last_p.relative_time})[/dim]"
+                "\n• [bold]Playback (24h):[/bold] [dim]0 played • Last:[/dim] "
+                f"[bold yellow]'{last_p.media_title}'[/bold yellow] "
+                f"[dim]on {last_p.device_name}{cl_str} ({last_p.relative_time})[/dim]"
             )
 
         verdict = Panel(
@@ -1181,30 +1190,35 @@ async def check_jellyfin(ctx: StatusContext) -> ServiceResult:
 
         # Connected clients (24h) branch
         if report.connected_clients_24h:
-            client_badges = []
+            client_lines = [
+                f"👥 Active Clients (24h): [bold cyan]{len(report.connected_clients_24h)} active[/bold cyan]"
+            ]
             for c in report.connected_clients_24h:
                 badge_inner = c.device_name
                 if c.platform and not c.platform.startswith("v") and c.platform != c.device_name:
                     short_plat = c.platform.split(" (")[0] if " (" in c.platform else c.platform
                     badge_inner = f"{short_plat} on {c.device_name}"
-                if c.route and c.route != "Unknown":
-                    badge_inner += f" • {c.route}"
-                client_badges.append(f"[bold cyan]{c.app_name}[/bold cyan] [dim]({badge_inner})[/dim]")
-            branches.append(f"👥 Active Clients (24h): {', '.join(client_badges)}")
+                route_str = f" [dim]•[/dim] {c.route_badge}" if c.route_badge else ""
+                time_str = f" [dim]({c.relative_time})[/dim]" if c.relative_time else ""
+                client_lines.append(
+                    f"  • [bold cyan]{c.app_name}[/bold cyan]: {badge_inner}{route_str}{time_str}"
+                )
+            branches.append("\n".join(client_lines))
 
         # Recent plays branch
         if report.plays_last_24h_count > 0:
             last_p = report.recent_playback[0]
             branches.append(
-                f"📜 Recent Plays (24h): [bold green]{report.plays_last_24h_count} item(s)[/bold green] "
-                f"[dim]• Last: \"{last_p.media_title}\" ({last_p.relative_time})[/dim]"
+                f"📜 Recent Plays (24h): [bold green]{report.plays_last_24h_count} item(s)[/bold green]\n"
+                f"  [dim]• Last:[/dim] [bold yellow]\"{last_p.media_title}\"[/bold yellow] "
+                f"[dim]({last_p.relative_time})[/dim]"
             )
         elif report.recent_playback:
             last_p = report.recent_playback[0]
             cl_str = f" ({last_p.client_name})" if last_p.client_name else ""
             branches.append(
-                f"📜 Recent Plays: [dim]0 in 24h • Last: \"{last_p.media_title}\" "
-                f"on {last_p.device_name}{cl_str} ({last_p.relative_time})[/dim]"
+                f"📜 Recent Plays: [dim]0 in 24h • Last:[/dim] [bold yellow]\"{last_p.media_title}\"[/bold yellow] "
+                f"[dim]on {last_p.device_name}{cl_str} ({last_p.relative_time})[/dim]"
             )
 
         return ServiceResult(
