@@ -83,6 +83,7 @@ def generate_nfo_content(
     season: int,
     episode: int,
     air_date: str | None = None,
+    plot: str | None = None,
 ) -> str:
     escaped_title = saxutils.escape(title, {"'": "&apos;", '"': "&quot;"})
     escaped_orig = saxutils.escape(original_title, {"'": "&apos;", '"': "&quot;"})
@@ -97,6 +98,9 @@ def generate_nfo_content(
     ]
     if air_date:
         lines.append(f"  <aired>{air_date}</aired>")
+    if plot:
+        escaped_plot = saxutils.escape(plot, {"'": "&apos;", '"': "&quot;"})
+        lines.append(f"  <plot>{escaped_plot}</plot>")
     lines.append("</episodedetails>")
     lines.append("")
     return "\n".join(lines)
@@ -228,11 +232,12 @@ def main() -> None:
         meta_entry = metadata.get(str(ep_num), {})
         title_ja = meta_entry.get("title_ja", "")
         air_date = meta_entry.get("air_date")
+        plot = meta_entry.get("plot", "")
 
         # Extract English title from subtitle track, or fall back to metadata
         title_en = extract_english_title_from_mkv(src_path)
         if not title_en:
-            title_en = meta_entry.get("title_ro", f"Episode {ep_num}")
+            title_en = meta_entry.get("title_en") or meta_entry.get("title_ro", f"Episode {ep_num}")
 
         nfo_status = "Skipped"
         nfo_content = generate_nfo_content(
@@ -241,6 +246,7 @@ def main() -> None:
             season=1,
             episode=ep_num,
             air_date=air_date,
+            plot=plot,
         )
 
         needs_write = True
