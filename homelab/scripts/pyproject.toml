@@ -17,6 +17,8 @@ dependencies = [
 download-anpanman = "download_anpanman:main"
 download-numberblocks = "download_numberblocks:main"
 build-anpanman-metadata = "build_anpanman_metadata:main"
+build-maruko-metadata = "build_maruko_metadata:main"
+sync-maruko = "sync_maruko:main"
 jellyfin-scan = "jellyfin:main"
 
 [build-system]
@@ -28,8 +30,11 @@ only-include = [
   "download_anpanman.py",
   "download_numberblocks.py",
   "build_anpanman_metadata.py",
+  "build_maruko_metadata.py",
+  "sync_maruko.py",
   "jellyfin.py",
   "anpanman_metadata.json",
+  "maruko_metadata.json",
   "README.md",
 ]
 

@@ -1,0 +1,1463 @@
+{
+  "1": {
+    "episode": 1,
+    "season": 1,
+    "air_date": "1990-01-07",
+    "titles_ja": [
+      "「まるちゃんきょうだいげんかをする」の巻",
+      "「まるちゃんはまだおとそ気分」の巻"
+    ],
+    "title_ja": "「まるちゃんきょうだいげんかをする」の巻／「まるちゃんはまだおとそ気分」の巻",
+    "title_ro": "( Maruchankyoudaigenkawosuru ) no Kan / ( Maruchanhamadaotoso Kibun ) no Kan"
+  },
+  "2": {
+    "episode": 2,
+    "season": 1,
+    "air_date": "1990-01-14",
+    "titles_ja": [
+      "「家庭教師がやってきた」の巻",
+      "「まるちゃん目覚まし時計を買う」の巻"
+    ],
+    "title_ja": "「家庭教師がやってきた」の巻／「まるちゃん目覚まし時計を買う」の巻",
+    "title_ro": "( Kateikyoushi Gayattekita ) no Kan / ( Maruchan Mezama Shi Tokei Wo Kau ) no Kan"
+  },
+  "3": {
+    "episode": 3,
+    "season": 1,
+    "air_date": "1990-01-21",
+    "titles_ja": [
+      "「今日は家庭訪問」の巻",
+      "「生き物係のキザ野郎参上」の巻"
+    ],
+    "title_ja": "「今日は家庭訪問」の巻／「生き物係のキザ野郎参上」の巻",
+    "title_ro": "( Konnichiha Kateihoumon ) no Kan / ( Ikimono Kakari no Kiza Yarou Sanjou ) no Kan"
+  },
+  "4": {
+    "episode": 4,
+    "season": 1,
+    "air_date": "1990-01-28",
+    "titles_ja": [
+      "「まるちゃん自転車の練習をする」の巻（前編）",
+      "「まるちゃん自転車の練習をする」の巻（後編）"
+    ],
+    "title_ja": "「まるちゃん自転車の練習をする」の巻（前編）／「まるちゃん自転車の練習をする」の巻（後編）",
+    "title_ro": "( Maruchan Jitensha no Renshuu Wosuru ) no Kan ( Zenpen ) / ( Maruchan Jitensha no Renshuu Wosuru ) no Kan ( Kouhen )"
+  },
+  "5": {
+    "episode": 5,
+    "season": 1,
+    "air_date": "1990-02-04",
+    "titles_ja": [
+      "「まるちゃん賞状をもらう」の巻",
+      "「まるちゃんカゼをひく」の巻"
+    ],
+    "title_ja": "「まるちゃん賞状をもらう」の巻／「まるちゃんカゼをひく」の巻",
+    "title_ro": "( Maruchan Shoujou Womorau ) no Kan / ( Maruchan Kaze Wohiku ) no Kan"
+  },
+  "6": {
+    "episode": 6,
+    "season": 1,
+    "air_date": "1990-02-11",
+    "titles_ja": [
+      "「まるちゃんたち犬をひろう」の巻"
+    ],
+    "title_ja": "「まるちゃんたち犬をひろう」の巻",
+    "title_ro": "( Maruchantachi Inu Wohirou ) no Kan"
+  },
+  "7": {
+    "episode": 7,
+    "season": 1,
+    "air_date": "1990-02-18",
+    "titles_ja": [
+      "「みんなでフランス料理を食べに行く」の巻",
+      "「まるちゃんはマラソンがイヤ」の巻"
+    ],
+    "title_ja": "「みんなでフランス料理を食べに行く」の巻／「まるちゃんはマラソンがイヤ」の巻",
+    "title_ro": "( Minnade Furansu Ryouri Wo Tabe ni Iku ) no Kan / ( Maruchanha Marason ga Iya ) no Kan"
+  },
+  "8": {
+    "episode": 8,
+    "season": 1,
+    "air_date": "1990-02-25",
+    "titles_ja": [
+      "「悲しきバレンタインデー」の巻",
+      "「花輪君子供歌合戦に出場する」の巻"
+    ],
+    "title_ja": "「悲しきバレンタインデー」の巻／「花輪君子供歌合戦に出場する」の巻",
+    "title_ro": "( Kanashiki Barentaindee ) no Kan / ( Hanawa Kunshi Tomo Utaawase Sen ni Shutsujou Suru ) no Kan"
+  },
+  "9": {
+    "episode": 9,
+    "season": 1,
+    "air_date": "1990-03-04",
+    "titles_ja": [
+      "「まるちゃん笛の練習をする」の巻",
+      "「雪を食べたい」の巻"
+    ],
+    "title_ja": "「まるちゃん笛の練習をする」の巻／「雪を食べたい」の巻",
+    "title_ro": "( Maruchan Fue no Renshuu Wosuru ) no Kan / ( Yuki Wo Tabeta I ) no Kan"
+  },
+  "10": {
+    "episode": 10,
+    "season": 1,
+    "air_date": "1990-03-11",
+    "titles_ja": [
+      "「まるちゃん遠くのしんせきの家に行く」の巻"
+    ],
+    "title_ja": "「まるちゃん遠くのしんせきの家に行く」の巻",
+    "title_ro": "( Maruchan Tooku Noshinsekino Ie ni Iku ) no Kan"
+  },
+  "11": {
+    "episode": 11,
+    "season": 1,
+    "air_date": "1990-03-18",
+    "titles_ja": [
+      "「避難訓練に余念のない県民」の巻",
+      "「まるちゃん通信簿をもらう」の巻"
+    ],
+    "title_ja": "「避難訓練に余念のない県民」の巻／「まるちゃん通信簿をもらう」の巻",
+    "title_ro": "( Hinankunren ni Yonen Nonai Kenmin ) no Kan / ( Maruchan Tsuushinbo Womorau ) no Kan"
+  },
+  "12": {
+    "episode": 12,
+    "season": 1,
+    "air_date": "1990-03-25",
+    "titles_ja": [
+      "「まぼろしの“ツチノコ株式会社”」の巻",
+      "「まるちゃんは遠足の準備が好き」の巻"
+    ],
+    "title_ja": "「まぼろしの“ツチノコ株式会社”」の巻／「まるちゃんは遠足の準備が好き」の巻",
+    "title_ro": "( Maboroshino “ Tsuchinoko Kabushikigaisha ” ) no Kan / ( Maruchanha Ensoku no Junbi ga Suki ) no Kan"
+  },
+  "13": {
+    "episode": 13,
+    "season": 1,
+    "air_date": "1990-04-01",
+    "titles_ja": [
+      "「まるちゃん遠足に行く」の巻"
+    ],
+    "title_ja": "「まるちゃん遠足に行く」の巻",
+    "title_ro": "( Maruchan Ensoku ni Iku ) no Kan"
+  },
+  "14": {
+    "episode": 14,
+    "season": 1,
+    "air_date": "1990-04-08",
+    "titles_ja": [
+      "「あこがれの鼻血」の巻",
+      "「ふたりだけの留守番」の巻"
+    ],
+    "title_ja": "「あこがれの鼻血」の巻／「ふたりだけの留守番」の巻",
+    "title_ro": "( Akogareno Hanaji ) no Kan / ( Futaridakeno Rusuban ) no Kan"
+  },
+  "15": {
+    "episode": 15,
+    "season": 1,
+    "air_date": "1990-04-15",
+    "titles_ja": [
+      "「丸尾君学級委員選挙いよいよ出馬」の巻"
+    ],
+    "title_ja": "「丸尾君学級委員選挙いよいよ出馬」の巻",
+    "title_ro": "( Maruo Kungaku Kyuu Iin Senkyo Iyoiyo Shutsuba ) no Kan"
+  },
+  "16": {
+    "episode": 16,
+    "season": 1,
+    "air_date": "1990-04-22",
+    "titles_ja": [
+      "「まるちゃん盲腸になる」の巻",
+      "「まるちゃん占いをされる」の巻"
+    ],
+    "title_ja": "「まるちゃん盲腸になる」の巻／「まるちゃん占いをされる」の巻",
+    "title_ro": "( Maruchan Mouchou Ninaru ) no Kan / ( Maruchan Uranai Wosareru ) no Kan"
+  },
+  "17": {
+    "episode": 17,
+    "season": 1,
+    "air_date": "1990-04-29",
+    "titles_ja": [
+      "「まるちゃん小鳥がほしくなる」の巻",
+      "「まるちゃんお誕生会を開く」の巻"
+    ],
+    "title_ja": "「まるちゃん小鳥がほしくなる」の巻／「まるちゃんお誕生会を開く」の巻",
+    "title_ro": "( Maruchan Kotori Gahoshikunaru ) no Kan / ( Maruchan'o Tanjoukai Wo Hiraku ) no Kan"
+  },
+  "18": {
+    "episode": 18,
+    "season": 1,
+    "air_date": "1990-05-06",
+    "titles_ja": [
+      "「おかあさんの宝物」の巻",
+      "「まるちゃん深夜の宴会」の巻"
+    ],
+    "title_ja": "「おかあさんの宝物」の巻／「まるちゃん深夜の宴会」の巻",
+    "title_ro": "( Okaasanno Takaramono ) no Kan / ( Maruchan Shinya no Enkai ) no Kan"
+  },
+  "19": {
+    "episode": 19,
+    "season": 1,
+    "air_date": "1990-05-13",
+    "titles_ja": [
+      "「おかあさんの日」の巻"
+    ],
+    "title_ja": "「おかあさんの日」の巻",
+    "title_ro": "( Okaasanno Nichi ) no Kan"
+  },
+  "20": {
+    "episode": 20,
+    "season": 1,
+    "air_date": "1990-05-20",
+    "titles_ja": [
+      "「5月のオリエンタル小僧」の巻",
+      "「ゆううつな参観日」の巻"
+    ],
+    "title_ja": "「5月のオリエンタル小僧」の巻／「ゆううつな参観日」の巻",
+    "title_ro": "( 5 Gatsu no Orientaru Kozou ) no Kan / ( Yuuutsuna Sankan Nichi ) no Kan"
+  },
+  "21": {
+    "episode": 21,
+    "season": 1,
+    "air_date": "1990-05-27",
+    "titles_ja": [
+      "「まるちゃん学芸会に出る」の巻"
+    ],
+    "title_ja": "「まるちゃん学芸会に出る」の巻",
+    "title_ro": "( Maruchan Gakugeikai ni Deru ) no Kan"
+  },
+  "22": {
+    "episode": 22,
+    "season": 1,
+    "air_date": "1990-06-03",
+    "titles_ja": [
+      "「まるちゃん文通をはじめる」の巻",
+      "「自習時間大好き」の巻"
+    ],
+    "title_ja": "「まるちゃん文通をはじめる」の巻／「自習時間大好き」の巻",
+    "title_ro": "( Maruchan Buntsuu Wohajimeru ) no Kan / ( Jishuu Jikan Daisuki ) no Kan"
+  },
+  "23": {
+    "episode": 23,
+    "season": 1,
+    "air_date": "1990-06-10",
+    "titles_ja": [
+      "「まるちゃんの町は大洪水」の巻"
+    ],
+    "title_ja": "「まるちゃんの町は大洪水」の巻",
+    "title_ro": "( Maruchanno Machi Ha Daikouzui ) no Kan"
+  },
+  "24": {
+    "episode": 24,
+    "season": 1,
+    "air_date": "1990-06-17",
+    "titles_ja": [
+      "「まるちゃん虫歯が痛い」の巻",
+      "「ああ身体検査」の巻"
+    ],
+    "title_ja": "「まるちゃん虫歯が痛い」の巻／「ああ身体検査」の巻",
+    "title_ro": "( Maruchan Mushiba ga Itai ) no Kan / ( Aa Shintaikensa ) no Kan"
+  },
+  "25": {
+    "episode": 25,
+    "season": 1,
+    "air_date": "1990-06-24",
+    "titles_ja": [
+      "「まるちゃん学校でお腹が痛くなる」の巻"
+    ],
+    "title_ja": "「まるちゃん学校でお腹が痛くなる」の巻",
+    "title_ro": "( Maruchan Gakkou Deo Hara ga Itaku Naru ) no Kan"
+  },
+  "26": {
+    "episode": 26,
+    "season": 1,
+    "air_date": "1990-07-01",
+    "titles_ja": [
+      "「プールびらき」の巻"
+    ],
+    "title_ja": "「プールびらき」の巻",
+    "title_ro": "( Puuru Biraki ) no Kan"
+  },
+  "27": {
+    "episode": 27,
+    "season": 1,
+    "air_date": "1990-07-08",
+    "titles_ja": [
+      "「七夕の願い事」の巻"
+    ],
+    "title_ja": "「七夕の願い事」の巻",
+    "title_ro": "( Tanabata no Negaigoto ) no Kan"
+  },
+  "28": {
+    "episode": 28,
+    "season": 1,
+    "air_date": "1990-07-15",
+    "titles_ja": [
+      "「まるちゃん傘を買ってもらう」の巻",
+      "「まるちゃんの夏の思い出」の巻"
+    ],
+    "title_ja": "「まるちゃん傘を買ってもらう」の巻／「まるちゃんの夏の思い出」の巻",
+    "title_ro": "( Maruchan Kasa Wo Katsu Temorau ) no Kan / ( Maruchanno Natsu no Omoide ) no Kan"
+  },
+  "29": {
+    "episode": 29,
+    "season": 1,
+    "air_date": "1990-07-22",
+    "titles_ja": [
+      "「まるちゃんの家のお風呂がこわれた」の巻",
+      "「おっちゃんの魔法カード」の巻"
+    ],
+    "title_ja": "「まるちゃんの家のお風呂がこわれた」の巻／「おっちゃんの魔法カード」の巻",
+    "title_ro": "( Maruchanno Ie Noo Furo Gakowareta ) no Kan / ( Otchanno Mahou Kaado ) no Kan"
+  },
+  "30": {
+    "episode": 30,
+    "season": 1,
+    "air_date": "1990-07-29",
+    "titles_ja": [
+      "「まるちゃんは夏休みも学校へ通う」の巻"
+    ],
+    "title_ja": "「まるちゃんは夏休みも学校へ通う」の巻",
+    "title_ro": "( Maruchanha Natsuyasumi Mo Gakkou e Kayou ) no Kan"
+  },
+  "31": {
+    "episode": 31,
+    "season": 1,
+    "air_date": "1990-08-05",
+    "titles_ja": [
+      "「まるちゃん南の島へ行く」の巻 (前編)"
+    ],
+    "title_ja": "「まるちゃん南の島へ行く」の巻 (前編)",
+    "title_ro": "( Maruchan Minami no Shima e Iku ) no Kan"
+  },
+  "32": {
+    "episode": 32,
+    "season": 1,
+    "air_date": "1990-08-12",
+    "titles_ja": [
+      "「まるちゃん南の島へ行く」の巻 (後編)"
+    ],
+    "title_ja": "「まるちゃん南の島へ行く」の巻 (後編)",
+    "title_ro": "( Maruchan Minami no Shima e Iku ) no Kan"
+  },
+  "33": {
+    "episode": 33,
+    "season": 1,
+    "air_date": "1990-08-19",
+    "titles_ja": [
+      "「まるちゃんお化け屋敷に行く」の巻"
+    ],
+    "title_ja": "「まるちゃんお化け屋敷に行く」の巻",
+    "title_ro": "( Maruchan'o Bake Yashiki ni Iku ) no Kan"
+  },
+  "34": {
+    "episode": 34,
+    "season": 1,
+    "air_date": "1990-08-26",
+    "titles_ja": [
+      "「宿題をためたまる子ちゃん」の巻"
+    ],
+    "title_ja": "「宿題をためたまる子ちゃん」の巻",
+    "title_ro": "( Shukudai Wotametamaru Ko Chan ) no Kan"
+  },
+  "35": {
+    "episode": 35,
+    "season": 1,
+    "air_date": "1990-09-02",
+    "titles_ja": [
+      "「まるちゃん写真屋さんに行く」の巻",
+      "「嵐の夜の出来事」の巻"
+    ],
+    "title_ja": "「まるちゃん写真屋さんに行く」の巻／「嵐の夜の出来事」の巻",
+    "title_ro": "( Maruchan Shashinya Sanni Iku ) no Kan / ( Arashi no Yoru no Dekigoto ) no Kan"
+  },
+  "36": {
+    "episode": 36,
+    "season": 1,
+    "air_date": "1990-09-09",
+    "titles_ja": [
+      "「まるちゃん熱帯魚を飼う」の巻"
+    ],
+    "title_ja": "「まるちゃん熱帯魚を飼う」の巻",
+    "title_ro": "( Maruchan Nettaigyo Wo Kau ) no Kan"
+  },
+  "37": {
+    "episode": 37,
+    "season": 1,
+    "air_date": "1990-09-16",
+    "titles_ja": [
+      "「おかっぱ・かっぱ」の巻"
+    ],
+    "title_ja": "「おかっぱ・かっぱ」の巻",
+    "title_ro": "( Okappa ・ Kappa ) no Kan"
+  },
+  "38": {
+    "episode": 38,
+    "season": 1,
+    "air_date": "1990-09-23",
+    "titles_ja": [
+      "「まるちゃんハイキングに行く」の巻"
+    ],
+    "title_ja": "「まるちゃんハイキングに行く」の巻",
+    "title_ro": "( Maruchan Haikingu ni Iku ) no Kan"
+  },
+  "39": {
+    "episode": 39,
+    "season": 1,
+    "air_date": "1990-09-30",
+    "titles_ja": [
+      "「まるちゃんお金を見つける」の巻"
+    ],
+    "title_ja": "「まるちゃんお金を見つける」の巻",
+    "title_ro": "( Maruchan'o Kin Wo Mitsu Keru ) no Kan"
+  },
+  "40": {
+    "episode": 40,
+    "season": 1,
+    "air_date": "1990-10-07",
+    "titles_ja": [
+      "「男子対女子大戦争」の巻"
+    ],
+    "title_ja": "「男子対女子大戦争」の巻",
+    "title_ro": "( Danshi Tsui Joshidai Sensou ) no Kan"
+  },
+  "41": {
+    "episode": 41,
+    "season": 1,
+    "air_date": "1990-10-14",
+    "titles_ja": [
+      "「まるちゃん席替えをする」の巻",
+      "「まるちゃん飲み屋さんに行く」の巻"
+    ],
+    "title_ja": "「まるちゃん席替えをする」の巻／「まるちゃん飲み屋さんに行く」の巻",
+    "title_ro": "( Maruchan Sekigae Wosuru ) no Kan / ( Maruchan Nomiya Sanni Iku ) no Kan"
+  },
+  "42": {
+    "episode": 42,
+    "season": 1,
+    "air_date": "1990-10-21",
+    "titles_ja": [
+      "「まるちゃんブロマイドをなくす」の巻"
+    ],
+    "title_ja": "「まるちゃんブロマイドをなくす」の巻",
+    "title_ro": "( Maruchan Buromaido Wonakusu ) no Kan"
+  },
+  "43": {
+    "episode": 43,
+    "season": 1,
+    "air_date": "1990-10-28",
+    "titles_ja": [
+      "「まるちゃん実験をする」の巻"
+    ],
+    "title_ja": "「まるちゃん実験をする」の巻",
+    "title_ro": "( Maruchan Jikken Wosuru ) no Kan"
+  },
+  "44": {
+    "episode": 44,
+    "season": 1,
+    "air_date": "1990-11-04",
+    "titles_ja": [
+      "「まるちゃんの“星に願いを”」の巻"
+    ],
+    "title_ja": "「まるちゃんの“星に願いを”」の巻",
+    "title_ro": "( Maruchanno “ Hoshi ni Negai Wo ” ) no Kan"
+  },
+  "45": {
+    "episode": 45,
+    "season": 1,
+    "air_date": "1990-11-11",
+    "titles_ja": [
+      "「いとこの七五三」の巻"
+    ],
+    "title_ja": "「いとこの七五三」の巻",
+    "title_ro": "( Itokono Shichigosan ) no Kan"
+  },
+  "46": {
+    "episode": 46,
+    "season": 1,
+    "air_date": "1990-11-18",
+    "titles_ja": [
+      "「恐怖のにわとり小屋そうじ」の巻",
+      "「一人っきりの日曜日」の巻"
+    ],
+    "title_ja": "「恐怖のにわとり小屋そうじ」の巻／「一人っきりの日曜日」の巻",
+    "title_ro": "( Kyoufu Noniwatori Koya Souji ) no Kan / ( Hitori Kkirino Nichiyoubi ) no Kan"
+  },
+  "47": {
+    "episode": 47,
+    "season": 1,
+    "air_date": "1990-11-25",
+    "titles_ja": [
+      "「お父さんとお母さん けんかする」の巻"
+    ],
+    "title_ja": "「お父さんとお母さん けんかする」の巻",
+    "title_ro": "( o Tousan Too Kaasan Kenkasuru ) no Kan"
+  },
+  "48": {
+    "episode": 48,
+    "season": 1,
+    "air_date": "1990-12-02",
+    "titles_ja": [
+      "「まるちゃん自分の部屋が欲しくなる」の巻"
+    ],
+    "title_ja": "「まるちゃん自分の部屋が欲しくなる」の巻",
+    "title_ro": "( Maruchan Jibun no Heya ga Hosshi Kunaru ) no Kan"
+  },
+  "49": {
+    "episode": 49,
+    "season": 1,
+    "air_date": "1990-12-09",
+    "titles_ja": [
+      "「まるちゃん年賀状を書く」の巻"
+    ],
+    "title_ja": "「まるちゃん年賀状を書く」の巻",
+    "title_ro": "( Maruchan Nengajou Wo Kaku ) no Kan"
+  },
+  "50": {
+    "episode": 50,
+    "season": 1,
+    "air_date": "1990-12-16",
+    "titles_ja": [
+      "「うちはびんぼう」の巻"
+    ],
+    "title_ja": "「うちはびんぼう」の巻",
+    "title_ro": "( Uchihabinbou ) no Kan"
+  },
+  "51": {
+    "episode": 51,
+    "season": 1,
+    "air_date": "1990-12-23",
+    "titles_ja": [
+      "「まるちゃん町内のクリスマス会に参加する」の巻"
+    ],
+    "title_ja": "「まるちゃん町内のクリスマス会に参加する」の巻",
+    "title_ro": "( Maruchan Chounai no Kurisumasu Kai ni Sanka Suru ) no Kan"
+  },
+  "52": {
+    "episode": 52,
+    "season": 1,
+    "air_date": "1990-12-30",
+    "titles_ja": [
+      "「年越し まる子ちゃん」の巻"
+    ],
+    "title_ja": "「年越し まる子ちゃん」の巻",
+    "title_ro": "( Toshikoshi Maru Ko Chan ) no Kan"
+  },
+  "53": {
+    "episode": 53,
+    "season": 1,
+    "air_date": "1991-01-06",
+    "titles_ja": [
+      "「いつものお正月」の巻"
+    ],
+    "title_ja": "「いつものお正月」の巻",
+    "title_ro": "( Itsumonoo Shougatsu ) no Kan"
+  },
+  "54": {
+    "episode": 54,
+    "season": 1,
+    "air_date": "1991-01-13",
+    "titles_ja": [
+      "「まるちゃん 眠れない夜」の巻"
+    ],
+    "title_ja": "「まるちゃん 眠れない夜」の巻",
+    "title_ro": "( Maruchan Nemure Nai Yoru ) no Kan"
+  },
+  "55": {
+    "episode": 55,
+    "season": 1,
+    "air_date": "1991-01-20",
+    "titles_ja": [
+      "「子供は風の子」の巻"
+    ],
+    "title_ja": "「子供は風の子」の巻",
+    "title_ro": "( Kodomo Ha Kaze no Ko ) no Kan"
+  },
+  "56": {
+    "episode": 56,
+    "season": 1,
+    "air_date": "1991-01-27",
+    "titles_ja": [
+      "「まるちゃん ご機嫌な一日」の巻"
+    ],
+    "title_ja": "「まるちゃん ご機嫌な一日」の巻",
+    "title_ro": "( Maruchan Go Kigen Na Tsuitachi ) no Kan"
+  },
+  "57": {
+    "episode": 57,
+    "season": 1,
+    "air_date": "1991-02-03",
+    "titles_ja": [
+      "「まる子 豆まきをする」の巻"
+    ],
+    "title_ja": "「まる子 豆まきをする」の巻",
+    "title_ro": "( Maru Ko Mamemaki Wosuru ) no Kan"
+  },
+  "58": {
+    "episode": 58,
+    "season": 1,
+    "air_date": "1991-02-10",
+    "titles_ja": [
+      "「まるちゃんデパートで迷子になる」の巻"
+    ],
+    "title_ja": "「まるちゃんデパートで迷子になる」の巻",
+    "title_ro": "( Maruchan Depaato De Maigo Ninaru ) no Kan"
+  },
+  "59": {
+    "episode": 59,
+    "season": 1,
+    "air_date": "1991-02-17",
+    "titles_ja": [
+      "「まるちゃんの風船物語」の巻"
+    ],
+    "title_ja": "「まるちゃんの風船物語」の巻",
+    "title_ro": "( Maruchanno Fuusen Monogatari ) no Kan"
+  },
+  "60": {
+    "episode": 60,
+    "season": 1,
+    "air_date": "1991-02-24",
+    "titles_ja": [
+      "「憧れの学級閉鎖」の巻"
+    ],
+    "title_ja": "「憧れの学級閉鎖」の巻",
+    "title_ro": "( Akogare no Gakkyuuheisa ) no Kan"
+  },
+  "61": {
+    "episode": 61,
+    "season": 1,
+    "air_date": "1991-03-03",
+    "titles_ja": [
+      "「まるちゃんおひな祭りに呼ばれる」の巻"
+    ],
+    "title_ja": "「まるちゃんおひな祭りに呼ばれる」の巻",
+    "title_ro": "( Maruchan'ohina Matsuri ni Yoba Reru ) no Kan"
+  },
+  "62": {
+    "episode": 62,
+    "season": 1,
+    "air_date": "1991-03-10",
+    "titles_ja": [
+      "「口笛が聞こえる」の巻"
+    ],
+    "title_ja": "「口笛が聞こえる」の巻",
+    "title_ro": "( Kuchibue ga Kiko Eru ) no Kan"
+  },
+  "63": {
+    "episode": 63,
+    "season": 1,
+    "air_date": "1991-03-17",
+    "titles_ja": [
+      "「放課後の学級会」の巻"
+    ],
+    "title_ja": "「放課後の学級会」の巻",
+    "title_ro": "( Houkago no Gakkyuukai ) no Kan"
+  },
+  "64": {
+    "episode": 64,
+    "season": 1,
+    "air_date": "1991-03-24",
+    "titles_ja": [
+      "「まるちゃんの水栽培」の巻"
+    ],
+    "title_ja": "「まるちゃんの水栽培」の巻",
+    "title_ro": "( Maruchanno Mizu Saibai ) no Kan"
+  },
+  "65": {
+    "episode": 65,
+    "season": 1,
+    "air_date": "1991-03-31",
+    "titles_ja": [
+      "「まるちゃんヘルスセンターに行く」の巻"
+    ],
+    "title_ja": "「まるちゃんヘルスセンターに行く」の巻",
+    "title_ro": "( Maruchan Herususentaa ni Iku ) no Kan"
+  },
+  "66": {
+    "episode": 66,
+    "season": 1,
+    "air_date": "1991-04-07",
+    "titles_ja": [
+      "「まるちゃん お花見に行く」の巻"
+    ],
+    "title_ja": "「まるちゃん お花見に行く」の巻",
+    "title_ro": "( Maruchan o Hanami ni Iku ) no Kan"
+  },
+  "67": {
+    "episode": 67,
+    "season": 1,
+    "air_date": "1991-04-14",
+    "titles_ja": [
+      "「まる子達 一年生の世話をやく」の巻"
+    ],
+    "title_ja": "「まる子達 一年生の世話をやく」の巻",
+    "title_ro": "( Maru Kotachi Ichinensei no Sewa Woyaku ) no Kan"
+  },
+  "68": {
+    "episode": 68,
+    "season": 1,
+    "air_date": "1991-04-21",
+    "titles_ja": [
+      "「まるちゃん 作文を書く」の巻"
+    ],
+    "title_ja": "「まるちゃん 作文を書く」の巻",
+    "title_ro": "( Maruchan Sakubun Wo Kaku ) no Kan"
+  },
+  "69": {
+    "episode": 69,
+    "season": 1,
+    "air_date": "1991-04-28",
+    "titles_ja": [
+      "「まる子ノストラダムスの予言を気にする」の巻"
+    ],
+    "title_ja": "「まる子ノストラダムスの予言を気にする」の巻",
+    "title_ro": "( Maru Ko Nosutoradamusu no Yogen Wo Kini Suru ) no Kan"
+  },
+  "70": {
+    "episode": 70,
+    "season": 1,
+    "air_date": "1991-05-05",
+    "titles_ja": [
+      "「まるちゃん 子供の日」の巻"
+    ],
+    "title_ja": "「まるちゃん 子供の日」の巻",
+    "title_ro": "( Maruchan Kodomo no Nichi ) no Kan"
+  },
+  "71": {
+    "episode": 71,
+    "season": 1,
+    "air_date": "1991-05-12",
+    "titles_ja": [
+      "「おじいちゃんベルトクイズに出る」の巻 (前編)"
+    ],
+    "title_ja": "「おじいちゃんベルトクイズに出る」の巻 (前編)",
+    "title_ro": "( Ojiichan Berutokuizu ni Deru ) no Kan"
+  },
+  "72": {
+    "episode": 72,
+    "season": 1,
+    "air_date": "1991-05-19",
+    "titles_ja": [
+      "「おじいちゃんベルトクイズに出る」の巻 (後編)"
+    ],
+    "title_ja": "「おじいちゃんベルトクイズに出る」の巻 (後編)",
+    "title_ro": "( Ojiichan Berutokuizu ni Deru ) no Kan"
+  },
+  "73": {
+    "episode": 73,
+    "season": 1,
+    "air_date": "1991-05-26",
+    "titles_ja": [
+      "「まる子 プラネタリウムに行く」の巻"
+    ],
+    "title_ja": "「まる子 プラネタリウムに行く」の巻",
+    "title_ro": "( Maru Ko Puranetariumu ni Iku ) no Kan"
+  },
+  "74": {
+    "episode": 74,
+    "season": 1,
+    "air_date": "1991-06-02",
+    "titles_ja": [
+      "「まるちゃん 学級新聞を作る」の巻"
+    ],
+    "title_ja": "「まるちゃん 学級新聞を作る」の巻",
+    "title_ro": "( Maruchan Gakkyuu Shinbun Wo Tsukuru ) no Kan"
+  },
+  "75": {
+    "episode": 75,
+    "season": 1,
+    "air_date": "1991-06-09",
+    "titles_ja": [
+      "「まるちゃんは名探偵」の巻"
+    ],
+    "title_ja": "「まるちゃんは名探偵」の巻",
+    "title_ro": "( Maruchanha Meitantei ) no Kan"
+  },
+  "76": {
+    "episode": 76,
+    "season": 1,
+    "air_date": "1991-06-16",
+    "titles_ja": [
+      "「まる子プリマドンナに憧れる」の巻",
+      "「まる子 耳かきぐせが直らない」の巻"
+    ],
+    "title_ja": "「まる子プリマドンナに憧れる」の巻／「まる子 耳かきぐせが直らない」の巻",
+    "title_ro": "( Maru Ko Purimadonna ni Akogare Ru ) no Kan / ( Maru Ko Mimi Kakigusega Naora Nai ) no Kan"
+  },
+  "77": {
+    "episode": 77,
+    "season": 1,
+    "air_date": "1991-06-23",
+    "titles_ja": [
+      "「まる子 百恵ちゃんのコンサートに行く」の巻"
+    ],
+    "title_ja": "「まる子 百恵ちゃんのコンサートに行く」の巻",
+    "title_ro": "( Maru Ko Momoe Channo Konsaato ni Iku ) no Kan"
+  },
+  "78": {
+    "episode": 78,
+    "season": 1,
+    "air_date": "1991-06-30",
+    "titles_ja": [
+      "「まるちゃん 結婚式に出席する」の巻"
+    ],
+    "title_ja": "「まるちゃん 結婚式に出席する」の巻",
+    "title_ro": "( Maruchan Kekkonshiki ni Shusseki Suru ) no Kan"
+  },
+  "79": {
+    "episode": 79,
+    "season": 1,
+    "air_date": "1991-07-07",
+    "titles_ja": [
+      "「まるちゃんの七夕映画会」の巻",
+      "「賞金27万円の使い道」の巻"
+    ],
+    "title_ja": "「まるちゃんの七夕映画会」の巻／「賞金27万円の使い道」の巻",
+    "title_ro": "( Maruchanno Tanabata Eiga Kai ) no Kan / ( Shoukin 27 Man'en no Tsukaimichi ) no Kan"
+  },
+  "80": {
+    "episode": 80,
+    "season": 1,
+    "air_date": "1991-07-14",
+    "titles_ja": [
+      "「まる子 洋服を作ってもらう」の巻",
+      "「まる子 かき氷を作る」の巻",
+      "「まる子 ファイトを燃やす」の巻",
+      "「まる子のファイト燃えつきる」の巻"
+    ],
+    "title_ja": "「まる子 洋服を作ってもらう」の巻／「まる子 かき氷を作る」の巻／「まる子 ファイトを燃やす」の巻／「まる子のファイト燃えつきる」の巻",
+    "title_ro": "( Maru Ko Youfuku Wo Tsukutsu Temorau ) no Kan / ( Maru Ko Kaki Koori Wo Tsukuru ) no Kan / ( Maru Ko Faito Wo Moya Su ) no Kan / ( Maru Ko no Faito Moe Tsukiru ) no Kan"
+  },
+  "81": {
+    "episode": 81,
+    "season": 1,
+    "air_date": "1991-07-28",
+    "titles_ja": [
+      "「まる子まぼろしの洋館を見る」の巻"
+    ],
+    "title_ja": "「まる子まぼろしの洋館を見る」の巻",
+    "title_ro": "( Maru Ko Maboroshino Youkan Wo Miru ) no Kan"
+  },
+  "82": {
+    "episode": 82,
+    "season": 1,
+    "air_date": "1991-08-04",
+    "titles_ja": [
+      "「まるちゃんお泊まりに行く」の巻"
+    ],
+    "title_ja": "「まるちゃんお泊まりに行く」の巻",
+    "title_ro": "( Maruchan'o Tomari ni Iku ) no Kan"
+  },
+  "83": {
+    "episode": 83,
+    "season": 1,
+    "air_date": "1991-08-11",
+    "titles_ja": [
+      "「まるちゃんラジオ体操がイヤで仕方ない」の巻"
+    ],
+    "title_ja": "「まるちゃんラジオ体操がイヤで仕方ない」の巻",
+    "title_ro": "( Maruchan Rajio Taisou ga Iya De Shikatanai ) no Kan"
+  },
+  "84": {
+    "episode": 84,
+    "season": 1,
+    "air_date": "1991-08-18",
+    "titles_ja": [
+      "「まる子双子がうらやましい」の巻"
+    ],
+    "title_ja": "「まる子双子がうらやましい」の巻",
+    "title_ro": "( Maru Ko Futago Gaurayamashii ) no Kan"
+  },
+  "85": {
+    "episode": 85,
+    "season": 1,
+    "air_date": "1991-08-25",
+    "titles_ja": [
+      "「まる子 神社の大掃除をする」の巻",
+      "「まる子 夏休みのお天気調べを忘れる」の巻"
+    ],
+    "title_ja": "「まる子 神社の大掃除をする」の巻／「まる子 夏休みのお天気調べを忘れる」の巻",
+    "title_ro": "( Maru Ko Jinja no Oosouji Wosuru ) no Kan / ( Maru Ko Natsuyasumi Noo Tenki Shirabe Wo Wasure Ru ) no Kan"
+  },
+  "86": {
+    "episode": 86,
+    "season": 1,
+    "air_date": "1991-09-01",
+    "titles_ja": [
+      "「まる子 南の島のおみやげ分配に困る」の巻"
+    ],
+    "title_ja": "「まる子 南の島のおみやげ分配に困る」の巻",
+    "title_ro": "( Maru Ko Minami no Shima Noomiyage Bunpai ni Komaru ) no Kan"
+  },
+  "87": {
+    "episode": 87,
+    "season": 1,
+    "air_date": "1991-09-08",
+    "titles_ja": [
+      "「まる子 はまじとウワサになる」の巻"
+    ],
+    "title_ja": "「まる子 はまじとウワサになる」の巻",
+    "title_ro": "( Maru Ko Hamajito Uwasa Ninaru ) no Kan"
+  },
+  "88": {
+    "episode": 88,
+    "season": 1,
+    "air_date": "1991-09-15",
+    "titles_ja": [
+      "「おじいちゃんの世界一周」の巻"
+    ],
+    "title_ja": "「おじいちゃんの世界一周」の巻",
+    "title_ro": "( Ojiichanno Sekaiisshuu ) no Kan"
+  },
+  "89": {
+    "episode": 89,
+    "season": 1,
+    "air_date": "1991-09-22",
+    "titles_ja": [
+      "「まる子 遊園地に行く」の巻"
+    ],
+    "title_ja": "「まる子 遊園地に行く」の巻",
+    "title_ro": "( Maru Ko Yuuenchi ni Iku ) no Kan"
+  },
+  "90": {
+    "episode": 90,
+    "season": 1,
+    "air_date": "1991-09-29",
+    "titles_ja": [
+      "「家庭内カルチャー教室」の巻"
+    ],
+    "title_ja": "「家庭内カルチャー教室」の巻",
+    "title_ro": "( Kateinai Karuchaa Kyoushitsu ) no Kan"
+  },
+  "91": {
+    "episode": 91,
+    "season": 1,
+    "air_date": "1991-10-06",
+    "titles_ja": [
+      "「まるちゃん 社会科見学に行く」の巻"
+    ],
+    "title_ja": "「まるちゃん 社会科見学に行く」の巻",
+    "title_ro": "( Maruchan Shakaika Kengaku ni Iku ) no Kan"
+  },
+  "92": {
+    "episode": 92,
+    "season": 1,
+    "air_date": "1991-10-13",
+    "titles_ja": [
+      "「まる子 松茸を食べる」の巻",
+      "「まる子 泡風呂に憧れる」の巻"
+    ],
+    "title_ja": "「まる子 松茸を食べる」の巻／「まる子 泡風呂に憧れる」の巻",
+    "title_ro": "( Maru Ko Matsutake Wo Tabe Ru ) no Kan / ( Maru Ko Awaburo ni Akogare Ru ) no Kan"
+  },
+  "93": {
+    "episode": 93,
+    "season": 1,
+    "air_date": "1991-10-20",
+    "titles_ja": [
+      "「お楽しみ給食会」の巻"
+    ],
+    "title_ja": "「お楽しみ給食会」の巻",
+    "title_ro": "( o Tanoshimi Kyuushoku Kai ) no Kan"
+  },
+  "94": {
+    "episode": 94,
+    "season": 1,
+    "air_date": "1991-10-27",
+    "titles_ja": [
+      "「誘拐犯に気をつけろ」の巻"
+    ],
+    "title_ja": "「誘拐犯に気をつけろ」の巻",
+    "title_ro": "( Yuukaihan ni Kiwo Tsukero ) no Kan"
+  },
+  "95": {
+    "episode": 95,
+    "season": 1,
+    "air_date": "1991-11-03",
+    "titles_ja": [
+      "「お父さん8ミリカメラを借りてくる」の巻"
+    ],
+    "title_ja": "「お父さん8ミリカメラを借りてくる」の巻",
+    "title_ro": "( o Tousan 8 Mirikamera Wo Kari Tekuru ) no Kan"
+  },
+  "96": {
+    "episode": 96,
+    "season": 1,
+    "air_date": "1991-11-10",
+    "titles_ja": [
+      "「まる子 お祭りに行く」の巻",
+      "「女の子・男の子」の巻"
+    ],
+    "title_ja": "「まる子 お祭りに行く」の巻／「女の子・男の子」の巻",
+    "title_ro": "( Maru Ko o Matsuri ni Iku ) no Kan / ( Onnanoko ・ Otokonoko ) no Kan"
+  },
+  "97": {
+    "episode": 97,
+    "season": 1,
+    "air_date": "1991-11-17",
+    "titles_ja": [
+      "「まる子みんなにばかにされる」の巻"
+    ],
+    "title_ja": "「まる子みんなにばかにされる」の巻",
+    "title_ro": "( Maru Ko Minnanibakanisareru ) no Kan"
+  },
+  "98": {
+    "episode": 98,
+    "season": 1,
+    "air_date": "1991-11-24",
+    "titles_ja": [
+      "「まる子 みかん狩りに行く」の巻"
+    ],
+    "title_ja": "「まる子 みかん狩りに行く」の巻",
+    "title_ro": "( Maru Ko Mikan Kari ni Iku ) no Kan"
+  },
+  "99": {
+    "episode": 99,
+    "season": 1,
+    "air_date": "1991-12-01",
+    "titles_ja": [
+      "「学校のバザー」の巻"
+    ],
+    "title_ja": "「学校のバザー」の巻",
+    "title_ro": "( Gakkou no Bazaa ) no Kan"
+  },
+  "100": {
+    "episode": 100,
+    "season": 1,
+    "air_date": "1991-12-08",
+    "titles_ja": [
+      "「花輪邸ついに公開」の巻"
+    ],
+    "title_ja": "「花輪邸ついに公開」の巻",
+    "title_ro": "( Hanawa Tei Tsuini Koukai ) no Kan"
+  },
+  "101": {
+    "episode": 101,
+    "season": 1,
+    "air_date": "1991-12-15",
+    "titles_ja": [
+      "「花輪クンちに来た友人帰る」の巻"
+    ],
+    "title_ja": "「花輪クンちに来た友人帰る」の巻",
+    "title_ro": "( Hanawa Kun Chini Kita Yuujin Kaeru ) no Kan"
+  },
+  "102": {
+    "episode": 102,
+    "season": 1,
+    "air_date": "1991-12-22",
+    "titles_ja": [
+      "「家庭内クリスマス」の巻"
+    ],
+    "title_ja": "「家庭内クリスマス」の巻",
+    "title_ro": "( Kateinai Kurisumasu ) no Kan"
+  },
+  "103": {
+    "episode": 103,
+    "season": 1,
+    "air_date": "1991-12-29",
+    "titles_ja": [
+      "「自家製洗濯石鹸」の巻",
+      "「お母さん鮎の甘露煮を作る」の巻"
+    ],
+    "title_ja": "「自家製洗濯石鹸」の巻／「お母さん鮎の甘露煮を作る」の巻",
+    "title_ro": "( Jikasei Sentakusekken ) no Kan / ( o Kaasan Ayu no Kanro ni Wo Tsukuru ) no Kan"
+  },
+  "104": {
+    "episode": 104,
+    "season": 1,
+    "air_date": "1992-01-05",
+    "titles_ja": [
+      "「まる子 凧上げをする」の巻",
+      "「まる子 七草がゆが食べたい」の巻"
+    ],
+    "title_ja": "「まる子 凧上げをする」の巻／「まる子 七草がゆが食べたい」の巻",
+    "title_ro": "( Maru Ko Tako Age Wosuru ) no Kan / ( Maru Ko Nanakusa Gayuga Tabeta I ) no Kan"
+  },
+  "105": {
+    "episode": 105,
+    "season": 1,
+    "air_date": "1992-01-12",
+    "titles_ja": [
+      "「まる子の貯金通帳」の巻",
+      "「まる子 編み物をする」の巻"
+    ],
+    "title_ja": "「まる子の貯金通帳」の巻／「まる子 編み物をする」の巻",
+    "title_ro": "( Maru Ko no Chokin Tsuuchou ) no Kan / ( Maru Ko Ami Mono Wosuru ) no Kan"
+  },
+  "106": {
+    "episode": 106,
+    "season": 1,
+    "air_date": "1992-01-19",
+    "titles_ja": [
+      "「まる子 湯たんぽを欲しがる」の巻"
+    ],
+    "title_ja": "「まる子 湯たんぽを欲しがる」の巻",
+    "title_ro": "( Maru Ko Yu Tanpowo Hosshi Garu ) no Kan"
+  },
+  "107": {
+    "episode": 107,
+    "season": 1,
+    "air_date": "1992-01-26",
+    "titles_ja": [
+      "「学校のスケート教室」の巻"
+    ],
+    "title_ja": "「学校のスケート教室」の巻",
+    "title_ro": "( Gakkou no Sukeeto Kyoushitsu ) no Kan"
+  },
+  "108": {
+    "episode": 108,
+    "season": 1,
+    "air_date": "1992-02-02",
+    "titles_ja": [
+      "「町にへび屋がやって来た」の巻",
+      "「まる子 甘酒ばかり飲む」の巻"
+    ],
+    "title_ja": "「町にへび屋がやって来た」の巻／「まる子 甘酒ばかり飲む」の巻",
+    "title_ro": "( Machi Nihebi Ya Gayatte Kita ) no Kan / ( Maru Ko Amazake Bakari Nomu ) no Kan"
+  },
+  "109": {
+    "episode": 109,
+    "season": 1,
+    "air_date": "1992-02-09",
+    "titles_ja": [
+      "「みどりちゃんのバレンタインデー」の巻"
+    ],
+    "title_ja": "「みどりちゃんのバレンタインデー」の巻",
+    "title_ro": "( Midorichanno Barentaindee ) no Kan"
+  },
+  "110": {
+    "episode": 110,
+    "season": 1,
+    "air_date": "1992-02-16",
+    "titles_ja": [
+      "「まる子星の砂が欲しい」の巻",
+      "「まる子 雀の餌づけをする」の巻"
+    ],
+    "title_ja": "「まる子星の砂が欲しい」の巻／「まる子 雀の餌づけをする」の巻",
+    "title_ro": "( Maru Ko Hoshi no Suna ga Hoshii ) no Kan / ( Maru Ko Suzume no Esa Zukewosuru ) no Kan"
+  },
+  "111": {
+    "episode": 111,
+    "season": 1,
+    "air_date": "1992-02-23",
+    "titles_ja": [
+      "「みやこお姉ちゃんの赤ちゃん」の巻"
+    ],
+    "title_ja": "「みやこお姉ちゃんの赤ちゃん」の巻",
+    "title_ro": "( Miyakoo Neechan no Akachan ) no Kan"
+  },
+  "112": {
+    "episode": 112,
+    "season": 1,
+    "air_date": "1992-03-01",
+    "titles_ja": [
+      "「先生の家に遊びに行こう」の巻"
+    ],
+    "title_ja": "「先生の家に遊びに行こう」の巻",
+    "title_ro": "( Sensei no Ie ni Asobi ni Iko U ) no Kan"
+  },
+  "113": {
+    "episode": 113,
+    "season": 1,
+    "air_date": "1992-03-08",
+    "titles_ja": [
+      "「まる子ノラ犬に追いかけられる」の巻"
+    ],
+    "title_ja": "「まる子ノラ犬に追いかけられる」の巻",
+    "title_ro": "( Maru Ko Nora Inu ni Oi Kakerareru ) no Kan"
+  },
+  "114": {
+    "episode": 114,
+    "season": 1,
+    "air_date": "1992-03-15",
+    "titles_ja": [
+      "「丸尾君と花輪君」の巻",
+      "「我が家に白アリが!」の巻"
+    ],
+    "title_ja": "「丸尾君と花輪君」の巻／「我が家に白アリが!」の巻",
+    "title_ro": "( Maruo Kun to Hanawa Kun ) no Kan / ( Wagaya ni Shiroari ga ! ) no Kan"
+  },
+  "115": {
+    "episode": 115,
+    "season": 1,
+    "air_date": "1992-03-22",
+    "titles_ja": [
+      "「まる子 鯉の放流に参加する」の巻",
+      "「花粉症騒動」の巻"
+    ],
+    "title_ja": "「まる子 鯉の放流に参加する」の巻／「花粉症騒動」の巻",
+    "title_ro": "( Maru Ko Koi no Houryuu ni Sanka Suru ) no Kan / ( Kafunshou Soudou ) no Kan"
+  },
+  "116": {
+    "episode": 116,
+    "season": 1,
+    "air_date": "1992-03-29",
+    "titles_ja": [
+      "「永沢君の家、火事になる」の巻"
+    ],
+    "title_ja": "「永沢君の家、火事になる」の巻",
+    "title_ro": "( Nagasawa Kun no Ie , Kaji Ninaru ) no Kan"
+  },
+  "117": {
+    "episode": 117,
+    "season": 1,
+    "air_date": "1992-04-05",
+    "titles_ja": [
+      "「永沢君ちの火事見舞い」の巻"
+    ],
+    "title_ja": "「永沢君ちの火事見舞い」の巻",
+    "title_ro": "( Nagasawa Kun Chino Kaji Mimai ) no Kan"
+  },
+  "118": {
+    "episode": 118,
+    "season": 1,
+    "air_date": "1992-04-12",
+    "titles_ja": [
+      "「まる子 不幸の手紙をもらう」の巻"
+    ],
+    "title_ja": "「まる子 不幸の手紙をもらう」の巻",
+    "title_ro": "( Maru Ko Fukou no Tegami Womorau ) no Kan"
+  },
+  "119": {
+    "episode": 119,
+    "season": 1,
+    "air_date": "1992-04-19",
+    "titles_ja": [
+      "「ノートはきれいに!」の巻",
+      "「ボンヤリまる子」の巻"
+    ],
+    "title_ja": "「ノートはきれいに!」の巻／「ボンヤリまる子」の巻",
+    "title_ro": "( Nooto Hakireini ! ) no Kan / ( Bonyari Maru Ko ) no Kan"
+  },
+  "120": {
+    "episode": 120,
+    "season": 1,
+    "air_date": "1992-04-26",
+    "titles_ja": [
+      "「まる子 お茶の味にうるさい」の巻"
+    ],
+    "title_ja": "「まる子 お茶の味にうるさい」の巻",
+    "title_ro": "( Maru Ko o Cha no Aji Niurusai ) no Kan"
+  },
+  "121": {
+    "episode": 121,
+    "season": 1,
+    "air_date": "1992-05-03",
+    "titles_ja": [
+      "「まる子 ふれあいの一人旅」の巻"
+    ],
+    "title_ja": "「まる子 ふれあいの一人旅」の巻",
+    "title_ro": "( Maru Ko Fureaino Hitoritabi ) no Kan"
+  },
+  "122": {
+    "episode": 122,
+    "season": 1,
+    "air_date": "1992-05-10",
+    "titles_ja": [
+      "「ツバメよ来い来い」の巻",
+      "「クラスのお誕生日会」の巻"
+    ],
+    "title_ja": "「ツバメよ来い来い」の巻／「クラスのお誕生日会」の巻",
+    "title_ro": "( Tsubame Yo Koi Koi ) no Kan / ( Kurasu Noo Tanjoubi Kai ) no Kan"
+  },
+  "123": {
+    "episode": 123,
+    "season": 1,
+    "air_date": "1992-05-17",
+    "titles_ja": [
+      "「動物園の写生大会」の巻"
+    ],
+    "title_ja": "「動物園の写生大会」の巻",
+    "title_ro": "( Doubutsuen no Shasei Taikai ) no Kan"
+  },
+  "124": {
+    "episode": 124,
+    "season": 1,
+    "air_date": "1992-05-24",
+    "titles_ja": [
+      "「しゃっくりが止まらない」の巻",
+      "「お父さん 北海道へ行く」の巻"
+    ],
+    "title_ja": "「しゃっくりが止まらない」の巻／「お父さん 北海道へ行く」の巻",
+    "title_ro": "( Shakkuriga Toma Ranai ) no Kan / ( o Tousan Hokkaidou e Iku ) no Kan"
+  },
+  "125": {
+    "episode": 125,
+    "season": 1,
+    "air_date": "1992-05-31",
+    "titles_ja": [
+      "「ヨッちゃんの彼女」の巻"
+    ],
+    "title_ja": "「ヨッちゃんの彼女」の巻",
+    "title_ro": "( Yotsu Channo Kanojo ) no Kan"
+  },
+  "126": {
+    "episode": 126,
+    "season": 1,
+    "air_date": "1992-06-07",
+    "titles_ja": [
+      "「食用ガエルで大騒ぎ」の巻"
+    ],
+    "title_ja": "「食用ガエルで大騒ぎ」の巻",
+    "title_ro": "( Shokuyou Gaeru De Oosawagi ) no Kan"
+  },
+  "127": {
+    "episode": 127,
+    "season": 1,
+    "air_date": "1992-06-14",
+    "titles_ja": [
+      "「フタが開かない」の巻",
+      "「まる子 砂時計が欲しい」の巻"
+    ],
+    "title_ja": "「フタが開かない」の巻／「まる子 砂時計が欲しい」の巻",
+    "title_ro": "( Futa ga Hiraka Nai ) no Kan / ( Maru Ko Sunadokei ga Hoshii ) no Kan"
+  },
+  "128": {
+    "episode": 128,
+    "season": 1,
+    "air_date": "1992-06-21",
+    "titles_ja": [
+      "「まる子 大パニック」の巻"
+    ],
+    "title_ja": "「まる子 大パニック」の巻",
+    "title_ro": "( Maru Ko Dai Panikku ) no Kan"
+  },
+  "129": {
+    "episode": 129,
+    "season": 1,
+    "air_date": "1992-06-28",
+    "titles_ja": [
+      "「うれしい お中元」の巻"
+    ],
+    "title_ja": "「うれしい お中元」の巻",
+    "title_ro": "( Ureshii o Chuugen ) no Kan"
+  },
+  "130": {
+    "episode": 130,
+    "season": 1,
+    "air_date": "1992-07-05",
+    "titles_ja": [
+      "「商店街の七夕祭り」の巻"
+    ],
+    "title_ja": "「商店街の七夕祭り」の巻",
+    "title_ro": "( Shoutengai no Tanabatamatsuri Ri ) no Kan"
+  },
+  "131": {
+    "episode": 131,
+    "season": 1,
+    "air_date": "1992-07-12",
+    "titles_ja": [
+      "「まる子 バーゲンの広告につられる」の巻"
+    ],
+    "title_ja": "「まる子 バーゲンの広告につられる」の巻",
+    "title_ro": "( Maru Ko Baagen no Koukoku Nitsurareru ) no Kan"
+  },
+  "132": {
+    "episode": 132,
+    "season": 1,
+    "air_date": "1992-07-19",
+    "titles_ja": [
+      "「明日から夏休み」の巻"
+    ],
+    "title_ja": "「明日から夏休み」の巻",
+    "title_ro": "( Ashita Kara Natsuyasumi ) no Kan"
+  },
+  "133": {
+    "episode": 133,
+    "season": 1,
+    "air_date": "1992-07-26",
+    "titles_ja": [
+      "「金魚すくいに情熱を」の巻"
+    ],
+    "title_ja": "「金魚すくいに情熱を」の巻",
+    "title_ro": "( Kingyo Sukuini Jounetsu Wo ) no Kan"
+  },
+  "134": {
+    "episode": 134,
+    "season": 1,
+    "air_date": "1992-08-02",
+    "titles_ja": [
+      "「夏休みの登校日」の巻"
+    ],
+    "title_ja": "「夏休みの登校日」の巻",
+    "title_ro": "( Natsuyasumi no Toukou Nichi ) no Kan"
+  },
+  "135": {
+    "episode": 135,
+    "season": 1,
+    "air_date": "1992-08-09",
+    "titles_ja": [
+      "「まる子 海水浴に行く」の巻"
+    ],
+    "title_ja": "「まる子 海水浴に行く」の巻",
+    "title_ro": "( Maru Ko Kaisuiyoku ni Iku ) no Kan"
+  },
+  "136": {
+    "episode": 136,
+    "season": 1,
+    "air_date": "1992-08-16",
+    "titles_ja": [
+      "「蚊がうるさい」の巻"
+    ],
+    "title_ja": "「蚊がうるさい」の巻",
+    "title_ro": "( Ka Gaurusai ) no Kan"
+  },
+  "137": {
+    "episode": 137,
+    "season": 1,
+    "air_date": "1992-08-23",
+    "titles_ja": [
+      "「巴川の花火大会」の巻"
+    ],
+    "title_ja": "「巴川の花火大会」の巻",
+    "title_ro": "( Tomoegawa no Hanabitaikai ) no Kan"
+  },
+  "138": {
+    "episode": 138,
+    "season": 1,
+    "air_date": "1992-08-30",
+    "titles_ja": [
+      "「まる子 ゴキブリをこわがる」の巻"
+    ],
+    "title_ja": "「まる子 ゴキブリをこわがる」の巻",
+    "title_ro": "( Maru Ko Gokiburi Wokowagaru ) no Kan"
+  },
+  "139": {
+    "episode": 139,
+    "season": 1,
+    "air_date": "1992-09-06",
+    "titles_ja": [
+      "「まる子花輪クンに英会話を習う」の巻"
+    ],
+    "title_ja": "「まる子花輪クンに英会話を習う」の巻",
+    "title_ro": "( Maru Ko Hanawa Kun ni Eikaiwa Wo Narau ) no Kan"
+  },
+  "140": {
+    "episode": 140,
+    "season": 1,
+    "air_date": "1992-09-13",
+    "titles_ja": [
+      "「まる子 つりに行く」の巻"
+    ],
+    "title_ja": "「まる子 つりに行く」の巻",
+    "title_ro": "( Maru Ko Tsurini Iku ) no Kan"
+  },
+  "141": {
+    "episode": 141,
+    "season": 1,
+    "air_date": "1992-09-20",
+    "titles_ja": [
+      "「花輪クンに恋人が!」の巻"
+    ],
+    "title_ja": "「花輪クンに恋人が!」の巻",
+    "title_ro": "( Hanawa Kun ni Koibito ga ! ) no Kan"
+  },
+  "142": {
+    "episode": 142,
+    "season": 1,
+    "air_date": "1992-09-27",
+    "titles_ja": [
+      "「さくら家のお月見」の巻"
+    ],
+    "title_ja": "「さくら家のお月見」の巻",
+    "title_ro": "( Sakura Ie Noo Tsukimi ) no Kan"
+  }
+}

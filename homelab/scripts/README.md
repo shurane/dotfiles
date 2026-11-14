@@ -17,6 +17,11 @@ uv run download-anpanman --dry-run --season 1 --limit 1
 uv run build-anpanman-metadata
 uv run build-anpanman-metadata --dry-run --end-sec 2 # test scraper on first 2 sections
 
+# Chibi Maruko-chan
+uv run sync-maruko --scan                            # hardlink, generate NFOs & trigger scan
+uv run sync-maruko --dry-run
+uv run build-maruko-metadata                         # scrape Season 1 metadata (142 episodes)
+
 # Jellyfin
 uv run jellyfin-scan                                 # trigger library refresh
 uv run jellyfin-scan --dry-run
