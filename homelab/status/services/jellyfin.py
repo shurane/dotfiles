@@ -196,7 +196,8 @@ async def _gather_jellyfin_raw_data(ctx: StatusContext) -> JellyfinRawData:
         try:
             async with httpx.AsyncClient(base_url=ctx.base_url("jellyfin"), timeout=ctx.http_timeout) as client:
                 auth_header = (
-                    'MediaBrowser Client="StatusCheck", Device="homelab-status", DeviceId="homelab-status-check", Version="1.0.0"'
+                    'MediaBrowser Client="StatusCheck", Device="homelab-status", '
+                    'DeviceId="homelab-status-check", Version="1.0.0"'
                 )
                 login_res = await client.post(
                     "/Users/AuthenticateByName",
