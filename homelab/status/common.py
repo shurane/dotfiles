@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime
+import sys
 
 from rich.console import Console
 from rich.panel import Panel
@@ -13,13 +14,29 @@ from models import TargetConnection
 console = Console()
 
 
-def require_env(env: dict[str, str], key: str) -> str:
+class Env(dict[str, str]):
+    """Environment dictionary with strict key requirement helper."""
+
+    def require(self, key: str) -> str:
+        """Return non-empty setting or print formatted error and exit."""
+        if val := self.get(key):
+            return val
+        console.print(f"[bold red]Error:[/bold red] {key} not found in .env or environment")
+        sys.exit(1)
+
+
+def require(env: dict[str, str], key: str) -> str:
     """Retrieve key from env dict or print error and exit in 1 line."""
+    if isinstance(env, Env):
+        return env.require(key)
     if val := env.get(key):
         return val
     console.print(f"[bold red]Error:[/bold red] {key} not found in .env or environment")
-    import sys
     sys.exit(1)
+
+
+# Backwards compatibility alias
+require_env = require
 
 
 def format_bytes(bytes_val: int) -> str:

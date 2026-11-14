@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 
 from dotenv import dotenv_values
 
+from common import Env
 from models import TargetConnection
 
 if TYPE_CHECKING:
@@ -242,7 +243,7 @@ def load_env(
     env_path: Path | None,
     lan_host: str,
     ssh_user: str | None = None,
-) -> dict[str, str]:
+) -> Env:
     """Load homelab .env file from local disk or via remote SFTP fallback."""
     if ssh_user is None:
         ssh_user = (
@@ -253,7 +254,7 @@ def load_env(
 
     # 1. Explicit path
     if env_path and env_path.is_file():
-        return {k: v for k, v in dotenv_values(env_path).items() if v is not None}
+        return Env({k: v for k, v in dotenv_values(env_path).items() if v is not None})
 
     # 2. Local homelab/.env or ./.env
     search_paths = [
@@ -266,7 +267,7 @@ def load_env(
     ]
     for p in search_paths:
         if p.is_file():
-            return {k: v for k, v in dotenv_values(p).items() if v is not None}
+            return Env({k: v for k, v in dotenv_values(p).items() if v is not None})
 
     # 3. Fallback to reading remote .env over SSH from lan_host (if on remote workstation / peer machine)
     if not is_target_local(lan_host):
@@ -288,12 +289,12 @@ def load_env(
             )
             if res.returncode == 0 and res.stdout:
                 parsed = dotenv_values(stream=io.StringIO(res.stdout))
-                return {k: v for k, v in parsed.items() if v is not None}
+                return Env({k: v for k, v in parsed.items() if v is not None})
         except Exception:
             pass
 
     # 4. OS environment variables
-    return dict(os.environ)
+    return Env(os.environ)
 
 
 def _get_ssh_tunnel_client(

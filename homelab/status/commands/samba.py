@@ -12,7 +12,6 @@ import anyio
 import typer
 from rich.console import Console
 
-from common import require_env
 from config import get_docker_client, load_env, resolve_target_connection
 from models import StatusContext
 from services.samba import render_samba_deep_report, run_samba_deep_check
@@ -61,8 +60,8 @@ def samba_command(
     conn = resolve_target_connection(lan_host)
     env = load_env(env_file, conn.host)
     username = env.get("HOMELAB_USERNAME", "username")
-    password = require_env(env, "HOMELAB_PASSWORD")
-    base_domain = require_env(env, "HOSTNAME_BASE")
+    password = env.require("HOMELAB_PASSWORD")
+    base_domain = env.require("HOSTNAME_BASE")
 
     docker_client = get_docker_client(docker_host, conn.host, no_docker)
 
