@@ -33,7 +33,7 @@ async def check_retroarch(ctx: StatusContext) -> ServiceResult:
                 )
 
             elapsed = (time.perf_counter() - t0) * 1000
-            root = ET.fromstring(res.text)
+            root = ET.fromstring(res.text)  # noqa: S314
             entries = []
             for resp in root.findall("{DAV:}response"):
                 href_elem = resp.find("{DAV:}href")

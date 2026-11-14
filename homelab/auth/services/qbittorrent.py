@@ -1,4 +1,5 @@
 import json
+from typing import TYPE_CHECKING
 
 import httpx
 
@@ -6,7 +7,9 @@ from common import ensure_state_dir, wait_for_http
 from compose import compose_up
 from config import QBITTORRENT_URL, ROOT
 from http_models import QbittorrentPreferences, QbittorrentSetPreferencesRequest
-from models import HomelabAuth
+
+if TYPE_CHECKING:
+    from models import HomelabAuth
 
 
 def qbittorrent_login(client: httpx.Client, username: str, password: str) -> bool:

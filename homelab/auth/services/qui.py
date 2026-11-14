@@ -1,11 +1,14 @@
 import sqlite3
+from typing import TYPE_CHECKING
 
 import httpx
 
 from common import ensure_state_dir, wait_for_http, wait_for_sqlite_table
 from compose import compose_exec, compose_up
 from config import QUI_URL, ROOT
-from models import HomelabAuth
+
+if TYPE_CHECKING:
+    from models import HomelabAuth
 
 
 def apply_qui(auth: HomelabAuth) -> None:

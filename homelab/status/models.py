@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import contextlib
 import json
-from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
@@ -14,6 +13,8 @@ import anyio
 from pydantic import BaseModel, ConfigDict, Field
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     import docker
     from docker.models.containers import Container
 
@@ -106,7 +107,7 @@ class StatusContext:
         try:
             cache_file.parent.mkdir(parents=True, exist_ok=True)
             cache_file.write_text(json.dumps(cache, indent=2), encoding="utf-8")
-        except Exception:
+        except Exception:  # noqa: S110
             pass
 
     @property
@@ -292,7 +293,7 @@ class StatusContext:
                 import os
 
                 found = []
-                targets = ["/mnt/mango", "/"] if os.path.exists("/mnt/mango") else ["/"]
+                targets = ["/mnt/mango", "/"] if Path("/mnt/mango").exists() else ["/"]
                 for path in targets:
                     try:
                         st = os.statvfs(path)
@@ -310,7 +311,7 @@ class StatusContext:
                                 "use_percent": pct,
                             }
                         )
-                    except Exception:
+                    except Exception:  # noqa: S110
                         pass
                 return found
 
@@ -353,7 +354,7 @@ class StatusContext:
                                     "use_percent": pct,
                                 }
                             )
-                        except Exception:
+                        except Exception:  # noqa: S110
                             pass
 
         self._disk_usage = disks

@@ -1,13 +1,16 @@
 """BookOrbit authentication bootstrap service."""
 
 import time
+from typing import TYPE_CHECKING
 
 import bcrypt
 import httpx
 
 from compose import compose_exec, compose_up
 from config import BOOKORBIT_URL
-from models import HomelabAuth
+
+if TYPE_CHECKING:
+    from models import HomelabAuth
 
 
 def wait_for_bookorbit(client: httpx.Client, timeout_seconds: int = 60) -> None:
@@ -54,7 +57,7 @@ def apply_bookorbit(auth: HomelabAuth) -> None:
             wait_for_bookorbit(client, timeout_seconds=15)
             if bookorbit_login(client, auth.username, auth.password):
                 return
-        except Exception:
+        except Exception:  # noqa: S110
             pass
 
     password_hash = bcrypt.hashpw(auth.password.encode("utf-8"), bcrypt.gensalt(12)).decode("utf-8")
@@ -62,7 +65,7 @@ def apply_bookorbit(auth: HomelabAuth) -> None:
     escaped_hash = password_hash.replace("'", "''")
 
     sql = (
-        f"INSERT INTO users (username, name, email, password_hash, is_superuser, failed_login_attempts, locked_until) "
+        f"INSERT INTO users (username, name, email, password_hash, is_superuser, failed_login_attempts, locked_until) "  # noqa: S608
         f"VALUES ('{escaped_user}', '{escaped_user}', '{escaped_user}@localhost', '{escaped_hash}', true, 0, NULL) "
         f"ON CONFLICT (username) DO UPDATE SET "
         f"password_hash = EXCLUDED.password_hash, "

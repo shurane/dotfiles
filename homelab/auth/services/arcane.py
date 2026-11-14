@@ -1,6 +1,6 @@
 import sys
 import time
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import httpx
 
@@ -8,7 +8,9 @@ from common import ensure_state_dir
 from compose import compose_up
 from config import ARCANE_URL, ROOT
 from http_models import ArcaneLoginRequest, ArcanePasswordRequest, ArcaneResponse, ArcaneUpdateUserRequest, ArcaneUser
-from models import HomelabAuth
+
+if TYPE_CHECKING:
+    from models import HomelabAuth
 
 
 def wait_for_arcane(client: httpx.Client, timeout_seconds: int = 60) -> None:

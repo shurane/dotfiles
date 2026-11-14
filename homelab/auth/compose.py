@@ -1,14 +1,18 @@
 import subprocess
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import docker
-from docker.models.containers import Container
 
 from config import ROOT
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from docker.models.containers import Container
+
 
 def run(command: list[str], cwd: Path | str | None = None) -> None:
-    subprocess.run(command, cwd=cwd, check=True)
+    subprocess.run(command, cwd=cwd, check=True)  # noqa: S603
 
 
 def docker_client() -> docker.DockerClient:
@@ -86,6 +90,6 @@ def get_container_ip(service: str, network: str = "proxy-tier") -> str | None:
         for net in networks.values():
             if net.get("IPAddress"):
                 return str(net["IPAddress"])
-    except Exception:
+    except Exception:  # noqa: S110
         pass
     return None

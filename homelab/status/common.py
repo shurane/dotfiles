@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
-from models import TargetConnection
+if TYPE_CHECKING:
+    from models import TargetConnection
 
 console = Console()
 

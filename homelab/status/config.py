@@ -190,7 +190,7 @@ def is_target_local(lan_host: str) -> bool:
             local_ips.add(info[4][0])
         if target_ip in local_ips:
             return True
-    except Exception:
+    except Exception:  # noqa: S110
         pass
 
     return False
@@ -223,17 +223,18 @@ def _load_raw_env(
 
     # 3. Fallback to reading remote .env over SSH from lan_host (if on remote workstation / peer machine)
     if not is_target_local(lan_host):
+        ssh_cmd = [
+            "ssh",
+            "-o",
+            "BatchMode=yes",
+            "-o",
+            "ConnectTimeout=3",
+            f"{ssh_user}@{lan_host}",
+            f"cat /home/{ssh_user}/dotfiles/homelab/.env",
+        ]
         try:
-            res = subprocess.run(
-                [
-                    "ssh",
-                    "-o",
-                    "BatchMode=yes",
-                    "-o",
-                    "ConnectTimeout=3",
-                    f"{ssh_user}@{lan_host}",
-                    f"cat /home/{ssh_user}/dotfiles/homelab/.env",
-                ],
+            res = subprocess.run(  # noqa: S603
+                ssh_cmd,
                 capture_output=True,
                 text=True,
                 timeout=4,
@@ -242,7 +243,7 @@ def _load_raw_env(
             if res.returncode == 0 and res.stdout:
                 parsed = dotenv_values(stream=io.StringIO(res.stdout))
                 return {k: str(v) for k, v in parsed.items() if v is not None}
-        except Exception:
+        except Exception:  # noqa: S110
             pass
 
     # 4. OS environment variables
@@ -275,7 +276,7 @@ def _get_ssh_tunnel_client(
 
     ssh_user = get_ssh_user(ssh_user)
 
-    runtime_dir = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp"))
+    runtime_dir = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp"))  # noqa: S108
     sock_path = runtime_dir / f"homelab-docker-{os.getuid()}.sock"
     sock_str = str(sock_path)
 
@@ -304,7 +305,7 @@ def _get_ssh_tunnel_client(
         f"{ssh_user}@{lan_host}",
     ]
     try:
-        proc = subprocess.Popen(
+        proc = subprocess.Popen(  # noqa: S603
             cmd,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
@@ -332,7 +333,7 @@ def _get_ssh_tunnel_client(
                 c = docker.DockerClient(base_url=f"unix://{sock_str}", timeout=1.0)
                 c.ping()
                 return c
-            except Exception:
+            except Exception:  # noqa: S110
                 pass
         time.sleep(0.02)
 
@@ -370,18 +371,18 @@ def get_docker_client(
             c = docker.from_env()
             c.ping()
             return c
-        except Exception:
+        except Exception:  # noqa: S110
             pass
 
     # Connect to local UNIX socket ONLY if target host is this local machine
     if is_target_local(lan_host):
-        sock_path = "/var/run/docker.sock"
-        if os.path.exists(sock_path) and os.access(sock_path, os.R_OK):
+        sock_p = Path("/var/run/docker.sock")
+        if sock_p.exists() and os.access(sock_p, os.R_OK):
             try:
                 c = docker.from_env()
                 c.ping()
                 return c
-            except Exception:
+            except Exception:  # noqa: S110
                 pass
 
     # Remote target host:

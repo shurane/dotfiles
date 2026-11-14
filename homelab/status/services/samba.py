@@ -6,14 +6,17 @@ import json
 import socket
 import time
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 import anyio
-from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
 from common import format_connection_badge, format_route_line, render_command_header
 from models import HealthStatus, ServiceResult, StatusContext, TargetConnection
+
+if TYPE_CHECKING:
+    from rich.console import Console
 
 
 @dataclass(slots=True)

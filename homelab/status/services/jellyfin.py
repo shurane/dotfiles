@@ -5,16 +5,18 @@ from __future__ import annotations
 import re
 import time
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import anyio
 import httpx
-from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
 from common import format_bytes, format_connection_badge, format_route_line, render_command_header
 from models import HealthStatus, ServiceResult, StatusContext, TargetConnection
+
+if TYPE_CHECKING:
+    from rich.console import Console
 
 
 @dataclass(slots=True)
@@ -227,7 +229,7 @@ async def _gather_jellyfin_raw_data(ctx: StatusContext) -> JellyfinRawData:
                             v = v_res.json().get("Version")
                             if v:
                                 raw.version = f"v{v}"
-                    except Exception:
+                    except Exception:  # noqa: S110
                         pass
 
                 async def _get_counts() -> None:
@@ -235,7 +237,7 @@ async def _gather_jellyfin_raw_data(ctx: StatusContext) -> JellyfinRawData:
                         c_res = await client.get("/Items/Counts", headers=headers)
                         if c_res.status_code == 200:
                             raw.item_counts = c_res.json()
-                    except Exception:
+                    except Exception:  # noqa: S110
                         pass
 
                 async def _get_sessions() -> None:
@@ -243,7 +245,7 @@ async def _gather_jellyfin_raw_data(ctx: StatusContext) -> JellyfinRawData:
                         s_res = await client.get("/Sessions", headers=headers)
                         if s_res.status_code == 200:
                             raw.sessions = s_res.json()
-                    except Exception:
+                    except Exception:  # noqa: S110
                         pass
 
                 async with anyio.create_task_group() as tg_api:

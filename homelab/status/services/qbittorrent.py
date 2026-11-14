@@ -4,17 +4,19 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import anyio
 import httpx
-from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
 from common import format_bytes, format_connection_badge, format_route_line, render_command_header
 from config import format_speed
 from models import HealthStatus, ServiceResult, StatusContext, TargetConnection
+
+if TYPE_CHECKING:
+    from rich.console import Console
 
 
 @dataclass(slots=True)
@@ -157,7 +159,7 @@ async def _fetch_host_public_ip(ctx: StatusContext) -> str:
             res = await client.get("https://ipinfo.io/ip")
             if res.status_code == 200:
                 return res.text.strip()
-    except Exception:
+    except Exception:  # noqa: S110
         pass
     return ""
 

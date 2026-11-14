@@ -6,7 +6,7 @@ import datetime
 import json
 import sys
 from dataclasses import asdict
-from pathlib import Path
+from pathlib import Path  # noqa: TC003
 
 import anyio
 import typer

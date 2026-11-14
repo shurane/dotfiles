@@ -15,7 +15,7 @@ def get_service_url(service_name: str, default_port: int, env_var: str) -> str:
 
         if ip := get_container_ip(service_name):
             return f"http://{ip}:{default_port}"
-    except Exception:
+    except Exception:  # noqa: S110
         pass
 
     return f"http://{service_name}:{default_port}"

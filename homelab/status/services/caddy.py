@@ -106,7 +106,7 @@ async def check_caddy(ctx: StatusContext) -> ServiceResult:
                         )
                         hosts = {h for r in srv_routes for m in r.get("match", []) for h in m.get("host", [])}
                         routes_list = sorted(hosts)
-                    except Exception:
+                    except Exception:  # noqa: S110
                         pass
 
         # Execute TLS, HTTP probe, and autosave read concurrently

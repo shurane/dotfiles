@@ -6,11 +6,10 @@ import json
 import re
 import time
 from dataclasses import asdict, dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import anyio
 import httpx
-from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
@@ -23,6 +22,9 @@ from common import (
     render_command_header,
 )
 from models import HealthStatus, ServiceResult, StatusContext, TargetConnection
+
+if TYPE_CHECKING:
+    from rich.console import Console
 
 
 @dataclass(slots=True)
@@ -134,7 +136,7 @@ async def _fetch_host_ip(ctx: StatusContext | None = None) -> IpDetails | None:
                 res = await client.get(url)
                 if res.status_code == 200:
                     return _parse_ipinfo(res.json())
-        except Exception:
+        except Exception:  # noqa: S112
             continue
     return None
 
@@ -499,7 +501,7 @@ def evaluate_vpn_report(
             report.download_speed = float(server_state.get("dl_info_speed", 0)) / 1024
             report.upload_speed = float(server_state.get("up_info_speed", 0)) / 1024
             report.active_torrents = len(maindata.get("torrents", {}))
-        except Exception:
+        except Exception:  # noqa: S110
             pass
 
     # 12. Transfer Info & Peer Swarm IP Verification
@@ -553,7 +555,7 @@ def evaluate_vpn_report(
                     warning=is_warn,
                 )
             )
-        except Exception:
+        except Exception:  # noqa: S110
             pass
     else:
         report.checks.append(

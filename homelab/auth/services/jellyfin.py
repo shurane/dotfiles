@@ -5,7 +5,7 @@ import sqlite3
 import time
 import uuid
 import xml.etree.ElementTree as ET
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import httpx
 
@@ -13,7 +13,11 @@ from common import ensure_state_dir
 from compose import compose_stop, compose_up
 from config import JELLYFIN_URL, ROOT
 from http_models import JellyfinAuthRequest, JellyfinAuthResponse
-from models import BootstrapOptions, HomelabAuth
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from models import BootstrapOptions, HomelabAuth
 
 JELLYFIN_PERMISSION_VALUES = {
     0: 1,
@@ -98,7 +102,7 @@ def wait_for_jellyfin(timeout_seconds: int = 90) -> None:
     raise RuntimeError("Jellyfin did not become ready")
 
 
-def ensure_jellyfin_files(jellyfin_root: Path, db_path: Path, system_config: Path) -> None:
+def ensure_jellyfin_files(_jellyfin_root: Path, db_path: Path, system_config: Path) -> None:
     if db_path.exists() and system_config.exists():
         return
 
@@ -125,7 +129,7 @@ def backup_jellyfin_db(db_path: Path) -> Path:
 
 
 def mark_jellyfin_wizard_complete(system_config: Path) -> None:
-    tree = ET.parse(system_config)
+    tree = ET.parse(system_config)  # noqa: S314
     root = tree.getroot()
     wizard = root.find("IsStartupWizardCompleted")
     if wizard is None:
@@ -325,7 +329,7 @@ def check_jellyfin(auth: HomelabAuth) -> bool:
         try:
             if jellyfin_login(client, auth.username, auth.password) is not None:
                 return True
-        except Exception:
+        except Exception:  # noqa: S110
             pass
     db_path = ROOT / "jellyfin" / "config" / "data" / "jellyfin.db"
     if db_path.exists():
@@ -333,7 +337,7 @@ def check_jellyfin(auth: HomelabAuth) -> bool:
             with sqlite3.connect(db_path) as db:
                 row = db.execute("select Username from Users where Username = ?", (auth.username,)).fetchone()
                 return row is not None
-        except Exception:
+        except Exception:  # noqa: S110
             pass
     return False
 
