@@ -214,7 +214,7 @@ def test_jellyfin_playback_sessions_parsing() -> None:
 
     assert len(report.active_sessions) == 1
     sess = report.active_sessions[0]
-    assert sess.username == "ehtesh"
+    assert sess.username == "username"
     assert sess.media_title == "Severance - Episode 1"
     assert sess.play_method == "Transcode"
     assert "ContainerNotSupported" in sess.transcode_reasons

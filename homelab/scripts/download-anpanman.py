@@ -190,7 +190,6 @@ def load_anpanman_metadata() -> dict[str, Any]:
     candidates = [
         Path(__file__).parent / "anpanman_metadata.json",
         Path.home() / "dotfiles/homelab/scripts/anpanman_metadata.json",
-        Path.home() / "dotfiles/homelab/scripts/anpanman_metadata.json",
     ]
     for p in candidates:
         if p.exists():

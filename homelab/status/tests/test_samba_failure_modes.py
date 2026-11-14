@@ -47,7 +47,7 @@ def _make_mock_raw(
     raw.port_445_open = port_445_open
     raw.port_445_latency_ms = port_445_latency_ms
     raw.shares = shares if shares is not None else ["downloads", "mango", "media", "retroarch"]
-    raw.accounts = accounts if accounts is not None else ["ehtesh"]
+    raw.accounts = accounts if accounts is not None else ["username"]
     raw.auth_check_code = auth_check_code
     raw.auth_check_out = auth_check_out
     raw.empty_pw_check_code = empty_pw_check_code
@@ -70,7 +70,7 @@ def test_samba_happy_path() -> None:
     assert len(report.shares) == 4
     assert len(report.accounts) == 1
     assert len(report.active_clients) == 1
-    assert report.active_clients[0].username == "ehtesh"
+    assert report.active_clients[0].username == "username"
     assert report.active_clients[0].protocol == "SMB3_11"
     assert report.drive_mount_mode == "rw"
 
@@ -163,14 +163,14 @@ def test_samba_smbstatus_parser() -> None:
         '"hostname": "192.168.1.50", "session_dialect": "SMB3_11", '
         '"encryption": {"cipher": "AES-128-GCM"}, "signing": {"cipher": "AES-128-GMAC"}}, '
         '"102": {"server_id": {"pid": "102"}, "username": "guest", "groupname": "nobody", '
-        '"remote_machine": "100.120.146.5", "session_dialect": "SMB3_00"}}, '
+        '"remote_machine": "100.64.0.5", "session_dialect": "SMB3_00"}}, '
         '"open_files": {}}'
     )
     version, sessions, locks = _parse_smb_json(sample_json)
     assert version == "v4.23.8"
     assert len(sessions) == 2
     assert sessions[0].pid == "101"
-    assert sessions[0].username == "ehtesh"
+    assert sessions[0].username == "username"
     assert sessions[0].protocol == "SMB3_11"
     assert sessions[0].encryption == "AES-128-GCM"
     assert sessions[1].username == "guest"
@@ -223,9 +223,9 @@ async def test_run_samba_deep_check_with_mock_context() -> None:
 
     async def _exec_c(name: str, cmd: str | list[str]) -> tuple[int, str]:
         cmd_str = " ".join(cmd) if isinstance(cmd, list) else str(cmd)
-        if "-Uehtesh%secret" in cmd_str:
+        if "-Uusername%secret" in cmd_str:
             return 0, "Domain=[WORKGROUP]"
-        if "-Uehtesh%" in cmd_str:
+        if "-Uusername%" in cmd_str:
             return 1, "session setup failed: NT_STATUS_LOGON_FAILURE"
         if "mount | grep" in cmd_str:
             return 0, "/dev/sda1 on /shares/mango type ext4 (rw,relatime)"
@@ -240,4 +240,4 @@ async def test_run_samba_deep_check_with_mock_context() -> None:
     report = await run_samba_deep_check(ctx)
     assert report.connection == ctx.connection
     assert "mango" in report.shares
-    assert "ehtesh" in report.accounts
+    assert "username" in report.accounts

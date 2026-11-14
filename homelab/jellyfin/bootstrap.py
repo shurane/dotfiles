@@ -114,7 +114,6 @@ def locate_env_file(custom_path: Path | None = None) -> Path | None:
     candidates = [
         Path(__file__).resolve().parent.parent / ".env",
         Path.home() / "dotfiles/homelab/.env",
-        Path.home() / "dotfiles/homelab/.env",
     ]
     for candidate in candidates:
         if candidate.exists():
