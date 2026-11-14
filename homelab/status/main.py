@@ -24,6 +24,8 @@ from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
 
+from commands.jellyfin import jellyfin_command
+from commands.samba import samba_command
 from commands.vpn import vpn_command
 from config import format_size, get_docker_client, load_env, render_sparkbar, resolve_target_connection
 from models import HealthStatus, ServiceResult, StatusContext
@@ -379,6 +381,16 @@ app.command(
     "vpn",
     help="Deep inspection of ProtonVPN tunnel, Gluetun kill switch, port forwarding, and qBittorrent.",
 )(vpn_command)
+
+app.command(
+    "jellyfin",
+    help="Deep inspection of Jellyfin container, Intel QuickSync (QSV) transcode, memory cgroup, and sessions.",
+)(jellyfin_command)
+
+app.command(
+    "samba",
+    help="Deep inspection of Samba container, port 445 connectivity, authenticated SMB, drive mounts, and locks.",
+)(samba_command)
 
 
 if __name__ == "__main__":

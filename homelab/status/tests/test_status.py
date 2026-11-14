@@ -211,12 +211,28 @@ def test_cli_help() -> None:
     assert "--host" in result.stdout
     assert "--json" in result.stdout
     assert "vpn" in result.stdout
+    assert "jellyfin" in result.stdout
+    assert "samba" in result.stdout
 
 
 def test_cli_vpn_help() -> None:
     result = runner.invoke(app, ["vpn", "--help"])
     assert result.exit_code == 0
     assert "Deep inspection of ProtonVPN tunnel" in result.stdout
+    assert "--json" in result.stdout
+
+
+def test_cli_jellyfin_help() -> None:
+    result = runner.invoke(app, ["jellyfin", "--help"])
+    assert result.exit_code == 0
+    assert "Deep inspection of Jellyfin container" in result.stdout
+    assert "--json" in result.stdout
+
+
+def test_cli_samba_help() -> None:
+    result = runner.invoke(app, ["samba", "--help"])
+    assert result.exit_code == 0
+    assert "Deep inspection of Samba container" in result.stdout
     assert "--json" in result.stdout
 
 
