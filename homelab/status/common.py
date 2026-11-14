@@ -10,6 +10,17 @@ from rich.text import Text
 
 from models import TargetConnection
 
+console = Console()
+
+
+def require_env(env: dict[str, str], key: str) -> str:
+    """Retrieve key from env dict or print error and exit in 1 line."""
+    if val := env.get(key):
+        return val
+    console.print(f"[bold red]Error:[/bold red] {key} not found in .env or environment")
+    import sys
+    sys.exit(1)
+
 
 def format_bytes(bytes_val: int) -> str:
     """Format bytes into human-friendly string (KB, MB, GB)."""

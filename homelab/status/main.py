@@ -27,6 +27,7 @@ from commands.jellyfin import jellyfin_command
 from commands.qbittorrent import qbittorrent_command
 from commands.samba import samba_command
 from commands.vpn import vpn_command
+from common import require_env
 from config import format_size, get_docker_client, load_env, render_sparkbar, resolve_target_connection
 from models import HealthStatus, ServiceResult, StatusContext
 from services import CHECK_REGISTRY, CheckFn
@@ -275,15 +276,8 @@ def main(
     conn = resolve_target_connection(lan_host)
     env = load_env(env_file, conn.host)
     username = env.get("HOMELAB_USERNAME", "username")
-    password = env.get("HOMELAB_PASSWORD", "")
-    base_domain = env.get("HOSTNAME_BASE", "")
-    if not base_domain:
-        console.print("[bold red]Error:[/bold red] HOSTNAME_BASE not found in .env or environment")
-        sys.exit(1)
-
-    if not password:
-        console.print("[bold red]Error:[/bold red] HOMELAB_PASSWORD not found in .env or environment")
-        sys.exit(1)
+    password = require_env(env, "HOMELAB_PASSWORD")
+    base_domain = require_env(env, "HOSTNAME_BASE")
 
     docker_client = get_docker_client(docker_host, conn.host, no_docker)
 

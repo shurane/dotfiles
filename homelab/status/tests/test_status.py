@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 import pytest
 from typer.testing import CliRunner
 
+from common import require_env
 from config import (
     classify_route,
     discover_tailscale_suffix,
@@ -314,6 +315,17 @@ async def test_check_qbittorrent_interface_binding() -> None:
         res_upnp = await check_qbittorrent(ctx)
     assert res_upnp.status == HealthStatus.DEGRADED
     assert any("UPnP" in b for b in res_upnp.branches)
+
+
+def test_require_env() -> None:
+    env = {"KEY1": "val1", "KEY2": ""}
+    assert require_env(env, "KEY1") == "val1"
+    with pytest.raises(SystemExit) as exc_info:
+        require_env(env, "KEY2")
+    assert exc_info.value.code == 1
+    with pytest.raises(SystemExit) as exc_info:
+        require_env(env, "MISSING_KEY")
+    assert exc_info.value.code == 1
 
 
 if __name__ == "__main__":

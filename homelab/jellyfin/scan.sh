@@ -20,18 +20,8 @@ if [ -f "$ENV_FILE" ]; then
     fi
 fi
 
-if [ -z "${JELLYFIN_API_KEY:-}" ]; then
-    echo "Error: JELLYFIN_API_KEY not found in environment or ${ENV_FILE}" >&2
-    exit 1
-fi
-
-if [ -z "${HOSTNAME_BASE:-}" ]; then
-    echo "Error: HOSTNAME_BASE not found in environment or ${ENV_FILE}" >&2
-    exit 1
-fi
-
-API_KEY="${JELLYFIN_API_KEY}"
-BASE_URL="https://jellyfin.${HOSTNAME_BASE}"
+API_KEY="${JELLYFIN_API_KEY:?Error: JELLYFIN_API_KEY not found in environment or ${ENV_FILE}}"
+BASE_URL="https://jellyfin.${HOSTNAME_BASE:?Error: HOSTNAME_BASE not found in environment or ${ENV_FILE}}"
 HOST="${1:-${JELLYFIN_HOST:-$BASE_URL}}"
 
 echo "Triggering Jellyfin library scan at ${HOST}..."
