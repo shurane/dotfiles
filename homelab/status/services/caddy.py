@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import datetime
 import json
 import socket
@@ -99,15 +100,13 @@ async def check_caddy(ctx: StatusContext) -> ServiceResult:
             else:
                 code, out = await ctx.exec_container(container, "cat /config/caddy/autosave.json")
                 if code == 0:
-                    try:
+                    with contextlib.suppress(json.JSONDecodeError, KeyError, TypeError):
                         cfg: dict[str, Any] = json.loads(out)
                         srv_routes = (
                             cfg.get("apps", {}).get("http", {}).get("servers", {}).get("srv0", {}).get("routes", [])
                         )
                         hosts = {h for r in srv_routes for m in r.get("match", []) for h in m.get("host", [])}
                         routes_list = sorted(hosts)
-                    except Exception:  # noqa: S110
-                        pass
 
         # Execute TLS, HTTP probe, and autosave read concurrently
         async with anyio.create_task_group() as tg:

@@ -1,3 +1,4 @@
+import contextlib
 import os
 from pathlib import Path
 
@@ -10,13 +11,11 @@ def get_service_url(service_name: str, default_port: int, env_var: str) -> str:
     if env_val := os.environ.get(env_var):
         return env_val.rstrip("/")
 
-    try:
-        from compose import get_container_ip
+    from compose import get_container_ip
 
+    with contextlib.suppress(Exception):
         if ip := get_container_ip(service_name):
             return f"http://{ip}:{default_port}"
-    except Exception:  # noqa: S110
-        pass
 
     return f"http://{service_name}:{default_port}"
 

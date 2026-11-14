@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import re
 import time
 from dataclasses import dataclass, field
@@ -223,30 +224,24 @@ async def _gather_jellyfin_raw_data(ctx: StatusContext) -> JellyfinRawData:
                 }
 
                 async def _get_version() -> None:
-                    try:
+                    with contextlib.suppress(httpx.HTTPError, KeyError, ValueError):
                         v_res = await client.get("/System/Info/Public")
                         if v_res.status_code == 200:
                             v = v_res.json().get("Version")
                             if v:
                                 raw.version = f"v{v}"
-                    except Exception:  # noqa: S110
-                        pass
 
                 async def _get_counts() -> None:
-                    try:
+                    with contextlib.suppress(httpx.HTTPError, KeyError, ValueError):
                         c_res = await client.get("/Items/Counts", headers=headers)
                         if c_res.status_code == 200:
                             raw.item_counts = c_res.json()
-                    except Exception:  # noqa: S110
-                        pass
 
                 async def _get_sessions() -> None:
-                    try:
+                    with contextlib.suppress(httpx.HTTPError, KeyError, ValueError):
                         s_res = await client.get("/Sessions", headers=headers)
                         if s_res.status_code == 200:
                             raw.sessions = s_res.json()
-                    except Exception:  # noqa: S110
-                        pass
 
                 async with anyio.create_task_group() as tg_api:
                     tg_api.start_soon(_get_version)

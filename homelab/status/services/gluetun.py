@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 import re
 import time
@@ -131,13 +132,11 @@ async def _fetch_host_ip(ctx: StatusContext | None = None) -> IpDetails | None:
                 return _parse_ipinfo(out)
 
     for url in ("https://ipinfo.io/json", "https://ifconfig.co/json"):
-        try:
+        with contextlib.suppress(httpx.HTTPError, json.JSONDecodeError, KeyError):
             async with httpx.AsyncClient(timeout=3.0) as client:
                 res = await client.get(url)
                 if res.status_code == 200:
                     return _parse_ipinfo(res.json())
-        except Exception:  # noqa: S112
-            continue
     return None
 
 
@@ -494,19 +493,17 @@ def evaluate_vpn_report(
 
     # 11. Swarm Connectivity & Torrent Counters
     if raw.qbt_maindata_raw.startswith("{"):
-        try:
+        with contextlib.suppress(json.JSONDecodeError, KeyError, ValueError, TypeError):
             maindata = json.loads(raw.qbt_maindata_raw)
             server_state = maindata.get("server_state", {})
             report.qbittorrent_status = str(server_state.get("connection_status", "unknown"))
             report.download_speed = float(server_state.get("dl_info_speed", 0)) / 1024
             report.upload_speed = float(server_state.get("up_info_speed", 0)) / 1024
             report.active_torrents = len(maindata.get("torrents", {}))
-        except Exception:  # noqa: S110
-            pass
 
     # 12. Transfer Info & Peer Swarm IP Verification
     if raw.qbt_transfer_code == 0 and raw.qbt_transfer_raw.startswith("{"):
-        try:
+        with contextlib.suppress(json.JSONDecodeError, KeyError, ValueError, TypeError):
             xfer = json.loads(raw.qbt_transfer_raw)
             dht_nodes = int(xfer.get("dht_nodes", 0))
             last_ext_v4 = str(xfer.get("last_external_address_v4", "")).strip()
@@ -555,8 +552,6 @@ def evaluate_vpn_report(
                     warning=is_warn,
                 )
             )
-        except Exception:  # noqa: S110
-            pass
     else:
         report.checks.append(
             VpnCheckItem(

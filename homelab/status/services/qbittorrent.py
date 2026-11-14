@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import time
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
@@ -154,13 +155,11 @@ async def _fetch_host_public_ip(ctx: StatusContext) -> str:
             if code == 0 and out.strip():
                 return out.strip()
 
-    try:
+    with contextlib.suppress(httpx.HTTPError):
         async with httpx.AsyncClient(timeout=3.0) as client:
             res = await client.get("https://ipinfo.io/ip")
             if res.status_code == 200:
                 return res.text.strip()
-    except Exception:  # noqa: S110
-        pass
     return ""
 
 

@@ -1,3 +1,4 @@
+import contextlib
 import subprocess
 from typing import TYPE_CHECKING
 
@@ -73,7 +74,7 @@ def compose_stop(stack: str, service: str | None = None) -> None:
 
 def get_container_ip(service: str, network: str = "proxy-tier") -> str | None:
     """Look up a Compose service container's IPv4 address on the specified Docker network."""
-    try:
+    with contextlib.suppress(Exception):
         client = docker_client()
         containers = client.containers.list(filters={"label": [f"com.docker.compose.service={service}"]})
         if not containers:
@@ -90,6 +91,4 @@ def get_container_ip(service: str, network: str = "proxy-tier") -> str | None:
         for net in networks.values():
             if net.get("IPAddress"):
                 return str(net["IPAddress"])
-    except Exception:  # noqa: S110
-        pass
     return None

@@ -1,5 +1,6 @@
 """BookOrbit authentication bootstrap service."""
 
+import contextlib
 import time
 from typing import TYPE_CHECKING
 
@@ -52,13 +53,10 @@ def apply_bookorbit(auth: HomelabAuth) -> None:
     compose_up("bookorbit", "bookorbit-postgres")
     compose_up("bookorbit")
 
-    with httpx.Client(timeout=15) as client:
-        try:
-            wait_for_bookorbit(client, timeout_seconds=15)
-            if bookorbit_login(client, auth.username, auth.password):
-                return
-        except Exception:  # noqa: S110
-            pass
+    with httpx.Client(timeout=15) as client, contextlib.suppress(httpx.HTTPError, RuntimeError):
+        wait_for_bookorbit(client, timeout_seconds=15)
+        if bookorbit_login(client, auth.username, auth.password):
+            return
 
     password_hash = bcrypt.hashpw(auth.password.encode("utf-8"), bcrypt.gensalt(12)).decode("utf-8")
     escaped_user = auth.username.replace("'", "''")

@@ -1,3 +1,4 @@
+import contextlib
 import hashlib
 import secrets
 import shutil
@@ -129,7 +130,7 @@ def backup_jellyfin_db(db_path: Path) -> Path:
 
 
 def mark_jellyfin_wizard_complete(system_config: Path) -> None:
-    tree = ET.parse(system_config)  # noqa: S314
+    tree = ET.parse(system_config)
     root = tree.getroot()
     wizard = root.find("IsStartupWizardCompleted")
     if wizard is None:
@@ -325,20 +326,14 @@ def verify_jellyfin(auth: HomelabAuth) -> None:
 
 
 def check_jellyfin(auth: HomelabAuth) -> bool:
-    with httpx.Client(timeout=5) as client:
-        try:
-            if jellyfin_login(client, auth.username, auth.password) is not None:
-                return True
-        except Exception:  # noqa: S110
-            pass
+    with httpx.Client(timeout=5) as client, contextlib.suppress(httpx.HTTPError):
+        if jellyfin_login(client, auth.username, auth.password) is not None:
+            return True
     db_path = ROOT / "jellyfin" / "config" / "data" / "jellyfin.db"
     if db_path.exists():
-        try:
-            with sqlite3.connect(db_path) as db:
-                row = db.execute("select Username from Users where Username = ?", (auth.username,)).fetchone()
-                return row is not None
-        except Exception:  # noqa: S110
-            pass
+        with contextlib.suppress(sqlite3.Error, OSError), sqlite3.connect(db_path) as db:
+            row = db.execute("select Username from Users where Username = ?", (auth.username,)).fetchone()
+            return row is not None
     return False
 
 

@@ -10,6 +10,7 @@ import platform
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -24,6 +25,7 @@ console = Console(stderr=True)
 
 if TYPE_CHECKING:
     import docker
+    import docker.errors
 
 
 def format_speed(bytes_per_sec: float) -> str:
@@ -183,15 +185,13 @@ def is_target_local(lan_host: str) -> bool:
     if current_node in (target_short, lan_host.lower()):
         return True
 
-    try:
+    with contextlib.suppress(socket.gaierror, OSError):
         target_ip = socket.gethostbyname(lan_host)
         local_ips = {"127.0.0.1", "::1"}
         for info in socket.getaddrinfo(socket.gethostname(), None):
             local_ips.add(info[4][0])
         if target_ip in local_ips:
             return True
-    except Exception:  # noqa: S110
-        pass
 
     return False
 
@@ -232,7 +232,7 @@ def _load_raw_env(
             f"{ssh_user}@{lan_host}",
             f"cat /home/{ssh_user}/dotfiles/homelab/.env",
         ]
-        try:
+        with contextlib.suppress(subprocess.SubprocessError, OSError):
             res = subprocess.run(  # noqa: S603
                 ssh_cmd,
                 capture_output=True,
@@ -243,8 +243,6 @@ def _load_raw_env(
             if res.returncode == 0 and res.stdout:
                 parsed = dotenv_values(stream=io.StringIO(res.stdout))
                 return {k: str(v) for k, v in parsed.items() if v is not None}
-        except Exception:  # noqa: S110
-            pass
 
     # 4. OS environment variables
     return dict(os.environ)
@@ -273,10 +271,11 @@ def _get_ssh_tunnel_client(
     import atexit
 
     import docker
+    import docker.errors
 
     ssh_user = get_ssh_user(ssh_user)
 
-    runtime_dir = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp"))  # noqa: S108
+    runtime_dir = Path(os.environ.get("XDG_RUNTIME_DIR", tempfile.gettempdir()))
     sock_path = runtime_dir / f"homelab-docker-{os.getuid()}.sock"
     sock_str = str(sock_path)
 
@@ -329,12 +328,10 @@ def _get_ssh_tunnel_client(
     t_end = time.perf_counter() + timeout
     while time.perf_counter() < t_end:
         if sock_path.exists():
-            try:
+            with contextlib.suppress(docker.errors.DockerException, OSError):
                 c = docker.DockerClient(base_url=f"unix://{sock_str}", timeout=1.0)
                 c.ping()
                 return c
-            except Exception:  # noqa: S110
-                pass
         time.sleep(0.02)
 
     _cleanup()
@@ -357,33 +354,29 @@ def get_docker_client(
     ssh_user = get_ssh_user(ssh_user)
 
     import docker
+    import docker.errors
 
     if docker_host:
-        try:
+        with contextlib.suppress(docker.errors.DockerException, OSError):
             c = docker.DockerClient(base_url=docker_host, timeout=5)
             c.ping()
             return c
-        except Exception:
-            return None
+        return None
 
     if os.environ.get("DOCKER_HOST"):
-        try:
+        with contextlib.suppress(docker.errors.DockerException, OSError):
             c = docker.from_env()
             c.ping()
             return c
-        except Exception:  # noqa: S110
-            pass
 
     # Connect to local UNIX socket ONLY if target host is this local machine
     if is_target_local(lan_host):
         sock_p = Path("/var/run/docker.sock")
         if sock_p.exists() and os.access(sock_p, os.R_OK):
-            try:
+            with contextlib.suppress(docker.errors.DockerException, OSError):
                 c = docker.from_env()
                 c.ping()
                 return c
-            except Exception:  # noqa: S110
-                pass
 
     # Remote target host:
     # Use native OpenSSH UNIX socket tunnel (high-performance C multiplexing, zero locking)

@@ -104,11 +104,9 @@ class StatusContext:
         cache = self._get_version_cache()
         cache[image_id] = version
         cache_file = Path.home() / ".cache" / "homelab" / "image_versions.json"
-        try:
+        with contextlib.suppress(OSError):
             cache_file.parent.mkdir(parents=True, exist_ok=True)
             cache_file.write_text(json.dumps(cache, indent=2), encoding="utf-8")
-        except Exception:  # noqa: S110
-            pass
 
     @property
     def disk_usage(self) -> list[dict[str, Any]] | None:
@@ -295,7 +293,7 @@ class StatusContext:
                 found = []
                 targets = ["/mnt/mango", "/"] if Path("/mnt/mango").exists() else ["/"]
                 for path in targets:
-                    try:
+                    with contextlib.suppress(OSError):
                         st = os.statvfs(path)
                         total = st.f_blocks * st.f_frsize
                         free = st.f_bavail * st.f_frsize
@@ -311,8 +309,6 @@ class StatusContext:
                                 "use_percent": pct,
                             }
                         )
-                    except Exception:  # noqa: S110
-                        pass
                 return found
 
             disks = await anyio.to_thread.run_sync(_local_stat)
@@ -340,7 +336,7 @@ class StatusContext:
                         if any(d["mount"] == mount_name for d in disks):
                             continue
 
-                        try:
+                        with contextlib.suppress(ValueError, IndexError):
                             total = int(parts[1]) * 1024
                             used = int(parts[2]) * 1024
                             free = int(parts[3]) * 1024
@@ -354,8 +350,6 @@ class StatusContext:
                                     "use_percent": pct,
                                 }
                             )
-                        except Exception:  # noqa: S110
-                            pass
 
         self._disk_usage = disks
         return disks
