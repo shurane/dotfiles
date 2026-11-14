@@ -317,7 +317,7 @@ async def test_check_qbittorrent_interface_binding() -> None:
     assert any("UPnP" in b for b in res_upnp.branches)
 
 
-def test_require_env() -> None:
+def test_env_require() -> None:
     env_obj = Env(HOMELAB_PASSWORD="val1", HOSTNAME_BASE="")
     assert env_obj.require("HOMELAB_PASSWORD") == "val1"
     with pytest.raises(SystemExit) as exc_info:
