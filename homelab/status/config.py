@@ -67,6 +67,28 @@ def render_sparkbar(pct: float, width: int = 10, bg: str = "grey27") -> str:
     return f"[{filled}{partial}{unfilled}]"
 
 
+def get_env_setting(key: str, default: str = "") -> str:
+    """Read configuration key from OS environment or local .env file."""
+    if val := os.environ.get(key):
+        return val
+
+    search_paths = [
+        Path.cwd() / ".env",
+        Path.cwd() / "homelab" / ".env",
+        Path(__file__).resolve().parent / ".env",
+        Path(__file__).resolve().parent.parent / ".env",
+        Path(__file__).resolve().parent.parent / "homelab" / ".env",
+        Path.home() / "dotfiles" / "homelab" / ".env",
+    ]
+    for p in search_paths:
+        if p.is_file():
+            values = dotenv_values(p)
+            if (val := values.get(key)) is not None:
+                return str(val)
+
+    return default
+
+
 def discover_tailscale_suffix() -> str | None:
     """Dynamically discover the Tailscale MagicDNS suffix for the current machine/tailnet."""
     # 1. Fast check: parse /etc/resolv.conf search/domain directive
@@ -82,9 +104,10 @@ def discover_tailscale_suffix() -> str | None:
         except Exception:
             pass
 
-    # 2. Fast check: canonical hostname lookup for short name 'm70q'
+    # 2. Fast check: canonical hostname lookup for configured node name
+    node = get_env_setting("HOMELAB_NODE_NAME", "server")
     try:
-        cname, _, _ = socket.gethostbyname_ex("m70q")
+        cname, _, _ = socket.gethostbyname_ex(node)
         if cname.endswith(".ts.net") and "." in cname:
             return cname.split(".", 1)[1]
     except Exception:
@@ -130,21 +153,23 @@ def resolve_target_connection(explicit_host: str | None = None) -> TargetConnect
 
     Candidate fallback order when no explicit host is provided:
       1. Explicit flag or HOMELAB_HOST env var
-      2. m70q.lan (Direct LAN)
-      3. m70q.<magicdns_suffix> (Tailscale MagicDNS)
-      4. m70q (MagicDNS short name)
+      2. {HOMELAB_NODE_NAME}.{HOMELAB_LAN_DOMAIN} (Direct LAN)
+      3. {HOMELAB_NODE_NAME}.<magicdns_suffix> (Tailscale MagicDNS)
+      4. {HOMELAB_NODE_NAME} (MagicDNS short name)
     """
     candidates: list[str] = []
     if explicit_host:
         candidates = [explicit_host]
-    elif env_host := os.environ.get("HOMELAB_HOST"):
+    elif env_host := get_env_setting("HOMELAB_HOST"):
         candidates = [env_host]
     else:
-        candidates.append("m70q.lan")
+        node = get_env_setting("HOMELAB_NODE_NAME", "server")
+        lan_domain = get_env_setting("HOMELAB_LAN_DOMAIN", "lan")
+        candidates.append(f"{node}.{lan_domain}")
         suffix = discover_tailscale_suffix()
         if suffix:
-            candidates.append(f"m70q.{suffix}")
-        candidates.append("m70q")
+            candidates.append(f"{node}.{suffix}")
+        candidates.append(node)
 
     selected_host = candidates[0]
     resolved_ip = ""
@@ -177,7 +202,7 @@ def resolve_target_connection(explicit_host: str | None = None) -> TargetConnect
 
 
 def resolve_target_host(explicit_host: str | None = None) -> str:
-    """Resolve target host: explicit flag -> env var -> m70q.lan (LAN) -> m70q (Tailscale)."""
+    """Resolve target host: explicit flag -> env var -> LAN host -> Tailscale."""
     return resolve_target_connection(explicit_host).host
 
 
@@ -207,9 +232,12 @@ def is_target_local(lan_host: str) -> bool:
 def load_env(
     env_path: Path | None,
     lan_host: str,
-    ssh_user: str = "ehtesh",
+    ssh_user: str | None = None,
 ) -> dict[str, str]:
     """Load homelab .env file from local disk or via remote SFTP fallback."""
+    if ssh_user is None:
+        ssh_user = get_env_setting("HOMELAB_SSH_USER") or os.environ.get("USER", "homelab")
+
     # 1. Explicit path
     if env_path and env_path.is_file():
         return {k: v for k, v in dotenv_values(env_path).items() if v is not None}
@@ -257,13 +285,16 @@ def load_env(
 
 def _get_ssh_tunnel_client(
     lan_host: str,
-    ssh_user: str = "ehtesh",
+    ssh_user: str | None = None,
     timeout: float = 3.0,
 ) -> docker.DockerClient | None:
     """Establish or reuse a native OpenSSH UNIX socket tunnel to remote docker.sock."""
     import atexit
 
     import docker
+
+    if ssh_user is None:
+        ssh_user = get_env_setting("HOMELAB_SSH_USER") or os.environ.get("USER", "homelab")
 
     runtime_dir = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp"))
     sock_path = runtime_dir / f"homelab-docker-{os.getuid()}.sock"
@@ -332,13 +363,19 @@ def _get_ssh_tunnel_client(
 
 def get_docker_client(
     docker_host: str | None = None,
-    lan_host: str = "m70q.lan",
+    lan_host: str | None = None,
     no_docker: bool = False,
-    ssh_user: str = "ehtesh",
+    ssh_user: str | None = None,
 ) -> docker.DockerClient | None:
     """Resolve Docker client using local socket, OpenSSH tunnel, or SSH bridge."""
     if no_docker:
         return None
+
+    if lan_host is None:
+        lan_host = resolve_target_host()
+
+    if ssh_user is None:
+        ssh_user = get_env_setting("HOMELAB_SSH_USER") or os.environ.get("USER", "homelab")
 
     import docker
 

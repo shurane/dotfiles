@@ -8,7 +8,7 @@ services:
       - CAP_NET_ADMIN
     environment:
       - MODEL=Macmini
-      - AVAHI_NAME=m70q
+      - AVAHI_NAME=${HOMELAB_NODE_NAME:-server}
       - AVAHI_DISABLE=true
       - FAIL_FAST=1
       - SAMBA_CONF_MAP_TO_GUEST=Bad User

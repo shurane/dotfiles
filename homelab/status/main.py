@@ -247,7 +247,7 @@ def main(
     docker_host: str | None = typer.Option(
         None,
         "--docker-host",
-        help="Override Docker daemon URL (e.g. ssh://ehtesh@m70q.lan)",
+        help="Override Docker daemon URL (e.g. ssh://user@server.lan)",
     ),
     no_docker: bool = typer.Option(
         False,
@@ -259,7 +259,7 @@ def main(
         "--lan-host",
         "--host",
         "-H",
-        help="Target host for SMB/Docker connection (auto-resolves m70q.lan or m70q on Tailscale)",
+        help="Target host for connection (auto-resolves from HOMELAB_HOST, LAN, or Tailscale)",
     ),
     timeout: float = typer.Option(
         10.0,

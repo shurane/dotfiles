@@ -92,6 +92,12 @@ class VpnRawData:
     dns_whoami_raw: str = ""
 
 
+def _extract_section(output: str, tag: str) -> str:
+    """Extract delimited section from batched command output (e.g. ===TAG=== ...)."""
+    match = re.search(rf"==={tag}===\n(.*?)(?=\n===|\Z)", output, re.DOTALL)
+    return match.group(1).strip() if match else ""
+
+
 def _parse_dns_whoami(output: str) -> str:
     """Parse upstream recursive DNS resolver IP from nslookup whoami.akamai.net output."""
     match = re.search(r"whoami\.akamai\.net.*?Address:\s*([0-9a-fA-F.:]+)", output, re.DOTALL)
@@ -205,13 +211,26 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
         async def fetch_vpn() -> None:
             raw.vpn_ip = await _fetch_gluetun_ip(ctx, "homelab-gluetun-1")
 
-        async def exec_tun() -> None:
-            raw.tun_stats_code, raw.tun_stats_raw = await ctx.exec_container(
-                "homelab-gluetun-1", "ip -s link show dev tun0"
+        async def exec_gluetun_local() -> None:
+            batch_cmd = (
+                "sh -c '"
+                "echo \"===TUN===\"; ip -s link show dev tun0 2>/dev/null; "
+                "echo \"===RESOLV===\"; cat /etc/resolv.conf 2>/dev/null; "
+                "echo \"===V6===\"; ip -6 route 2>/dev/null; "
+                "echo \"===PORT===\"; cat /tmp/gluetun/forwarded_port 2>/dev/null; "
+                "echo \"===IPTABLES===\"; iptables -nL INPUT 2>/dev/null; "
+                "echo \"===NETSTAT===\"; netstat -tuln 2>/dev/null; "
+                "echo \"===END===\""
+                "'"
             )
-
-        async def exec_resolv() -> None:
-            _, raw.resolv_conf = await ctx.exec_container("homelab-gluetun-1", "cat /etc/resolv.conf")
+            code, out = await ctx.exec_container("homelab-gluetun-1", batch_cmd)
+            raw.tun_stats_raw = _extract_section(out, "TUN")
+            raw.tun_stats_code = 0 if raw.tun_stats_raw else (code or 1)
+            raw.resolv_conf = _extract_section(out, "RESOLV")
+            raw.ipv6_route = _extract_section(out, "V6")
+            raw.forwarded_port_raw = _extract_section(out, "PORT")
+            raw.iptables_raw = _extract_section(out, "IPTABLES")
+            raw.netstat_raw = _extract_section(out, "NETSTAT")
 
         async def exec_trace() -> None:
             _, raw.trace_raw = await ctx.exec_container(
@@ -223,51 +242,29 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
                 "homelab-gluetun-1", "nslookup whoami.akamai.net"
             )
 
-        async def exec_v6() -> None:
-            _, raw.ipv6_route = await ctx.exec_container("homelab-gluetun-1", "ip -6 route")
-
-        async def exec_port() -> None:
-            _, raw.forwarded_port_raw = await ctx.exec_container(
-                "homelab-gluetun-1", "cat /tmp/gluetun/forwarded_port"
+        async def exec_qbt() -> None:
+            batch_qbt = (
+                "sh -c '"
+                "echo \"===PREFS===\"; wget -qO- http://127.0.0.1:8080/api/v2/app/preferences 2>/dev/null; "
+                "echo \"\n===MAINDATA===\"; wget -qO- http://127.0.0.1:8080/api/v2/sync/maindata 2>/dev/null; "
+                "echo \"\n===TRANSFER===\"; wget -qO- http://127.0.0.1:8080/api/v2/transfer/info 2>/dev/null; "
+                "echo \"\n===END===\""
+                "'"
             )
-
-        async def exec_iptables() -> None:
-            _, raw.iptables_raw = await ctx.exec_container("homelab-gluetun-1", "iptables -nL INPUT")
-
-        async def exec_netstat() -> None:
-            _, raw.netstat_raw = await ctx.exec_container("homelab-gluetun-1", "netstat -tuln")
-
-        async def exec_qbt_prefs() -> None:
-            code, out = await ctx.exec_container(
-                "homelab-qbittorrent-1", "wget -qO- http://127.0.0.1:8080/api/v2/app/preferences"
-            )
-            raw.qbt_prefs_code, raw.qbt_prefs_raw = code, out
-
-        async def exec_qbt_main() -> None:
-            _, raw.qbt_maindata_raw = await ctx.exec_container(
-                "homelab-qbittorrent-1", "wget -qO- http://127.0.0.1:8080/api/v2/sync/maindata"
-            )
-
-        async def exec_qbt_xfer() -> None:
-            code, out = await ctx.exec_container(
-                "homelab-qbittorrent-1", "wget -qO- http://127.0.0.1:8080/api/v2/transfer/info"
-            )
-            raw.qbt_transfer_code, raw.qbt_transfer_raw = code, out
+            code, out = await ctx.exec_container("homelab-qbittorrent-1", batch_qbt)
+            raw.qbt_prefs_raw = _extract_section(out, "PREFS")
+            raw.qbt_prefs_code = code if code != 0 else (0 if raw.qbt_prefs_raw.startswith("{") else 1)
+            raw.qbt_maindata_raw = _extract_section(out, "MAINDATA")
+            raw.qbt_transfer_raw = _extract_section(out, "TRANSFER")
+            raw.qbt_transfer_code = code if code != 0 else (0 if raw.qbt_transfer_raw.startswith("{") else 1)
 
         tg.start_soon(fetch_host)
         tg.start_soon(fetch_vpn)
-        tg.start_soon(exec_tun)
-        tg.start_soon(exec_resolv)
+        tg.start_soon(exec_gluetun_local)
         tg.start_soon(exec_trace)
         tg.start_soon(exec_dns_whoami)
-        tg.start_soon(exec_v6)
-        tg.start_soon(exec_port)
-        tg.start_soon(exec_iptables)
-        tg.start_soon(exec_netstat)
         if raw.qbt_found and raw.qbt_status == "running":
-            tg.start_soon(exec_qbt_prefs)
-            tg.start_soon(exec_qbt_main)
-            tg.start_soon(exec_qbt_xfer)
+            tg.start_soon(exec_qbt)
 
     return raw
 

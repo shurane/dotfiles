@@ -94,7 +94,7 @@ def _make_mock_raw(
 
 def test_evaluate_qbittorrent_report_healthy() -> None:
     raw = _make_mock_raw()
-    conn = TargetConnection(host="m70q.lan", ip="192.168.1.10", route="lan", description="Direct LAN")
+    conn = TargetConnection(host="server.lan", ip="192.168.1.10", route="lan", description="Direct LAN")
     report = evaluate_qbittorrent_report(raw, connection=conn)
 
     assert report.all_passed is True

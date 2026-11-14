@@ -61,7 +61,7 @@ def _make_mock_raw(
 
 
 def test_samba_happy_path() -> None:
-    conn = TargetConnection("m70q.lan", "192.168.1.10", "lan", "Direct LAN")
+    conn = TargetConnection("server.lan", "192.168.1.10", "lan", "Direct LAN")
     raw = _make_mock_raw()
     report = evaluate_samba_report(raw, conn)
 

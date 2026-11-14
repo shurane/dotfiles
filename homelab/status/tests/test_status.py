@@ -37,10 +37,10 @@ def test_is_target_local() -> None:
     assert is_target_local("nonexistent-host-999.invalid") is False
 
 
-def test_resolve_target_host() -> None:
+def test_resolve_target_host(monkeypatch: pytest.MonkeyPatch) -> None:
     assert resolve_target_host("custom.host") == "custom.host"
-    resolved = resolve_target_host()
-    assert resolved in ("m70q.lan", "m70q")
+    monkeypatch.setenv("HOMELAB_HOST", "mock-node.lan")
+    assert resolve_target_host() == "mock-node.lan"
 
 
 def test_classify_route() -> None:
@@ -50,17 +50,17 @@ def test_classify_route() -> None:
     assert "Local Host" in desc
 
     # Tailscale IP (RFC 6598 CGNAT block 100.64.0.0/10)
-    route, desc = classify_route("m70q", "100.64.0.1", is_local=False)
+    route, desc = classify_route("server", "100.64.0.1", is_local=False)
     assert route == "tailscale"
     assert desc == "Tailscale MagicDNS"
 
     # Tailscale MagicDNS FQDN
-    route, desc = classify_route("m70q.example.ts.net", "100.64.0.1", is_local=False)
+    route, desc = classify_route("server.example.ts.net", "100.64.0.1", is_local=False)
     assert route == "tailscale"
     assert desc == "Tailscale MagicDNS"
 
     # Direct LAN (RFC 1918)
-    route, desc = classify_route("m70q.lan", "192.168.1.10", is_local=False)
+    route, desc = classify_route("server.lan", "192.168.1.10", is_local=False)
     assert route == "lan"
     assert desc == "Direct LAN"
 
@@ -78,9 +78,9 @@ def test_discover_tailscale_suffix() -> None:
 
 
 def test_resolve_target_connection() -> None:
-    conn = resolve_target_connection("m70q.example.ts.net")
-    assert conn.host == "m70q.example.ts.net"
-    if is_target_local("m70q.example.ts.net"):
+    conn = resolve_target_connection("server.example.ts.net")
+    assert conn.host == "server.example.ts.net"
+    if is_target_local("server.example.ts.net"):
         assert conn.route == "local"
         assert conn.is_local is True
     else:

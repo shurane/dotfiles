@@ -55,7 +55,7 @@ uv run --project status status vpn           # ProtonVPN tun0 tunnel, Gluetun ki
 
 # Filter services, inspect remote hosts, or export JSON
 uv run --project status status -s jellyfin -s qbittorrent
-uv run --project status status -H m70q.lan         # Inspect remote host (auto-resolves LAN / Tailscale)
+uv run --project status status -H server.lan       # Inspect remote host (auto-resolves LAN / Tailscale)
 uv run --project status status --json
 
 # Or run from status/

@@ -35,7 +35,7 @@ def samba_command(
     docker_host: str | None = typer.Option(
         None,
         "--docker-host",
-        help="Override Docker daemon URL (e.g. ssh://ehtesh@m70q.lan)",
+        help="Override Docker daemon URL (e.g. ssh://user@server.lan)",
     ),
     no_docker: bool = typer.Option(
         False,
@@ -47,7 +47,7 @@ def samba_command(
         "--lan-host",
         "--host",
         "-H",
-        help="Target host for Samba connection (auto-resolves m70q.lan or m70q on Tailscale)",
+        help="Target host for Samba connection (auto-resolves from HOMELAB_HOST, LAN, or Tailscale)",
     ),
     timeout: float = typer.Option(
         10.0,

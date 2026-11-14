@@ -45,7 +45,7 @@ def _create_mock_context(
 ) -> StatusContext:
     ctx = MagicMock(spec=StatusContext)
     ctx.no_docker = False
-    ctx.connection = TargetConnection("m70q.lan", "192.168.1.10", "lan", "Direct LAN")
+    ctx.connection = TargetConnection("server.lan", "192.168.1.10", "lan", "Direct LAN")
 
     c_gluetun = _make_mock_container("homelab-gluetun-1", status=gluetun_status, health=gluetun_health)
     c_qbt = _make_mock_container(
@@ -65,6 +65,39 @@ def _create_mock_context(
 
     async def _exec_container(container_name: str, cmd: str | list[str]) -> tuple[int, str]:
         cmd_str = cmd if isinstance(cmd, str) else " ".join(cmd)
+
+        if "===TUN===" in cmd_str:
+            tun_code, tun_out = mapping.get("ip -s link show dev tun0", (0, ""))
+            res_code, res_out = mapping.get("cat /etc/resolv.conf", (0, ""))
+            v6_code, v6_out = mapping.get("ip -6 route", (0, ""))
+            port_code, port_out = mapping.get("forwarded_port", (0, ""))
+            ipt_code, ipt_out = mapping.get("iptables -nL INPUT", (0, ""))
+            net_code, net_out = mapping.get("netstat -tuln", (0, ""))
+            batch_out = (
+                f"===TUN===\n{tun_out}\n"
+                f"===RESOLV===\n{res_out}\n"
+                f"===V6===\n{v6_out}\n"
+                f"===PORT===\n{port_out}\n"
+                f"===IPTABLES===\n{ipt_out}\n"
+                f"===NETSTAT===\n{net_out}\n"
+                "===END==="
+            )
+            overall_code = tun_code or res_code or v6_code or port_code or ipt_code or net_code
+            return (overall_code, batch_out)
+
+        if "===PREFS===" in cmd_str:
+            p_code, p_out = mapping.get("api/v2/app/preferences", (0, ""))
+            m_code, m_out = mapping.get("api/v2/sync/maindata", (0, ""))
+            t_code, t_out = mapping.get("api/v2/transfer/info", (0, ""))
+            batch_out = (
+                f"===PREFS===\n{p_out}\n"
+                f"===MAINDATA===\n{m_out}\n"
+                f"===TRANSFER===\n{t_out}\n"
+                "===END==="
+            )
+            overall_code = p_code or m_code or t_code
+            return (overall_code, batch_out)
+
         for pattern, res in mapping.items():
             if pattern in cmd_str:
                 return res
@@ -408,11 +441,11 @@ async def test_adversarial_stale_cache_bypass() -> None:
 async def test_vpn_inspection_routes() -> None:
     """Verify that On-Device, Direct LAN, and Tailscale connection routes are correctly captured."""
     # 1. On-Device (local UNIX socket)
-    local_conn = TargetConnection("m70q", "127.0.0.1", "local", "Local Host (UNIX socket)", is_local=True)
+    local_conn = TargetConnection("server", "127.0.0.1", "local", "Local Host (UNIX socket)", is_local=True)
     badge, endpoint, full = format_connection_badge(local_conn)
     assert "On-Device" in badge
-    assert endpoint == "m70q • Local UNIX socket"
-    assert full == "On-Device (m70q • Local UNIX socket)"
+    assert endpoint == "server • Local UNIX socket"
+    assert full == "On-Device (server • Local UNIX socket)"
 
     ctx_local = _create_mock_context(exec_map=_default_exec_map())
     ctx_local.connection = local_conn
@@ -422,15 +455,15 @@ async def test_vpn_inspection_routes() -> None:
     ):
         report_local = await run_vpn_deep_check(ctx_local)
     assert report_local.checks[0].name == "Inspection Route"
-    assert report_local.checks[0].details == "On-Device (m70q • Local UNIX socket)"
+    assert report_local.checks[0].details == "On-Device (server • Local UNIX socket)"
     assert report_local.checks[0].passed is True
 
     # 2. Remote via Direct LAN
-    lan_conn = TargetConnection("m70q.lan", "192.168.1.10", "lan", "Direct LAN", is_local=False)
+    lan_conn = TargetConnection("server.lan", "192.168.1.10", "lan", "Direct LAN", is_local=False)
     badge_lan, endpoint_lan, full_lan = format_connection_badge(lan_conn)
     assert "Direct LAN" in badge_lan
-    assert endpoint_lan == "m70q.lan • 192.168.1.10"
-    assert full_lan == "Remote via Direct LAN (m70q.lan • 192.168.1.10)"
+    assert endpoint_lan == "server.lan • 192.168.1.10"
+    assert full_lan == "Remote via Direct LAN (server.lan • 192.168.1.10)"
 
     ctx_lan = _create_mock_context(exec_map=_default_exec_map())
     ctx_lan.connection = lan_conn
@@ -440,14 +473,14 @@ async def test_vpn_inspection_routes() -> None:
     ):
         report_lan = await run_vpn_deep_check(ctx_lan)
     assert report_lan.checks[0].name == "Inspection Route"
-    assert report_lan.checks[0].details == "Remote via Direct LAN (m70q.lan • 192.168.1.10)"
+    assert report_lan.checks[0].details == "Remote via Direct LAN (server.lan • 192.168.1.10)"
 
     # 3. Remote via Tailscale
-    ts_conn = TargetConnection("m70q", "100.64.0.1", "tailscale", "Tailscale MagicDNS", is_local=False)
+    ts_conn = TargetConnection("server", "100.64.0.1", "tailscale", "Tailscale MagicDNS", is_local=False)
     badge_ts, endpoint_ts, full_ts = format_connection_badge(ts_conn)
     assert "Tailscale" in badge_ts
-    assert endpoint_ts == "m70q • 100.64.0.1"
-    assert full_ts == "Remote via Tailscale (m70q • 100.64.0.1)"
+    assert endpoint_ts == "server • 100.64.0.1"
+    assert full_ts == "Remote via Tailscale (server • 100.64.0.1)"
 
     ctx_ts = _create_mock_context(exec_map=_default_exec_map())
     ctx_ts.connection = ts_conn
@@ -457,7 +490,7 @@ async def test_vpn_inspection_routes() -> None:
     ):
         report_ts = await run_vpn_deep_check(ctx_ts)
     assert report_ts.checks[0].name == "Inspection Route"
-    assert report_ts.checks[0].details == "Remote via Tailscale (m70q • 100.64.0.1)"
+    assert report_ts.checks[0].details == "Remote via Tailscale (server • 100.64.0.1)"
 
 
 @pytest.mark.anyio
