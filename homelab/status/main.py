@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import contextlib
-import datetime
 import json
 import logging
 import sys
@@ -22,6 +21,7 @@ from rich.spinner import Spinner
 from rich.table import Table
 from rich.text import Text
 from rich.tree import Tree
+from whenever import SYSTEM_TZ, Instant, ZonedDateTime
 
 from commands.jellyfin import jellyfin_command
 from commands.qbittorrent import qbittorrent_command
@@ -302,7 +302,7 @@ def main(
 
     # Terminal UI output mode: print header panel immediately before checks
     if not json_output:
-        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now_str = ZonedDateTime.now(SYSTEM_TZ).format("YYYY-MM-DD HH:mm:ss")
         header_text = Text()
         header_text.append("🔮 Homelab Deep Health & Content Inspector\n", style="bold magenta")
 
@@ -336,7 +336,7 @@ def main(
     # JSON output mode
     if json_output:
         out_dict = {
-            "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
+            "timestamp": Instant.now().format_iso(),
             "connection": asdict(conn),
             "target_host": conn.host,
             "base_domain": config.base_domain,

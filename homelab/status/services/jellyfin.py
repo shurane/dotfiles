@@ -12,6 +12,7 @@ import anyio
 import httpx
 from rich.panel import Panel
 from rich.table import Table
+from whenever import Instant
 
 from common import format_bytes, format_connection_badge, format_route_line, render_command_header
 from models import HealthStatus, ServiceResult, StatusContext, TargetConnection
@@ -37,6 +38,27 @@ class PlaybackSessionInfo:
     play_method: str  # DirectPlay, DirectStream, Transcode
     transcode_reasons: list[str] = field(default_factory=list)
     bitrate_bps: int = 0
+
+
+@dataclass(slots=True)
+class ConnectedClientInfo:
+    app_name: str
+    device_name: str
+    username: str
+    last_activity: str  # ISO-8601 UTC string
+    relative_time: str
+    app_version: str = ""
+
+
+@dataclass(slots=True)
+class PlaybackHistoryItem:
+    timestamp: str  # ISO-8601 UTC string
+    relative_time: str
+    username: str
+    media_title: str
+    device_name: str
+    client_name: str = ""
+    item_id: str = ""
 
 
 @dataclass(slots=True)
@@ -74,6 +96,8 @@ class JellyfinRawData:
     api_auth_token: str | None = None
     item_counts: dict[str, int] = field(default_factory=dict)
     sessions: list[dict[str, Any]] = field(default_factory=list)
+    devices: list[dict[str, Any]] = field(default_factory=list)
+    activity_entries: list[dict[str, Any]] = field(default_factory=list)
     version: str | None = None
     username: str = "username"
 
@@ -86,8 +110,39 @@ class JellyfinDeepReport:
     memory: JellyfinMemoryInfo | None = None
     qsv_speed: str = ""
     active_sessions: list[PlaybackSessionInfo] = field(default_factory=list)
+    connected_clients_24h: list[ConnectedClientInfo] = field(default_factory=list)
+    recent_playback: list[PlaybackHistoryItem] = field(default_factory=list)
+    plays_last_24h_count: int = 0
+    plays_by_client_24h: dict[str, int] = field(default_factory=dict)
     item_counts: dict[str, int] = field(default_factory=dict)
     version: str | None = None
+
+
+def _format_relative_time(dt: datetime.datetime, now: datetime.datetime | None = None) -> str:
+    """Format a datetime into human readable relative time (e.g. '12m ago', '3h 15m ago', '2d ago')."""
+    if now is None:
+        now = datetime.datetime.now(datetime.UTC)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=datetime.UTC)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=datetime.UTC)
+
+    diff = now - dt
+    total_seconds = max(0, int(diff.total_seconds()))
+    if total_seconds < 60:
+        return "just now"
+    minutes = total_seconds // 60
+    if minutes < 60:
+        return f"{minutes}m ago"
+    hours = minutes // 60
+    rem_min = minutes % 60
+    if hours < 24:
+        return f"{hours}h {rem_min}m ago" if rem_min > 0 else f"{hours}h ago"
+    days = hours // 24
+    rem_hours = hours % 24
+    if days < 7:
+        return f"{days}d {rem_hours}h ago" if rem_hours > 0 else f"{days}d ago"
+    return f"{days}d ago"
 
 
 def _parse_qsv_speed(output: str) -> str:
@@ -243,10 +298,26 @@ async def _gather_jellyfin_raw_data(ctx: StatusContext) -> JellyfinRawData:
                         if s_res.status_code == 200:
                             raw.sessions = s_res.json()
 
+                async def _get_devices() -> None:
+                    with contextlib.suppress(httpx.HTTPError, KeyError, ValueError):
+                        d_res = await client.get("/Devices", headers=headers)
+                        if d_res.status_code == 200:
+                            raw.devices = d_res.json().get("Items", [])
+
+                async def _get_activity() -> None:
+                    with contextlib.suppress(httpx.HTTPError, KeyError, ValueError):
+                        a_res = await client.get(
+                            "/System/ActivityLog/Entries", params={"limit": 200}, headers=headers
+                        )
+                        if a_res.status_code == 200:
+                            raw.activity_entries = a_res.json().get("Items", [])
+
                 async with anyio.create_task_group() as tg_api:
                     tg_api.start_soon(_get_version)
                     tg_api.start_soon(_get_counts)
                     tg_api.start_soon(_get_sessions)
+                    tg_api.start_soon(_get_devices)
+                    tg_api.start_soon(_get_activity)
         except Exception:
             raw.api_auth_code = -1
 
@@ -524,6 +595,161 @@ def evaluate_jellyfin_report(raw: JellyfinRawData, connection: TargetConnection 
             )
         )
 
+    # 11. Connected Clients (Last 24h)
+    now = datetime.datetime.now(datetime.UTC)
+    cutoff_24h = now - datetime.timedelta(hours=24)
+    ignored_apps = {"statuscheck", "homelabbootstrap", "jellyfin-cli", "status"}
+
+    def _parse_dt(dt_str: str | None) -> datetime.datetime | None:
+        if not dt_str:
+            return None
+        try:
+            return datetime.datetime.fromisoformat(dt_str)
+        except (ValueError, TypeError):
+            return None
+
+    # Build device-to-app map (device_name.lower() -> app_name)
+    device_app_map: dict[str, str] = {}
+    connected_clients: list[ConnectedClientInfo] = []
+    seen_devices: set[tuple[str, str]] = set()
+
+    epoch_min = datetime.datetime.min.replace(tzinfo=datetime.UTC)
+    sorted_devices = sorted(
+        raw.devices,
+        key=lambda d: _parse_dt(d.get("DateLastActivity")) or epoch_min,
+        reverse=True,
+    )
+
+    for dev in sorted_devices:
+        app = dev.get("AppName", "").strip()
+        dev_name = dev.get("Name", "").strip()
+        if not dev_name or app.lower() in ignored_apps:
+            continue
+        if dev_name.lower() not in device_app_map:
+            device_app_map[dev_name.lower()] = app
+
+        dt = _parse_dt(dev.get("DateLastActivity"))
+        if dt and dt >= cutoff_24h:
+            key = (dev_name.lower(), app.lower())
+            if key not in seen_devices:
+                seen_devices.add(key)
+                connected_clients.append(
+                    ConnectedClientInfo(
+                        app_name=app,
+                        device_name=dev_name,
+                        username=dev.get("LastUserName", ""),
+                        last_activity=dt.isoformat(),
+                        relative_time=_format_relative_time(dt, now),
+                        app_version=dev.get("AppVersion", ""),
+                    )
+                )
+
+    report.connected_clients_24h = connected_clients
+
+    if connected_clients:
+        c_descs = [f"{c.app_name} on {c.device_name} ({c.relative_time})" for c in connected_clients]
+        report.checks.append(
+            JellyfinCheckItem(
+                name="Connected Clients (24h)",
+                passed=True,
+                details=f"{len(connected_clients)} active: {', '.join(c_descs)}",
+            )
+        )
+    else:
+        report.checks.append(
+            JellyfinCheckItem(
+                name="Connected Clients (24h)",
+                passed=True,
+                details="No client activity in the last 24h",
+            )
+        )
+
+    # 12. Playback History & 24h Activity
+    playback_pattern = re.compile(r"^(?P<user>.+?)\s+is playing\s+(?P<title>.+?)\s+on\s+(?P<device>.+)$")
+    parsed_history: list[PlaybackHistoryItem] = []
+    plays_24h_count = 0
+    plays_by_client: dict[str, int] = {}
+
+    for entry in raw.activity_entries:
+        if entry.get("Type") != "VideoPlayback":
+            continue
+        m = playback_pattern.match(entry.get("Name", ""))
+        if not m:
+            continue
+        user = m.group("user").strip()
+        title = m.group("title").strip()
+        dev_name = m.group("device").strip()
+        dt = _parse_dt(entry.get("Date"))
+        if not dt:
+            continue
+
+        # Deduplicate consecutive plays of same title & device within 5 minutes
+        if parsed_history:
+            prev = parsed_history[-1]
+            prev_dt = _parse_dt(prev.timestamp)
+            if (
+                prev_dt
+                and prev.media_title == title
+                and prev.device_name == dev_name
+                and abs((prev_dt - dt).total_seconds()) < 300
+            ):
+                continue
+
+        resolved_client = device_app_map.get(dev_name.lower(), "")
+        client_label = f"{resolved_client} ({dev_name})" if resolved_client else dev_name
+
+        if dt >= cutoff_24h:
+            plays_24h_count += 1
+            plays_by_client[client_label] = plays_by_client.get(client_label, 0) + 1
+
+        if len(parsed_history) < 10:
+            parsed_history.append(
+                PlaybackHistoryItem(
+                    timestamp=dt.isoformat(),
+                    relative_time=_format_relative_time(dt, now),
+                    username=user,
+                    media_title=title,
+                    device_name=dev_name,
+                    client_name=resolved_client,
+                    item_id=entry.get("ItemId", ""),
+                )
+            )
+
+    report.recent_playback = parsed_history
+    report.plays_last_24h_count = plays_24h_count
+    report.plays_by_client_24h = plays_by_client
+
+    if plays_24h_count > 0:
+        breakdown = ", ".join(f"{cnt} on {cl}" for cl, cnt in plays_by_client.items())
+        report.checks.append(
+            JellyfinCheckItem(
+                name="Playback Activity (24h)",
+                passed=True,
+                details=f"{plays_24h_count} item(s) played ({breakdown})",
+            )
+        )
+    elif parsed_history:
+        last_item = parsed_history[0]
+        cl_str = f" ({last_item.client_name})" if last_item.client_name else ""
+        report.checks.append(
+            JellyfinCheckItem(
+                name="Playback Activity (24h)",
+                passed=True,
+                details=(
+                    f"0 plays in last 24h • Last: '{last_item.media_title}' "
+                    f"on {last_item.device_name}{cl_str} ({last_item.relative_time})"
+                ),
+            )
+        )
+    else:
+        report.checks.append(
+            JellyfinCheckItem(
+                name="Playback Activity (24h)",
+                passed=True,
+                details="No playback history recorded",
+            )
+        )
+
     report.all_passed = all(c.passed for c in report.checks if not c.warning)
     return report
 
@@ -562,6 +788,29 @@ def render_jellyfin_deep_report(report: JellyfinDeepReport, console: Console) ->
     console.print(table)
     console.print()
 
+    if report.recent_playback:
+        history_table = Table(
+            title="📜 Recent Playback History (Most Recent 10)",
+            show_header=True,
+            header_style="bold cyan",
+        )
+        history_table.add_column("Time", style="cyan", width=14)
+        history_table.add_column("Media Title", style="bold green")
+        history_table.add_column("User", style="yellow", width=12)
+        history_table.add_column("Client / Device", style="magenta", width=26)
+
+        for p in report.recent_playback:
+            cl_info = f"{p.client_name} ({p.device_name})" if p.client_name else p.device_name
+            history_table.add_row(
+                p.relative_time,
+                p.media_title,
+                p.username,
+                cl_info,
+            )
+
+        console.print(history_table)
+        console.print()
+
     route_line = format_route_line(report.connection)
 
     if report.all_passed:
@@ -595,13 +844,35 @@ def render_jellyfin_deep_report(report: JellyfinDeepReport, console: Console) ->
         else:
             stream_str = "\n• [bold]Active Streams:[/bold] [bold cyan]0[/bold cyan] (Idle)"
 
+        clients_line = ""
+        if report.connected_clients_24h:
+            c_names = [f"{c.app_name} on {c.device_name}" for c in report.connected_clients_24h]
+            clients_line = f"\n• [bold]Connected Clients (24h):[/bold] {', '.join(c_names)}"
+
+        playback_line = ""
+        if report.plays_last_24h_count > 0:
+            breakdown = ", ".join(f"{cnt} on {cl}" for cl, cnt in report.plays_by_client_24h.items())
+            playback_line = (
+                f"\n• [bold]Playback (24h):[/bold] "
+                f"[bold green]{report.plays_last_24h_count} item(s) played[/bold green] ({breakdown})"
+            )
+        elif report.recent_playback:
+            last_p = report.recent_playback[0]
+            cl_str = f" ({last_p.client_name})" if last_p.client_name else ""
+            playback_line = (
+                f"\n• [bold]Playback (24h):[/bold] [dim]0 played • Last: '{last_p.media_title}' "
+                f"on {last_p.device_name}{cl_str} ({last_p.relative_time})[/dim]"
+            )
+
         verdict = Panel(
             "[bold green]✔ ALL JELLYFIN CHECKS PASSED & HARDWARE ACCELERATED[/bold green]\n\n"
             f"{route_line}"
             f"• [bold]Hardware Acceleration:[/bold] Intel QuickSync ({qsv_str}) via iHD driver\n"
             f"• [bold]Media Library:[/bold] {cat_str}"
             f"{mem_str}"
-            f"{stream_str}",
+            f"{stream_str}"
+            f"{clients_line}"
+            f"{playback_line}",
             title="[bold green]Status: HEALTHY & ACCELERATED[/bold green]",
             border_style="green",
         )
@@ -687,6 +958,29 @@ async def check_jellyfin(ctx: StatusContext) -> ServiceResult:
                 for s in report.active_sessions
             ]
             branches.append(f"▶️ Active Playback: {', '.join(streams_repr)}")
+
+        # Connected clients (24h) branch
+        if report.connected_clients_24h:
+            client_badges = [
+                f"[bold cyan]{c.app_name}[/bold cyan] [dim]({c.device_name})[/dim]"
+                for c in report.connected_clients_24h
+            ]
+            branches.append(f"👥 Active Clients (24h): {', '.join(client_badges)}")
+
+        # Recent plays branch
+        if report.plays_last_24h_count > 0:
+            last_p = report.recent_playback[0]
+            branches.append(
+                f"📜 Recent Plays (24h): [bold green]{report.plays_last_24h_count} item(s)[/bold green] "
+                f"[dim]• Last: \"{last_p.media_title}\" ({last_p.relative_time})[/dim]"
+            )
+        elif report.recent_playback:
+            last_p = report.recent_playback[0]
+            cl_str = f" ({last_p.client_name})" if last_p.client_name else ""
+            branches.append(
+                f"📜 Recent Plays: [dim]0 in 24h • Last: \"{last_p.media_title}\" "
+                f"on {last_p.device_name}{cl_str} ({last_p.relative_time})[/dim]"
+            )
 
         return ServiceResult(
             service_id=service_id,

@@ -9,6 +9,7 @@ import pytest
 from models import StatusContext, TargetConnection
 from services.jellyfin import (
     JellyfinRawData,
+    _format_relative_time,
     _parse_qsv_speed,
     _parse_vainfo_driver,
     evaluate_jellyfin_report,
@@ -36,6 +37,8 @@ def _make_mock_raw(
     api_auth_token: str | None = "mock_token_123",
     item_counts: dict[str, int] | None = None,
     sessions: list[dict] | None = None,
+    devices: list[dict] | None = None,
+    activity_entries: list[dict] | None = None,
 ) -> JellyfinRawData:
     raw = JellyfinRawData()
     raw.container_found = container_found
@@ -59,6 +62,8 @@ def _make_mock_raw(
         item_counts if item_counts is not None else {"MovieCount": 150, "SeriesCount": 25, "ItemCount": 1500}
     )
     raw.sessions = sessions if sessions is not None else []
+    raw.devices = devices if devices is not None else []
+    raw.activity_entries = activity_entries if activity_entries is not None else []
     raw.version = "v10.10.6"
     return raw
 
@@ -86,6 +91,8 @@ def test_jellyfin_happy_path() -> None:
     assert "Jellyfin API Auth" in check_names
     assert "Media Catalog" in check_names
     assert "Playback Sessions" in check_names
+    assert "Connected Clients (24h)" in check_names
+    assert "Playback Activity (24h)" in check_names
 
 
 def test_jellyfin_failure_container_stopped() -> None:
@@ -273,3 +280,123 @@ async def test_run_jellyfin_deep_check_with_mock_context() -> None:
     assert report.connection == ctx.connection
     assert report.memory is not None
     assert report.memory.usage_bytes == 200000000
+
+
+def test_jellyfin_connected_clients_parsing() -> None:
+    import datetime  # noqa: TID251
+
+    now = datetime.datetime.now(datetime.UTC)
+    recent_iso = (now - datetime.timedelta(minutes=10)).isoformat()
+    old_iso = (now - datetime.timedelta(days=2)).isoformat()
+
+    devices = [
+        {
+            "Name": "iPad",
+            "AppName": "Infuse-Direct",
+            "AppVersion": "8.5.9",
+            "LastUserName": "alice",
+            "DateLastActivity": recent_iso,
+        },
+        {
+            "Name": "homelab-status",
+            "AppName": "StatusCheck",
+            "AppVersion": "1.0.0",
+            "LastUserName": "bot",
+            "DateLastActivity": recent_iso,
+        },
+        {
+            "Name": "Firefox",
+            "AppName": "Jellyfin Web",
+            "AppVersion": "12.4.0",
+            "LastUserName": "alice",
+            "DateLastActivity": old_iso,
+        },
+    ]
+
+    raw = _make_mock_raw(devices=devices)
+    report = evaluate_jellyfin_report(raw)
+
+    # StatusCheck should be filtered out, and old device (>24h) excluded from connected_clients_24h
+    assert len(report.connected_clients_24h) == 1
+    client = report.connected_clients_24h[0]
+    assert client.app_name == "Infuse-Direct"
+    assert client.device_name == "iPad"
+    assert client.username == "alice"
+
+    check = next(c for c in report.checks if c.name == "Connected Clients (24h)")
+    assert check.passed is True
+    assert "Infuse-Direct on iPad" in check.details
+
+
+def test_jellyfin_playback_history_and_24h_activity() -> None:
+    import datetime  # noqa: TID251
+
+    now = datetime.datetime.now(datetime.UTC)
+    d1 = (now - datetime.timedelta(hours=1)).isoformat()
+    d2 = (now - datetime.timedelta(hours=1, seconds=30)).isoformat()  # duplicate within 5m
+    d3 = (now - datetime.timedelta(hours=5)).isoformat()
+    d4 = (now - datetime.timedelta(days=3)).isoformat()  # older than 24h
+
+    devices = [
+        {"Name": "iPad", "AppName": "Infuse-Direct", "DateLastActivity": d1},
+        {"Name": "Living Room TV", "AppName": "Android TV", "DateLastActivity": d3},
+    ]
+
+    activity_entries = [
+        {
+            "Type": "VideoPlayback",
+            "Name": "alice is playing Severance - Episode 1 on iPad",
+            "Date": d1,
+            "ItemId": "item_1",
+        },
+        {
+            "Type": "VideoPlayback",
+            "Name": "alice is playing Severance - Episode 1 on iPad",
+            "Date": d2,
+            "ItemId": "item_1",
+        },
+        {
+            "Type": "VideoPlayback",
+            "Name": "alice is playing Silo - Episode 2 on Living Room TV",
+            "Date": d3,
+            "ItemId": "item_2",
+        },
+        {
+            "Type": "VideoPlayback",
+            "Name": "alice is playing Ted Lasso - Episode 3 on iPad",
+            "Date": d4,
+            "ItemId": "item_3",
+        },
+    ]
+
+    raw = _make_mock_raw(devices=devices, activity_entries=activity_entries)
+    report = evaluate_jellyfin_report(raw)
+
+    # d2 should be deduplicated with d1
+    assert len(report.recent_playback) == 3
+    assert report.recent_playback[0].media_title == "Severance - Episode 1"
+    assert report.recent_playback[0].client_name == "Infuse-Direct"
+    assert report.recent_playback[1].media_title == "Silo - Episode 2"
+    assert report.recent_playback[1].client_name == "Android TV"
+    assert report.recent_playback[2].media_title == "Ted Lasso - Episode 3"
+
+    # Only d1 and d3 are within the last 24h
+    assert report.plays_last_24h_count == 2
+    assert "Infuse-Direct (iPad)" in report.plays_by_client_24h
+    assert report.plays_by_client_24h["Infuse-Direct (iPad)"] == 1
+    assert report.plays_by_client_24h["Android TV (Living Room TV)"] == 1
+
+    check = next(c for c in report.checks if c.name == "Playback Activity (24h)")
+    assert check.passed is True
+    assert "2 item(s) played" in check.details
+
+
+def test_format_relative_time() -> None:
+    import datetime  # noqa: TID251
+
+    now = datetime.datetime.now(datetime.UTC)
+    assert _format_relative_time(now, now) == "just now"
+    assert _format_relative_time(now - datetime.timedelta(minutes=5), now) == "5m ago"
+    assert _format_relative_time(now - datetime.timedelta(hours=2, minutes=10), now) == "2h 10m ago"
+    assert _format_relative_time(now - datetime.timedelta(days=3, hours=5), now) == "3d 5h ago"
+    assert _format_relative_time(now - datetime.timedelta(days=14), now) == "14d ago"

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import datetime
 import json
 import sys
 from dataclasses import asdict
@@ -11,6 +10,7 @@ from pathlib import Path
 import anyio
 import typer
 from rich.console import Console
+from whenever import Instant
 
 from config import get_docker_client, load_env, resolve_target_connection
 from models import StatusContext
@@ -77,7 +77,7 @@ def jellyfin_command(
 
     if json_output:
         out_dict = {
-            "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
+            "timestamp": Instant.now().format_iso(),
             "connection": asdict(conn) if conn else None,
             "all_passed": report.all_passed,
             "version": report.version,
@@ -85,6 +85,10 @@ def jellyfin_command(
             "memory": asdict(report.memory) if report.memory else None,
             "item_counts": report.item_counts,
             "active_sessions": [asdict(s) for s in report.active_sessions],
+            "connected_clients_24h": [asdict(c) for c in report.connected_clients_24h],
+            "recent_playback": [asdict(p) for p in report.recent_playback],
+            "plays_last_24h_count": report.plays_last_24h_count,
+            "plays_by_client_24h": report.plays_by_client_24h,
             "checks": [asdict(c) for c in report.checks],
         }
         print(json.dumps(out_dict, indent=2))

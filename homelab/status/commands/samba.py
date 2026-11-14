@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import datetime
 import json
 import sys
 from dataclasses import asdict
@@ -11,6 +10,7 @@ from pathlib import Path
 import anyio
 import typer
 from rich.console import Console
+from whenever import Instant
 
 from config import get_docker_client, load_env, resolve_target_connection
 from models import StatusContext
@@ -77,7 +77,7 @@ def samba_command(
 
     if json_output:
         out_dict = {
-            "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
+            "timestamp": Instant.now().format_iso(),
             "connection": asdict(conn) if conn else None,
             "all_passed": report.all_passed,
             "version": report.version,

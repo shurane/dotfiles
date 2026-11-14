@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
+from whenever import SYSTEM_TZ, ZonedDateTime
 
 if TYPE_CHECKING:
     from models import TargetConnection
@@ -69,7 +69,7 @@ def render_command_header(
 
     badge, _, full = format_connection_badge(conn)
     ip_info = f" ({conn.ip})" if conn.ip and conn.ip != "unknown" else ""
-    now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now_str = ZonedDateTime.now(SYSTEM_TZ).format("YYYY-MM-DD HH:mm:ss")
 
     header_text = Text()
     header_text.append(f"{title}\n", style=f"bold {border_style}")

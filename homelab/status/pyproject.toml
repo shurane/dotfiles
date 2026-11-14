@@ -10,6 +10,7 @@ dependencies = [
   "python-dotenv>=1.0.0",
   "rich>=13.0.0",
   "typer>=0.16.0",
+  "whenever>=0.11.0",
 ]
 
 [project.scripts]
@@ -62,6 +63,14 @@ select = [
   "ARG",    # flake8-unused-arguments
   "A",      # flake8-builtins (no shadowing)
   "TC",     # flake8-type-checking (clean import graph)
+  "PGH",    # pygrep-hooks (ban blanket noqa and type: ignore)
+  "T10",    # flake8-debugger (ban breakpoint/pdb)
+  "ERA",    # eradicate (ban commented-out code)
+  "PLE",    # Pylint Error (fatal errors)
+  "LOG",    # flake8-logging (correct logging calls)
+  "SLOT",   # flake8-slots (slots on subclasses of builtins)
+  "ISC",    # flake8-implicit-str-concat (collection string concatenation safety)
+  "TID",    # flake8-tidy-imports (banned APIs)
 ]
 ignore = [
   "B008",      # Typer uses Option(...) / Argument(...) as function defaults by design
@@ -70,10 +79,14 @@ ignore = [
   "ASYNC240",  # Synchronous Path operations in CLI scripts are intentional
   "S314",      # XML parsing using standard library (Python 3.14 bundles expat >= 2.6 with native protection)
   "S405",      # xml.etree import check (paired with S314)
+  "ISC001",    # Single-line implicit concatenation (formatter compatibility)
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ANN", "SLF001", "T201", "S", "ARG"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"datetime".msg = "Use `whenever` instead of standard library `datetime`."
 
 [tool.ruff.lint.flake8-type-checking]
 exempt-modules = ["typing", "pathlib"]
@@ -87,6 +100,18 @@ unused-awaitable = "error"
 redundant-cast = "error"
 disjoint-cast = "error"
 missing-override-decorator = "error"
+possibly-missing-submodule = "error"
+deprecated = "error"
+truthiness-test-of-callable = "error"
+truthiness-test-of-iterable = "error"
+redundant-condition = "error"
+invalid-ignore-comment = "error"
+ignore-comment-unknown-rule = "error"
+pydantic-discarded-extra-argument = "error"
+division-by-zero = "error"
+ineffective-final = "error"
+redundant-final-classvar = "error"
+useless-overload-body = "error"
 
 [tool.ruff.format]
 quote-style = "double"

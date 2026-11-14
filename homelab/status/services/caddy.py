@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import contextlib
-import datetime
 import json
 import socket
 import ssl
@@ -12,6 +11,7 @@ from typing import Any
 
 import anyio
 import httpx
+from whenever import SYSTEM_TZ, PlainDateTime, ZonedDateTime
 
 from models import HealthStatus, ServiceResult, StatusContext
 
@@ -47,10 +47,11 @@ def _check_tls_sync(base_domain: str, timeout: float) -> tuple[dict[str, str], i
             if isinstance(raw_not_after, str):
                 not_after = raw_not_after
                 try:
-                    dt = datetime.datetime.strptime(not_after, "%b %d %H:%M:%S %Y %Z").replace(tzinfo=datetime.UTC)
-                    expires_str = dt.strftime("%b %d %Y")
-                    days_left = (dt - datetime.datetime.now(datetime.UTC)).days
-                except Exception:
+                    normalized = " ".join(not_after.split())
+                    dt = PlainDateTime.parse(normalized, pattern="MMM D HH:mm:ss YYYY 'GMT'")
+                    expires_str = dt.format("MMM DD YYYY")
+                    days_left = int(dt.date().since(ZonedDateTime.now(SYSTEM_TZ).date(), total="days"))
+                except ValueError:
                     expires_str = not_after
 
         return {"issuer": issuer_org, "expires": expires_str}, days_left
