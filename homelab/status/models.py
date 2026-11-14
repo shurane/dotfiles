@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import anyio
+from pydantic import BaseModel, ConfigDict, Field
 
 if TYPE_CHECKING:
     import docker
@@ -41,6 +42,19 @@ class ServiceResult:
         return self.status == HealthStatus.HEALTHY
 
 
+class HomelabConfig(BaseModel):
+    """Homelab configuration loaded from .env or environment with strict validation."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    password: str = Field(alias="HOMELAB_PASSWORD", min_length=1)
+    base_domain: str = Field(alias="HOSTNAME_BASE", min_length=1)
+    username: str = Field(default="username", alias="HOMELAB_USERNAME")
+    hostname: str | None = Field(default=None, alias="HOMELAB_HOSTNAME")
+    ssh_user: str | None = Field(default=None, alias="HOMELAB_SSH_USER")
+    lan_subnet: str | None = Field(default=None, alias="HOMELAB_LAN_SUBNET")
+
+
 @dataclass
 class TargetConnection:
     host: str
@@ -52,7 +66,6 @@ class TargetConnection:
 
 @dataclass
 class StatusContext:
-    env: Mapping[Any, Any]
     username: str
     password: str
     base_domain: str
@@ -61,6 +74,8 @@ class StatusContext:
     http_timeout: float = 10.0
     no_docker: bool = False
     connection: TargetConnection | None = None
+    config: HomelabConfig | None = None
+    env: Mapping[Any, Any] = field(default_factory=dict)
     _disk_usage: list[dict[str, Any]] | None = field(default=None, init=False)
     _containers_cache: dict[str, Container] | None = field(default=None, init=False)
     _version_cache: dict[str, str] | None = field(default=None, init=False)

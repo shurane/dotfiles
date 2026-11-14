@@ -3,10 +3,6 @@
 from __future__ import annotations
 
 import datetime
-import sys
-from collections import UserDict
-from collections.abc import Iterable, Mapping
-from typing import Any, Literal
 
 from rich.console import Console
 from rich.panel import Panel
@@ -15,45 +11,6 @@ from rich.text import Text
 from models import TargetConnection
 
 console = Console()
-
-type EnvKey = Literal[
-    "HOMELAB_PASSWORD",
-    "HOSTNAME_BASE",
-    "HOMELAB_USERNAME",
-    "HOMELAB_SSH_USER",
-    "HOMELAB_HOSTNAME",
-    "HOMELAB_HOST",
-    "HOMELAB_LAN_SUBNET",
-    "HOMELAB_LAN_DOMAIN",
-    "HOMELAB_NODE_NAME",
-    "HOMELAB_DOCKER_HOST",
-]
-
-
-class Env(UserDict[EnvKey, str]):
-    """Environment dictionary restricted to known EnvKey keys with strict requirement helper."""
-
-    def __init__(
-        self,
-        dict_or_iterable: Mapping[Any, str] | Iterable[tuple[Any, str]] | None = None,
-        **kwargs: str,
-    ) -> None:
-        raw_data: dict[Any, str] = {}
-        if dict_or_iterable is not None:
-            if isinstance(dict_or_iterable, Mapping):
-                raw_data.update(dict_or_iterable)
-            else:
-                raw_data.update(dict(dict_or_iterable))
-        if kwargs:
-            raw_data.update(kwargs)
-        super().__init__(raw_data)  # type: ignore[arg-type]
-
-    def require(self, key: EnvKey) -> str:
-        """Return non-empty setting or print formatted error and exit."""
-        if val := self.get(key):
-            return val
-        console.print(f"[bold red]Error:[/bold red] {key} not found in .env or environment")
-        sys.exit(1)
 
 
 def format_bytes(bytes_val: int) -> str:

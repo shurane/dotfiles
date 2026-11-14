@@ -9,14 +9,18 @@ import os
 import platform
 import socket
 import subprocess
+import sys
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from dotenv import dotenv_values
+from pydantic import ValidationError
+from rich.console import Console
 
-from common import Env
-from models import TargetConnection
+from models import HomelabConfig, TargetConnection
+
+console = Console(stderr=True)
 
 if TYPE_CHECKING:
     import docker
@@ -239,12 +243,12 @@ def is_target_local(lan_host: str) -> bool:
     return False
 
 
-def load_env(
+def _load_raw_env(
     env_path: Path | None,
     lan_host: str,
     ssh_user: str | None = None,
-) -> Env:
-    """Load homelab .env file from local disk or via remote SFTP fallback."""
+) -> dict[str, str]:
+    """Retrieve raw environment key-value pairs from local disk, remote host over SSH, or os.environ."""
     if ssh_user is None:
         ssh_user = (
             get_env_setting("HOMELAB_SSH_USER")
@@ -254,7 +258,7 @@ def load_env(
 
     # 1. Explicit path
     if env_path and env_path.is_file():
-        return Env({k: v for k, v in dotenv_values(env_path).items() if v is not None})
+        return {k: str(v) for k, v in dotenv_values(env_path).items() if v is not None}
 
     # 2. Local homelab/.env or ./.env
     search_paths = [
@@ -267,7 +271,7 @@ def load_env(
     ]
     for p in search_paths:
         if p.is_file():
-            return Env({k: v for k, v in dotenv_values(p).items() if v is not None})
+            return {k: str(v) for k, v in dotenv_values(p).items() if v is not None}
 
     # 3. Fallback to reading remote .env over SSH from lan_host (if on remote workstation / peer machine)
     if not is_target_local(lan_host):
@@ -289,12 +293,26 @@ def load_env(
             )
             if res.returncode == 0 and res.stdout:
                 parsed = dotenv_values(stream=io.StringIO(res.stdout))
-                return Env({k: v for k, v in parsed.items() if v is not None})
+                return {k: str(v) for k, v in parsed.items() if v is not None}
         except Exception:
             pass
 
     # 4. OS environment variables
-    return Env(os.environ)
+    return dict(os.environ)
+
+
+def load_env(
+    env_path: Path | None,
+    lan_host: str,
+    ssh_user: str | None = None,
+) -> HomelabConfig:
+    """Load homelab .env file and validate with HomelabConfig."""
+    raw = _load_raw_env(env_path, lan_host, ssh_user)
+    try:
+        return HomelabConfig.model_validate(raw)
+    except ValidationError as err:
+        console.print(f"[bold red]Configuration validation error:[/bold red]\n{err}")
+        sys.exit(1)
 
 
 def _get_ssh_tunnel_client(

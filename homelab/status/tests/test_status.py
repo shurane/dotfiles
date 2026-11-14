@@ -7,9 +7,9 @@ import sys
 import xml.etree.ElementTree as ET
 
 import pytest
+from pydantic import ValidationError
 from typer.testing import CliRunner
 
-from common import Env
 from config import (
     classify_route,
     discover_tailscale_suffix,
@@ -20,7 +20,7 @@ from config import (
     resolve_target_host,
 )
 from main import app
-from models import HealthStatus, ServiceResult
+from models import HealthStatus, HomelabConfig, ServiceResult
 from services import CHECK_REGISTRY
 
 runner = CliRunner()
@@ -317,15 +317,26 @@ async def test_check_qbittorrent_interface_binding() -> None:
     assert any("UPnP" in b for b in res_upnp.branches)
 
 
-def test_env_require() -> None:
-    env_obj = Env(HOMELAB_PASSWORD="val1", HOSTNAME_BASE="")
-    assert env_obj.require("HOMELAB_PASSWORD") == "val1"
-    with pytest.raises(SystemExit) as exc_info:
-        env_obj.require("HOSTNAME_BASE")
-    assert exc_info.value.code == 1
-    with pytest.raises(SystemExit) as exc_info:
-        env_obj.require("HOMELAB_USERNAME")
-    assert exc_info.value.code == 1
+def test_homelab_config_validation() -> None:
+    # 1. Valid configuration
+    cfg = HomelabConfig.model_validate({"HOMELAB_PASSWORD": "secret_password", "HOSTNAME_BASE": "example.com"})
+    assert cfg.password == "secret_password"
+    assert cfg.base_domain == "example.com"
+    assert cfg.username == "username"
+
+    # 2. Missing password
+    with pytest.raises(ValidationError):
+        HomelabConfig.model_validate({"HOSTNAME_BASE": "example.com"})
+
+    # 3. Missing base domain
+    with pytest.raises(ValidationError):
+        HomelabConfig.model_validate({"HOMELAB_PASSWORD": "secret_password"})
+
+    # 4. Empty values
+    with pytest.raises(ValidationError):
+        HomelabConfig.model_validate({"HOMELAB_PASSWORD": "", "HOSTNAME_BASE": "example.com"})
+    with pytest.raises(ValidationError):
+        HomelabConfig.model_validate({"HOMELAB_PASSWORD": "secret_password", "HOSTNAME_BASE": ""})
 
 
 if __name__ == "__main__":

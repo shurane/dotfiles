@@ -58,18 +58,14 @@ def qbittorrent_command(
 ) -> None:
     """Deep inspection of qBittorrent container, VPN tunnel binding, port alignment, and torrent catalog."""
     conn = resolve_target_connection(lan_host)
-    env = load_env(env_file, conn.host)
-    username = env.get("HOMELAB_USERNAME", "username")
-    password = env.require("HOMELAB_PASSWORD")
-    base_domain = env.require("HOSTNAME_BASE")
-
+    config = load_env(env_file, conn.host)
     docker_client = get_docker_client(docker_host, conn.host, no_docker)
 
     ctx = StatusContext(
-        env=env,
-        username=username,
-        password=password,
-        base_domain=base_domain,
+        config=config,
+        username=config.username,
+        password=config.password,
+        base_domain=config.base_domain,
         lan_host=conn.host,
         docker_client=docker_client,
         http_timeout=timeout,

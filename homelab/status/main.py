@@ -273,18 +273,14 @@ def main(
         return
 
     conn = resolve_target_connection(lan_host)
-    env = load_env(env_file, conn.host)
-    username = env.get("HOMELAB_USERNAME", "username")
-    password = env.require("HOMELAB_PASSWORD")
-    base_domain = env.require("HOSTNAME_BASE")
-
+    config = load_env(env_file, conn.host)
     docker_client = get_docker_client(docker_host, conn.host, no_docker)
 
     ctx = StatusContext(
-        env=env,
-        username=username,
-        password=password,
-        base_domain=base_domain,
+        config=config,
+        username=config.username,
+        password=config.password,
+        base_domain=config.base_domain,
         lan_host=conn.host,
         docker_client=docker_client,
         http_timeout=timeout,
@@ -322,7 +318,10 @@ def main(
         ip_info = f" ({conn.ip})" if conn.ip and conn.ip != "unknown" else ""
         header_text.append(f"Target: {conn.host}{ip_info}  •  Route: ", style="dim")
         header_text.append_text(Text.from_markup(route_badge))
-        header_text.append(f"\nDomain: {base_domain}  •  Auth: {username}  •  Time: {now_str}", style="dim")
+        header_text.append(
+            f"\nDomain: {config.base_domain}  •  Auth: {config.username}  •  Time: {now_str}",
+            style="dim",
+        )
         console.print(Panel(header_text, border_style="magenta", expand=False))
 
     show_progress = not json_output and console.is_terminal
@@ -340,7 +339,7 @@ def main(
             "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
             "connection": asdict(conn),
             "target_host": conn.host,
-            "base_domain": base_domain,
+            "base_domain": config.base_domain,
             "total_elapsed_seconds": round(total_elapsed, 3),
             "all_healthy": all(r.is_healthy for r in results),
             "disk_usage": ctx.disk_usage or [],
