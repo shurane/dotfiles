@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
 """Homelab Centralized Authentication Bootstrap Manager."""
 
 from __future__ import annotations

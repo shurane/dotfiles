@@ -16,6 +16,7 @@ dependencies = [
 
 [project.scripts]
 homelab-auth = "cli:typer_main"
+auth = "cli:typer_main"
 
 [build-system]
 requires = ["hatchling"]
