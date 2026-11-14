@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import json
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
@@ -51,7 +52,7 @@ class TargetConnection:
 
 @dataclass
 class StatusContext:
-    env: dict[str, str]
+    env: Mapping[Any, Any]
     username: str
     password: str
     base_domain: str

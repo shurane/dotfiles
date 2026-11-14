@@ -318,13 +318,13 @@ async def test_check_qbittorrent_interface_binding() -> None:
 
 
 def test_require_env() -> None:
-    env_obj = Env(KEY1="val1", KEY2="")
-    assert env_obj.require("KEY1") == "val1"
+    env_obj = Env(HOMELAB_PASSWORD="val1", HOSTNAME_BASE="")
+    assert env_obj.require("HOMELAB_PASSWORD") == "val1"
     with pytest.raises(SystemExit) as exc_info:
-        env_obj.require("KEY2")
+        env_obj.require("HOSTNAME_BASE")
     assert exc_info.value.code == 1
     with pytest.raises(SystemExit) as exc_info:
-        env_obj.require("MISSING_KEY")
+        env_obj.require("HOMELAB_USERNAME")
     assert exc_info.value.code == 1
 
 

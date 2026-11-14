@@ -192,7 +192,10 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
     raw.gluetun_found = True
     await anyio.to_thread.run_sync(gluetun.reload)
     raw.gluetun_status = gluetun.status
-    raw.gluetun_health = gluetun.attrs.get("State", {}).get("Health", {}).get("Status", "none")
+    attrs = gluetun.attrs or {}
+    state = attrs.get("State") or {}
+    health = state.get("Health") or {}
+    raw.gluetun_health = health.get("Status", "none")
 
     if raw.gluetun_status != "running":
         return raw
@@ -202,7 +205,9 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
         raw.qbt_found = True
         await anyio.to_thread.run_sync(qbt.reload)
         raw.qbt_status = qbt.status
-        raw.qbt_net_mode = qbt.attrs.get("HostConfig", {}).get("NetworkMode", "")
+        qbt_attrs = qbt.attrs or {}
+        host_config = qbt_attrs.get("HostConfig") or {}
+        raw.qbt_net_mode = host_config.get("NetworkMode", "")
 
     async with anyio.create_task_group() as tg:
         async def fetch_host() -> None:
