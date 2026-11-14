@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import datetime
 import json
 import re
 import time
@@ -14,8 +13,15 @@ import httpx
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from rich.text import Text
 
+from common import (
+    format_bytes as _format_bytes,
+)
+from common import (
+    format_connection_badge,
+    format_route_line,
+    render_command_header,
+)
 from models import HealthStatus, ServiceResult, StatusContext, TargetConnection
 
 
@@ -34,37 +40,6 @@ class VpnCheckItem:
     passed: bool
     details: str
     warning: bool = False
-
-
-def format_connection_badge(conn: TargetConnection | None) -> tuple[str, str, str]:
-    """Format connection route into a Rich badge, endpoint description, and full summary.
-
-    Returns:
-        tuple[badge_markup, endpoint_str, full_summary_str]
-    """
-    if not conn:
-        return "[dim]Unknown[/dim]", "unknown", "Unknown execution context"
-
-    ip_str = f" • {conn.ip}" if conn.ip and conn.ip != "unknown" else ""
-
-    if conn.is_local or conn.route == "local":
-        badge = "[bold magenta]🏠 On-Device[/bold magenta]"
-        endpoint = f"{conn.host} • Local UNIX socket"
-        full = f"On-Device ({endpoint})"
-    elif conn.route == "tailscale":
-        badge = "[bold cyan]🔒 Remote (Tailscale)[/bold cyan]"
-        endpoint = f"{conn.host}{ip_str}"
-        full = f"Remote via Tailscale ({endpoint})"
-    elif conn.route == "lan":
-        badge = "[bold green]🟢 Remote (Direct LAN)[/bold green]"
-        endpoint = f"{conn.host}{ip_str}"
-        full = f"Remote via Direct LAN ({endpoint})"
-    else:
-        badge = f"[bold yellow]🌐 Remote ({conn.description})[/bold yellow]"
-        endpoint = f"{conn.host}{ip_str}"
-        full = f"Remote via {conn.description} ({endpoint})"
-
-    return badge, endpoint, full
 
 
 @dataclass(slots=True)
@@ -198,17 +173,6 @@ def _parse_tun_stats(link_output: str) -> tuple[int, int, int, int]:
                 tx_bytes = int(parts[0]) if parts[0].isdigit() else 0
                 tx_packets = int(parts[1]) if parts[1].isdigit() else 0
     return rx_bytes, rx_packets, tx_bytes, tx_packets
-
-
-def _format_bytes(num_bytes: int) -> str:
-    """Format bytes into human-friendly string."""
-    if num_bytes < 1024:
-        return f"{num_bytes} B"
-    if num_bytes < 1024 * 1024:
-        return f"{num_bytes / 1024:.1f} KB"
-    if num_bytes < 1024 * 1024 * 1024:
-        return f"{num_bytes / (1024 * 1024):.1f} MB"
-    return f"{num_bytes / (1024 * 1024 * 1024):.2f} GB"
 
 
 async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
@@ -720,18 +684,12 @@ async def run_vpn_deep_check(ctx: StatusContext) -> VpnDeepReport:
 
 def render_vpn_deep_report(report: VpnDeepReport, console: Console) -> None:
     if report.connection:
-        badge, _, full = format_connection_badge(report.connection)
-        conn = report.connection
-        ip_info = f" ({conn.ip})" if conn.ip and conn.ip != "unknown" else ""
-        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        header_text = Text()
-        header_text.append("🛡️ ProtonVPN + Gluetun + qBittorrent Deep Health Inspector\n", style="bold magenta")
-        header_text.append(f"Target: {conn.host}{ip_info}  •  Route: ", style="dim")
-        header_text.append_text(Text.from_markup(badge))
-        header_text.append(f"\nExecution Mode: {full}  •  Time: {now_str}", style="dim")
-        console.print()
-        console.print(Panel(header_text, border_style="magenta", expand=False))
+        render_command_header(
+            "🛡️ ProtonVPN + Gluetun + qBittorrent Deep Health Inspector",
+            report.connection,
+            console,
+            border_style="magenta",
+        )
 
     table = Table(
         title="🛡️ ProtonVPN + Gluetun + qBittorrent Health Status", show_header=True, header_style="bold magenta"
@@ -753,10 +711,7 @@ def render_vpn_deep_report(report: VpnDeepReport, console: Console) -> None:
     console.print(table)
     console.print()
 
-    route_line = ""
-    if report.connection:
-        badge, endpoint, _ = format_connection_badge(report.connection)
-        route_line = f"• [bold]Inspection Route:[/bold] {badge} [dim]({endpoint})[/dim]\n"
+    route_line = format_route_line(report.connection)
 
     if report.all_passed:
         vpn_org = report.vpn_ip.org if report.vpn_ip else "ProtonVPN"
