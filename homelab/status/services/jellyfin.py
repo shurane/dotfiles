@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+import base64
 import contextlib
+import ipaddress
+import json
 import re
+import socket
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import anyio
@@ -48,6 +53,10 @@ class ConnectedClientInfo:
     last_activity: str  # ISO-8601 UTC string
     relative_time: str
     app_version: str = ""
+    platform: str = ""
+    route: str = ""
+    endpoint: str = ""
+    route_badge: str = ""
 
 
 @dataclass(slots=True)
@@ -59,6 +68,132 @@ class PlaybackHistoryItem:
     device_name: str
     client_name: str = ""
     item_id: str = ""
+    route: str = ""
+
+
+def classify_client_route(ip_str: str | None) -> tuple[str, str]:
+    """Classify client IP into network route name and Rich-styled badge.
+
+    Returns:
+        tuple[route_name, route_badge] e.g. ('Tailscale', '🔒 Tailscale')
+    """
+    if not ip_str:
+        return "Unknown", ""
+    try:
+        ip = ipaddress.ip_address(ip_str.strip())
+        if ip.is_loopback:
+            return "Local", "🏠 Local"
+        # Tailscale CGNAT RFC6598: 100.64.0.0/10
+        if ip in ipaddress.ip_network("100.64.0.0/10"):
+            return "Tailscale", "🔒 Tailscale"
+        if ip.is_private:
+            return "LAN", "🟢 LAN"
+        return "WAN", "🌐 WAN"
+    except ValueError:
+        return "Unknown", ""
+
+
+def decode_browser_user_agent(device_id: str | None) -> str | None:
+    """Decode Jellyfin Web base64-encoded DeviceId into human-readable OS and browser."""
+    if not device_id or len(device_id) < 16:
+        return None
+    try:
+        pad = "=" * (-len(device_id) % 4)
+        decoded = base64.b64decode(device_id + pad).decode("utf-8", errors="ignore")
+        if "Mozilla/" not in decoded and "Gecko" not in decoded and "AppleWebKit" not in decoded:
+            return None
+
+        # Determine OS
+        if "Windows NT 10.0" in decoded or "Windows NT 11.0" in decoded:
+            os_name = "Windows 11"
+        elif "Windows NT" in decoded:
+            os_name = "Windows"
+        elif "Macintosh" in decoded or "Mac OS X" in decoded:
+            os_name = "macOS"
+        elif "Android" in decoded:
+            os_name = "Android"
+        elif "iPhone" in decoded or "iPad" in decoded:
+            os_name = "iOS"
+        elif "Linux" in decoded:
+            os_name = "Linux"
+        else:
+            os_name = None
+
+        # Determine Browser
+        if "Firefox/" in decoded:
+            browser = "Firefox"
+        elif "Edg/" in decoded:
+            browser = "Edge"
+        elif "Chrome/" in decoded:
+            browser = "Chrome"
+        elif "Safari/" in decoded:
+            browser = "Safari"
+        else:
+            browser = None
+
+        if browser and os_name:
+            return f"{browser} ({os_name})"
+        return browser or os_name
+    except Exception:
+        return None
+
+
+def normalize_hostname(host: str | None) -> str | None:
+    """Strip domain suffixes to unify LAN and Tailscale host stems (e.g. sp11.lan -> sp11)."""
+    if not host:
+        return None
+    h = host.strip().rstrip(".")
+    for suffix in (
+        ".tail4f594f.ts.net",
+        ".ts.net",
+        ".lan",
+        ".local",
+        ".localdomain",
+        ".internal",
+        ".home",
+    ):
+        if h.endswith(suffix):
+            h = h[: -len(suffix)]
+            break
+    return h or None
+
+
+def _resolve_ip_hostname(ip: str) -> str | None:
+    """Reverse-lookup IP to normalized hostname with short socket timeout."""
+    try:
+        orig = socket.getdefaulttimeout()
+        socket.setdefaulttimeout(0.15)
+        try:
+            host, _, _ = socket.gethostbyaddr(ip)
+            return normalize_hostname(host)
+        finally:
+            socket.setdefaulttimeout(orig)
+    except Exception:
+        return None
+
+
+def _get_device_cache_path() -> Path:
+    return Path.home() / ".cache" / "homelab" / "jellyfin_device_routes.json"
+
+
+def load_device_cache() -> dict[str, dict[str, Any]]:
+    """Load cached device IP, route, and hostname mappings."""
+    path = _get_device_cache_path()
+    if not path.is_file():
+        return {}
+    with contextlib.suppress(Exception):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(data, dict):
+            return data
+    return {}
+
+
+def save_device_cache(cache: dict[str, dict[str, Any]]) -> None:
+    """Persist device IP, route, and hostname mappings."""
+    path = _get_device_cache_path()
+    with contextlib.suppress(Exception):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(cache, indent=2), encoding="utf-8")
 
 
 @dataclass(slots=True)
@@ -331,7 +466,11 @@ async def _gather_jellyfin_raw_data(ctx: StatusContext) -> JellyfinRawData:
     return raw
 
 
-def evaluate_jellyfin_report(raw: JellyfinRawData, connection: TargetConnection | None = None) -> JellyfinDeepReport:
+def evaluate_jellyfin_report(
+    raw: JellyfinRawData,
+    connection: TargetConnection | None = None,
+    history_limit: int = 10,
+) -> JellyfinDeepReport:
     """Evaluate raw Jellyfin diagnostics into a verified structured report."""
     report = JellyfinDeepReport(connection=connection, version=raw.version, item_counts=raw.item_counts)
 
@@ -604,6 +743,17 @@ def evaluate_jellyfin_report(raw: JellyfinRawData, connection: TargetConnection 
         except (ValueError, TypeError):
             return None
 
+    # Map session device IDs to endpoints
+    session_endpoints: dict[str, str] = {}
+    for s in raw.sessions:
+        s_dev_id = s.get("DeviceId")
+        s_ip = s.get("RemoteEndPoint")
+        if s_dev_id and s_ip:
+            session_endpoints[s_dev_id] = s_ip
+
+    device_cache = load_device_cache()
+    cache_dirty = False
+
     # Build device-to-app map (device_name.lower() -> app_name)
     device_app_map: dict[str, str] = {}
     connected_clients: list[ConnectedClientInfo] = []
@@ -618,31 +768,74 @@ def evaluate_jellyfin_report(raw: JellyfinRawData, connection: TargetConnection 
     for dev in sorted_devices:
         app = dev.get("AppName", "").strip()
         dev_name = dev.get("Name", "").strip()
+        dev_id = dev.get("Id", "").strip()
         if not dev_name or app.lower() in ignored_apps:
             continue
         if dev_name.lower() not in device_app_map:
             device_app_map[dev_name.lower()] = app
 
+        # Determine endpoint, route, platform, and hostname
+        cached = device_cache.get(dev_id) or {}
+        ip = session_endpoints.get(dev_id) or cached.get("endpoint")
+        route_name, route_badge = classify_client_route(ip) if ip else ("Unknown", "")
+
+        decoded_platform = decode_browser_user_agent(dev_id)
+        platform = decoded_platform or (f"v{dev.get('AppVersion')}" if dev.get("AppVersion") else "")
+
+        resolved_host = None
+        if ip:
+            if cached.get("endpoint") == ip and cached.get("hostname"):
+                resolved_host = cached.get("hostname")
+            else:
+                resolved_host = _resolve_ip_hostname(ip)
+
+        effective_device = resolved_host or cached.get("hostname") or dev_name
+
+        # Update cache if we have new or updated info
+        if dev_id and (ip or resolved_host or decoded_platform):
+            new_entry = {
+                "endpoint": ip or "",
+                "hostname": effective_device,
+                "platform": platform,
+                "route": route_name if route_name != "Unknown" else cached.get("route", ""),
+                "route_badge": route_badge or cached.get("route_badge", ""),
+                "app_name": app,
+                "device_name": dev_name,
+            }
+            if new_entry != cached:
+                device_cache[dev_id] = new_entry
+                cache_dirty = True
+
         dt = _parse_dt(dev.get("DateLastActivity"))
         if dt and dt >= cutoff_24h:
-            key = (dev_name.lower(), app.lower())
+            key = (effective_device.lower(), app.lower())
             if key not in seen_devices:
                 seen_devices.add(key)
                 connected_clients.append(
                     ConnectedClientInfo(
                         app_name=app,
-                        device_name=dev_name,
+                        device_name=effective_device,
                         username=dev.get("LastUserName", ""),
                         last_activity=dt.format_iso(),
                         relative_time=_format_relative_time(dt, now),
                         app_version=dev.get("AppVersion", ""),
+                        platform=platform,
+                        route=route_name,
+                        endpoint=ip or "",
+                        route_badge=route_badge,
                     )
                 )
+
+    if cache_dirty:
+        save_device_cache(device_cache)
 
     report.connected_clients_24h = connected_clients
 
     if connected_clients:
-        c_descs = [f"{c.app_name} on {c.device_name} ({c.relative_time})" for c in connected_clients]
+        c_descs = []
+        for c in connected_clients:
+            r_str = f" • {c.route}" if c.route and c.route != "Unknown" else ""
+            c_descs.append(f"{c.app_name} on {c.device_name}{r_str} ({c.relative_time})")
         report.checks.append(
             JellyfinCheckItem(
                 name="Connected Clients (24h)",
@@ -697,7 +890,7 @@ def evaluate_jellyfin_report(raw: JellyfinRawData, connection: TargetConnection 
             plays_24h_count += 1
             plays_by_client[client_label] = plays_by_client.get(client_label, 0) + 1
 
-        if len(parsed_history) < 10:
+        if len(parsed_history) < history_limit:
             parsed_history.append(
                 PlaybackHistoryItem(
                     timestamp=dt.format_iso(),
@@ -749,10 +942,10 @@ def evaluate_jellyfin_report(raw: JellyfinRawData, connection: TargetConnection 
     return report
 
 
-async def run_jellyfin_deep_check(ctx: StatusContext) -> JellyfinDeepReport:
+async def run_jellyfin_deep_check(ctx: StatusContext, history_limit: int = 10) -> JellyfinDeepReport:
     """Execute the full Jellyfin deep verification suite with concurrent I/O."""
     raw = await _gather_jellyfin_raw_data(ctx)
-    return evaluate_jellyfin_report(raw, connection=ctx.connection)
+    return evaluate_jellyfin_report(raw, connection=ctx.connection, history_limit=history_limit)
 
 
 def render_jellyfin_deep_report(report: JellyfinDeepReport, console: Console) -> None:
@@ -783,9 +976,41 @@ def render_jellyfin_deep_report(report: JellyfinDeepReport, console: Console) ->
     console.print(table)
     console.print()
 
+    if report.connected_clients_24h:
+        client_table = Table(
+            title="👥 Connected Clients (Last 24h)",
+            show_header=True,
+            header_style="bold cyan",
+        )
+        client_table.add_column("Client App", style="bold cyan", width=16)
+        client_table.add_column("Device Name", style="bold", width=22)
+        client_table.add_column("Platform / OS", style="dim", width=22)
+        client_table.add_column("Route & Endpoint", width=28)
+        client_table.add_column("Last Active", style="dim", width=14)
+        client_table.add_column("User", style="yellow", width=10)
+
+        for client in report.connected_clients_24h:
+            route_str = (
+                f"{client.route_badge} [dim]({client.endpoint})[/dim]"
+                if client.endpoint and client.route_badge
+                else client.route_badge or "[dim]Unknown[/dim]"
+            )
+            client_table.add_row(
+                client.app_name,
+                client.device_name,
+                client.platform or "[dim]—[/dim]",
+                route_str,
+                client.relative_time,
+                client.username or "—",
+            )
+
+        console.print(client_table)
+        console.print()
+
     if report.recent_playback:
+        history_title = f"📜 Recent Playback History (Most Recent {len(report.recent_playback)})"
         history_table = Table(
-            title="📜 Recent Playback History (Most Recent 10)",
+            title=history_title,
             show_header=True,
             header_style="bold cyan",
         )
@@ -956,10 +1181,15 @@ async def check_jellyfin(ctx: StatusContext) -> ServiceResult:
 
         # Connected clients (24h) branch
         if report.connected_clients_24h:
-            client_badges = [
-                f"[bold cyan]{c.app_name}[/bold cyan] [dim]({c.device_name})[/dim]"
-                for c in report.connected_clients_24h
-            ]
+            client_badges = []
+            for c in report.connected_clients_24h:
+                badge_inner = c.device_name
+                if c.platform and not c.platform.startswith("v") and c.platform != c.device_name:
+                    short_plat = c.platform.split(" (")[0] if " (" in c.platform else c.platform
+                    badge_inner = f"{short_plat} on {c.device_name}"
+                if c.route and c.route != "Unknown":
+                    badge_inner += f" • {c.route}"
+                client_badges.append(f"[bold cyan]{c.app_name}[/bold cyan] [dim]({badge_inner})[/dim]")
             branches.append(f"👥 Active Clients (24h): {', '.join(client_badges)}")
 
         # Recent plays branch

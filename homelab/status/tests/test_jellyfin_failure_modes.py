@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 from models import StatusContext, TargetConnection
 from services.jellyfin import (
@@ -12,8 +16,13 @@ from services.jellyfin import (
     _format_relative_time,
     _parse_qsv_speed,
     _parse_vainfo_driver,
+    classify_client_route,
+    decode_browser_user_agent,
     evaluate_jellyfin_report,
+    load_device_cache,
+    normalize_hostname,
     run_jellyfin_deep_check,
+    save_device_cache,
 )
 
 
@@ -400,3 +409,160 @@ def test_format_relative_time() -> None:
     assert _format_relative_time(now - hours(2) - minutes(10), now) == "2h 10m ago"
     assert _format_relative_time(now - hours(77), now) == "3d 5h ago"
     assert _format_relative_time(now - hours(14 * 24), now) == "14d ago"
+
+
+def test_classify_client_route() -> None:
+    assert classify_client_route("100.123.98.28") == ("Tailscale", "🔒 Tailscale")
+    assert classify_client_route("100.64.0.1") == ("Tailscale", "🔒 Tailscale")
+    assert classify_client_route("192.168.8.144") == ("LAN", "🟢 LAN")
+    assert classify_client_route("10.0.0.5") == ("LAN", "🟢 LAN")
+    assert classify_client_route("172.20.0.5") == ("LAN", "🟢 LAN")
+    assert classify_client_route("127.0.0.1") == ("Local", "🏠 Local")
+    assert classify_client_route("::1") == ("Local", "🏠 Local")
+    assert classify_client_route("8.8.8.8") == ("WAN", "🌐 WAN")
+    assert classify_client_route(None) == ("Unknown", "")
+    assert classify_client_route("not_an_ip") == ("Unknown", "")
+
+
+def test_decode_browser_user_agent() -> None:
+    import base64
+
+    # Windows 11 Firefox
+    ua_ff = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) Gecko/20100101 Firefox/157.0|12345"
+    id_ff = base64.b64encode(ua_ff.encode()).decode()
+    assert decode_browser_user_agent(id_ff) == "Firefox (Windows 11)"
+
+    # macOS Safari
+    ua_safari = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15"
+    id_safari = base64.b64encode(ua_safari.encode()).decode()
+    assert decode_browser_user_agent(id_safari) == "Safari (macOS)"
+
+    # Linux Chrome
+    ua_chrome = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130.0.0.0 Safari/537.36"
+    id_chrome = base64.b64encode(ua_chrome.encode()).decode()
+    assert decode_browser_user_agent(id_chrome) == "Chrome (Linux)"
+
+    # Native App UUID
+    assert decode_browser_user_agent("B04DB671-261A-41A5-B87B-1FEB3534047F") is None
+    assert decode_browser_user_agent(None) is None
+    assert decode_browser_user_agent("short") is None
+
+
+def test_normalize_hostname() -> None:
+    assert normalize_hostname("sp11.lan") == "sp11"
+    assert normalize_hostname("sp11.tail4f594f.ts.net") == "sp11"
+    assert normalize_hostname("Keifukus-iPad-Pro-11.local") == "Keifukus-iPad-Pro-11"
+    assert normalize_hostname("m70q.localdomain") == "m70q"
+    assert normalize_hostname("myhost") == "myhost"
+    assert normalize_hostname(None) is None
+    assert normalize_hostname("") is None
+
+
+def test_custom_playback_history_limit() -> None:
+    from whenever import Instant
+
+    now = Instant.now()
+    activity_entries = [
+        {
+            "Type": "VideoPlayback",
+            "Name": f"user is playing Episode {i} on TV",
+            "Date": now.format_iso(),
+            "ItemId": f"item_{i}",
+        }
+        for i in range(15)
+    ]
+    raw = _make_mock_raw(activity_entries=activity_entries)
+
+    # Test default limit (10)
+    report_default = evaluate_jellyfin_report(raw)
+    assert len(report_default.recent_playback) == 10
+
+    # Test custom limit (5)
+    report_5 = evaluate_jellyfin_report(raw, history_limit=5)
+    assert len(report_5.recent_playback) == 5
+
+    # Test custom limit (15)
+    report_15 = evaluate_jellyfin_report(raw, history_limit=15)
+    assert len(report_15.recent_playback) == 15
+
+
+def test_connected_clients_route_and_platform_enrichment(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from whenever import Instant
+
+    # Mock device cache to tmp_path
+    monkeypatch.setattr(
+        "services.jellyfin._get_device_cache_path",
+        lambda: tmp_path / "jellyfin_device_routes.json",
+    )
+
+    # Test explicit save_device_cache and load_device_cache
+    save_device_cache({"initial": {"endpoint": "100.1.2.3", "hostname": "initial-host"}})
+    assert load_device_cache()["initial"]["hostname"] == "initial-host"
+
+    now = Instant.now()
+    import base64
+
+    ua_ff = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) Gecko/20100101 Firefox/157.0"
+    dev_id_ff = base64.b64encode(ua_ff.encode()).decode()
+
+    devices = [
+        {
+            "Name": "Firefox",
+            "Id": dev_id_ff,
+            "AppName": "Jellyfin Web",
+            "DateLastActivity": now.format_iso(),
+            "LastUserName": "ehtesh",
+        },
+        {
+            "Name": "iPad",
+            "Id": "B04DB671-261A-41A5-B87B-1FEB3534047F",
+            "AppName": "VidHub",
+            "DateLastActivity": now.format_iso(),
+            "LastUserName": "ehtesh",
+            "AppVersion": "3.1.0",
+        },
+    ]
+
+    sessions = [
+        {
+            "DeviceId": dev_id_ff,
+            "RemoteEndPoint": "100.123.98.28",
+        },
+        {
+            "DeviceId": "B04DB671-261A-41A5-B87B-1FEB3534047F",
+            "RemoteEndPoint": "192.168.8.135",
+        },
+    ]
+
+    # Mock hostname lookup so tests don't rely on live DNS
+    def mock_resolve(ip: str) -> str | None:
+        if ip == "100.123.98.28":
+            return "sp11"
+        if ip == "192.168.8.135":
+            return "Keifukus-iPad-Pro-11"
+        return None
+
+    monkeypatch.setattr("services.jellyfin._resolve_ip_hostname", mock_resolve)
+
+    raw = _make_mock_raw(devices=devices, sessions=sessions)
+    report = evaluate_jellyfin_report(raw)
+
+    assert len(report.connected_clients_24h) == 2
+    c_web = next(c for c in report.connected_clients_24h if c.app_name == "Jellyfin Web")
+    assert c_web.device_name == "sp11"
+    assert c_web.platform == "Firefox (Windows 11)"
+    assert c_web.route == "Tailscale"
+    assert c_web.route_badge == "🔒 Tailscale"
+    assert c_web.endpoint == "100.123.98.28"
+
+    c_vid = next(c for c in report.connected_clients_24h if c.app_name == "VidHub")
+    assert c_vid.device_name == "Keifukus-iPad-Pro-11"
+    assert c_vid.route == "LAN"
+    assert c_vid.route_badge == "🟢 LAN"
+    assert c_vid.endpoint == "192.168.8.135"
+
+    # Verify cache was written
+    cache = load_device_cache()
+    assert dev_id_ff in cache
+    assert cache[dev_id_ff]["hostname"] == "sp11"
+    assert cache[dev_id_ff]["route"] == "Tailscale"

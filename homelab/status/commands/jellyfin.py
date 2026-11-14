@@ -20,6 +20,12 @@ console = Console()
 
 
 def jellyfin_command(
+    limit: int = typer.Option(
+        10,
+        "--limit",
+        "-n",
+        help="Number of recent playback history entries to display [default: 10]",
+    ),
     json_output: bool = typer.Option(
         False,
         "--json",
@@ -73,7 +79,7 @@ def jellyfin_command(
         connection=conn,
     )
 
-    report = anyio.run(run_jellyfin_deep_check, ctx)
+    report = anyio.run(run_jellyfin_deep_check, ctx, limit)
 
     if json_output:
         out_dict = {
