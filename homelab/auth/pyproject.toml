@@ -77,6 +77,9 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ANN", "SLF001", "T201", "S", "ARG"]
 
+[tool.ruff.lint.flake8-type-checking]
+exempt-modules = ["typing", "pathlib"]
+
 [tool.ty.rules]
 missing-direct-dependency = "error"
 blanket-ignore-comment = "error"

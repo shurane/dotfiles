@@ -85,6 +85,9 @@ ignore = [
   "S405",      # xml.etree import check (paired with S314)
 ]
 
+[tool.ruff.lint.flake8-type-checking]
+exempt-modules = ["typing", "pathlib"]
+
 [tool.ty.rules]
 missing-direct-dependency = "error"
 blanket-ignore-comment = "error"

@@ -10,7 +10,7 @@ import sys
 import time
 from collections import deque
 from dataclasses import asdict
-from pathlib import Path  # noqa: TC003
+from pathlib import Path
 from typing import Any
 
 import anyio
