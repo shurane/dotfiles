@@ -283,11 +283,11 @@ async def test_run_jellyfin_deep_check_with_mock_context() -> None:
 
 
 def test_jellyfin_connected_clients_parsing() -> None:
-    import datetime  # noqa: TID251
+    from whenever import Instant, hours, minutes
 
-    now = datetime.datetime.now(datetime.UTC)
-    recent_iso = (now - datetime.timedelta(minutes=10)).isoformat()
-    old_iso = (now - datetime.timedelta(days=2)).isoformat()
+    now = Instant.now()
+    recent_iso = (now - minutes(10)).format_iso()
+    old_iso = (now - hours(48)).format_iso()
 
     devices = [
         {
@@ -329,13 +329,13 @@ def test_jellyfin_connected_clients_parsing() -> None:
 
 
 def test_jellyfin_playback_history_and_24h_activity() -> None:
-    import datetime  # noqa: TID251
+    from whenever import Instant, hours, seconds
 
-    now = datetime.datetime.now(datetime.UTC)
-    d1 = (now - datetime.timedelta(hours=1)).isoformat()
-    d2 = (now - datetime.timedelta(hours=1, seconds=30)).isoformat()  # duplicate within 5m
-    d3 = (now - datetime.timedelta(hours=5)).isoformat()
-    d4 = (now - datetime.timedelta(days=3)).isoformat()  # older than 24h
+    now = Instant.now()
+    d1 = (now - hours(1)).format_iso()
+    d2 = (now - hours(1) - seconds(30)).format_iso()  # duplicate within 5m
+    d3 = (now - hours(5)).format_iso()
+    d4 = (now - hours(72)).format_iso()  # older than 24h
 
     devices = [
         {"Name": "iPad", "AppName": "Infuse-Direct", "DateLastActivity": d1},
@@ -392,11 +392,11 @@ def test_jellyfin_playback_history_and_24h_activity() -> None:
 
 
 def test_format_relative_time() -> None:
-    import datetime  # noqa: TID251
+    from whenever import Instant, hours, minutes
 
-    now = datetime.datetime.now(datetime.UTC)
+    now = Instant.now()
     assert _format_relative_time(now, now) == "just now"
-    assert _format_relative_time(now - datetime.timedelta(minutes=5), now) == "5m ago"
-    assert _format_relative_time(now - datetime.timedelta(hours=2, minutes=10), now) == "2h 10m ago"
-    assert _format_relative_time(now - datetime.timedelta(days=3, hours=5), now) == "3d 5h ago"
-    assert _format_relative_time(now - datetime.timedelta(days=14), now) == "14d ago"
+    assert _format_relative_time(now - minutes(5), now) == "5m ago"
+    assert _format_relative_time(now - hours(2) - minutes(10), now) == "2h 10m ago"
+    assert _format_relative_time(now - hours(77), now) == "3d 5h ago"
+    assert _format_relative_time(now - hours(14 * 24), now) == "14d ago"

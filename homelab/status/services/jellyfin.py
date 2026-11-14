@@ -118,17 +118,13 @@ class JellyfinDeepReport:
     version: str | None = None
 
 
-def _format_relative_time(dt: datetime.datetime, now: datetime.datetime | None = None) -> str:
-    """Format a datetime into human readable relative time (e.g. '12m ago', '3h 15m ago', '2d ago')."""
+def _format_relative_time(inst: Instant, now: Instant | None = None) -> str:
+    """Format an Instant into human readable relative time (e.g. '12m ago', '3h 15m ago', '2d ago')."""
     if now is None:
-        now = datetime.datetime.now(datetime.UTC)
-    if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=datetime.UTC)
-    if now.tzinfo is None:
-        now = now.replace(tzinfo=datetime.UTC)
+        now = Instant.now()
 
-    diff = now - dt
-    total_seconds = max(0, int(diff.total_seconds()))
+    diff = now - inst
+    total_seconds = max(0, int(diff.total("seconds")))
     if total_seconds < 60:
         return "just now"
     minutes = total_seconds // 60
@@ -596,15 +592,15 @@ def evaluate_jellyfin_report(raw: JellyfinRawData, connection: TargetConnection 
         )
 
     # 11. Connected Clients (Last 24h)
-    now = datetime.datetime.now(datetime.UTC)
-    cutoff_24h = now - datetime.timedelta(hours=24)
+    now = Instant.now()
+    cutoff_24h = now.subtract(hours=24)
     ignored_apps = {"statuscheck", "homelabbootstrap", "jellyfin-cli", "status"}
 
-    def _parse_dt(dt_str: str | None) -> datetime.datetime | None:
+    def _parse_dt(dt_str: str | None) -> Instant | None:
         if not dt_str:
             return None
         try:
-            return datetime.datetime.fromisoformat(dt_str)
+            return Instant.parse_iso(dt_str)
         except (ValueError, TypeError):
             return None
 
@@ -613,10 +609,9 @@ def evaluate_jellyfin_report(raw: JellyfinRawData, connection: TargetConnection 
     connected_clients: list[ConnectedClientInfo] = []
     seen_devices: set[tuple[str, str]] = set()
 
-    epoch_min = datetime.datetime.min.replace(tzinfo=datetime.UTC)
     sorted_devices = sorted(
         raw.devices,
-        key=lambda d: _parse_dt(d.get("DateLastActivity")) or epoch_min,
+        key=lambda d: _parse_dt(d.get("DateLastActivity")) or Instant.MIN,
         reverse=True,
     )
 
@@ -638,7 +633,7 @@ def evaluate_jellyfin_report(raw: JellyfinRawData, connection: TargetConnection 
                         app_name=app,
                         device_name=dev_name,
                         username=dev.get("LastUserName", ""),
-                        last_activity=dt.isoformat(),
+                        last_activity=dt.format_iso(),
                         relative_time=_format_relative_time(dt, now),
                         app_version=dev.get("AppVersion", ""),
                     )
@@ -691,7 +686,7 @@ def evaluate_jellyfin_report(raw: JellyfinRawData, connection: TargetConnection 
                 prev_dt
                 and prev.media_title == title
                 and prev.device_name == dev_name
-                and abs((prev_dt - dt).total_seconds()) < 300
+                and abs(int((prev_dt - dt).total("seconds"))) < 300
             ):
                 continue
 
@@ -705,7 +700,7 @@ def evaluate_jellyfin_report(raw: JellyfinRawData, connection: TargetConnection 
         if len(parsed_history) < 10:
             parsed_history.append(
                 PlaybackHistoryItem(
-                    timestamp=dt.isoformat(),
+                    timestamp=dt.format_iso(),
                     relative_time=_format_relative_time(dt, now),
                     username=user,
                     media_title=title,
