@@ -137,8 +137,6 @@ def main() -> None:
     )
     parser.add_argument(
         "--dry-run",
-        "-n",
-        "--simulate",
         action="store_true",
         help="Simulate downloads without writing files",
     )
@@ -197,7 +195,7 @@ def main() -> None:
             overall_exit_code = rc
 
     if args.scan and overall_exit_code == 0:
-        jellyfin.refresh()
+        jellyfin.refresh(dry_run=args.dry_run)
 
     sys.exit(overall_exit_code)
 

@@ -11,7 +11,7 @@ uv run download-numberblocks --dry-run --season 1 --limit 1
 uv run download-anpanman --season 1 --scan           # download & trigger jellyfin scan
 uv run download-anpanman --season 1 --episodes 1-50 --concurrency 4
 uv run download-anpanman --verify-checksum           # verify local files against MD5
-uv run download-anpanman --limit 1                   # test run
+uv run download-anpanman --dry-run --season 1 --limit 1
 
 # Anpanman metadata
 uv run build-anpanman-metadata
@@ -19,4 +19,5 @@ uv run build-anpanman-metadata --dry-run --end-sec 2 # test scraper on first 2 s
 
 # Jellyfin
 uv run jellyfin-scan                                 # trigger library refresh
+uv run jellyfin-scan --dry-run
 ```

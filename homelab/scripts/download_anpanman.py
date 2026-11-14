@@ -95,6 +95,8 @@ def parse_range_spec(range_str: str) -> set[int]:
 async def fetch_archive_files(
     client: httpx.AsyncClient,
     cache_path: Path | None = None,
+    *,
+    dry_run: bool = False,
 ) -> list[EpisodeFile]:
     """Fetch metadata from Archive.org and extract video files grouped into seasons."""
     raw_data: dict[str, Any] | None = None
@@ -113,9 +115,12 @@ async def fetch_archive_files(
         resp = await client.get(METADATA_URL, timeout=30.0)
         resp.raise_for_status()
         raw_data = resp.json()
-        if cache_path:
-            cache_path.parent.mkdir(parents=True, exist_ok=True)
-            await anyio.Path(cache_path).write_text(json.dumps(raw_data), encoding="utf-8")
+        if cache_path and not dry_run:
+            try:
+                cache_path.parent.mkdir(parents=True, exist_ok=True)
+                await anyio.Path(cache_path).write_text(json.dumps(raw_data), encoding="utf-8")
+            except OSError as e:
+                console.print(f"[dim yellow]Warning: Failed to write cache: {e}[/dim yellow]")
 
     files_list: list[dict[str, Any]] = raw_data.get("files", [])
     episodes: list[EpisodeFile] = []
@@ -539,8 +544,8 @@ async def main_async(args: argparse.Namespace) -> int:
     if args.episodes:
         target_episodes = parse_range_spec(args.episodes)
 
-    dest_dir = Path(args.dest_dir).resolve()
-    media_dir = Path(args.media_dir).resolve() if args.media_dir else None
+    dest_dir = args.dest_dir.resolve()
+    media_dir = args.media_dir.resolve() if args.media_dir else None
     cache_path = dest_dir / ".archive_metadata.json"
 
     console.print(
@@ -566,7 +571,7 @@ async def main_async(args: argparse.Namespace) -> int:
         timeout=timeout,
         headers={"User-Agent": "Mozilla/5.0 (compatible; AnpanmanDownloader/1.0)"},
     ) as client:
-        all_episodes = await fetch_archive_files(client, cache_path=cache_path)
+        all_episodes = await fetch_archive_files(client, cache_path=cache_path, dry_run=args.dry_run)
         selected_episodes = [ep for ep in all_episodes if ep.season in target_seasons]
 
         if target_episodes is not None:
@@ -629,6 +634,12 @@ async def main_async(args: argparse.Namespace) -> int:
         )
         console.print()
 
+        if args.dry_run:
+            console.print("[dim][dry-run][/dim] Simulation complete. No files were downloaded.\n")
+            if args.scan and media_dir:
+                jellyfin.refresh(dry_run=True)
+            return 0
+
         # Rich live progress bar
         progress = Progress(
             SpinnerColumn(),
@@ -689,7 +700,7 @@ async def main_async(args: argparse.Namespace) -> int:
         return 1
 
     if args.scan and media_dir:
-        jellyfin.refresh()
+        jellyfin.refresh(dry_run=args.dry_run)
 
     return 0
 
@@ -716,14 +727,14 @@ def main() -> None:
     )
     parser.add_argument(
         "--dest-dir",
-        type=str,
-        default="/mnt/mango/torrents/tv/Anpanman (1988)",
+        type=Path,
+        default=Path("/mnt/mango/torrents/tv/Anpanman (1988)"),
         help="Destination directory for downloads (Default: /mnt/mango/torrents/tv/Anpanman (1988))",
     )
     parser.add_argument(
         "--media-dir",
-        type=str,
-        default="/mnt/mango/media/tv/Soreike! Anpanman (1988)",
+        type=Path,
+        default=Path("/mnt/mango/media/tv/Soreike! Anpanman (1988)"),
         help="Media directory for Jellyfin hardlinks (Default: /mnt/mango/media/tv/Soreike! Anpanman (1988))",
     )
     parser.add_argument(
@@ -736,6 +747,11 @@ def main() -> None:
         "--verify-checksum",
         action="store_true",
         help="Perform deep MD5 verification on existing files (Default: false, relies on exact size)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Simulate downloads and inspect file availability without downloading",
     )
     parser.add_argument(
         "--scan",

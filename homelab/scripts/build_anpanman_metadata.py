@@ -116,7 +116,6 @@ def scrape_sections(start_section: int = 2, end_section: int = 8, delay: float =
 def main() -> None:
     parser = argparse.ArgumentParser(description="Scrape and build Anpanman episode metadata.")
     parser.add_argument(
-        "-o",
         "--output",
         type=Path,
         default=Path(__file__).resolve().parent / "anpanman_metadata.json",
