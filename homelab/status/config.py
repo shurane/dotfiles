@@ -94,40 +94,13 @@ def get_env_setting(key: str, default: str = "") -> str:
     return default
 
 
-def get_node_name() -> str:
-    """Resolve homelab node name from HOMELAB_NODE_NAME, HOMELAB_HOSTNAME, HOMELAB_HOST, or default to 'server'."""
-    if node := get_env_setting("HOMELAB_NODE_NAME"):
-        return node
-    if host := (get_env_setting("HOMELAB_HOSTNAME") or get_env_setting("HOMELAB_HOST")):
-        return host.split(".")[0]
-    return "server"
-
-
-def discover_tailscale_suffix() -> str | None:
-    """Dynamically discover the Tailscale MagicDNS suffix for the current machine/tailnet."""
-    # 1. Fast check: parse /etc/resolv.conf search/domain directive
-    resolv = Path("/etc/resolv.conf")
-    if resolv.is_file():
-        try:
-            for line in resolv.read_text().splitlines():
-                line = line.strip()
-                if line.startswith(("search", "domain")):
-                    for word in line.split()[1:]:
-                        if word.endswith(".ts.net"):
-                            return word
-        except Exception:
-            pass
-
-    # 2. Fast check: canonical hostname lookup for configured node name
-    node = get_node_name()
-    try:
-        cname, _, _ = socket.gethostbyname_ex(node)
-        if cname.endswith(".ts.net") and "." in cname:
-            return cname.split(".", 1)[1]
-    except Exception:
-        pass
-
-    return None
+def get_ssh_user(explicit_user: str | None = None) -> str:
+    """Resolve SSH user from explicit argument, HOMELAB_SSH_USER, or HOMELAB_USERNAME."""
+    if explicit_user:
+        return explicit_user
+    if user := (get_env_setting("HOMELAB_SSH_USER") or get_env_setting("HOMELAB_USERNAME")):
+        return user
+    return "homelab"
 
 
 def classify_route(host: str, ip: str, is_local: bool) -> tuple[str, str]:
@@ -229,12 +202,7 @@ def _load_raw_env(
     ssh_user: str | None = None,
 ) -> dict[str, str]:
     """Retrieve raw environment key-value pairs from local disk, remote host over SSH, or os.environ."""
-    if ssh_user is None:
-        ssh_user = (
-            get_env_setting("HOMELAB_SSH_USER")
-            or get_env_setting("HOMELAB_USERNAME")
-            or os.environ.get("USER", "homelab")
-        )
+    ssh_user = get_ssh_user(ssh_user)
 
     # 1. Explicit path
     if env_path and env_path.is_file():
@@ -305,12 +273,7 @@ def _get_ssh_tunnel_client(
 
     import docker
 
-    if ssh_user is None:
-        ssh_user = (
-            get_env_setting("HOMELAB_SSH_USER")
-            or get_env_setting("HOMELAB_USERNAME")
-            or os.environ.get("USER", "homelab")
-        )
+    ssh_user = get_ssh_user(ssh_user)
 
     runtime_dir = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp"))
     sock_path = runtime_dir / f"homelab-docker-{os.getuid()}.sock"
@@ -390,12 +353,7 @@ def get_docker_client(
     if lan_host is None:
         lan_host = resolve_target_host()
 
-    if ssh_user is None:
-        ssh_user = (
-            get_env_setting("HOMELAB_SSH_USER")
-            or get_env_setting("HOMELAB_USERNAME")
-            or os.environ.get("USER", "homelab")
-        )
+    ssh_user = get_ssh_user(ssh_user)
 
     import docker
 

@@ -12,9 +12,8 @@ from typer.testing import CliRunner
 
 from config import (
     classify_route,
-    discover_tailscale_suffix,
     format_speed,
-    get_node_name,
+    get_ssh_user,
     is_target_local,
     resolve_target_connection,
     resolve_target_host,
@@ -52,20 +51,18 @@ def test_resolve_target_host(monkeypatch: pytest.MonkeyPatch) -> None:
     assert exc_info.value.code == 1
 
 
-def test_get_node_name(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("HOMELAB_NODE_NAME", "custom-box")
-    assert get_node_name() == "custom-box"
+def test_get_ssh_user(monkeypatch: pytest.MonkeyPatch) -> None:
+    assert get_ssh_user("custom_user") == "custom_user"
 
-    monkeypatch.setenv("HOMELAB_NODE_NAME", "")
-    monkeypatch.setenv("HOMELAB_HOSTNAME", "derived-node.home.arpa")
-    assert get_node_name() == "derived-node"
+    env_mock = {"HOMELAB_SSH_USER": "ssh_admin", "HOMELAB_USERNAME": "generic_user"}
+    monkeypatch.setattr("config.get_env_setting", lambda k, d="": env_mock.get(k, d))
+    assert get_ssh_user() == "ssh_admin"
 
-    monkeypatch.setenv("HOMELAB_HOSTNAME", "")
-    monkeypatch.setenv("HOMELAB_HOST", "fallback-node.lan")
-    assert get_node_name() == "fallback-node"
+    env_mock.pop("HOMELAB_SSH_USER")
+    assert get_ssh_user() == "generic_user"
 
-    monkeypatch.setenv("HOMELAB_HOST", "")
-    assert get_node_name() in ("m70q", "server")
+    env_mock.pop("HOMELAB_USERNAME")
+    assert get_ssh_user() == "homelab"
 
 
 def test_classify_route() -> None:
@@ -93,13 +90,6 @@ def test_classify_route() -> None:
     route, desc = classify_route("example.com", "93.184.216.34", is_local=False)
     assert route == "wan"
     assert desc == "WAN / Remote"
-
-
-def test_discover_tailscale_suffix() -> None:
-    # Test dynamic discovery (should return suffix or None without crashing)
-    suffix = discover_tailscale_suffix()
-    if suffix:
-        assert suffix.endswith(".ts.net")
 
 
 def test_resolve_target_connection() -> None:

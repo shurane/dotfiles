@@ -53,6 +53,7 @@ class HomelabConfig(BaseModel):
     username: str = Field(default="username", alias="HOMELAB_USERNAME")
     hostname: str | None = Field(default=None, alias="HOMELAB_HOSTNAME")
     ssh_user: str | None = Field(default=None, alias="HOMELAB_SSH_USER")
+    node_name: str | None = Field(default=None, alias="HOMELAB_NODE_NAME")
 
     @property
     def effective_ssh_user(self) -> str:
