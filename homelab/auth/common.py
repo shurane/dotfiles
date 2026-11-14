@@ -1,3 +1,4 @@
+import contextlib
 import os
 import sqlite3
 import time
@@ -14,15 +15,13 @@ def format_path(path: Path | None) -> str:
     """Format path relative to user's home directory (e.g. ~/dotfiles/...) if applicable."""
     if path is None:
         return "<none>"
-    try:
+    with contextlib.suppress(ValueError, RuntimeError):
         resolved = path.resolve()
         home = Path.home().resolve()
         if resolved == home:
             return "~"
         if resolved.is_relative_to(home):
             return f"~/{resolved.relative_to(home)}"
-    except ValueError, RuntimeError:
-        pass
     return str(path)
 
 
@@ -63,7 +62,7 @@ def wait_for_sqlite_table(db_path: Path, table_name: str, timeout_seconds: int =
     deadline = time.monotonic() + timeout_seconds
     while time.monotonic() < deadline:
         if db_path.exists():
-            try:
+            with contextlib.suppress(sqlite3.Error):
                 with sqlite3.connect(db_path) as db:
                     row = db.execute(
                         "select name from sqlite_master where type = 'table' and name = ?",
@@ -71,8 +70,6 @@ def wait_for_sqlite_table(db_path: Path, table_name: str, timeout_seconds: int =
                     ).fetchone()
                 if row is not None:
                     return
-            except sqlite3.Error:
-                pass
         time.sleep(2)
     raise RuntimeError(f"timed out waiting for table {table_name!r} in {db_path}")
 

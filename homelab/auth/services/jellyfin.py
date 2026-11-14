@@ -93,12 +93,10 @@ def hash_jellyfin_password(password: str) -> str:
 def wait_for_jellyfin(timeout_seconds: int = 90) -> None:
     deadline = time.monotonic() + timeout_seconds
     while time.monotonic() < deadline:
-        try:
+        with contextlib.suppress(httpx.HTTPError):
             response = httpx.get(f"{JELLYFIN_URL}/System/Info/Public", timeout=5)
             if response.status_code == 200:
                 return
-        except httpx.HTTPError:
-            pass
         time.sleep(2)
     raise RuntimeError("Jellyfin did not become ready")
 

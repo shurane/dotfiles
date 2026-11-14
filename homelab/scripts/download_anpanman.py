@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import contextlib
 import hashlib
 import json
 import os
@@ -187,11 +188,11 @@ def load_anpanman_metadata() -> dict[str, Any]:
     ]
     for p in candidates:
         if p.exists():
-            try:
-                with p.open(encoding="utf-8") as f:
-                    return json.load(f)
-            except OSError, json.JSONDecodeError:
-                pass
+            with (
+                contextlib.suppress(OSError, json.JSONDecodeError),
+                p.open(encoding="utf-8") as f,
+            ):
+                return json.load(f)
     return {}
 
 

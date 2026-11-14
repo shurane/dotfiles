@@ -120,7 +120,7 @@ def classify_route(host: str, ip: str, is_local: bool) -> tuple[str, str]:
     if host.endswith(".ts.net"):
         return "tailscale", "Tailscale MagicDNS"
 
-    try:
+    with contextlib.suppress(ValueError):
         addr = ipaddress.ip_address(ip)
         if addr in ipaddress.ip_network("100.64.0.0/10"):
             return "tailscale", "Tailscale MagicDNS"
@@ -128,8 +128,6 @@ def classify_route(host: str, ip: str, is_local: bool) -> tuple[str, str]:
             return "local", "Local Host"
         if addr.is_private:
             return "lan", "Direct LAN"
-    except ValueError:
-        pass
 
     if host.endswith((".lan", ".local", ".home.arpa")):
         return "lan", "Direct LAN"

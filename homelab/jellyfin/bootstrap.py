@@ -17,6 +17,7 @@ Detects host GPU capabilities and safely manages:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import difflib
 import os
 from pathlib import Path
@@ -52,10 +53,8 @@ def detect_gpu(
     """Detect host GPU vendor and determine target hardware acceleration."""
     vendor = "unknown"
     if vendor_path.exists():
-        try:
+        with contextlib.suppress(OSError):
             vendor = vendor_path.read_text(encoding="utf-8").strip().lower()
-        except OSError:
-            pass
 
     match vendor:
         case "0x8086":
@@ -69,17 +68,13 @@ def detect_gpu(
 
     render_gid = "none"
     if render_path.exists():
-        try:
+        with contextlib.suppress(OSError):
             render_gid = str(render_path.stat().st_gid)
-        except OSError:
-            pass
 
     video_gid = "none"
     if card_path.exists():
-        try:
+        with contextlib.suppress(OSError):
             video_gid = str(card_path.stat().st_gid)
-        except OSError:
-            pass
 
     return GpuInfo(
         vendor_id=vendor,
@@ -126,15 +121,13 @@ def format_path(path: Path | None) -> str:
     """Format path relative to user's home directory (e.g. ~/dotfiles/...) if applicable."""
     if path is None:
         return "<none>"
-    try:
+    with contextlib.suppress(ValueError, RuntimeError):
         resolved = path.resolve()
         home = Path.home().resolve()
         if resolved == home:
             return "~"
         if resolved.is_relative_to(home):
             return f"~/{resolved.relative_to(home)}"
-    except (ValueError, RuntimeError):
-        pass
     return str(path)
 
 

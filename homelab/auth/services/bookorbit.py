@@ -19,12 +19,10 @@ def wait_for_bookorbit(client: httpx.Client, timeout_seconds: int = 60) -> None:
     url = f"{BOOKORBIT_URL}/api/v1/health"
     deadline = time.monotonic() + timeout_seconds
     while time.monotonic() < deadline:
-        try:
+        with contextlib.suppress(httpx.HTTPError, ValueError):
             response = client.get(url)
             if response.status_code == 200:
                 return
-        except httpx.HTTPError, ValueError:
-            pass
         time.sleep(2)
     raise RuntimeError(f"timed out waiting for {url}")
 
