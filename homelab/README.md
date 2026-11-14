@@ -22,14 +22,20 @@ docker compose up -d --remove-orphans
 
 ### 3. Auth Bootstrap
 
+Manages and bootstraps authenticated credentials across services (qBittorrent, Qui, Arcane, Jellyfin, BookOrbit).
 Defaults to dry-run verification; pass `--apply` to commit credentials:
 
 ```bash
-./auth/main.py --apply
-./auth/main.py --apply --services jellyfin
-```
+# Run from homelab/
+uv run -p auth auth                         # Dry-run verification across all services
+uv run -p auth auth --apply                 # Commit credentials
+uv run -p auth auth --apply --services jellyfin
 
-Run without `--apply` to verify credentials in dry-run mode.
+# Or run from auth/
+cd auth
+uv run auth                                 # Dry-run verification
+uv run auth --apply
+```
 
 `HOSTNAME_BASE` is the canonical local domain (e.g. `example.com`).
 
@@ -38,14 +44,21 @@ Run without `--apply` to verify credentials in dry-run mode.
 Deep health & content inspector that authenticates and queries service state, libraries, torrents, shares, and routes:
 
 ```bash
-# Run via uv project script
-uv run --project status status
+# Run full status tree from homelab/
+uv run -p status status
 
-# Or execute main.py directly
-./status/main.py
-./status/main.py --service jellyfin --service qbittorrent
-./status/main.py --json
+# Deep service inspectors
+uv run -p status status jellyfin   # Intel QuickSync (QSV) transcode benchmark, 512MB cgroup, active streams, media library
+uv run -p status status samba      # Port 445, SMB auth & empty pw rejection, drive mounts (/dev/sda1 rw), active clients, locks
+uv run -p status status vpn        # ProtonVPN tun0 tunnel, Gluetun kill switch, port forwarding, qBittorrent integration
 
-# Run unit tests
-cd status && uv run pytest
+# Filter services or export JSON
+uv run -p status status -s jellyfin -s qbittorrent
+uv run -p status status --json
+
+# Or run from status/
+cd status
+uv run status
+uv run status jellyfin
+uv run pytest                      # Run unit test suite
 ```
