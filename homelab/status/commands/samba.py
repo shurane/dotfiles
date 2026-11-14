@@ -86,6 +86,7 @@ def samba_command(
             "all_passed": report.all_passed,
             "version": report.version,
             "shares": report.shares,
+            "share_details": [asdict(s) for s in report.share_details],
             "accounts": report.accounts,
             "drive_mount_mode": report.drive_mount_mode,
             "active_clients": [asdict(c) for c in report.active_clients],

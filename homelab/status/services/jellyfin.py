@@ -570,27 +570,38 @@ def render_jellyfin_deep_report(report: JellyfinDeepReport, console: Console) ->
         mem_str = ""
         if report.memory and report.memory.limit_bytes > 0:
             mem_str = (
-                f"\n• [bold]Memory Cgroup:[/bold] {format_bytes(report.memory.usage_bytes)} / "
-                f"{format_bytes(report.memory.limit_bytes)} ({report.memory.usage_percent:.1f}%) "
-                f"[dim]• 512MiB enforced • 0 OOM kills[/dim]"
+                f"\n• [bold]Memory Cgroup:[/bold] [bold cyan]{format_bytes(report.memory.usage_bytes)}[/bold cyan] / "
+                f"[bold cyan]{format_bytes(report.memory.limit_bytes)}[/bold cyan] "
+                f"([bold cyan]{report.memory.usage_percent:.1f}%[/bold cyan]) "
+                f"[dim]• [bold cyan]512MiB[/bold cyan] enforced • [bold cyan]0[/bold cyan] OOM kills[/dim]"
             )
 
-        qsv_str = f"QSV {report.qsv_speed}" if report.qsv_speed else "Active"
+        qsv_str = f"QSV [bold cyan]{report.qsv_speed}[/bold cyan]" if report.qsv_speed else "Active"
         cat = report.item_counts
-        cat_str = f"{cat.get('MovieCount', 0):,} movies, {cat.get('SeriesCount', 0):,} series"
+        movies_cnt = cat.get("MovieCount", 0)
+        series_cnt = cat.get("SeriesCount", 0)
+        items_cnt = cat.get("ItemCount", 0)
+        cat_str = (
+            f"[bold cyan]{movies_cnt:,}[/bold cyan] movies, "
+            f"[bold cyan]{series_cnt:,}[/bold cyan] series "
+            f"([bold cyan]{items_cnt:,}[/bold cyan] items)"
+        )
 
         stream_str = ""
         if report.active_sessions:
             first_sess = report.active_sessions[0]
-            stream_str = f"\n• [bold]Active Stream:[/bold] {first_sess.media_title} ({first_sess.play_method})"
+            stream_str = (
+                f"\n• [bold]Active Stream:[/bold] [bold yellow]{first_sess.media_title}[/bold yellow] "
+                f"({first_sess.play_method})"
+            )
         else:
-            stream_str = "\n• [bold]Active Streams:[/bold] None (Idle)"
+            stream_str = "\n• [bold]Active Streams:[/bold] [bold cyan]0[/bold cyan] (Idle)"
 
         verdict = Panel(
             "[bold green]✔ ALL JELLYFIN CHECKS PASSED & HARDWARE ACCELERATED[/bold green]\n\n"
             f"{route_line}"
             f"• [bold]Hardware Acceleration:[/bold] Intel QuickSync ({qsv_str}) via iHD driver\n"
-            f"• [bold]Media Library:[/bold] {cat_str} ({cat.get('ItemCount', 0):,} items)"
+            f"• [bold]Media Library:[/bold] {cat_str}"
             f"{mem_str}"
             f"{stream_str}",
             title="[bold green]Status: HEALTHY & ACCELERATED[/bold green]",

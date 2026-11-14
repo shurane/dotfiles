@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run
+#!/usr/bin/env python3
 """Homelab Deep Health & Content Inspector - CLI Entrypoint."""
 
 from __future__ import annotations

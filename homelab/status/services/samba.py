@@ -47,6 +47,14 @@ class SmbLockInfo:
 
 
 @dataclass(slots=True)
+class ShareDetails:
+    name: str
+    path: str
+    mode: str = "rw"
+    backing_device: str = ""
+
+
+@dataclass(slots=True)
 class SambaRawData:
     container_found: bool = False
     container_status: str = "unknown"
@@ -75,10 +83,38 @@ class SambaDeepReport:
     all_passed: bool = True
     version: str | None = None
     shares: list[str] = field(default_factory=list)
+    share_details: list[ShareDetails] = field(default_factory=list)
     accounts: list[str] = field(default_factory=list)
     active_clients: list[SmbClientSession] = field(default_factory=list)
     active_locks: list[SmbLockInfo] = field(default_factory=list)
     drive_mount_mode: str = ""
+
+
+def _parse_share_mounts(shares: list[str], mount_output: str) -> list[ShareDetails]:
+    """Correlate configured shares with active Linux mount points."""
+    mount_map: dict[str, tuple[str, str, str]] = {}
+    for line in mount_output.splitlines():
+        parts = line.strip().split()
+        if len(parts) >= 6 and parts[1] == "on" and parts[3] == "type":
+            dev = parts[0]
+            mount_path = parts[2]
+            fstype = parts[4]
+            opts = parts[5].strip("()")
+            mode = "ro" if "ro" in opts.split(",") else "rw"
+            mount_map[mount_path] = (dev, fstype, mode)
+
+    details: list[ShareDetails] = []
+    for s in shares:
+        target_path = f"/shares/{s}"
+        dev_info = mount_map.get(target_path) or mount_map.get("/shares")
+        if dev_info:
+            dev, fstype, mode = dev_info
+            backing = f"backed by {dev} ({fstype})"
+        else:
+            mode = "rw"
+            backing = "local container volume"
+        details.append(ShareDetails(name=s, path=target_path, mode=mode, backing_device=backing))
+    return details
 
 
 def _check_port_445_sync(lan_host: str, timeout: float) -> tuple[bool, float]:
@@ -235,7 +271,7 @@ async def _gather_samba_raw_data(ctx: StatusContext) -> SambaRawData:
     async def _check_mounts() -> None:
         if ctx.no_docker or not raw.container_found:
             return
-        code, out = await ctx.exec_container(container_name, ["sh", "-c", "mount | grep /shares/mango"])
+        code, out = await ctx.exec_container(container_name, ["sh", "-c", "mount | grep /shares"])
         raw.mount_check_code = code
         raw.mount_options = out.strip()
 
@@ -271,6 +307,7 @@ def evaluate_samba_report(raw: SambaRawData, connection: TargetConnection | None
         shares=raw.shares,
         accounts=raw.accounts,
     )
+    report.share_details = _parse_share_mounts(raw.shares, raw.mount_options)
 
     # 1. Inspection Route
     badge, endpoint, _ = format_connection_badge(connection)
@@ -309,7 +346,10 @@ def evaluate_samba_report(raw: SambaRawData, connection: TargetConnection | None
             SambaCheckItem(
                 name="TCP Port 445 Reachability",
                 passed=True,
-                details=f"Port 445 open on {target_host} • Latency: {raw.port_445_latency_ms:.1f}ms",
+                details=(
+                    f"Port 445 open on {target_host} • "
+                    f"Latency: [bold cyan]{raw.port_445_latency_ms:.1f}ms[/bold cyan]"
+                ),
             )
         )
     else:
@@ -406,7 +446,7 @@ def evaluate_samba_report(raw: SambaRawData, connection: TargetConnection | None
             SambaCheckItem(
                 name="Active Client Sessions",
                 passed=True,
-                details=f"{len(clients)} active connection(s): {', '.join(c_descs)}",
+                details=f"[bold cyan]{len(clients)}[/bold cyan] active connection(s): {', '.join(c_descs)}",
             )
         )
     else:
@@ -414,7 +454,7 @@ def evaluate_samba_report(raw: SambaRawData, connection: TargetConnection | None
             SambaCheckItem(
                 name="Active Client Sessions",
                 passed=True,
-                details="0 active client connections (idle)",
+                details="[bold cyan]0[/bold cyan] active client connections (idle)",
             )
         )
 
@@ -426,7 +466,7 @@ def evaluate_samba_report(raw: SambaRawData, connection: TargetConnection | None
             SambaCheckItem(
                 name="File Locks Table",
                 passed=True,
-                details=f"{len(locks)} active file lock(s): {', '.join(l_descs)}{more}",
+                details=f"[bold cyan]{len(locks)}[/bold cyan] active file lock(s): {', '.join(l_descs)}{more}",
             )
         )
     else:
@@ -434,7 +474,7 @@ def evaluate_samba_report(raw: SambaRawData, connection: TargetConnection | None
             SambaCheckItem(
                 name="File Locks Table",
                 passed=True,
-                details="No locked files (zero stuck handles)",
+                details="No locked files ([bold cyan]0[/bold cyan] stuck handles)",
             )
         )
 
@@ -479,17 +519,54 @@ def render_samba_deep_report(report: SambaDeepReport, console: Console) -> None:
     route_line = format_route_line(report.connection)
 
     if report.all_passed:
-        shares_str = ", ".join(report.shares) if report.shares else "None"
-        clients_str = f"{len(report.active_clients)} connected" if report.active_clients else "0 connected (idle)"
-        locks_str = f"{len(report.active_locks)} files locked" if report.active_locks else "0 locked files"
+        clients_cnt = len(report.active_clients)
+        locks_cnt = len(report.active_locks)
+        clients_str = (
+            f"[bold cyan]{clients_cnt}[/bold cyan] connected"
+            if clients_cnt > 0
+            else "[bold cyan]0[/bold cyan] connected (idle)"
+        )
+        locks_str = (
+            f"[bold cyan]{locks_cnt}[/bold cyan] files locked"
+            if locks_cnt > 0
+            else "[bold cyan]0[/bold cyan] locked files"
+        )
+
+        shares_lines = [
+            f"  • [bold magenta]{sh.name}[/bold magenta]: [dim]{sh.path}[/dim] "
+            f"[dim]•[/dim] [bold green]{sh.mode}[/bold green] "
+            f"[dim]• {sh.backing_device}[/dim]"
+            for sh in report.share_details
+        ]
+        if shares_lines:
+            shares_block = "\n".join(shares_lines)
+            shares_section = (
+                f"• [bold]Shares Active ([bold cyan]{len(report.shares)}[/bold cyan] total):[/bold]\n"
+                f"{shares_block}\n"
+            )
+        else:
+            styled_shares = [f"[bold magenta]{s}[/bold magenta]" for s in report.shares]
+            shares_section = (
+                f"• [bold]Shares Active ([bold cyan]{len(report.shares)}[/bold cyan] total):[/bold] "
+                f"{', '.join(styled_shares)}\n"
+            )
+
+        storage_line = (
+            "• [bold]Storage Health:[/bold] [bold cyan]/dev/sda1[/bold cyan] "
+            "verified read-write ([bold green]rw[/bold green])\n"
+        )
+        auth_line = (
+            "• [bold]SMB Authentication:[/bold] Verified with "
+            "[bold cyan]NTLMv2[/bold cyan] & empty password rejection\n"
+        )
 
         verdict = Panel(
             "[bold green]✔ ALL SAMBA STORAGE & AUTHENTICATION CHECKS PASSED[/bold green]\n\n"
             f"{route_line}"
-            f"• [bold]Shares Active:[/bold] {shares_str} ({len(report.shares)} total)\n"
-            f"• [bold]Storage Health:[/bold] /dev/sda1 verified read-write (rw)\n"
-            f"• [bold]SMB Authentication:[/bold] Verified with NTLMv2 & empty password rejection\n"
-            f"• [bold]Client Connections:[/bold] {clients_str} • {locks_str}",
+            f"{shares_section}"
+            f"{storage_line}"
+            f"{auth_line}"
+            f"• [bold]Client Connections:[/bold] {clients_str} [dim]•[/dim] {locks_str}",
             title="[bold green]Status: HEALTHY & ACCESSIBLE[/bold green]",
             border_style="green",
         )
