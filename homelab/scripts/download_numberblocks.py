@@ -107,7 +107,6 @@ def main() -> None:
     )
     parser.add_argument(
         "--season",
-        "-s",
         type=str,
         default="5",
         help="Season(s) to download: '1', '5', '1-8', '5,6', or 'all' (Default: 5)",
