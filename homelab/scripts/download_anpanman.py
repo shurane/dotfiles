@@ -31,6 +31,8 @@ from rich.progress import (
 )
 from rich.table import Table
 
+from jellyfin import trigger_jellyfin_scan
+
 console = Console()
 
 ARCHIVE_ITEM = "anpanman-episodes-1-600"
@@ -689,14 +691,7 @@ async def main_async(args: argparse.Namespace) -> int:
         return 1
 
     if args.scan and media_dir:
-        scan_bin = Path.home() / ".local/bin/jellyfin-scan"
-        if scan_bin.exists():
-            console.print(f"[bold cyan]Triggering Jellyfin library scan via [white]{scan_bin}[/white]...[/bold cyan]")
-            proc = await anyio.run_process([str(scan_bin)], check=False)
-            if proc.returncode == 0:
-                console.print("[bold green]✔ Jellyfin library scan triggered successfully.[/bold green]")
-            else:
-                console.print(f"[bold red]✖ Jellyfin scan failed with exit code {proc.returncode}[/bold red]")
+        trigger_jellyfin_scan(console=console)
 
     return 0
 

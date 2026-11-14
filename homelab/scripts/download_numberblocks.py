@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import argparse
-import subprocess
 import sys
 from pathlib import Path
 
 from rich.console import Console
+
+from jellyfin import trigger_jellyfin_scan
 
 console = Console()
 
@@ -199,18 +200,7 @@ def main() -> None:
             overall_exit_code = rc
 
     if args.scan and overall_exit_code == 0:
-        candidates = [
-            Path.home() / "dotfiles/homelab/jellyfin/scan.sh",
-            Path.home() / ".local/bin/jellyfin-scan",
-        ]
-        scan_bin = next((p for p in candidates if p.exists()), None)
-        if scan_bin:
-            console.print(f"[bold cyan]Triggering Jellyfin library scan via [white]{scan_bin}[/white]...[/bold cyan]")
-            proc = subprocess.run([str(scan_bin)], check=False)  # noqa: S603
-            if proc.returncode == 0:
-                console.print("[bold green]✔ Jellyfin library scan triggered successfully.[/bold green]")
-            else:
-                console.print(f"[bold red]✖ Jellyfin scan failed with exit code {proc.returncode}[/bold red]")
+        trigger_jellyfin_scan(console=console)
 
     sys.exit(overall_exit_code)
 

@@ -16,6 +16,7 @@ dependencies = [
 download-anpanman = "download_anpanman:main"
 download-numberblocks = "download_numberblocks:main"
 build-anpanman-metadata = "build_anpanman_metadata:main"
+jellyfin-scan = "jellyfin:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -26,6 +27,7 @@ only-include = [
   "download_anpanman.py",
   "download_numberblocks.py",
   "build_anpanman_metadata.py",
+  "jellyfin.py",
   "anpanman_metadata.json",
 ]
 
