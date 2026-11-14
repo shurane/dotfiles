@@ -82,6 +82,7 @@ class QbittorrentRawData:
     qui_found: bool = False
     qui_status: str = "unknown"
     qui_health: str = "unknown"
+    base_domain: str = ""
 
 
 @dataclass(slots=True)
@@ -163,7 +164,8 @@ async def _fetch_host_public_ip(ctx: StatusContext) -> str:
 
 async def _gather_qbittorrent_raw_data(ctx: StatusContext) -> QbittorrentRawData:
     """Collect Docker state, WebUI API data, storage rw status, and network endpoints."""
-    raw = QbittorrentRawData(username=ctx.username)
+    base_domain = ctx.base_domain if hasattr(ctx, "base_domain") else ""
+    raw = QbittorrentRawData(username=ctx.username, base_domain=base_domain)
 
     async def fetch_docker_state() -> None:
         c = await ctx.get_container("homelab-qbittorrent-1", full=True)
@@ -553,11 +555,12 @@ def evaluate_qbittorrent_report(
     if raw.qui_found:
         is_qui_ok = raw.qui_status == "running"
         h_str = f" ({raw.qui_health})" if raw.qui_health != "none" else ""
+        qui_endpoint = f" (qui.{raw.base_domain})" if raw.base_domain else ""
         report.checks.append(
             QbittorrentCheckItem(
                 name="Qui Web Companion",
                 passed=is_qui_ok,
-                details=f"Container 'homelab-qui-1' is {raw.qui_status}{h_str} on port 7476 (qui.example.com)",
+                details=f"Container 'homelab-qui-1' is {raw.qui_status}{h_str} on port 7476{qui_endpoint}",
             )
         )
     else:

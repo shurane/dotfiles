@@ -61,7 +61,10 @@ def qbittorrent_command(
     env = load_env(env_file, conn.host)
     username = env.get("HOMELAB_USERNAME", "username")
     password = env.get("HOMELAB_PASSWORD", "")
-    base_domain = env.get("HOSTNAME_BASE", "example.com")
+    base_domain = env.get("HOSTNAME_BASE", "")
+    if not base_domain:
+        console.print("[bold red]Error:[/bold red] HOSTNAME_BASE not found in .env or environment")
+        sys.exit(1)
 
     docker_client = get_docker_client(docker_host, conn.host, no_docker)
 

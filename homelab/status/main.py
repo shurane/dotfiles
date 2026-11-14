@@ -276,7 +276,10 @@ def main(
     env = load_env(env_file, conn.host)
     username = env.get("HOMELAB_USERNAME", "username")
     password = env.get("HOMELAB_PASSWORD", "")
-    base_domain = env.get("HOSTNAME_BASE", "example.com")
+    base_domain = env.get("HOSTNAME_BASE", "")
+    if not base_domain:
+        console.print("[bold red]Error:[/bold red] HOSTNAME_BASE not found in .env or environment")
+        sys.exit(1)
 
     if not password:
         console.print("[bold red]Error:[/bold red] HOMELAB_PASSWORD not found in .env or environment")

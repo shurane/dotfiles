@@ -20,7 +20,8 @@ services:
         SAMBA_VOLUME_CONFIG_mango=[mango]
         path = /shares/mango
         guest ok = yes
-        read only = no
+        read only = yes
+        write list = ${HOMELAB_USERNAME:?err}, share
         browseable = yes
         force user = share
         force group = share
@@ -31,7 +32,8 @@ services:
         SAMBA_VOLUME_CONFIG_media=[media]
         path = /shares/media
         guest ok = yes
-        read only = no
+        read only = yes
+        write list = ${HOMELAB_USERNAME:?err}, share
         browseable = yes
         force user = share
         force group = share
@@ -41,7 +43,8 @@ services:
         SAMBA_VOLUME_CONFIG_downloads=[downloads]
         path = /shares/downloads
         guest ok = yes
-        read only = no
+        read only = yes
+        write list = ${HOMELAB_USERNAME:?err}, share
         browseable = yes
         force user = share
         force group = share
@@ -51,7 +54,8 @@ services:
         SAMBA_VOLUME_CONFIG_retroarch=[retroarch]
         path = /shares/retroarch
         guest ok = yes
-        read only = no
+        read only = yes
+        write list = ${HOMELAB_USERNAME:?err}, share
         browseable = yes
         force user = share
         force group = share

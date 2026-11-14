@@ -6,7 +6,7 @@ set -euo pipefail
 # Triggers a full library refresh on Jellyfin via the REST API.
 # ==============================================================================
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 ENV_FILE="${SCRIPT_DIR}/../.env"
 
 if [ -f "$ENV_FILE" ]; then
@@ -25,8 +25,13 @@ if [ -z "${JELLYFIN_API_KEY:-}" ]; then
     exit 1
 fi
 
+if [ -z "${HOSTNAME_BASE:-}" ]; then
+    echo "Error: HOSTNAME_BASE not found in environment or ${ENV_FILE}" >&2
+    exit 1
+fi
+
 API_KEY="${JELLYFIN_API_KEY}"
-BASE_URL="https://jellyfin.${HOSTNAME_BASE:-example.com}"
+BASE_URL="https://jellyfin.${HOSTNAME_BASE}"
 HOST="${1:-${JELLYFIN_HOST:-$BASE_URL}}"
 
 echo "Triggering Jellyfin library scan at ${HOST}..."

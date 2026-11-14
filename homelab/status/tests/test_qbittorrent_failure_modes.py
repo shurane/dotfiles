@@ -239,6 +239,7 @@ async def test_run_qbittorrent_deep_check_with_mock_context() -> None:
     ctx = MagicMock(spec=StatusContext)
     ctx.username = "username"
     ctx.password = "secret"
+    ctx.base_domain = "example.com"
     ctx.no_docker = False
     ctx.connection = None
     ctx.base_url = MagicMock(return_value="http://localhost:8080")

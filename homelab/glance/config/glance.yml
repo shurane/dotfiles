@@ -68,7 +68,7 @@ theme:
   contrast-multiplier: 1.1
 
 branding:
-  app-name: example.com
+  app-name: ${HOSTNAME_BASE}
 
 pages:
   - name: Home
@@ -80,44 +80,44 @@ pages:
             groups:
               - links:
                   - title: Arcane
-                    url: https://arcane.example.com
+                    url: https://arcane.${HOSTNAME_BASE}
                     icon: /assets/icons/arcane.svg
                   - title: Jellyfin
-                    url: https://jellyfin.example.com
+                    url: https://jellyfin.${HOSTNAME_BASE}
                     icon: /assets/icons/jellyfin.svg
                   - title: qBittorrent
-                    url: https://qbittorrent.example.com
+                    url: https://qbittorrent.${HOSTNAME_BASE}
                     icon: /assets/icons/qbittorrent.svg
                   - title: Qui
-                    url: https://qui.example.com
+                    url: https://qui.${HOSTNAME_BASE}
                     icon: /assets/icons/qui.svg
                   - title: BookOrbit
-                    url: https://bookorbit.example.com
+                    url: https://bookorbit.${HOSTNAME_BASE}
                     icon: /assets/icons/bookorbit.svg
                   - title: RetroArch WebDAV
-                    url: https://retroarch.example.com
+                    url: https://retroarch.${HOSTNAME_BASE}
                     icon: /assets/icons/rclone.svg
           - type: monitor
             css-class: homelab-monitor
             cache: 1m
             sites:
               - title: Arcane
-                url: https://arcane.example.com
+                url: https://arcane.${HOSTNAME_BASE}
                 check-url: http://arcane:3552
               - title: Jellyfin
-                url: https://jellyfin.example.com
+                url: https://jellyfin.${HOSTNAME_BASE}
                 check-url: http://jellyfin:8096
                 alt-status-codes:
                   - 302
               - title: qBittorrent
-                url: https://qbittorrent.example.com
+                url: https://qbittorrent.${HOSTNAME_BASE}
                 check-url: http://qbittorrent:8080
               - title: Qui
-                url: https://qui.example.com
+                url: https://qui.${HOSTNAME_BASE}
                 check-url: http://qui:7476
               - title: BookOrbit
-                url: https://bookorbit.example.com
+                url: https://bookorbit.${HOSTNAME_BASE}
                 check-url: http://bookorbit:3000/api/v1/health
               - title: RetroArch WebDAV
-                url: https://retroarch.example.com
+                url: https://retroarch.${HOSTNAME_BASE}
                 check-url: http://rclone-retroarch:8080/manifest.server

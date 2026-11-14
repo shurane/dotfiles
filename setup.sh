@@ -25,5 +25,5 @@ END
 sudo pacman -S 7zip ripgrep neovim nodejs clang gcc tmux rsync btop zoxide gdu glow fd bat vivid tokei git-delta lazygit broot ranger fastfetch
 # use `npx --yes` with http-server@latest, serve@latest, nodemon, tsc@latest, tsx@latest, oxlint@latest, biome@latest
 
-# share neovim configuration between default user and root:
-sudo mkdir -p /root/.config && sudo ln -s $HOME/dotfiles/nvim /root/.config/nvim
+# copy neovim configuration to root:
+sudo mkdir -p /root/.config && sudo cp -r $HOME/dotfiles/nvim /root/.config/nvim && sudo chown -R root:root /root/.config/nvim
