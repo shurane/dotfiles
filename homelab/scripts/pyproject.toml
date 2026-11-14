@@ -48,7 +48,7 @@ dev = [
 [tool.ruff]
 target-version = "py314"
 line-length = 120
-src = ["."]
+src = [".", "tests"]
 
 [tool.ruff.lint]
 select = [
@@ -95,6 +95,9 @@ ignore = [
   "ISC001",    # Single-line implicit concatenation (formatter compatibility)
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ANN", "SLF001", "T201", "S", "ARG"]
+
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "datetime".msg = "Use `whenever` instead of standard library `datetime`."
 
@@ -129,3 +132,7 @@ indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
 docstring-code-format = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
