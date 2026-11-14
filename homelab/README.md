@@ -52,13 +52,17 @@ uv run -p status status jellyfin   # Intel QuickSync (QSV) transcode benchmark, 
 uv run -p status status samba      # Port 445, SMB auth & empty pw rejection, drive mounts (/dev/sda1 rw), active clients, locks
 uv run -p status status vpn        # ProtonVPN tun0 tunnel, Gluetun kill switch, port forwarding, qBittorrent integration
 
-# Filter services or export JSON
+# Filter services, inspect remote hosts, or export JSON
 uv run -p status status -s jellyfin -s qbittorrent
+uv run -p status status -H m70q.lan         # Inspect remote host (auto-resolves LAN / Tailscale)
 uv run -p status status --json
 
 # Or run from status/
 cd status
 uv run status
 uv run status jellyfin
-uv run pytest                      # Run unit test suite
+
+# Run unit test suites from homelab/
+uv --directory status run pytest            # 54 status & failure mode tests
+uv --directory auth run pytest              # 29 credential bootstrap tests
 ```
