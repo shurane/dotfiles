@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import re
+import json
 import socket
 import time
 from dataclasses import dataclass, field
@@ -62,10 +62,8 @@ class SambaRawData:
     empty_pw_check_out: str = ""
     mount_check_code: int = -1
     mount_options: str = ""
-    smbstatus_sessions_code: int = -1
-    smbstatus_sessions_out: str = ""
-    smbstatus_locks_code: int = -1
-    smbstatus_locks_out: str = ""
+    smbstatus_code: int = -1
+    smbstatus_json: str = ""
     version: str | None = None
     username: str = "username"
 
@@ -95,88 +93,74 @@ def _check_port_445_sync(lan_host: str, timeout: float) -> tuple[bool, float]:
         return False, lat
 
 
-def _parse_smb_sessions(output: str) -> list[SmbClientSession]:
-    """Parse output from `smbstatus -b` into structured client session records."""
+def _parse_smb_json(json_str: str) -> tuple[str | None, list[SmbClientSession], list[SmbLockInfo]]:
+    """Parse output from `smbstatus -j` into structured version, client sessions, and locks."""
+    if not json_str.strip():
+        return None, [], []
+
+    try:
+        data = json.loads(json_str)
+    except Exception:
+        return None, [], []
+
+    version = f"v{data['version']}" if data.get("version") else None
+
     sessions: list[SmbClientSession] = []
-    lines = output.splitlines()
-    in_records = False
-
-    for line in lines:
-        stripped = line.strip()
-        if not stripped:
-            continue
-        if stripped.startswith("---"):
-            in_records = True
-            continue
-        if not in_records:
-            continue
-
-        match = re.match(r"^\s*(\d+)\s+(\S+)\s+(\S+)\s+(.+?)\s+(SMB\S*|NT1)\s+(\S+)\s+(\S+)", line)
-        if match:
+    raw_sessions = data.get("sessions") or {}
+    if isinstance(raw_sessions, dict):
+        for s in raw_sessions.values():
+            if not isinstance(s, dict):
+                continue
+            pid = str(s.get("server_id", {}).get("pid", ""))
+            username = str(s.get("username", ""))
+            group = str(s.get("groupname", ""))
+            machine = str(s.get("hostname") or s.get("remote_machine") or "")
+            protocol = str(s.get("session_dialect", "SMB"))
+            enc = s.get("encryption", {}).get("cipher", "-") if isinstance(s.get("encryption"), dict) else "-"
+            signing = s.get("signing", {}).get("cipher", "-") if isinstance(s.get("signing"), dict) else "-"
             sessions.append(
                 SmbClientSession(
-                    pid=match.group(1),
-                    username=match.group(2),
-                    group=match.group(3),
-                    machine=match.group(4).strip(),
-                    protocol=match.group(5),
-                    encryption=match.group(6),
-                    signing=match.group(7),
-                )
-            )
-
-    return sessions
-
-
-def _parse_smb_locks(output: str) -> list[SmbLockInfo]:
-    """Parse output from `smbstatus -L` into structured file lock records."""
-    locks: list[SmbLockInfo] = []
-    if "No locked files" in output:
-        return locks
-
-    lines = output.splitlines()
-    in_records = False
-
-    for line in lines:
-        stripped = line.strip()
-        if not stripped:
-            continue
-        if stripped.startswith("---"):
-            in_records = True
-            continue
-        if not in_records:
-            continue
-
-        parts = line.split()
-        if len(parts) >= 8:
-            pid = parts[0]
-            uid = parts[1]
-            deny = parts[2]
-            access = parts[3]
-            rw = parts[4]
-            share_path = parts[6]
-            filename = parts[7]
-            locks.append(
-                SmbLockInfo(
                     pid=pid,
-                    uid=uid,
-                    deny_mode=deny,
-                    access=access,
-                    rw=rw,
-                    share_path=share_path,
-                    filename=filename,
+                    username=username,
+                    group=group,
+                    machine=machine,
+                    protocol=protocol,
+                    encryption=enc,
+                    signing=signing,
                 )
             )
 
-    return locks
+    locks: list[SmbLockInfo] = []
+    raw_locks = data.get("open_files") or {}
+    lock_items = (
+        raw_locks.values()
+        if isinstance(raw_locks, dict)
+        else (raw_locks if isinstance(raw_locks, list) else [])
+    )
+    for lk in lock_items:
+        if not isinstance(lk, dict):
+            continue
+        pid = str(lk.get("server_id", {}).get("pid", ""))
+        uid = str(lk.get("uid", ""))
+        sh_mode = lk.get("share_mode") or {}
+        deny = sh_mode.get("deny_mode", "DENY_NONE") if isinstance(sh_mode, dict) else str(sh_mode)
+        rw = sh_mode.get("read_write", "RW") if isinstance(sh_mode, dict) else str(lk.get("rw", "RW"))
+        access = str(lk.get("access_mask", "0x0"))
+        share_path = str(lk.get("servicepath") or lk.get("share_path", ""))
+        filename = str(lk.get("filename", ""))
+        locks.append(
+            SmbLockInfo(
+                pid=pid,
+                uid=uid,
+                deny_mode=deny,
+                access=access,
+                rw=rw,
+                share_path=share_path,
+                filename=filename,
+            )
+        )
 
-
-def _parse_samba_version(output: str) -> str | None:
-    """Extract Samba server version string (e.g. '4.23.8')."""
-    match = re.search(r"Samba version\s+([0-9.]+)", output)
-    if match:
-        return f"v{match.group(1)}"
-    return None
+    return version, sessions, locks
 
 
 async def _gather_samba_raw_data(ctx: StatusContext) -> SambaRawData:
@@ -258,17 +242,13 @@ async def _gather_samba_raw_data(ctx: StatusContext) -> SambaRawData:
     async def _fetch_smbstatus() -> None:
         if ctx.no_docker or not raw.container_found:
             return
-        # Brief session table
-        code_s, out_s = await ctx.exec_container(container_name, ["smbstatus", "-b"])
-        raw.smbstatus_sessions_code = code_s
-        raw.smbstatus_sessions_out = out_s
-        if not raw.version:
-            raw.version = _parse_samba_version(out_s)
-
-        # File locks table
-        code_l, out_l = await ctx.exec_container(container_name, ["smbstatus", "-L"])
-        raw.smbstatus_locks_code = code_l
-        raw.smbstatus_locks_out = out_l
+        code, out = await ctx.exec_container(container_name, ["smbstatus", "-j"])
+        raw.smbstatus_code = code
+        raw.smbstatus_json = out
+        if code == 0 and out.strip():
+            v_parsed, _, _ = _parse_smb_json(out)
+            if v_parsed:
+                raw.version = v_parsed
 
     async with anyio.create_task_group() as tg:
         tg.start_soon(_probe_tcp_port)
@@ -413,9 +393,13 @@ def evaluate_samba_report(raw: SambaRawData, connection: TargetConnection | None
             )
         )
 
-    # 7. Active Client Sessions (smbstatus -b)
-    clients = _parse_smb_sessions(raw.smbstatus_sessions_out)
+    # 7. Active Client Sessions & File Locks (smbstatus -j)
+    v_parsed, clients, locks = _parse_smb_json(raw.smbstatus_json)
+    if not report.version and v_parsed:
+        report.version = v_parsed
     report.active_clients = clients
+    report.active_locks = locks
+
     if clients:
         c_descs = [f"{c.username}@{c.machine} ({c.protocol})" for c in clients]
         report.checks.append(
@@ -434,9 +418,7 @@ def evaluate_samba_report(raw: SambaRawData, connection: TargetConnection | None
             )
         )
 
-    # 8. File Lock Table (smbstatus -L)
-    locks = _parse_smb_locks(raw.smbstatus_locks_out)
-    report.active_locks = locks
+    # 8. File Lock Table
     if locks:
         l_descs = [f"{lock.filename} ({lock.rw})" for lock in locks[:3]]
         more = f" (+{len(locks) - 3} more)" if len(locks) > 3 else ""

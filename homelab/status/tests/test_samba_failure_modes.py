@@ -9,9 +9,7 @@ import pytest
 from models import StatusContext, TargetConnection
 from services.samba import (
     SambaRawData,
-    _parse_samba_version,
-    _parse_smb_locks,
-    _parse_smb_sessions,
+    _parse_smb_json,
     evaluate_samba_report,
     run_samba_deep_check,
 )
@@ -32,15 +30,13 @@ def _make_mock_raw(
     empty_pw_check_out: str = "session setup failed: NT_STATUS_LOGON_FAILURE",
     mount_check_code: int = 0,
     mount_options: str = "/dev/sda1 on /shares/mango type ext4 (rw,relatime)",
-    smbstatus_sessions_code: int = 0,
-    smbstatus_sessions_out: str = (
-        "Samba version 4.23.8\n"
-        "PID     Username     Group        Machine               Protocol Version  Encryption  Signing\n"
-        "----------------------------------------------------------------------------------------------------\n"
-        "12345   ehtesh       users        192.168.1.150 (ipv4)  SMB3_11           -           partial\n"
+    smbstatus_code: int = 0,
+    smbstatus_json: str = (
+        '{"version": "4.23.8", "sessions": {"101": {"server_id": {"pid": "101"}, '
+        '"username": "username", "groupname": "users", "remote_machine": "192.168.1.50", '
+        '"session_dialect": "SMB3_11", "encryption": {"cipher": "AES-128-GCM"}, '
+        '"signing": {"cipher": "AES-128-GMAC"}}}, "open_files": {}}'
     ),
-    smbstatus_locks_code: int = 0,
-    smbstatus_locks_out: str = "No locked files\n",
     version: str | None = "v4.23.8",
 ) -> SambaRawData:
     raw = SambaRawData()
@@ -58,10 +54,8 @@ def _make_mock_raw(
     raw.empty_pw_check_out = empty_pw_check_out
     raw.mount_check_code = mount_check_code
     raw.mount_options = mount_options
-    raw.smbstatus_sessions_code = smbstatus_sessions_code
-    raw.smbstatus_sessions_out = smbstatus_sessions_out
-    raw.smbstatus_locks_code = smbstatus_locks_code
-    raw.smbstatus_locks_out = smbstatus_locks_out
+    raw.smbstatus_code = smbstatus_code
+    raw.smbstatus_json = smbstatus_json
     raw.version = version
     return raw
 
@@ -163,14 +157,17 @@ def test_samba_failure_drive_read_only() -> None:
 
 
 def test_samba_smbstatus_parser() -> None:
-    sample_b = (
-        "Samba version 4.23.8\n"
-        "PID     Username     Group        Machine               Protocol Version  Encryption   Signing\n"
-        "----------------------------------------------------------------------------------------------------\n"
-        "101     ehtesh       users        192.168.1.50 (ipv4)   SMB3_11           AES-128-GCM  AES-128-GMAC\n"
-        "102     guest        nobody       100.120.146.5 (ipv4)  SMB3_00           -            partial\n"
+    sample_json = (
+        '{"version": "4.23.8", "sessions": {'
+        '"101": {"server_id": {"pid": "101"}, "username": "username", "groupname": "users", '
+        '"hostname": "192.168.1.50", "session_dialect": "SMB3_11", '
+        '"encryption": {"cipher": "AES-128-GCM"}, "signing": {"cipher": "AES-128-GMAC"}}, '
+        '"102": {"server_id": {"pid": "102"}, "username": "guest", "groupname": "nobody", '
+        '"remote_machine": "100.120.146.5", "session_dialect": "SMB3_00"}}, '
+        '"open_files": {}}'
     )
-    sessions = _parse_smb_sessions(sample_b)
+    version, sessions, locks = _parse_smb_json(sample_json)
+    assert version == "v4.23.8"
     assert len(sessions) == 2
     assert sessions[0].pid == "101"
     assert sessions[0].username == "ehtesh"
@@ -178,26 +175,30 @@ def test_samba_smbstatus_parser() -> None:
     assert sessions[0].encryption == "AES-128-GCM"
     assert sessions[1].username == "guest"
     assert sessions[1].protocol == "SMB3_00"
-
-    version = _parse_samba_version(sample_b)
-    assert version == "v4.23.8"
+    assert len(locks) == 0
 
 
 def test_samba_smbstatus_locks_parser() -> None:
-    sample_l = (
-        "Locked files:\n"
-        "Pid          Uid        DenyMode   Access      R/W        Oplock      SharePath       Name       Time\n"
-        "----------------------------------------------------------------------------------------------------\n"
-        "101          1000       DENY_NONE  0x120089    RDONLY     LEASE(R)    /shares/media   movie.mkv  Fri\n"
+    sample_json = (
+        '{"version": "4.23.8", "sessions": {}, "open_files": {'
+        '"123": {"server_id": {"pid": "101"}, "uid": 1000, "filename": "movie.mkv", '
+        '"servicepath": "/shares/media", "share_mode": {"read_write": "RDONLY", "deny_mode": "DENY_NONE"}}}}'
     )
-    locks = _parse_smb_locks(sample_l)
+    _v, _s, locks = _parse_smb_json(sample_json)
     assert len(locks) == 1
     assert locks[0].pid == "101"
     assert locks[0].filename == "movie.mkv"
     assert locks[0].rw == "RDONLY"
+    assert locks[0].share_path == "/shares/media"
 
-    empty_locks = _parse_smb_locks("No locked files\n")
+    _, empty_sessions, empty_locks = _parse_smb_json('{"version": "4.23.8", "sessions": {}, "open_files": {}}')
+    assert empty_sessions == []
     assert empty_locks == []
+
+    v_bad, s_bad, l_bad = _parse_smb_json("invalid json")
+    assert v_bad is None
+    assert s_bad == []
+    assert l_bad == []
 
 
 @pytest.mark.anyio
@@ -228,10 +229,8 @@ async def test_run_samba_deep_check_with_mock_context() -> None:
             return 1, "session setup failed: NT_STATUS_LOGON_FAILURE"
         if "mount | grep" in cmd_str:
             return 0, "/dev/sda1 on /shares/mango type ext4 (rw,relatime)"
-        if "smbstatus -b" in cmd_str:
-            return 0, "Samba version 4.23.8\n---"
-        if "smbstatus -L" in cmd_str:
-            return 0, "No locked files\n"
+        if "smbstatus" in cmd_str:
+            return 0, '{"version": "4.23.8", "sessions": {}, "open_files": {}}'
         return 0, ""
 
     ctx.get_container = _get_c
