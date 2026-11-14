@@ -24,6 +24,7 @@ from rich.text import Text
 from rich.tree import Tree
 
 from commands.jellyfin import jellyfin_command
+from commands.qbittorrent import qbittorrent_command
 from commands.samba import samba_command
 from commands.vpn import vpn_command
 from config import format_size, get_docker_client, load_env, render_sparkbar, resolve_target_connection
@@ -385,6 +386,11 @@ app.command(
     "jellyfin",
     help="Deep inspection of Jellyfin container, Intel QuickSync (QSV) transcode, memory cgroup, and sessions.",
 )(jellyfin_command)
+
+app.command(
+    "qbittorrent",
+    help="Deep inspection of qBittorrent container, VPN tunnel binding, port alignment, and torrent catalog.",
+)(qbittorrent_command)
 
 app.command(
     "samba",

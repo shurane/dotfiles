@@ -48,9 +48,10 @@ Deep health & content inspector that authenticates and queries service state, li
 uv run -p status status
 
 # Deep service inspectors
-uv run -p status status jellyfin   # Intel QuickSync (QSV) transcode benchmark, 512MB cgroup, active streams, media library
-uv run -p status status samba      # Port 445, SMB auth & empty pw rejection, drive mounts (/dev/sda1 rw), active clients, locks
-uv run -p status status vpn        # ProtonVPN tun0 tunnel, Gluetun kill switch, port forwarding, qBittorrent integration
+uv run -p status status jellyfin      # Intel QuickSync (QSV) transcode benchmark, 512MB cgroup, active streams, media library
+uv run -p status status qbittorrent   # VPN tun0 binding, port alignment, /mnt/mango/torrents rw, swarm speeds, errors
+uv run -p status status samba         # Port 445, SMB auth & empty pw rejection, drive mounts (/dev/sda1 rw), active clients, locks
+uv run -p status status vpn           # ProtonVPN tun0 tunnel, Gluetun kill switch, port forwarding, qBittorrent integration
 
 # Filter services, inspect remote hosts, or export JSON
 uv run -p status status -s jellyfin -s qbittorrent
