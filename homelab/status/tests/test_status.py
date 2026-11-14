@@ -13,6 +13,7 @@ from config import (
     classify_route,
     discover_tailscale_suffix,
     format_speed,
+    get_node_name,
     is_target_local,
     resolve_target_connection,
     resolve_target_host,
@@ -41,6 +42,18 @@ def test_resolve_target_host(monkeypatch: pytest.MonkeyPatch) -> None:
     assert resolve_target_host("custom.host") == "custom.host"
     monkeypatch.setenv("HOMELAB_HOST", "mock-node.lan")
     assert resolve_target_host() == "mock-node.lan"
+
+
+def test_get_node_name(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("HOMELAB_NODE_NAME", "custom-box")
+    assert get_node_name() == "custom-box"
+
+    monkeypatch.setenv("HOMELAB_NODE_NAME", "")
+    monkeypatch.setenv("HOMELAB_HOST", "derived-node.home.arpa")
+    assert get_node_name() == "derived-node"
+
+    monkeypatch.setenv("HOMELAB_HOST", "")
+    assert get_node_name() in ("m70q", "server")
 
 
 def test_classify_route() -> None:

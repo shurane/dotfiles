@@ -69,8 +69,8 @@ def render_sparkbar(pct: float, width: int = 10, bg: str = "grey27") -> str:
 
 def get_env_setting(key: str, default: str = "") -> str:
     """Read configuration key from OS environment or local .env file."""
-    if val := os.environ.get(key):
-        return val
+    if key in os.environ:
+        return os.environ[key]
 
     search_paths = [
         Path.cwd() / ".env",
@@ -89,6 +89,15 @@ def get_env_setting(key: str, default: str = "") -> str:
     return default
 
 
+def get_node_name() -> str:
+    """Resolve homelab node name from HOMELAB_NODE_NAME, HOMELAB_HOST, or default to 'server'."""
+    if node := get_env_setting("HOMELAB_NODE_NAME"):
+        return node
+    if host := get_env_setting("HOMELAB_HOST"):
+        return host.split(".")[0]
+    return "server"
+
+
 def discover_tailscale_suffix() -> str | None:
     """Dynamically discover the Tailscale MagicDNS suffix for the current machine/tailnet."""
     # 1. Fast check: parse /etc/resolv.conf search/domain directive
@@ -105,7 +114,7 @@ def discover_tailscale_suffix() -> str | None:
             pass
 
     # 2. Fast check: canonical hostname lookup for configured node name
-    node = get_env_setting("HOMELAB_NODE_NAME", "server")
+    node = get_node_name()
     try:
         cname, _, _ = socket.gethostbyname_ex(node)
         if cname.endswith(".ts.net") and "." in cname:
@@ -163,7 +172,7 @@ def resolve_target_connection(explicit_host: str | None = None) -> TargetConnect
     elif env_host := get_env_setting("HOMELAB_HOST"):
         candidates = [env_host]
     else:
-        node = get_env_setting("HOMELAB_NODE_NAME", "server")
+        node = get_node_name()
         lan_domain = get_env_setting("HOMELAB_LAN_DOMAIN", "lan")
         candidates.append(f"{node}.{lan_domain}")
         suffix = discover_tailscale_suffix()
