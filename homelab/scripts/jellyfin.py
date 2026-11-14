@@ -1,7 +1,5 @@
 """Jellyfin REST API client helper for library refresh and automation."""
 
-from __future__ import annotations
-
 import os
 import sys
 from pathlib import Path

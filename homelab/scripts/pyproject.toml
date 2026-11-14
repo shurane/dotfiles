@@ -64,7 +64,6 @@ select = [
   "PERF",   # Perflint
   "FURB",   # refurb
   "FLY",    # flynt
-  "FA",     # flake8-future-annotations
   "S",      # flake8-bandit (security)
   "PTH",    # flake8-use-pathlib (modern pathlib)
   "ARG",    # flake8-unused-arguments
