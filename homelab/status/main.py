@@ -230,8 +230,7 @@ def main(
     services: list[str] = typer.Option(
         None,
         "--service",
-        "-s",
-        help="Specific service(s) to check (e.g. -s jellyfin -s bookorbit)",
+        help="Specific service(s) to check (e.g. --service jellyfin --service bookorbit)",
     ),
     json_output: bool = typer.Option(
         False,
