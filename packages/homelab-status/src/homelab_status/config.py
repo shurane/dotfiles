@@ -74,26 +74,55 @@ def render_sparkbar(pct: float, width: int = 10, bg: str = "grey27") -> str:
     return f"[{filled}{partial}{unfilled}]"
 
 
+def find_homelab_env(explicit_path: Path | None = None) -> Path | None:
+    """Locate the homelab .env file dynamically.
+
+    Searches:
+    1. Explicit path if given and exists.
+    2. Explicit environment variable override (HOMELAB_ENV).
+    3. CWD .env or CWD / homelab / .env.
+    4. Walks upward from this file until .git boundary or filesystem root.
+    5. Fallback to ~/dotfiles/homelab/.env.
+    """
+    if explicit_path and explicit_path.is_file():
+        return explicit_path
+
+    if env_file := os.environ.get("HOMELAB_ENV"):
+        p = Path(env_file).resolve()
+        if p.is_file():
+            return p
+
+    # Current working directory
+    if (cwd_env := Path.cwd() / ".env").is_file():
+        return cwd_env
+    if (cwd_homelab := Path.cwd() / "homelab" / ".env").is_file():
+        return cwd_homelab
+
+    # Walk upward until repo boundary (.git) or filesystem root
+    current = Path(__file__).resolve()
+    for parent in current.parents:
+        if (candidate := parent / "homelab" / ".env").is_file():
+            return candidate
+        if parent.name == "homelab" and (candidate := parent / ".env").is_file():
+            return candidate
+        if (parent / ".git").exists() or parent == parent.parent:
+            break
+
+    if (fallback := Path.home() / "dotfiles" / "homelab" / ".env").is_file():
+        return fallback
+
+    return None
+
+
 def get_env_setting(key: str, default: str = "") -> str:
     """Read configuration key from OS environment or local .env file."""
     if key in os.environ:
         return os.environ[key]
 
-    search_paths = [
-        Path.cwd() / ".env",
-        Path.cwd() / "homelab" / ".env",
-        Path(__file__).resolve().parent / ".env",
-        Path(__file__).resolve().parents[1] / ".env",
-        Path(__file__).resolve().parents[2] / ".env",
-        Path(__file__).resolve().parents[3] / "homelab" / ".env",
-        Path(__file__).resolve().parents[2] / "homelab" / ".env",
-        Path.home() / "dotfiles" / "homelab" / ".env",
-    ]
-    for p in search_paths:
-        if p.is_file():
-            values = dotenv_values(p)
-            if (val := values.get(key)) is not None:
-                return str(val)
+    if (env_file := find_homelab_env()) is not None:
+        values = dotenv_values(env_file)
+        if (val := values.get(key)) is not None:
+            return str(val)
 
     return default
 
@@ -203,24 +232,9 @@ def _load_raw_env(
     """Retrieve raw environment key-value pairs from local disk, remote host over SSH, or os.environ."""
     ssh_user = get_ssh_user(ssh_user)
 
-    # 1. Explicit path
-    if env_path and env_path.is_file():
-        return {k: str(v) for k, v in dotenv_values(env_path).items() if v is not None}
-
-    # 2. Local homelab/.env or ./.env
-    search_paths = [
-        Path.cwd() / ".env",
-        Path.cwd() / "homelab" / ".env",
-        Path(__file__).resolve().parent / ".env",
-        Path(__file__).resolve().parents[1] / ".env",
-        Path(__file__).resolve().parents[2] / ".env",
-        Path(__file__).resolve().parents[3] / "homelab" / ".env",
-        Path(__file__).resolve().parents[2] / "homelab" / ".env",
-        Path.home() / "dotfiles" / "homelab" / ".env",
-    ]
-    for p in search_paths:
-        if p.is_file():
-            return {k: str(v) for k, v in dotenv_values(p).items() if v is not None}
+    # 1. Local homelab/.env or explicit path
+    if (found := find_homelab_env(env_path)) is not None:
+        return {k: str(v) for k, v in dotenv_values(found).items() if v is not None}
 
     # 3. Fallback to reading remote .env over SSH from lan_host (if on remote workstation / peer machine)
     if not is_target_local(lan_host):

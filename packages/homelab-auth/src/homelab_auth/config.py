@@ -2,7 +2,29 @@ import contextlib
 import os
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+
+def find_homelab_root() -> Path:
+    """Locate the homelab/ directory containing docker-compose.yml.
+
+    Searches upward from the current file until the repository root (.git) or filesystem root.
+    Falls back to ~/dotfiles/homelab.
+    """
+    if env_dir := os.environ.get("HOMELAB_DIR"):
+        return Path(env_dir).resolve()
+
+    current = Path(__file__).resolve()
+    for parent in current.parents:
+        if (parent / "homelab" / "docker-compose.yml").is_file():
+            return parent / "homelab"
+        if parent.name == "homelab" and (parent / "docker-compose.yml").is_file():
+            return parent
+        if (parent / ".git").exists() or parent == parent.parent:
+            break
+
+    return Path.home() / "dotfiles" / "homelab"
+
+
+ROOT = find_homelab_root()
 AUTH_ENV = Path(os.environ.get("AUTH_ENV", ROOT / ".env"))
 
 

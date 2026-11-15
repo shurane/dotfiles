@@ -1,10 +1,10 @@
 [tool.uv.workspace]
 members = [
-  "homelab/status",
-  "homelab/auth",
-  "homelab/scripts",
-  "tools/bitwarden-extras",
-  "tools/soju-extras",
+  "homelab-status",
+  "homelab-auth",
+  "homelab-scripts",
+  "bitwarden-extras",
+  "soju-extras",
 ]
 
 [dependency-groups]
@@ -20,10 +20,8 @@ dev = [
 target-version = "py314"
 line-length = 120
 extend-exclude = [
-  "homelab/jellyfin",
-  "homelab/withings-sync",
-  "tools/soju-extras/benchmarks",
-  "tools/soju-extras/tmp",
+  "soju-extras/benchmarks",
+  "soju-extras/tmp",
 ]
 
 [tool.ruff.lint]
@@ -88,12 +86,6 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 docstring-code-format = true
 
-[tool.ty.src]
-exclude = [
-  "homelab/jellyfin/**",
-  "homelab/withings-sync/**",
-]
-
 [tool.ty.rules]
 missing-direct-dependency = "error"
 blanket-ignore-comment = "error"
@@ -119,12 +111,12 @@ useless-overload-body = "error"
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib"]
 pythonpath = [
-  "tools/soju-extras",
+  "soju-extras",
 ]
 testpaths = [
-  "homelab/status/tests",
-  "homelab/auth/tests",
-  "homelab/scripts/tests",
-  "tools/bitwarden-extras/tests",
-  "tools/soju-extras/tests",
+  "homelab-status/tests",
+  "homelab-auth/tests",
+  "homelab-scripts/tests",
+  "bitwarden-extras/tests",
+  "soju-extras/tests",
 ]

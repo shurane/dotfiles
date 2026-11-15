@@ -9,13 +9,30 @@ import httpx
 from rich.console import Console
 
 
+def find_homelab_env() -> Path | None:
+    """Locate homelab/.env dynamically by upward search stopping at repo boundary."""
+    if env_override := os.environ.get("HOMELAB_ENV"):
+        p = Path(env_override).resolve()
+        if p.is_file():
+            return p
+    current = Path(__file__).resolve()
+    for parent in current.parents:
+        if (candidate := parent / "homelab" / ".env").is_file():
+            return candidate
+        if (parent / ".git").exists() or parent == parent.parent:
+            break
+    if (fallback := Path.home() / "dotfiles/homelab/.env").is_file():
+        return fallback
+    return None
+
+
 def get_jellyfin_config(env_file: Path | None = None) -> tuple[str, str] | None:
     """Resolve (base_url, api_key) from environment or .env file."""
     api_key = os.environ.get("JELLYFIN_API_KEY")
     hostname_base = os.environ.get("HOSTNAME_BASE")
 
-    target_env = env_file if env_file is not None else Path.home() / "dotfiles/homelab/.env"
-    if target_env.exists():
+    target_env = env_file if env_file is not None else find_homelab_env()
+    if target_env and target_env.exists():
         for raw_line in target_env.read_text(encoding="utf-8").splitlines():
             line = raw_line.strip()
             if not line or line.startswith("#"):

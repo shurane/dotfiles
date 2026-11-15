@@ -26,15 +26,13 @@ Manages and bootstraps authenticated credentials across services (qBittorrent, Q
 Defaults to dry-run verification; pass `--apply` to commit credentials:
 
 ```bash
-# Run from homelab/
-uv run --project auth auth                         # Dry-run verification across all services
-uv run --project auth auth --apply                 # Commit credentials
-uv run --project auth auth --apply --services jellyfin
+# Direct CLI (installed via uv tool) or via packages/ workspace:
+auth                                          # Dry-run verification across all services
+auth --apply                                  # Commit credentials
+auth --apply --services jellyfin
 
-# Or run from auth/
-cd auth
-uv run auth                                        # Dry-run verification
-uv run auth --apply
+# Or run via packages/ workspace:
+uv run --project ../packages auth             # From homelab/
 ```
 
 `HOSTNAME_BASE` is the canonical local domain (e.g. `example.com`).
@@ -44,26 +42,22 @@ uv run auth --apply
 Deep health & content inspector that authenticates and queries service state, libraries, torrents, shares, and routes:
 
 ```bash
-# Run full status tree from homelab/
-uv run --project status status
+# Run full status tree (direct CLI or via packages/)
+status
+# or: uv run --project ../packages status
 
 # Deep service inspectors
-uv run --project status status jellyfin      # Intel QuickSync (QSV) transcode benchmark, 512MB cgroup, active streams, media library
-uv run --project status status qbittorrent   # VPN tun0 binding, port alignment, /mnt/mango/torrents rw, swarm speeds, errors
-uv run --project status status samba         # Port 445, SMB auth & empty pw rejection, drive mounts (/dev/sda1 rw), active clients, locks
-uv run --project status status vpn           # ProtonVPN tun0 tunnel, Gluetun kill switch, port forwarding, qBittorrent integration
+status jellyfin      # Intel QuickSync (QSV) transcode benchmark, 512MB cgroup, active streams, media library
+status qbittorrent   # VPN tun0 binding, port alignment, /mnt/mango/torrents rw, swarm speeds, errors
+status samba         # Port 445, SMB auth & empty pw rejection, drive mounts (/dev/sda1 rw), active clients, locks
+status vpn           # ProtonVPN tun0 tunnel, Gluetun kill switch, port forwarding, qBittorrent integration
 
 # Filter services, inspect remote hosts, or export JSON
-uv run --project status status --service jellyfin --service qbittorrent
-uv run --project status status -H server.lan       # Inspect remote host (auto-resolves LAN / Tailscale)
-uv run --project status status --json
+status --service jellyfin --service qbittorrent
+status -H server.lan       # Inspect remote host (auto-resolves LAN / Tailscale)
+status --json
 
-# Or run from status/
-cd status
-uv run status
-uv run status jellyfin
-
-# Run unit test suites from homelab/
-uv --directory status run pytest            # 54 status & failure mode tests
+# Run unit test suites from packages/
+cd ../packages && uv run pytest homelab-status/tests
 uv --directory auth run pytest              # 29 credential bootstrap tests
 ```

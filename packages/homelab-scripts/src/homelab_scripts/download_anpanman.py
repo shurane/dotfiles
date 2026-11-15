@@ -187,6 +187,7 @@ def load_anpanman_metadata() -> dict[str, Any]:
     """Load episode titles and metadata from local json cache if available."""
     candidates = [
         Path(__file__).parent / "anpanman_metadata.json",
+        Path.home() / "dotfiles/packages/homelab-scripts/src/homelab_scripts/anpanman_metadata.json",
         Path.home() / "dotfiles/homelab/scripts/anpanman_metadata.json",
     ]
     for p in candidates:

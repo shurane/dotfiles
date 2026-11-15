@@ -127,7 +127,7 @@ wheels = [
 [[package]]
 name = "bitwarden-extras"
 version = "0.1.0"
-source = { editable = "tools/bitwarden-extras" }
+source = { editable = "bitwarden-extras" }
 dependencies = [
     { name = "pydantic" },
     { name = "pyyaml" },
@@ -284,7 +284,7 @@ wheels = [
 [[package]]
 name = "homelab-auth"
 version = "0.1.0"
-source = { editable = "homelab/auth" }
+source = { editable = "homelab-auth" }
 dependencies = [
     { name = "anyio" },
     { name = "bcrypt" },
@@ -315,7 +315,7 @@ requires-dist = [
 [[package]]
 name = "homelab-scripts"
 version = "0.1.0"
-source = { editable = "homelab/scripts" }
+source = { editable = "homelab-scripts" }
 dependencies = [
     { name = "anyio" },
     { name = "beautifulsoup4" },
@@ -346,7 +346,7 @@ requires-dist = [
 [[package]]
 name = "homelab-status"
 version = "0.1.0"
-source = { editable = "homelab/status" }
+source = { editable = "homelab-status" }
 dependencies = [
     { name = "anyio" },
     { name = "docker" },
@@ -792,7 +792,7 @@ wheels = [
 [[package]]
 name = "soju-extras"
 version = "0.1.0"
-source = { editable = "tools/soju-extras" }
+source = { editable = "soju-extras" }
 dependencies = [
     { name = "pydantic" },
     { name = "rich" },
