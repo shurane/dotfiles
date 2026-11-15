@@ -1,11 +1,17 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "python-xlib>=0.33",
+# ]
+# ///
 """Turn off DPMS display and listen for wake events."""
 
 import subprocess
 import time
 
-from Xlib import X  # ty: ignore[import-not-found]
-from Xlib.display import Display  # ty: ignore[import-not-found]
+from Xlib import X
+from Xlib.display import Display
 
 display = Display(":0")
 root = display.screen().root
