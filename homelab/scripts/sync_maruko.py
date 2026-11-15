@@ -10,6 +10,7 @@ import subprocess
 import xml.sax.saxutils as saxutils
 from pathlib import Path
 
+from py_subtitle_extractor import extract_subtitle_tracks, extract_subtitles
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -47,8 +48,69 @@ def parse_range_spec(range_str: str) -> set[int]:
     return result
 
 
-def extract_english_title_from_mkv(mkv_path: Path) -> str | None:
-    """Extract translated segment titles from ASS subtitle tracks (EpTitle style)."""
+def clean_ass_text(raw_text: str) -> str:
+    """Parse ASS dialogue text, stripping override tag blocks ({...}) and normalizing control codes.
+
+    Grammar:
+        Text        := ( PlainChar | TagBlock | EscapeCode )*
+        TagBlock    := '{' [^}]* '}'
+        EscapeCode  := '\\N' | '\\n' | '\\h' | '\\' .
+    """
+    chars: list[str] = []
+    in_tag = False
+    i = 0
+    n = len(raw_text)
+
+    while i < n:
+        ch = raw_text[i]
+        if ch == "{":
+            in_tag = True
+            i += 1
+        elif ch == "}":
+            in_tag = False
+            i += 1
+        elif in_tag:
+            i += 1
+        elif ch == "\\" and i + 1 < n and raw_text[i + 1] in ("N", "n", "h"):
+            chars.append(" ")
+            i += 2
+        else:
+            chars.append(ch)
+            i += 1
+
+    return " ".join("".join(chars).split())
+
+
+def extract_english_title_via_py_extractor(mkv_path: Path) -> str | None:
+    """Extract translated segment titles from ASS subtitle tracks using py-subtitle-extractor."""
+    try:
+        tracks = extract_subtitle_tracks(str(mkv_path))
+        ass_tracks = [t for t in tracks if "ASS" in t.get("codec_id", "") or "SSA" in t.get("codec_id", "")]
+        if not ass_tracks:
+            ass_tracks = tracks
+        if not ass_tracks:
+            return None
+
+        track_num = ass_tracks[0]["track_number"]
+        entries = extract_subtitles(str(mkv_path), track_num)
+        titles: list[str] = []
+        for entry in entries:
+            payload = entry[1]
+            parts = payload.split(",", 8)
+            if len(parts) == 9 and parts[2].strip() == "EpTitle":
+                cleaned = clean_ass_text(parts[8])
+                if cleaned and cleaned not in titles:
+                    titles.append(cleaned)
+
+        if titles:
+            return " & ".join(titles)
+    except Exception as e:
+        console.print(f"[dim]py-subtitle-extractor note for {mkv_path.name}: {e}[/dim]")
+    return None
+
+
+def extract_english_title_via_ffmpeg(mkv_path: Path) -> str | None:
+    """Extract translated segment titles from ASS subtitle tracks using ffmpeg subprocess."""
     try:
         cmd = [
             "ffmpeg",
@@ -65,19 +127,39 @@ def extract_english_title_from_mkv(mkv_path: Path) -> str | None:
         res = subprocess.run(cmd, capture_output=True, text=True, timeout=10.0, check=False)  # noqa: S603
         titles: list[str] = []
         for line in res.stdout.splitlines():
-            if "EpTitle" in line and line.startswith("Dialogue:"):
+            if line.startswith("Dialogue:"):
                 parts = line.split(",", 9)
-                if len(parts) == 10:
-                    raw_text = parts[9].replace(r"\N", " ").strip()
-                    cleaned = re.sub(r"\{.*?\}", "", raw_text).strip()
-                    cleaned = re.sub(r"\s+", " ", cleaned)
+                if len(parts) == 10 and parts[3].strip() == "EpTitle":
+                    cleaned = clean_ass_text(parts[9])
                     if cleaned and cleaned not in titles:
                         titles.append(cleaned)
         if titles:
             return " & ".join(titles)
     except Exception as e:
-        console.print(f"[dim]Subtitle probe note for {mkv_path.name}: {e}[/dim]")
+        console.print(f"[dim]ffmpeg subtitle probe note for {mkv_path.name}: {e}[/dim]")
     return None
+
+
+def extract_english_title_from_mkv(mkv_path: Path, *, reconcile: bool = False) -> str | None:
+    """Extract translated segment titles from ASS subtitle tracks.
+
+    Defaults to fast in-process extraction via py-subtitle-extractor with ffmpeg fallback.
+    If reconcile is True, runs both extractors, logs any discrepancy, and prefers ffmpeg.
+    """
+    if reconcile:
+        py_title = extract_english_title_via_py_extractor(mkv_path)
+        ff_title = extract_english_title_via_ffmpeg(mkv_path)
+        if py_title != ff_title:
+            console.print(
+                f"[yellow]Subtitle reconciliation mismatch for {mkv_path.name}: "
+                f"py-extractor='{py_title}' vs ffmpeg='{ff_title}'. Using ffmpeg.[/yellow]"
+            )
+        return ff_title if ff_title is not None else py_title
+
+    py_title = extract_english_title_via_py_extractor(mkv_path)
+    if py_title:
+        return py_title
+    return extract_english_title_via_ffmpeg(mkv_path)
 
 
 def generate_nfo_content(
@@ -163,7 +245,17 @@ def main() -> None:
     parser.add_argument(
         "--repair",
         action="store_true",
-        help="Force re-probing MKV subtitles via ffmpeg and regenerating NFO sidecars",
+        help="Force re-probing MKV subtitles and regenerating NFO sidecars",
+    )
+    parser.add_argument(
+        "--reconcile",
+        "--exhaustive",
+        dest="reconcile",
+        action="store_true",
+        help=(
+            "Cross-check extraction using both py-subtitle-extractor and ffmpeg subprocess "
+            "(prefers ffmpeg on discrepancy)"
+        ),
     )
     parser.add_argument(
         "--dry-run",
@@ -245,7 +337,7 @@ def main() -> None:
         # Only extract from MKV via ffmpeg if NFO is missing, empty, or --repair requested
         needs_nfo_check = args.repair or not dest_nfo.exists() or dest_nfo.stat().st_size == 0
         if needs_nfo_check:
-            title_en = extract_english_title_from_mkv(src_path)
+            title_en = extract_english_title_from_mkv(src_path, reconcile=args.reconcile)
             if not title_en:
                 title_en = meta_entry.get("title_en") or meta_entry.get("title_ro", f"Episode {ep_num}")
 

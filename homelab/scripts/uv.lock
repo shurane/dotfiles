@@ -75,6 +75,7 @@ dependencies = [
     { name = "anyio" },
     { name = "beautifulsoup4" },
     { name = "httpx" },
+    { name = "py-subtitle-extractor" },
     { name = "pykakasi" },
     { name = "rich" },
     { name = "yt-dlp" },
@@ -93,6 +94,7 @@ requires-dist = [
     { name = "anyio", specifier = ">=4.8.0" },
     { name = "beautifulsoup4", specifier = ">=4.12.0" },
     { name = "httpx", specifier = ">=0.28.1" },
+    { name = "py-subtitle-extractor", specifier = ">=1.0.6" },
     { name = "pykakasi", specifier = ">=2.3.0" },
     { name = "rich", specifier = ">=13.9.4" },
     { name = "yt-dlp", specifier = ">=2026.10.26" },
@@ -198,6 +200,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/bf/db/7fc19e6f2dc92a966727031389fc2e08b558f0f25eb7403c1119ad4713cd/pluggy-1.7.0.tar.gz", hash = "sha256:d1eaa46ebb595891b860ab086b4d09c8588af65ebd4361b8e8f4bb8920b90ba8", size = 123304, upload-time = "2026-10-15T09:50:58.343Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/40/9e/2b38731e0fc536806f16490e1a12d7f0dc2a1235aa8cc07bcc75416a7daa/pluggy-1.7.0-py3-none-any.whl", hash = "sha256:7dd7b0d8832ba3cb632c306926ded123429211b83641b35dc5c41ad2d34f9bec", size = 27082, upload-time = "2026-10-15T09:50:56.808Z" },
+]
+
+[[package]]
+name = "py-subtitle-extractor"
+version = "1.0.6"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/74/09/039b039b797ee96aa1a9ba6ad5c244863399e83d159a5f14d8bf170a7c54/py_subtitle_extractor-1.0.6.tar.gz", hash = "sha256:d57681f85e57a424a203b859b86413c35fd50253e94d9769dfc401f7b7b5250c", size = 4941, upload-time = "2026-03-28T13:48:00.284Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c0/7b/3bcac6bc6571152a92798157c7768166f0931a25069627923d4bde9aa796/py_subtitle_extractor-1.0.6-py3-none-any.whl", hash = "sha256:c1979443d0d5a6edcf93f646d6bfa9e6cd3366a3ac68f811e1754ff9f8ec0eaa", size = 6550, upload-time = "2026-03-28T13:47:59.422Z" },
 ]
 
 [[package]]

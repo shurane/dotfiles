@@ -7,6 +7,7 @@ dependencies = [
   "anyio>=4.8.0",
   "beautifulsoup4>=4.12.0",
   "httpx>=0.28.1",
+  "py-subtitle-extractor>=1.0.6",
   "pykakasi>=2.3.0",
   "rich>=13.9.4",
   "yt-dlp>=2026.10.26",
