@@ -283,11 +283,11 @@ def _format_relative_time(inst: Instant, now: Instant | None = None) -> str:
 
 
 def _format_playback_time(inst: Instant, now: Instant | None = None) -> str:
-    """Format an Instant into short time (hh:mm) and humanized relative duration (e.g. '08:34 • an hour ago')."""
+    """Format an Instant into short time (hh:mm am/pm) and humanized duration (e.g. '08:34 am • an hour ago')."""
     if now is None:
         now = Instant.now()
     local_dt = inst.to_tz(SYSTEM_TZ)
-    short_time = f"{local_dt.hour:02d}:{local_dt.minute:02d}"
+    short_time = local_dt.format("ii:mm aa").lower()
     diff_sec = max(0.0, (now - inst).total("seconds"))
     duration_ago = humanize.naturaltime(diff_sec)
     return f"{short_time} • {duration_ago}"
