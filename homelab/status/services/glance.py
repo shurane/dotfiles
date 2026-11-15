@@ -7,13 +7,13 @@ import time
 
 import httpx
 
-from models import HealthStatus, ServiceResult, StatusContext
+from models import ContainerName, HealthStatus, ServiceResult, StatusContext
 
 
 async def check_glance(ctx: StatusContext) -> ServiceResult:
     service_id = "glance"
     name = "Glance Dashboard"
-    container = "homelab-glance-1"
+    container = ContainerName.GLANCE
     t0 = time.perf_counter()
 
     try:

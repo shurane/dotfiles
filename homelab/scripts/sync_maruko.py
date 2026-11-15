@@ -161,6 +161,11 @@ def main() -> None:
         help="Limit number of episodes to process",
     )
     parser.add_argument(
+        "--repair",
+        action="store_true",
+        help="Force re-probing MKV subtitles via ffmpeg and regenerating NFO sidecars",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Simulate actions without creating links or writing files",
@@ -237,36 +242,41 @@ def main() -> None:
         air_date = meta_entry.get("air_date")
         plot = meta_entry.get("plot", "")
 
-        # Extract English title from subtitle track, or fall back to metadata
-        title_en = extract_english_title_from_mkv(src_path)
-        if not title_en:
+        # Only extract from MKV via ffmpeg if NFO is missing, empty, or --repair requested
+        needs_nfo_check = args.repair or not dest_nfo.exists() or dest_nfo.stat().st_size == 0
+        if needs_nfo_check:
+            title_en = extract_english_title_from_mkv(src_path)
+            if not title_en:
+                title_en = meta_entry.get("title_en") or meta_entry.get("title_ro", f"Episode {ep_num}")
+
+            nfo_status = "Skipped"
+            nfo_content = generate_nfo_content(
+                title=title_en,
+                original_title=title_ja,
+                season=1,
+                episode=ep_num,
+                air_date=air_date,
+                plot=plot,
+            )
+
+            needs_write = True
+            if dest_nfo.exists() and dest_nfo.read_text(encoding="utf-8") == nfo_content:
+                needs_write = False
+                nfo_status = "Up to date"
+
+            if needs_write:
+                if not args.dry_run:
+                    try:
+                        dest_nfo.write_text(nfo_content, encoding="utf-8")
+                        nfos_written += 1
+                        nfo_status = "[green]Written[/green]"
+                    except OSError as e:
+                        nfo_status = f"[red]Write failed: {e}[/red]"
+                else:
+                    nfo_status = "[dim]Would write[/dim]"
+        else:
             title_en = meta_entry.get("title_en") or meta_entry.get("title_ro", f"Episode {ep_num}")
-
-        nfo_status = "Skipped"
-        nfo_content = generate_nfo_content(
-            title=title_en,
-            original_title=title_ja,
-            season=1,
-            episode=ep_num,
-            air_date=air_date,
-            plot=plot,
-        )
-
-        needs_write = True
-        if dest_nfo.exists() and dest_nfo.read_text(encoding="utf-8") == nfo_content:
-            needs_write = False
             nfo_status = "Up to date"
-
-        if needs_write:
-            if not args.dry_run:
-                try:
-                    dest_nfo.write_text(nfo_content, encoding="utf-8")
-                    nfos_written += 1
-                    nfo_status = "[green]Written[/green]"
-                except OSError as e:
-                    nfo_status = f"[red]Write failed: {e}[/red]"
-            else:
-                nfo_status = "[dim]Would write[/dim]"
 
         table.add_row(
             f"S01E{ep_num:02d}",

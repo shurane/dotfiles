@@ -14,7 +14,7 @@ from rich.table import Table
 
 from common import format_bytes, format_connection_badge, format_route_line, render_command_header
 from config import format_speed
-from models import HealthStatus, ServiceResult, StatusContext, TargetConnection
+from models import ContainerName, HealthStatus, ServiceResult, StatusContext, TargetConnection
 
 if TYPE_CHECKING:
     from rich.console import Console
@@ -150,7 +150,7 @@ def summarize_torrent_catalog(torrents: dict[str, Any]) -> TorrentCatalogSummary
 async def _fetch_host_public_ip(ctx: StatusContext) -> str:
     """Fetch the host egress IP (non-VPN) to verify zero IP leakage."""
     if not ctx.no_docker:
-        for cname in ("homelab-caddy-1", "homelab-jellyfin-1"):
+        for cname in (ContainerName.CADDY, ContainerName.GLANCE):
             code, out = await ctx.exec_container(cname, "wget -qO- -T 3 https://ipinfo.io/ip")
             if code == 0 and out.strip():
                 return out.strip()
@@ -169,7 +169,7 @@ async def _gather_qbittorrent_raw_data(ctx: StatusContext) -> QbittorrentRawData
     raw = QbittorrentRawData(username=ctx.username, base_domain=base_domain)
 
     async def fetch_docker_state() -> None:
-        c = await ctx.get_container("homelab-qbittorrent-1", full=True)
+        c = await ctx.get_container(ContainerName.QBITTORRENT, full=True)
         if c:
             raw.container_found = True
             raw.container_status = getattr(c, "status", "unknown")
@@ -177,14 +177,14 @@ async def _gather_qbittorrent_raw_data(ctx: StatusContext) -> QbittorrentRawData
             raw.container_health = health or "none"
             raw.restart_count = getattr(c, "restart_count", 0)
 
-        qui_c = await ctx.get_container("homelab-qui-1", full=True)
+        qui_c = await ctx.get_container(ContainerName.QUI, full=True)
         if qui_c:
             raw.qui_found = True
             raw.qui_status = getattr(qui_c, "status", "unknown")
             qui_health = getattr(qui_c, "health", "none")
             raw.qui_health = qui_health or "none"
 
-        raw.version = await ctx.get_container_version("homelab-qbittorrent-1")
+        raw.version = await ctx.get_container_version(ContainerName.QBITTORRENT)
 
     async def fetch_api_data() -> None:
         try:
@@ -213,7 +213,7 @@ async def _gather_qbittorrent_raw_data(ctx: StatusContext) -> QbittorrentRawData
     async def fetch_storage_check() -> None:
         if not ctx.no_docker:
             code, out = await ctx.exec_container(
-                "homelab-qbittorrent-1",
+                ContainerName.QBITTORRENT,
                 "sh -c 'touch /mnt/mango/torrents/.status_check && rm -f /mnt/mango/torrents/.status_check'",
             )
             raw.torrents_rw_code = code
@@ -221,11 +221,11 @@ async def _gather_qbittorrent_raw_data(ctx: StatusContext) -> QbittorrentRawData
 
     async def fetch_gluetun_details() -> None:
         if not ctx.no_docker:
-            code, out = await ctx.exec_container("homelab-gluetun-1", "cat /tmp/gluetun/forwarded_port")
+            code, out = await ctx.exec_container(ContainerName.GLUETUN, "cat /tmp/gluetun/forwarded_port")
             if code == 0 and out.strip().isdigit():
                 raw.gluetun_forwarded_port = int(out.strip())
 
-            v_code, v_out = await ctx.exec_container("homelab-gluetun-1", "wget -qO- -T 3 https://ipinfo.io/ip")
+            v_code, v_out = await ctx.exec_container(ContainerName.GLUETUN, "wget -qO- -T 3 https://ipinfo.io/ip")
             if v_code == 0 and v_out.strip():
                 raw.vpn_public_ip = v_out.strip()
 
@@ -717,7 +717,7 @@ async def check_qbittorrent(ctx: StatusContext) -> ServiceResult:
     """Standard service tree check for qBittorrent."""
     service_id = "qbittorrent"
     name = "qBittorrent"
-    container = "homelab-qbittorrent-1"
+    container = ContainerName.QBITTORRENT
     t0 = time.perf_counter()
 
     try:

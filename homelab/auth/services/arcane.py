@@ -103,7 +103,7 @@ def verify_arcane(auth: HomelabAuth) -> None:
 
 
 def check_arcane(auth: HomelabAuth) -> bool:
-    with httpx.Client(timeout=5) as client:
+    with httpx.Client(timeout=httpx.Timeout(5.0, connect=0.5)) as client:
         try:
             return arcane_login(client, auth.username, auth.password)
         except Exception:

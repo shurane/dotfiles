@@ -7,13 +7,13 @@ import xml.etree.ElementTree as ET
 
 import httpx
 
-from models import HealthStatus, ServiceResult, StatusContext
+from models import ContainerName, HealthStatus, ServiceResult, StatusContext
 
 
 async def check_retroarch(ctx: StatusContext) -> ServiceResult:
     service_id = "retroarch"
     name = "RetroArch (WebDAV)"
-    container = "homelab-rclone-retroarch-1"
+    container = ContainerName.RETROARCH
     t0 = time.perf_counter()
 
     try:

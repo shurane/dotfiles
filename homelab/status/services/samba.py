@@ -13,7 +13,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from common import format_connection_badge, format_route_line, render_command_header
-from models import HealthStatus, ServiceResult, StatusContext, TargetConnection
+from models import ContainerName, HealthStatus, ServiceResult, StatusContext, TargetConnection
 
 if TYPE_CHECKING:
     from rich.console import Console
@@ -205,7 +205,7 @@ def _parse_smb_json(json_str: str) -> tuple[str | None, list[SmbClientSession], 
 async def _gather_samba_raw_data(ctx: StatusContext) -> SambaRawData:
     """Concurrently gather container metadata, TCP 445 connectivity, authenticated SMB test, mounts, and locks."""
     raw = SambaRawData(username=ctx.username)
-    container_name = "homelab-samba-1"
+    container_name = ContainerName.SAMBA
 
     # 1. Inspect Docker container metadata
     c = await ctx.get_container(container_name, full=True)
@@ -349,7 +349,7 @@ def evaluate_samba_report(raw: SambaRawData, connection: TargetConnection | None
             SambaCheckItem(
                 name="Container Lifecycle",
                 passed=False,
-                details="Container 'homelab-samba-1' not found",
+                details=f"Container '{ContainerName.SAMBA}' not found",
             )
         )
 
@@ -602,7 +602,7 @@ async def check_samba(ctx: StatusContext) -> ServiceResult:
     """Standard service check for the homelab status tree."""
     service_id = "samba"
     name = "Samba File Server"
-    container = "homelab-samba-1"
+    container = ContainerName.SAMBA
     t0 = time.perf_counter()
 
     try:

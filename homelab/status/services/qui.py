@@ -6,13 +6,13 @@ import time
 
 import httpx
 
-from models import HealthStatus, ServiceResult, StatusContext
+from models import ContainerName, HealthStatus, ServiceResult, StatusContext
 
 
 async def check_qui(ctx: StatusContext) -> ServiceResult:
     service_id = "qui"
     name = "Qui WebUI"
-    container = "homelab-qui-1"
+    container = ContainerName.QUI
     t0 = time.perf_counter()
 
     try:

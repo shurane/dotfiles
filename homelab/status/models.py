@@ -25,6 +25,21 @@ class HealthStatus(StrEnum):
     UNHEALTHY = "UNHEALTHY"
 
 
+class ContainerName(StrEnum):
+    ARCANE = "homelab-arcane-1"
+    BOOKORBIT = "homelab-bookorbit-1"
+    BOOKORBIT_POSTGRES = "homelab-bookorbit-postgres-1"
+    CADDY = "homelab-caddy-1"
+    GLANCE = "homelab-glance-1"
+    GLUETUN = "homelab-gluetun-1"
+    JELLYFIN = "homelab-jellyfin-1"
+    QBITTORRENT = "homelab-qbittorrent-1"
+    QUI = "homelab-qui-1"
+    RETROARCH = "homelab-rclone-retroarch-1"
+    SAMBA = "homelab-samba-1"
+    WITHINGS_SYNC = "homelab-withings-sync-1"
+
+
 @dataclass
 class ServiceResult:
     service_id: str
@@ -317,9 +332,9 @@ class StatusContext:
 
         # 2. If running remotely with docker client:
         if self.docker_client and not self.no_docker:
-            code, out = await self.exec_container("homelab-qbittorrent-1", "df -k /mnt/mango/torrents /")
+            code, out = await self.exec_container(ContainerName.QBITTORRENT, "df -k /mnt/mango/torrents /")
             if code != 0:
-                code, out = await self.exec_container("homelab-samba-1", "df -k /shares/mango /")
+                code, out = await self.exec_container(ContainerName.SAMBA, "df -k /shares/mango /")
 
             if code == 0:
                 for line in out.strip().splitlines()[1:]:

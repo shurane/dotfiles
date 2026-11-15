@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from compose import compose_service, get_container_ip
@@ -22,9 +23,18 @@ def test_get_service_url_resolves_via_get_container_ip() -> None:
         assert get_service_url("qbittorrent", 8080, "NONEXISTENT_VAR") == "http://172.20.0.99:8080"
 
 
-def test_get_service_url_falls_back_to_default_hostname() -> None:
-    with patch("compose.get_container_ip", return_value=None):
+def test_get_service_url_falls_back_to_default_hostname(tmp_path: Path) -> None:
+    empty_env = tmp_path / "empty.env"
+    empty_env.write_text("")
+    with patch("compose.get_container_ip", return_value=None), patch("config.AUTH_ENV", empty_env):
         assert get_service_url("qbittorrent", 8080, "NONEXISTENT_VAR") == "http://qbittorrent:8080"
+
+
+def test_get_service_url_resolves_via_auth_env_base_domain(tmp_path: Path) -> None:
+    env_file = tmp_path / ".env"
+    env_file.write_text("HOSTNAME_BASE=cluster.lan\n")
+    with patch("compose.get_container_ip", return_value=None), patch("config.AUTH_ENV", env_file):
+        assert get_service_url("qbittorrent", 8080, "NONEXISTENT_VAR") == "https://qbittorrent.cluster.lan"
 
 
 def test_get_container_ip_extracts_ip_from_container() -> None:

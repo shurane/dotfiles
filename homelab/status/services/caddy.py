@@ -13,7 +13,7 @@ import anyio
 import httpx
 from whenever import SYSTEM_TZ, PlainDateTime, ZonedDateTime
 
-from models import HealthStatus, ServiceResult, StatusContext
+from models import ContainerName, HealthStatus, ServiceResult, StatusContext
 
 
 def _check_tls_sync(base_domain: str, timeout: float) -> tuple[dict[str, str], int]:
@@ -60,7 +60,7 @@ def _check_tls_sync(base_domain: str, timeout: float) -> tuple[dict[str, str], i
 async def check_caddy(ctx: StatusContext) -> ServiceResult:
     service_id = "caddy"
     name = "Caddy Ingress"
-    container = "homelab-caddy-1"
+    container = ContainerName.CADDY
     t0 = time.perf_counter()
 
     try:

@@ -7,13 +7,13 @@ import time
 import anyio
 import httpx
 
-from models import HealthStatus, ServiceResult, StatusContext
+from models import ContainerName, HealthStatus, ServiceResult, StatusContext
 
 
 async def check_arcane(ctx: StatusContext) -> ServiceResult:
     service_id = "arcane"
     name = "Arcane Management"
-    container = "homelab-arcane-1"
+    container = ContainerName.ARCANE
     t0 = time.perf_counter()
 
     try:

@@ -324,7 +324,7 @@ def verify_jellyfin(auth: HomelabAuth) -> None:
 
 
 def check_jellyfin(auth: HomelabAuth) -> bool:
-    with httpx.Client(timeout=5) as client, contextlib.suppress(httpx.HTTPError):
+    with httpx.Client(timeout=httpx.Timeout(5.0, connect=0.5)) as client, contextlib.suppress(httpx.HTTPError):
         if jellyfin_login(client, auth.username, auth.password) is not None:
             return True
     db_path = ROOT / "jellyfin" / "config" / "data" / "jellyfin.db"

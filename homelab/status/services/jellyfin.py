@@ -21,7 +21,7 @@ from rich.table import Table
 from whenever import Instant
 
 from common import format_bytes, format_connection_badge, format_route_line, render_command_header
-from models import HealthStatus, ServiceResult, StatusContext, TargetConnection
+from models import ContainerName, HealthStatus, ServiceResult, StatusContext, TargetConnection
 
 if TYPE_CHECKING:
     from rich.console import Console
@@ -303,7 +303,7 @@ def _parse_vainfo_driver(output: str) -> str:
 async def _gather_jellyfin_raw_data(ctx: StatusContext) -> JellyfinRawData:
     """Concurrently collect Docker metadata, GPU node status, QSV test, media mount, and HTTP API."""
     raw = JellyfinRawData(username=ctx.username)
-    container_name = "homelab-jellyfin-1"
+    container_name = ContainerName.JELLYFIN
 
     # 1. Inspect Docker Container
     c = await ctx.get_container(container_name, full=True)
@@ -507,7 +507,7 @@ def evaluate_jellyfin_report(
             JellyfinCheckItem(
                 name="Container Lifecycle",
                 passed=False,
-                details="Container 'homelab-jellyfin-1' not found",
+                details=f"Container '{ContainerName.JELLYFIN}' not found",
             )
         )
 
@@ -1123,7 +1123,7 @@ async def check_jellyfin(ctx: StatusContext) -> ServiceResult:
     """Standard service check for the homelab status tree with GPU and cgroup telemetry."""
     service_id = "jellyfin"
     name = "Jellyfin"
-    container = "homelab-jellyfin-1"
+    container = ContainerName.JELLYFIN
     t0 = time.perf_counter()
 
     try:
@@ -1205,14 +1205,19 @@ async def check_jellyfin(ctx: StatusContext) -> ServiceResult:
                 )
             branches.append("\n".join(client_lines))
 
-        # Recent plays branch
+        # Recent plays branch (up to last 10 items)
         if report.plays_last_24h_count > 0:
-            last_p = report.recent_playback[0]
-            branches.append(
-                f"📜 Recent Plays (24h): [bold green]{report.plays_last_24h_count} item(s)[/bold green]\n"
-                f"  [dim]• Last:[/dim] [bold yellow]\"{last_p.media_title}\"[/bold yellow] "
-                f"[dim]({last_p.relative_time})[/dim]"
-            )
+            play_lines = [f"📜 Recent Plays (24h): [bold green]{report.plays_last_24h_count} item(s)[/bold green]"]
+            for p in report.recent_playback[:10]:
+                dev_str = (
+                    f" on {p.client_name}"
+                    if p.client_name
+                    else (f" on {p.device_name}" if p.device_name else "")
+                )
+                play_lines.append(
+                    f"  • [bold yellow]\"{p.media_title}\"[/bold yellow][dim]{dev_str} ({p.relative_time})[/dim]"
+                )
+            branches.append("\n".join(play_lines))
         elif report.recent_playback:
             last_p = report.recent_playback[0]
             cl_str = f" ({last_p.client_name})" if last_p.client_name else ""

@@ -94,11 +94,35 @@ async def main_async(options: BootstrapOptions) -> int:
 
     if is_dry_run:
         check_tasks = [check_task_definitions(auth)[service] for service in options.services]
+        results: list[tuple[int, str, bool, str | None]] = []
+
+        def _run_check(idx: int, name: str, task: CheckTask) -> tuple[int, str, bool, str | None]:
+            try:
+                matched = task()
+                return (idx, name, matched, None)
+            except Exception as e:
+                return (idx, name, False, str(e))
+
+        async def _worker(idx: int, name: str, task: CheckTask) -> None:
+            res = await anyio.to_thread.run_sync(_run_check, idx, name, task)
+            results.append(res)
+
+        async with anyio.create_task_group() as tg:
+            for idx, (name, task) in enumerate(check_tasks):
+                tg.start_soon(_worker, idx, name, task)
+
+        results.sort(key=lambda x: x[0])
         all_matched = True
-        for name, task in check_tasks:
-            matched = dry_run_service(name, task)
-            if not matched:
+        for _, name, matched, err in results:
+            if err:
+                console_err.print(f"  [bold red]✗[/] [cyan]{name}[/] error checking credentials: {err}")
                 all_matched = False
+            elif matched:
+                console.print(f"  [bold green]✓[/] [cyan]{name}[/] credentials already match")
+            else:
+                console.print(f"  [bold yellow]✗[/] [cyan]{name}[/] credentials need update")
+                all_matched = False
+
         if all_matched:
             console.print(
                 "\n[bold green]All selected services already have matching credentials. No changes needed.[/]"
@@ -154,3 +178,7 @@ def main(
 
 def typer_main() -> None:
     typer.run(main)
+
+
+if __name__ == "__main__":
+    typer_main()

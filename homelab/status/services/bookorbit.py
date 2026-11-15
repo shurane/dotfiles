@@ -6,13 +6,13 @@ import time
 
 import httpx
 
-from models import HealthStatus, ServiceResult, StatusContext
+from models import ContainerName, HealthStatus, ServiceResult, StatusContext
 
 
 async def check_bookorbit(ctx: StatusContext) -> ServiceResult:
     service_id = "bookorbit"
     name = "BookOrbit"
-    container = "homelab-bookorbit-1"
+    container = ContainerName.BOOKORBIT
     t0 = time.perf_counter()
 
     try:

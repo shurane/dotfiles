@@ -22,7 +22,7 @@ from common import (
     format_route_line,
     render_command_header,
 )
-from models import HealthStatus, ServiceResult, StatusContext, TargetConnection
+from models import ContainerName, HealthStatus, ServiceResult, StatusContext, TargetConnection
 
 if TYPE_CHECKING:
     from rich.console import Console
@@ -126,7 +126,7 @@ def _parse_ipinfo(data: dict[str, Any] | str) -> IpDetails:
 
 async def _fetch_host_ip(ctx: StatusContext | None = None) -> IpDetails | None:
     if ctx and not ctx.no_docker:
-        for cname in ("homelab-caddy-1", "homelab-homepage-1", "homelab-jellyfin-1"):
+        for cname in (ContainerName.CADDY, ContainerName.GLANCE):
             code, out = await ctx.exec_container(cname, "wget -qO- -T 3 https://ipinfo.io/json")
             if code == 0 and "ip" in out:
                 return _parse_ipinfo(out)
@@ -186,7 +186,7 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
     """Concurrently execute all Docker and network queries using anyio task group."""
     raw = VpnRawData()
 
-    gluetun = await ctx.get_container("homelab-gluetun-1")
+    gluetun = await ctx.get_container(ContainerName.GLUETUN)
     if not gluetun:
         return raw
 
@@ -201,7 +201,7 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
     if raw.gluetun_status != "running":
         return raw
 
-    qbt = await ctx.get_container("homelab-qbittorrent-1")
+    qbt = await ctx.get_container(ContainerName.QBITTORRENT)
     if qbt:
         raw.qbt_found = True
         await anyio.to_thread.run_sync(qbt.reload)
@@ -215,7 +215,7 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
             raw.host_ip = await _fetch_host_ip(ctx)
 
         async def fetch_vpn() -> None:
-            raw.vpn_ip = await _fetch_gluetun_ip(ctx, "homelab-gluetun-1")
+            raw.vpn_ip = await _fetch_gluetun_ip(ctx, ContainerName.GLUETUN)
 
         async def exec_gluetun_local() -> None:
             batch_cmd = (
@@ -229,7 +229,7 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
                 "echo \"===END===\""
                 "'"
             )
-            code, out = await ctx.exec_container("homelab-gluetun-1", batch_cmd)
+            code, out = await ctx.exec_container(ContainerName.GLUETUN, batch_cmd)
             raw.tun_stats_raw = _extract_section(out, "TUN")
             raw.tun_stats_code = 0 if raw.tun_stats_raw else (code or 1)
             raw.resolv_conf = _extract_section(out, "RESOLV")
@@ -240,12 +240,12 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
 
         async def exec_trace() -> None:
             _, raw.trace_raw = await ctx.exec_container(
-                "homelab-gluetun-1", "wget -T 3 -qO- https://1.1.1.1/cdn-cgi/trace"
+                ContainerName.GLUETUN, "wget -T 3 -qO- https://1.1.1.1/cdn-cgi/trace"
             )
 
         async def exec_dns_whoami() -> None:
             _, raw.dns_whoami_raw = await ctx.exec_container(
-                "homelab-gluetun-1", "nslookup whoami.akamai.net"
+                ContainerName.GLUETUN, "nslookup whoami.akamai.net"
             )
 
         async def exec_qbt() -> None:
@@ -257,7 +257,7 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
                 "echo \"\n===END===\""
                 "'"
             )
-            code, out = await ctx.exec_container("homelab-qbittorrent-1", batch_qbt)
+            code, out = await ctx.exec_container(ContainerName.QBITTORRENT, batch_qbt)
             raw.qbt_prefs_raw = _extract_section(out, "PREFS")
             raw.qbt_prefs_code = code if code != 0 else (0 if raw.qbt_prefs_raw.startswith("{") else 1)
             raw.qbt_maindata_raw = _extract_section(out, "MAINDATA")
@@ -568,7 +568,7 @@ async def check_gluetun(ctx: StatusContext) -> ServiceResult:
     """Standard service check for the homelab status tree."""
     service_id = "gluetun"
     name = "Gluetun VPN"
-    container = "homelab-gluetun-1"
+    container = ContainerName.GLUETUN
     t0 = time.perf_counter()
 
     c = await ctx.get_container(container)

@@ -41,7 +41,7 @@ def bookorbit_login(client: httpx.Client, username: str, password: str) -> bool:
 
 def check_bookorbit(auth: HomelabAuth) -> bool:
     """Check if BookOrbit accepts current centralized credentials."""
-    with httpx.Client(timeout=10) as client:
+    with httpx.Client(timeout=httpx.Timeout(5.0, connect=0.5)) as client:
         return bookorbit_login(client, auth.username, auth.password)
 
 

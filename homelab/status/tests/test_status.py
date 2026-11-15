@@ -369,6 +369,16 @@ def test_homelab_config_validation() -> None:
         })
 
 
+def test_container_name_enum() -> None:
+    from models import ContainerName
+
+    assert len(ContainerName) == 12
+    for member in ContainerName:
+        assert member.value.startswith("homelab-")
+        assert member.value.endswith("-1")
+        assert isinstance(member, str)
+
+
 if __name__ == "__main__":
     import pytest
 

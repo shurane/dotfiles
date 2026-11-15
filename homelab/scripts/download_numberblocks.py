@@ -91,7 +91,7 @@ def download_season(
     ]
 
     if dry_run:
-        args.append("--simulate")
+        args.extend(["--simulate", "--flat-playlist"])
     if limit:
         args.extend(["--playlist-items", f"1-{limit}"])
     elif episodes:

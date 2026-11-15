@@ -17,6 +17,16 @@ def get_service_url(service_name: str, default_port: int, env_var: str) -> str:
         if ip := get_container_ip(service_name):
             return f"http://{ip}:{default_port}"
 
+    with contextlib.suppress(Exception):
+        from common import load_env
+
+        if AUTH_ENV.exists():
+            env = load_env(AUTH_ENV)
+            if base_domain := env.get("HOSTNAME_BASE"):
+                return f"https://{service_name}.{base_domain}"
+            if homelab_host := env.get("HOMELAB_HOSTNAME"):
+                return f"http://{homelab_host}:{default_port}"
+
     return f"http://{service_name}:{default_port}"
 
 

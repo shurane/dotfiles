@@ -5,13 +5,13 @@ from __future__ import annotations
 import re
 import time
 
-from models import HealthStatus, ServiceResult, StatusContext
+from models import ContainerName, HealthStatus, ServiceResult, StatusContext
 
 
 async def check_withings_sync(ctx: StatusContext) -> ServiceResult:
     service_id = "withings-sync"
     name = "Withings Health Sync"
-    container = "homelab-withings-sync-1"
+    container = ContainerName.WITHINGS_SYNC
     t0 = time.perf_counter()
 
     c = await ctx.get_container(container)

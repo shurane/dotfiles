@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import time
 
-from models import HealthStatus, ServiceResult, StatusContext
+from models import ContainerName, HealthStatus, ServiceResult, StatusContext
 
 
 async def check_postgres(ctx: StatusContext) -> ServiceResult:
     service_id = "postgres"
     name = "BookOrbit Database"
-    container = "homelab-bookorbit-postgres-1"
+    container = ContainerName.BOOKORBIT_POSTGRES
     t0 = time.perf_counter()
 
     c = await ctx.get_container(container)
