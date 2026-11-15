@@ -5,16 +5,15 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from typer.testing import CliRunner
-
-from main import app
-from models import StatusContext, TargetConnection
-from services.qbittorrent import (
+from homelab_status.main import app
+from homelab_status.models import StatusContext, TargetConnection
+from homelab_status.services.qbittorrent import (
     QbittorrentRawData,
     evaluate_qbittorrent_report,
     run_qbittorrent_deep_check,
     summarize_torrent_catalog,
 )
+from typer.testing import CliRunner
 
 runner = CliRunner()
 

@@ -30,9 +30,7 @@ class SojuTargetResolver:
             (user_id, name, name),
         )
         if len(rows) != 1:
-            raise ValueError(
-                f"Network {name!r} must identify one existing network; use --network-map"
-            )
+            raise ValueError(f"Network {name!r} must identify one existing network; use --network-map")
         return rows[0].id
 
     def get_or_create_target(self, network_id: int, target: str) -> int:

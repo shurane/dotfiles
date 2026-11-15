@@ -4,7 +4,6 @@ from compression import zstd
 from pathlib import Path
 
 import pytest
-
 from soju_extras.importer.archive import prepare_history, verify_output
 from soju_extras.importer.cli import SojuLogImporter
 
@@ -51,21 +50,14 @@ def test_failed_partition_is_not_published_and_can_retry(tmp_path: Path, bad: by
     assert not (tmp_path / "result").exists()
     assert not list(tmp_path.glob(".history-*"))
     path.write_bytes(good)
-    assert (
-        prepare_history(
-            source, tmp_path / "result", since="2026-07-01", timezone="UTC"
-        ).source_records
-        == 2
-    )
+    assert prepare_history(source, tmp_path / "result", since="2026-07-01", timezone="UTC").source_records == 2
 
 
 def test_same_target_rotations_are_rejected_before_writing(tmp_path: Path) -> None:
     source = tmp_path / "source"
     source.mkdir()
     for suffix in ("", ".1"):
-        (source / ("irc.libera.#test.weechatlog" + suffix)).write_bytes(
-            b"2026-01-01 00:00:00\tx\told\n"
-        )
+        (source / ("irc.libera.#test.weechatlog" + suffix)).write_bytes(b"2026-01-01 00:00:00\tx\told\n")
     with pytest.raises(ValueError, match="one plain"):
         prepare_history(source, tmp_path / "result", since="2026-07-01", timezone="UTC")
     assert not (tmp_path / "result").exists()

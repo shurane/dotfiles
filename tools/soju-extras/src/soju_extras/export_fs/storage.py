@@ -22,9 +22,7 @@ class FileOffset(BaseModel):
     @model_validator(mode="after")
     def validate_replacement(self) -> Self:
         paths = (self.backup_path, self.replacement_path, self.sort_path)
-        if any(path is not None for path in paths) and (
-            self.size is None or any(path is None for path in paths)
-        ):
+        if any(path is not None for path in paths) and (self.size is None or any(path is None for path in paths)):
             raise ValueError("A replacement requires the original size and all recovery paths")
         return self
 

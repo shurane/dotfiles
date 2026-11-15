@@ -1,8 +1,8 @@
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from download_anpanman import EpisodeFile, ensure_media_link_and_nfo, format_media_filename
-from sync_maruko import generate_nfo_content
+from homelab_scripts.download_anpanman import EpisodeFile, ensure_media_link_and_nfo, format_media_filename
+from homelab_scripts.sync_maruko import generate_nfo_content
 
 
 def test_sync_maruko_generate_nfo_content_basic() -> None:

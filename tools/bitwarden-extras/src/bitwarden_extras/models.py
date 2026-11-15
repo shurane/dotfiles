@@ -207,9 +207,7 @@ def process_vault(
 
     folder_names.sort()
 
-    sanitized_items = [
-        sanitize_item(it, folder_map, include_notes=include_notes) for it in items_data
-    ]
+    sanitized_items = [sanitize_item(it, folder_map, include_notes=include_notes) for it in items_data]
 
     return VaultMetadata(
         folders=folder_names,

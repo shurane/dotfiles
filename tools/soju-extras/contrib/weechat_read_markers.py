@@ -8,9 +8,10 @@ Unknown markers are reported separately. Never connect, restore sessions, or cha
 import importlib
 import json
 import shlex
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol, cast
+
+from whenever import Instant
 
 
 class WeeChat(Protocol):
@@ -22,7 +23,7 @@ class WeeChat(Protocol):
         name: str,
         author: str,
         version: str,
-        license: str,
+        license_name: str,
         description: str,
         shutdown: str,
         charset: str,
@@ -44,7 +45,7 @@ class WeeChat(Protocol):
     def hdata_integer(self, hdata: str, pointer: str, name: str) -> int: ...
     def hdata_string(self, hdata: str, pointer: str, name: str) -> str: ...
     def hdata_time(self, hdata: str, pointer: str, name: str) -> int: ...
-    def buffer_get_string(self, buffer: str, property: str) -> str: ...
+    def buffer_get_string(self, buffer: str, property_name: str) -> str: ...
     def infolist_next(self, infolist: str) -> int: ...
     def infolist_fields(self, infolist: str) -> str: ...
     def infolist_string(self, infolist: str, name: str) -> str: ...
@@ -55,7 +56,7 @@ class WeeChat(Protocol):
     def upgrade_close(self, upgrade: str) -> int: ...
 
 
-w = cast(WeeChat, importlib.import_module("weechat"))
+w = cast("WeeChat", importlib.import_module("weechat"))
 markers: list[dict[str, str]] = []
 unread: list[dict[str, str]] = []
 unresolved: list[dict[str, str]] = []
@@ -65,12 +66,7 @@ all_unread = False
 
 
 def timestamp(seconds: int, microseconds: int) -> str:
-    return (
-        datetime.fromtimestamp(seconds, UTC)
-        .replace(microsecond=microseconds)
-        .isoformat(timespec="milliseconds")
-        .replace("+00:00", "Z")
-    )
+    return Instant.from_timestamp(seconds).add(nanoseconds=microseconds * 1_000).format_iso(unit="millisecond")
 
 
 def finish_buffer() -> None:
@@ -84,7 +80,7 @@ def finish_buffer() -> None:
         )
 
 
-def read_snapshot(data: str, handle: str, object_id: int, infolist: str) -> int:
+def read_snapshot(_data: str, _handle: str, _object_id: int, infolist: str) -> int:
     global network, target, has_marker, all_unread
     while w.infolist_next(infolist):
         fields = set(w.infolist_fields(infolist).split(","))
@@ -98,20 +94,17 @@ def read_snapshot(data: str, handle: str, object_id: int, infolist: str) -> int:
             localvars: dict[str, str] = {}
             index = 0
             while f"s:localvar_name_{index:05}" in fields:
-                localvars[w.infolist_string(infolist, f"localvar_name_{index:05}")] = (
-                    w.infolist_string(infolist, f"localvar_value_{index:05}")
+                localvars[w.infolist_string(infolist, f"localvar_name_{index:05}")] = w.infolist_string(
+                    infolist, f"localvar_value_{index:05}"
                 )
                 index += 1
             if localvars.get("type") in ("channel", "private"):
                 network = localvars.get("server", "")
                 target = localvars.get("channel", "")
-        elif "i:last_read_line" in fields and network and target:
-            if w.infolist_integer(infolist, "last_read_line"):
-                saved_time = timestamp(
-                    w.infolist_time(infolist, "date"), w.infolist_integer(infolist, "date_usec")
-                )
-                markers.append({"network": network, "target": target, "timestamp": saved_time})
-                has_marker = True
+        elif "i:last_read_line" in fields and network and target and w.infolist_integer(infolist, "last_read_line"):
+            saved_time = timestamp(w.infolist_time(infolist, "date"), w.infolist_integer(infolist, "date_usec"))
+            markers.append({"network": network, "target": target, "timestamp": saved_time})
+            has_marker = True
     return w.WEECHAT_RC_OK
 
 
@@ -148,17 +141,13 @@ def read_live() -> None:
                     {
                         "network": server,
                         "target": channel,
-                        **(
-                            {"scope": "retained_lines"}
-                            if is_unread
-                            else {"reason": "marker_unavailable"}
-                        ),
+                        **({"scope": "retained_lines"} if is_unread else {"reason": "marker_unavailable"}),
                     }
                 )
         buffer = w.hdata_pointer(hbuffer, buffer, "next_buffer")
 
 
-def export_markers(data: str, buffer: str, args: str) -> int:
+def export_markers(_data: str, buffer: str, args: str) -> int:
     global network, target, has_marker, all_unread
     markers.clear()
     unread.clear()
@@ -200,9 +189,7 @@ def export_markers(data: str, buffer: str, args: str) -> int:
     return w.WEECHAT_RC_OK
 
 
-if w.register(
-    "soju_read_markers", "soju-extras", "0.1", "MIT", "Export known read markers", "", ""
-):
+if w.register("soju_read_markers", "soju-extras", "0.1", "MIT", "Export known read markers", "", ""):
     w.hook_command(
         "soju_read_markers",
         "Export known read markers without changing state",

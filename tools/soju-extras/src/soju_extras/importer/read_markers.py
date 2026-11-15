@@ -64,18 +64,14 @@ def resolve_target(db: sqlite3.Connection, network: int, target: str) -> str:
     return targets[0].target if targets else target
 
 
-def import_read_markers(
-    markers: ReadMarkers, db_path: Path, username: str, network_map: dict[str, str]
-) -> None:
+def import_read_markers(markers: ReadMarkers, db_path: Path, username: str, network_map: dict[str, str]) -> None:
     """Apply the explicitly supplied markers atomically; preserve later existing reads."""
     with open_soju_db(db_path) as db, transaction(db):
         resolver = SojuTargetResolver(db)
         user_id = resolver.resolve_user(username)
         unread_targets: set[tuple[int, str]] = set()
         for unread in markers.unread:
-            network = resolver.resolve_network(
-                user_id, network_map.get(unread.network.lower(), unread.network)
-            )
+            network = resolver.resolve_network(user_id, network_map.get(unread.network.lower(), unread.network))
             target = resolve_target(db, network, unread.target)
             if query_rows(
                 db,
@@ -89,14 +85,10 @@ def import_read_markers(
                 )
             unread_targets.add((network, target.lower()))
         for marker in markers.markers:
-            network = resolver.resolve_network(
-                user_id, network_map.get(marker.network.lower(), marker.network)
-            )
+            network = resolver.resolve_network(user_id, network_map.get(marker.network.lower(), marker.network))
             target = resolve_target(db, network, marker.target)
             if (network, target.lower()) in unread_targets:
-                raise ValueError(
-                    f"Conflicting read and unread states for {marker.network}/{target}"
-                )
+                raise ValueError(f"Conflicting read and unread states for {marker.network}/{target}")
             execute(
                 db,
                 """

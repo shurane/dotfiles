@@ -3,7 +3,6 @@
 from typing import Any
 
 import pytest
-
 from bitwarden_extras.models import (
     LoginData,
     LoginUri,

@@ -4,10 +4,9 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
-from whenever import Instant
-
 from soju_extras.models import SojuTargetFile, WeeChatLogRecord
 from soju_extras.time import soju_timestamp
+from whenever import Instant
 
 
 @pytest.mark.parametrize(

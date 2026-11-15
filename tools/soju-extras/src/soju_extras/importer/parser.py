@@ -10,9 +10,7 @@ from soju_extras.models import WeeChatLogRecord
 
 
 @contextmanager
-def parse_weechat_log_file(
-    file_path: Path, *, timezone: str = "UTC"
-) -> Generator[Iterator[WeeChatLogRecord]]:
+def parse_weechat_log_file(file_path: Path, *, timezone: str = "UTC") -> Generator[Iterator[WeeChatLogRecord]]:
     """Keep the file lifetime explicit even when the consumer stops early."""
 
     def records(lines: Iterator[str]) -> Iterator[WeeChatLogRecord]:

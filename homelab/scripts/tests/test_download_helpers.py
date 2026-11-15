@@ -5,8 +5,13 @@ from urllib.parse import quote
 
 import httpx
 import pytest
-
-from download_anpanman import METADATA_URL, EpisodeFile, compute_file_md5, ensure_hardlink, fetch_archive_files
+from homelab_scripts.download_anpanman import (
+    METADATA_URL,
+    EpisodeFile,
+    compute_file_md5,
+    ensure_hardlink,
+    fetch_archive_files,
+)
 
 
 def test_episode_file_attributes_and_url_encoding() -> None:

@@ -110,9 +110,7 @@ class SojuFSExporter:
     def set_last_synced_id(self, last_id: int) -> None:
         atomic_write(self.state_file, f"{last_id}\n")
 
-    def fetch_new_records(
-        self, start_id: int, end_id: int | None = None
-    ) -> list[ExportedLogRecord]:
+    def fetch_new_records(self, start_id: int, end_id: int | None = None) -> list[ExportedLogRecord]:
         records: list[ExportedLogRecord] = []
         with (
             open_soju_db(self.db_path, readonly=True) as db,
@@ -263,9 +261,7 @@ class SojuFSExporter:
                         size=path.stat().st_size if path.exists() else None,
                     )
                 )
-        journal = AppendJournal(
-            previous_id=self.get_last_synced_id(), latest_id=records[-1].msg_id, files=entries
-        )
+        journal = AppendJournal(previous_id=self.get_last_synced_id(), latest_id=records[-1].msg_id, files=entries)
         atomic_write(self.journal_file, journal.model_dump_json())
         for entry in entries:
             path = self._contained_path(entry.relative_path)
@@ -329,24 +325,16 @@ class SojuFSExporter:
         self._recover()
         checkpoint = self.get_last_synced_id()
         if checkpoint == 0 and any(self.output_dir.rglob("*.log*")):
-            raise ValueError(
-                "Existing logs have no usable checkpoint; use a fresh output directory"
-            )
+            raise ValueError("Existing logs have no usable checkpoint; use a fresh output directory")
         if force_all and checkpoint:
-            raise ValueError(
-                "--all requires a fresh output directory; existing exports resume automatically"
-            )
+            raise ValueError("--all requires a fresh output directory; existing exports resume automatically")
         if since_id is not None and since_id < checkpoint:
-            raise ValueError(
-                "--since-id cannot precede the checkpoint; use a fresh output directory"
-            )
+            raise ValueError("--since-id cannot precede the checkpoint; use a fresh output directory")
         start = checkpoint if since_id is None else since_id
         with open_soju_db(self.db_path, readonly=True) as db:
             end = query_rows(db, MaximumID, "SELECT coalesce(max(id), 0) AS id FROM Message")[0].id
         if checkpoint > end:
-            raise ValueError(
-                "Checkpoint exceeds database history; verify the database and output directory"
-            )
+            raise ValueError("Checkpoint exceeds database history; verify the database and output directory")
         if not identity_path.exists():
             atomic_write(identity_path, identity.model_dump_json())
         while records := self.fetch_new_records(start, end):
@@ -370,9 +358,7 @@ class SojuFSExporter:
                 raise ValueError("--since-id cannot precede the checkpoint")
             start = since_id if since_id is not None else checkpoint
             with open_soju_db(self.db_path, readonly=True) as db:
-                end = query_rows(db, MaximumID, "SELECT coalesce(max(id), 0) AS id FROM Message")[
-                    0
-                ].id
+                end = query_rows(db, MaximumID, "SELECT coalesce(max(id), 0) AS id FROM Message")[0].id
             count = 0
             while records := self.fetch_new_records(start, end):
                 for record in records:

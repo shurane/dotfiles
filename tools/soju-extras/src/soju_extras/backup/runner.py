@@ -34,7 +34,9 @@ def flush_weechat(config: BackupConfig) -> None:
     if checkpoint is None:
         return
     result = subprocess.run(  # noqa: S603
-        ["pgrep", "-u", checkpoint.user, "-x", "weechat"], stdout=subprocess.DEVNULL, check=False  # noqa: S607
+        ["pgrep", "-u", checkpoint.user, "-x", "weechat"],  # noqa: S607
+        stdout=subprocess.DEVNULL,
+        check=False,
     )
     if result.returncode == 1:
         return  # Saved configuration remains available while the client is stopped.
@@ -83,9 +85,7 @@ def copy_sources(config: BackupConfig, stage: Path) -> None:
         destination = stage / source.destination
         destination.parent.mkdir(parents=True, exist_ok=True)
         if source.source.is_dir() and not source.source.is_symlink():
-            shutil.copytree(
-                source.source, destination, symlinks=True, ignore=partial(ignored_names, source)
-            )
+            shutil.copytree(source.source, destination, symlinks=True, ignore=partial(ignored_names, source))
         else:
             shutil.copy2(source.source, destination, follow_symlinks=False)
 
@@ -133,9 +133,7 @@ def complete(snapshot: Path, remote: Remote | None) -> None:
             atomic_write(marker, receipt.model_dump_json() + "\n")
             destination = f"{remote.host}:{snapshot.name}/"
             env = remote_environment(remote)
-            run(
-                ["rsync", "-a", "--no-owner", "--no-group", "--", str(marker), destination], env=env
-            )
+            run(["rsync", "-a", "--no-owner", "--no-group", "--", str(marker), destination], env=env)
             if run(["rsync", "-rcni", "--", str(marker), destination], env=env).strip():
                 raise ValueError("Remote completion receipt did not verify")
     atomic_write(snapshot / RECEIPT, receipt.model_dump_json() + "\n")

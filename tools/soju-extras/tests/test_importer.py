@@ -6,7 +6,6 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
-
 from soju_extras.importer.cli import SojuLogImporter, main
 from soju_extras.importer.parser import parse_weechat_log_file
 
@@ -23,9 +22,7 @@ def make_log(tmp_path: Path, text: str, *, compressed: bool = False) -> Path:
 
 
 def test_import_rolls_back_messages_when_later_insert_fails(soju_db: Path, tmp_path: Path) -> None:
-    logs = make_log(
-        tmp_path, "2026-09-30 10:00:00\talice\thello\n2026-09-30 10:00:01\talice\treject\n"
-    )
+    logs = make_log(tmp_path, "2026-09-30 10:00:00\talice\thello\n2026-09-30 10:00:01\talice\treject\n")
     with closing(sqlite3.connect(soju_db)) as db:
         db.execute(
             "CREATE TRIGGER reject_message BEFORE INSERT ON Message WHEN NEW.text = 'reject' BEGIN SELECT RAISE(ABORT, 'injected failure'); END"
@@ -34,21 +31,14 @@ def test_import_rolls_back_messages_when_later_insert_fails(soju_db: Path, tmp_p
         SojuLogImporter(logs, db_path=soju_db).run()
     with closing(sqlite3.connect(soju_db)) as db:
         assert db.execute("SELECT count(*) FROM Message").fetchone()[0] == 0
-        assert (
-            db.execute("SELECT count(*) FROM MessageFTS WHERE MessageFTS MATCH 'hello'").fetchone()[
-                0
-            ]
-            == 0
-        )
+        assert db.execute("SELECT count(*) FROM MessageFTS WHERE MessageFTS MATCH 'hello'").fetchone()[0] == 0
     with closing(sqlite3.connect(soju_db)) as db:
         db.execute("DROP TRIGGER reject_message")
     assert SojuLogImporter(logs, db_path=soju_db).run() == 2
 
 
 def test_invalid_line_aborts_file_with_location(soju_db: Path, tmp_path: Path) -> None:
-    logs = make_log(
-        tmp_path, "2026-09-30 10:00:00\talice\thello\n2026-09-30 10:00:00garbage\talice\tbad\n"
-    )
+    logs = make_log(tmp_path, "2026-09-30 10:00:00\talice\thello\n2026-09-30 10:00:00garbage\talice\tbad\n")
     with pytest.raises(ValueError, match=r"weechatlog:2:"):
         SojuLogImporter(logs, db_path=soju_db, batch_size=1).run()
     with closing(sqlite3.connect(soju_db)) as db:
@@ -58,15 +48,10 @@ def test_invalid_line_aborts_file_with_location(soju_db: Path, tmp_path: Path) -
 def test_compressed_import_keeps_later_receipt(soju_db: Path, tmp_path: Path) -> None:
     logs = make_log(tmp_path, "2026-09-30 10:00:00\talice\thello\n", compressed=True)
     with closing(sqlite3.connect(soju_db)) as db, db:
-        db.execute(
-            "INSERT INTO ReadReceipt(network,target,timestamp) VALUES (1,'#python','2026-10-01T00:00:00.000Z')"
-        )
+        db.execute("INSERT INTO ReadReceipt(network,target,timestamp) VALUES (1,'#python','2026-10-01T00:00:00.000Z')")
     assert SojuLogImporter(logs, db_path=soju_db).run() == 1
     with closing(sqlite3.connect(soju_db)) as db:
-        assert (
-            db.execute("SELECT timestamp FROM ReadReceipt").fetchone()[0]
-            == "2026-10-01T00:00:00.000Z"
-        )
+        assert db.execute("SELECT timestamp FROM ReadReceipt").fetchone()[0] == "2026-10-01T00:00:00.000Z"
 
 
 def test_dry_run_without_database(tmp_path: Path) -> None:
@@ -101,9 +86,7 @@ def test_explicit_network_mapping(soju_db: Path, tmp_path: Path) -> None:
     )
 
 
-def test_parser_context_closes_on_early_exit(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_parser_context_closes_on_early_exit(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     logs = make_log(tmp_path, "2026-09-30 10:00:00\talice\thi\n" * 2)
     path = next(logs.iterdir())
     stream = path.open()
@@ -127,18 +110,11 @@ def test_empty_and_populated_targets_preserve_source_multiplicity(
     assert importer.run() == 0
     with closing(sqlite3.connect(soju_db)) as db:
         assert db.execute("SELECT count(*) FROM Message").fetchone()[0] == 3
-        assert (
-            db.execute(
-                "SELECT count(*) FROM MessageFTS WHERE MessageFTS MATCH 'repeated'"
-            ).fetchone()[0]
-            == 3
-        )
+        assert db.execute("SELECT count(*) FROM MessageFTS WHERE MessageFTS MATCH 'repeated'").fetchone()[0] == 3
 
 
 @pytest.mark.parametrize("receipt", [None, "2026-09-29T00:00:00.000Z", "2026-10-01T00:00:00.000Z"])
-def test_import_preserves_read_and_delivery_receipts(
-    soju_db: Path, tmp_path: Path, receipt: str | None
-) -> None:
+def test_import_preserves_read_and_delivery_receipts(soju_db: Path, tmp_path: Path, receipt: str | None) -> None:
     logs = make_log(tmp_path, "2026-09-30 10:00:00\talice\thello\n")
     with closing(sqlite3.connect(soju_db)) as db, db:
         if receipt is not None:
@@ -149,15 +125,11 @@ def test_import_preserves_read_and_delivery_receipts(
         db.execute(
             "INSERT INTO DeliveryReceipt(network,target,client,internal_msgid) VALUES(1,'#python','weechat','42')"
         )
-        before = [
-            db.execute(f"SELECT * FROM {table}").fetchall()
-            for table in ("ReadReceipt", "DeliveryReceipt")
-        ]
+        before = [db.execute(f"SELECT * FROM {table}").fetchall() for table in ("ReadReceipt", "DeliveryReceipt")]
     SojuLogImporter(logs, db_path=soju_db).run()
     with closing(sqlite3.connect(soju_db)) as db:
         assert before == [
-            db.execute(f"SELECT * FROM {table}").fetchall()
-            for table in ("ReadReceipt", "DeliveryReceipt")
+            db.execute(f"SELECT * FROM {table}").fetchall() for table in ("ReadReceipt", "DeliveryReceipt")
         ]
 
 

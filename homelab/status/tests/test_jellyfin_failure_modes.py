@@ -10,8 +10,8 @@ import pytest
 if TYPE_CHECKING:
     from pathlib import Path
 
-from models import StatusContext, TargetConnection
-from services.jellyfin import (
+from homelab_status.models import StatusContext, TargetConnection
+from homelab_status.services.jellyfin import (
     JellyfinRawData,
     _format_playback_time,
     _format_relative_time,
@@ -515,7 +515,7 @@ def test_connected_clients_route_and_platform_enrichment(tmp_path: Path, monkeyp
 
     # Mock device cache to tmp_path
     monkeypatch.setattr(
-        "services.jellyfin._get_device_cache_path",
+        "homelab_status.services.jellyfin._get_device_cache_path",
         lambda: tmp_path / "jellyfin_device_routes.json",
     )
 
@@ -566,7 +566,7 @@ def test_connected_clients_route_and_platform_enrichment(tmp_path: Path, monkeyp
             return "Keifukus-iPad-Pro-11"
         return None
 
-    monkeypatch.setattr("services.jellyfin._resolve_ip_hostname", mock_resolve)
+    monkeypatch.setattr("homelab_status.services.jellyfin._resolve_ip_hostname", mock_resolve)
 
     raw = _make_mock_raw(devices=devices, sessions=sessions)
     report = evaluate_jellyfin_report(raw)

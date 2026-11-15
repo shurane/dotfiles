@@ -37,9 +37,7 @@ def line_time(line: str) -> str:
 @contextmanager
 def read_log(path: Path, *, compress: bool) -> Generator[Iterator[str]]:
     with (
-        gzip.open(path, "rt", encoding="utf-8", newline="")
-        if compress
-        else path.open(encoding="utf-8", newline="")
+        gzip.open(path, "rt", encoding="utf-8", newline="") if compress else path.open(encoding="utf-8", newline="")
     ) as stream:
         yield iter(stream)
 
@@ -58,9 +56,7 @@ def inspect_log(path: Path, *, compress: bool) -> LogOrder:
 def write_log(path: Path, lines: Iterable[str], *, compress: bool, append: bool) -> None:
     with path.open("ab" if append else "xb") as stream:
         if compress:
-            with gzip.GzipFile(
-                fileobj=stream, mode="wb", filename="", mtime=0, compresslevel=6
-            ) as compressed:
+            with gzip.GzipFile(fileobj=stream, mode="wb", filename="", mtime=0, compresslevel=6) as compressed:
                 for line in lines:
                     compressed.write(line.encode("utf-8"))
         else:
@@ -83,9 +79,7 @@ def rewrite_log(
     with read_log(source, compress=compress) as archived:
         if ordered:
             # Stable ties: archived lines first, then new lines in message-ID order.
-            write_log(
-                destination, merge(archived, lines, key=line_time), compress=compress, append=False
-            )
+            write_log(destination, merge(archived, lines, key=line_time), compress=compress, append=False)
         else:
             # Older exporter versions could leave unordered logs. Use SQLite's external
             # sort instead of collecting an entire decompressed daily file in memory.
@@ -102,6 +96,4 @@ def rewrite_log(
                         ((line_time(line), line) for line in chain(archived, lines)),
                     )
                 with query(db, StoredLine, "SELECT line FROM lines ORDER BY time, seq") as rows:
-                    write_log(
-                        destination, (row.line for row in rows), compress=compress, append=False
-                    )
+                    write_log(destination, (row.line for row in rows), compress=compress, append=False)

@@ -63,9 +63,7 @@ def handle_client_errors() -> Generator[None]:
         sys.exit(1)
 
 
-@app.command(
-    name="export", help="Extract sanitized metadata to YAML or JSON (passwords strictly omitted)."
-)
+@app.command(name="export", help="Extract sanitized metadata to YAML or JSON (passwords strictly omitted).")
 def export_cmd(
     output_format: Annotated[
         OutputFormat,
@@ -100,15 +98,11 @@ def export_cmd(
     ] = False,
     no_sync: Annotated[
         bool,
-        typer.Option(
-            "--no-sync", help="Skip automatic cloud sync and export from local cache immediately."
-        ),
+        typer.Option("--no-sync", help="Skip automatic cloud sync and export from local cache immediately."),
     ] = False,
 ) -> None:
     with handle_client_errors():
-        folders_data, items_data, info = client.fetch_live_data(
-            server_url=server, sync=sync, no_sync=no_sync
-        )
+        folders_data, items_data, info = client.fetch_live_data(server_url=server, sync=sync, no_sync=no_sync)
     console.print(f"[dim]{info}...[/dim]")
 
     metadata = process_vault(folders_data, items_data, include_notes=include_notes)
@@ -137,9 +131,7 @@ def export_cmd(
         output_path.open("w", encoding="utf-8") as f,
     ):
         if output_format == OutputFormat.YAML:
-            yaml.safe_dump(
-                output_dict, f, sort_keys=False, default_flow_style=False, allow_unicode=True
-            )
+            yaml.safe_dump(output_dict, f, sort_keys=False, default_flow_style=False, allow_unicode=True)
         else:
             json.dump(output_dict, f, indent=2)
 
@@ -168,9 +160,7 @@ def sync_cmd(
         with console.status("[cyan]Syncing vault with Bitwarden cloud...[/cyan]", spinner="dots"):
             ok = client.sync(server_url=server)
         if ok:
-            console.print(
-                "[bold green]✓ Vault synced successfully with Bitwarden cloud![/bold green]"
-            )
+            console.print("[bold green]✓ Vault synced successfully with Bitwarden cloud![/bold green]")
         else:
             err_console.print("[bold red]Error:[/bold red] Vault sync failed.")
             sys.exit(1)
@@ -207,9 +197,7 @@ def query_cmd(
     ] = False,
     no_sync: Annotated[
         bool,
-        typer.Option(
-            "--no-sync", help="Skip automatic cloud sync and query local cache immediately."
-        ),
+        typer.Option("--no-sync", help="Skip automatic cloud sync and query local cache immediately."),
     ] = False,
 ) -> None:
     items_to_load: list[Any] = []
@@ -224,9 +212,7 @@ def query_cmd(
             items_to_load = data.get("items", [])
     else:
         with handle_client_errors():
-            folders_data, items_data, info = client.fetch_live_data(
-                server_url=server, sync=sync, no_sync=no_sync
-            )
+            folders_data, items_data, info = client.fetch_live_data(server_url=server, sync=sync, no_sync=no_sync)
         console.print(f"[dim]{info}...[/dim]")
         meta = process_vault(folders_data, items_data, include_notes=True)
         items_to_load = meta.items
@@ -258,9 +244,7 @@ def query_cmd(
         run_repl(conn, console=console, refresh_callback=refresh_db if file_path is None else None)
 
 
-@app.command(
-    name="clean-blank-notes", help="Wipe phantom/whitespace notes across vault items via bw serve."
-)
+@app.command(name="clean-blank-notes", help="Wipe phantom/whitespace notes across vault items via bw serve.")
 def clean_blank_notes_cmd(
     server: Annotated[
         str | None,
@@ -272,9 +256,7 @@ def clean_blank_notes_cmd(
     ] = None,
     dry_run: Annotated[
         bool,
-        typer.Option(
-            "--dry-run", help="List items that would be modified without making any changes."
-        ),
+        typer.Option("--dry-run", help="List items that would be modified without making any changes."),
     ] = False,
     yes: Annotated[
         bool,
@@ -285,9 +267,7 @@ def clean_blank_notes_cmd(
         active_url = client.get_active_serve_url(server)
 
     if not active_url:
-        err_console.print(
-            "\n[bold red]Error:[/bold red] 'clean-blank-notes' requires 'bw serve' to be running."
-        )
+        err_console.print("\n[bold red]Error:[/bold red] 'clean-blank-notes' requires 'bw serve' to be running.")
         sys.exit(1)
 
     with console.status("[cyan]Syncing vault before cleanup...[/cyan]", spinner="dots"):
@@ -319,15 +299,11 @@ def clean_blank_notes_cmd(
     console.print(table)
 
     if dry_run:
-        console.print(
-            f"\n[yellow]Dry-run mode: {len(blank_items)} items would have their notes set to NULL.[/yellow]"
-        )
+        console.print(f"\n[yellow]Dry-run mode: {len(blank_items)} items would have their notes set to NULL.[/yellow]")
         return
 
     if not yes:
-        confirm = typer.confirm(
-            f"Are you sure you want to set notes to NULL for these {len(blank_items)} items?"
-        )
+        confirm = typer.confirm(f"Are you sure you want to set notes to NULL for these {len(blank_items)} items?")
         if not confirm:
             console.print("[dim]Operation cancelled.[/dim]")
             return
@@ -370,17 +346,13 @@ def clean_blank_notes_cmd(
             if put_res and put_res.get("success"):
                 updated_count += 1
             else:
-                err_console.print(
-                    f"\n[bold red]Warning:[/bold red] Failed to update item {item_id}."
-                )
+                err_console.print(f"\n[bold red]Warning:[/bold red] Failed to update item {item_id}.")
             progress.advance(task)
 
     with console.status("[cyan]Syncing vault after cleanup...[/cyan]", spinner="dots"):
         client.sync(server_url=active_url)
 
-    console.print(
-        f"\n[bold green]✓ Successfully emptied notes for {updated_count} items![/bold green]"
-    )
+    console.print(f"\n[bold green]✓ Successfully emptied notes for {updated_count} items![/bold green]")
 
 
 def main() -> None:

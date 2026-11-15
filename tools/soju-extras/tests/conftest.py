@@ -25,9 +25,7 @@ def soju_db(tmp_path: Path) -> Path:
     return path
 
 
-def add_message(
-    path: Path, text: str = "hello world", *, time: str = "2026-09-30T10:00:00.123Z"
-) -> None:
+def add_message(path: Path, text: str = "hello world", *, time: str = "2026-09-30T10:00:00.123Z") -> None:
     with closing(sqlite3.connect(path)) as db, db:
         db.execute(
             "INSERT INTO Message (target, raw, time, sender, text) VALUES (1, ?, ?, 'alice', ?)",

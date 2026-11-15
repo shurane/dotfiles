@@ -124,9 +124,7 @@ class SojuLogImporter:
                 timestamp,
                 self._build_raw_irc(rec, timestamp, target.target),
                 rec.sender_nick,
-                rec.clean_text
-                if rec.kind in (MessageKind.PRIVMSG, MessageKind.NOTICE, MessageKind.ACTION)
-                else None,
+                rec.clean_text if rec.kind in (MessageKind.PRIVMSG, MessageKind.NOTICE, MessageKind.ACTION) else None,
             )
             included += 1
         console.print(
@@ -155,19 +153,13 @@ class SojuLogImporter:
             )
             resolver = SojuTargetResolver(db)
             user_id = resolver.resolve_user(opts.username)
-            for target in track(
-                targets, description="Importing", console=console, disable=not console.is_terminal
-            ):
-                network_id = resolver.resolve_network(
-                    user_id, opts.network_map.get(target.network, target.network)
-                )
+            for target in track(targets, description="Importing", console=console, disable=not console.is_terminal):
+                network_id = resolver.resolve_network(user_id, opts.network_map.get(target.network, target.network))
                 # Parse to disk-backed SQLite temporary storage before taking the main writer lock.
                 with transaction(db, immediate=False):
                     execute(db, "DELETE FROM incoming")
                     execute(db, "DELETE FROM existing")
-                    with parse_weechat_log_file(
-                        target.source_path, timezone=opts.timezone
-                    ) as records:
+                    with parse_weechat_log_file(target.source_path, timezone=opts.timezone) as records:
                         rows = self._input_rows(records, target)
                         for batch in batched(rows, opts.batch_size, strict=False):
                             execute_many(db, "INSERT INTO incoming VALUES (?, ?, ?, ?, ?)", batch)
@@ -244,19 +236,14 @@ class SojuLogImporter:
                         )
                     inserted = query_rows(db, CountRow, "SELECT changes() AS count")[0].count
                 imported += inserted
-                console.print(
-                    f"{target.source_path}: committed {inserted:,} messages", markup=False
-                )
+                console.print(f"{target.source_path}: committed {inserted:,} messages", markup=False)
         return imported
 
     def _build_raw_irc(self, rec: WeeChatLogRecord, iso_ts: str, target: str) -> str:
         if rec.kind == MessageKind.PRIVMSG:
             return f"@time={iso_ts} :{rec.sender_hostmask} PRIVMSG {target} :{rec.clean_text}"
         if rec.kind == MessageKind.ACTION:
-            return (
-                f"@time={iso_ts} :{rec.sender_hostmask} PRIVMSG {target} "
-                f":\x01ACTION {rec.clean_text}\x01"
-            )
+            return f"@time={iso_ts} :{rec.sender_hostmask} PRIVMSG {target} :\x01ACTION {rec.clean_text}\x01"
         if rec.kind == MessageKind.JOIN:
             return f"@time={iso_ts} :{rec.sender_hostmask} JOIN {target}"
         if rec.kind == MessageKind.PART:
@@ -270,9 +257,7 @@ class SojuLogImporter:
     def run(self) -> int:
         opts = self.options
         markers = (
-            ReadMarkers.model_validate_json(opts.read_markers.read_bytes())
-            if opts.read_markers is not None
-            else None
+            ReadMarkers.model_validate_json(opts.read_markers.read_bytes()) if opts.read_markers is not None else None
         )
         targets = self.discover_targets()
         count = self.import_to_db(targets)
@@ -289,25 +274,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--db-path", type=Path, default=Path("/var/lib/soju/main.db"))
     parser.add_argument("--username", default="shurane")
     parser.add_argument("--batch-size", type=int, default=5000)
-    parser.add_argument(
-        "--timezone", default="UTC", help="Timezone for timestamps without an offset (default: UTC)"
-    )
+    parser.add_argument("--timezone", default="UTC", help="Timezone for timestamps without an offset (default: UTC)")
     parser.add_argument("--mode", choices=["db"], default="db")
-    parser.add_argument(
-        "--network-map", action="append", default=[], metavar="LOG_NAME=SOJU_NAME_OR_ADDRESS"
-    )
+    parser.add_argument("--network-map", action="append", default=[], metavar="LOG_NAME=SOJU_NAME_OR_ADDRESS")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument(
         "--read-markers",
         type=Path,
         help="Explicit versioned JSON read markers; applied after all log files succeed",
     )
-    parser.add_argument(
-        "--since", help="Import timestamps at or after this ISO timestamp (UTC if naive)"
-    )
-    parser.add_argument(
-        "--before", help="Import only timestamps before this ISO timestamp (UTC if naive)"
-    )
+    parser.add_argument("--since", help="Import timestamps at or after this ISO timestamp (UTC if naive)")
+    parser.add_argument("--before", help="Import only timestamps before this ISO timestamp (UTC if naive)")
     parser.add_argument(
         "--allow-overlap",
         action="store_true",

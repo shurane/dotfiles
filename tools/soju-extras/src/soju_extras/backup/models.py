@@ -134,9 +134,7 @@ class SymlinkEntry(Entry):
     target: str
 
 
-type SnapshotEntry = Annotated[
-    FileEntry | DirectoryEntry | SymlinkEntry, Field(discriminator="kind")
-]
+type SnapshotEntry = Annotated[FileEntry | DirectoryEntry | SymlinkEntry, Field(discriminator="kind")]
 
 
 class Manifest(Boundary):

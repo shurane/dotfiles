@@ -1,0 +1,184 @@
+"""Caddy reverse proxy routes and TLS certificate health check."""
+
+from __future__ import annotations
+
+import contextlib
+import json
+import socket
+import ssl
+import time
+from typing import Any
+
+import anyio
+import httpx
+from whenever import SYSTEM_TZ, PlainDateTime, ZonedDateTime
+
+from homelab_status.models import ContainerName, HealthStatus, ServiceResult, StatusContext
+
+
+def _check_tls_sync(base_domain: str, timeout: float) -> tuple[dict[str, str], int]:
+    """Perform synchronous TLS handshake to inspect peer certificate."""
+    ssl_ctx = ssl.create_default_context()
+    with (
+        socket.create_connection((base_domain, 443), timeout=timeout) as sock,
+        ssl_ctx.wrap_socket(sock, server_hostname=base_domain) as ssock,
+    ):
+        cert = ssock.getpeercert()
+        issuer_org = "Valid TLS"
+        expires_str = ""
+        days_left = 999
+        if cert:
+            raw_issuer = cert.get("issuer")
+            if isinstance(raw_issuer, tuple):
+                org: str | None = None
+                cn: str | None = None
+                for rdn in raw_issuer:
+                    for name, value in rdn:
+                        if isinstance(value, str):
+                            if name == "organizationName":
+                                org = value
+                            elif name == "commonName":
+                                cn = value
+                if org:
+                    issuer_org = org
+                elif cn:
+                    issuer_org = cn
+            raw_not_after = cert.get("notAfter")
+            if isinstance(raw_not_after, str):
+                not_after = raw_not_after
+                try:
+                    normalized = " ".join(not_after.split())
+                    dt = PlainDateTime.parse(normalized, pattern="MMM D HH:mm:ss YYYY 'GMT'")
+                    expires_str = dt.format("MMM DD YYYY")
+                    days_left = int(dt.date().since(ZonedDateTime.now(SYSTEM_TZ).date(), total="days"))
+                except ValueError:
+                    expires_str = not_after
+
+        return {"issuer": issuer_org, "expires": expires_str}, days_left
+
+
+async def check_caddy(ctx: StatusContext) -> ServiceResult:
+    service_id = "caddy"
+    name = "Caddy Ingress"
+    container = ContainerName.CADDY
+    t0 = time.perf_counter()
+
+    try:
+        cert_info: dict[str, str] = {}
+        days_left = 999
+        probe_code = 200
+        routes_list: list[str] = []
+
+        async def _check_tls() -> None:
+            nonlocal cert_info, days_left
+            cert_info, days_left = await anyio.to_thread.run_sync(_check_tls_sync, ctx.base_domain, ctx.http_timeout)
+
+        async def _probe_http() -> None:
+            nonlocal probe_code
+            try:
+                async with httpx.AsyncClient(base_url=f"https://{ctx.base_domain}", timeout=ctx.http_timeout) as client:
+                    probe = await client.get("/")
+                    probe_code = probe.status_code
+            except Exception:
+                probe_code = 502
+
+        async def _read_routes() -> None:
+            nonlocal routes_list
+            conts = await ctx.get_all_containers()
+            discovered: set[str] = set()
+            for cont in conts.values():
+                labels = cont.labels or {}
+                for k, v in labels.items():
+                    if (k == "caddy" or k.startswith("caddy_")) and v and not k.startswith("caddy."):
+                        for token in v.replace(",", " ").split():
+                            token = token.strip()
+                            if token and not token.startswith("{"):
+                                host = token.split()[0].split(":")[0]
+                                if "." in host:
+                                    discovered.add(host)
+            if discovered:
+                routes_list = sorted(discovered)
+            else:
+                code, out = await ctx.exec_container(container, "cat /config/caddy/autosave.json")
+                if code == 0:
+                    with contextlib.suppress(json.JSONDecodeError, KeyError, TypeError):
+                        cfg: dict[str, Any] = json.loads(out)
+                        srv_routes = (
+                            cfg.get("apps", {}).get("http", {}).get("servers", {}).get("srv0", {}).get("routes", [])
+                        )
+                        hosts = {h for r in srv_routes for m in r.get("match", []) for h in m.get("host", [])}
+                        routes_list = sorted(hosts)
+
+        # Execute TLS, HTTP probe, and autosave read concurrently
+        async with anyio.create_task_group() as tg:
+            tg.start_soon(_check_tls)
+            tg.start_soon(_probe_http)
+            tg.start_soon(_read_routes)
+
+        elapsed = (time.perf_counter() - t0) * 1000
+
+        if probe_code >= 500:
+            return ServiceResult(
+                service_id=service_id,
+                name=name,
+                container=container,
+                status=HealthStatus.UNHEALTHY,
+                latency_ms=elapsed,
+                summary=f"Root ingress route returned HTTP {probe_code}",
+                branches=[f"[bold red]✖ Root ingress returned HTTP {probe_code}[/bold red]"],
+            )
+
+        short_routes = [h.replace(f".{ctx.base_domain}", "") if h != ctx.base_domain else h for h in routes_list]
+        routes_str = f"{len(routes_list)} routes ({', '.join(short_routes)})" if routes_list else "Ingress active"
+        tls_summary = f"TLS: {cert_info.get('issuer')} (valid to {cert_info.get('expires')})"
+        summary = f"{routes_str} • {tls_summary}"
+
+        status = HealthStatus.HEALTHY
+        if days_left <= 0:
+            status = HealthStatus.UNHEALTHY
+            days_style = "bold red"
+        elif days_left <= 14:
+            status = HealthStatus.DEGRADED
+            days_style = "bold red"
+        elif days_left <= 30:
+            status = HealthStatus.HEALTHY
+            days_style = "bold yellow"
+        else:
+            status = HealthStatus.HEALTHY
+            days_style = "bold green"
+
+        styled_routes = [f"[bold cyan]{r}[/bold cyan]" for r in short_routes]
+        branches = [
+            (f"🌐 Reverse Proxy: [bold cyan]{len(routes_list)}[/bold cyan] routes ({', '.join(styled_routes)})"),
+            (
+                f"🔒 TLS Certificate: [bold yellow]{cert_info.get('issuer')}[/bold yellow] "
+                f"[dim]•[/dim] valid to [bold white]{cert_info.get('expires')}[/bold white] "
+                f"[dim]([{days_style}]{days_left}d remaining[/{days_style}])[/dim]"
+            ),
+        ]
+
+        version = await ctx.get_container_version(container)
+
+        return ServiceResult(
+            service_id=service_id,
+            name=name,
+            container=container,
+            status=status,
+            latency_ms=elapsed,
+            summary=summary,
+            version=version,
+            branches=branches,
+            raw_data={"routes": routes_list, "cert": cert_info, "days_left": days_left},
+        )
+    except Exception as exc:
+        elapsed = (time.perf_counter() - t0) * 1000
+        return ServiceResult(
+            service_id=service_id,
+            name=name,
+            container=container,
+            status=HealthStatus.UNHEALTHY,
+            latency_ms=elapsed,
+            summary=f"Error: {exc}",
+            branches=[f"[bold red]✖ Error: {exc}[/bold red]"],
+            error=str(exc),
+        )

@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
 
-from build_anpanman_metadata import to_romaji as anpanman_to_romaji
-from build_maruko_metadata import clean_en_title
-from build_maruko_metadata import to_romaji as maruko_to_romaji
+from homelab_scripts.build_anpanman_metadata import to_romaji as anpanman_to_romaji
+from homelab_scripts.build_maruko_metadata import clean_en_title
+from homelab_scripts.build_maruko_metadata import to_romaji as maruko_to_romaji
 
 if TYPE_CHECKING:
     import pykakasi

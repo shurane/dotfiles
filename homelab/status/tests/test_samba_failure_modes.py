@@ -5,9 +5,8 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-
-from models import StatusContext, TargetConnection
-from services.samba import (
+from homelab_status.models import StatusContext, TargetConnection
+from homelab_status.services.samba import (
     SambaRawData,
     _parse_smb_json,
     evaluate_samba_report,

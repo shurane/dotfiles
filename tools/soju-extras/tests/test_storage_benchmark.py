@@ -37,9 +37,7 @@ def test_storage_reports_invalid_sample_and_keeps_stdout_json(
 ) -> None:
     logs = tmp_path / "logs"
     logs.mkdir()
-    (logs / "irc.libera.#python.weechatlog").write_text(
-        "bad record\n2026-09-30 10:00:00\talice\thello\n"
-    )
+    (logs / "irc.libera.#python.weechatlog").write_text("bad record\n2026-09-30 10:00:00\talice\thello\n")
     assert main(["--logs-dir", str(logs), "--temp-dir", str(tmp_path)]) == 0
     output = capsys.readouterr()
     report = json.loads(output.out)

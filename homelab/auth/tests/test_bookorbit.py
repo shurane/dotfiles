@@ -1,9 +1,8 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-
-from models import HomelabAuth, ServiceName
-from services.bookorbit import (
+from homelab_auth.models import HomelabAuth, ServiceName
+from homelab_auth.services.bookorbit import (
     apply_bookorbit,
     bookorbit_login,
     check_bookorbit,
@@ -41,17 +40,17 @@ def test_bookorbit_login_failure() -> None:
 
 
 def test_check_bookorbit_uses_login(auth: HomelabAuth) -> None:
-    with patch("services.bookorbit.bookorbit_login", return_value=True) as mock_login:
+    with patch("homelab_auth.services.bookorbit.bookorbit_login", return_value=True) as mock_login:
         assert check_bookorbit(auth) is True
         mock_login.assert_called_once()
 
 
 def test_apply_bookorbit_skips_if_already_valid(auth: HomelabAuth) -> None:
     with (
-        patch("services.bookorbit.compose_up") as mock_up,
-        patch("services.bookorbit.wait_for_bookorbit"),
-        patch("services.bookorbit.bookorbit_login", return_value=True),
-        patch("services.bookorbit.compose_exec") as mock_exec,
+        patch("homelab_auth.services.bookorbit.compose_up") as mock_up,
+        patch("homelab_auth.services.bookorbit.wait_for_bookorbit"),
+        patch("homelab_auth.services.bookorbit.bookorbit_login", return_value=True),
+        patch("homelab_auth.services.bookorbit.compose_exec") as mock_exec,
     ):
         apply_bookorbit(auth)
         assert mock_up.call_count == 2
@@ -60,10 +59,10 @@ def test_apply_bookorbit_skips_if_already_valid(auth: HomelabAuth) -> None:
 
 def test_apply_bookorbit_executes_upsert_when_invalid(auth: HomelabAuth) -> None:
     with (
-        patch("services.bookorbit.compose_up"),
-        patch("services.bookorbit.wait_for_bookorbit"),
-        patch("services.bookorbit.bookorbit_login", return_value=False),
-        patch("services.bookorbit.compose_exec") as mock_exec,
+        patch("homelab_auth.services.bookorbit.compose_up"),
+        patch("homelab_auth.services.bookorbit.wait_for_bookorbit"),
+        patch("homelab_auth.services.bookorbit.bookorbit_login", return_value=False),
+        patch("homelab_auth.services.bookorbit.compose_exec") as mock_exec,
     ):
         apply_bookorbit(auth)
         mock_exec.assert_called_once()
@@ -80,8 +79,8 @@ def test_apply_bookorbit_executes_upsert_when_invalid(auth: HomelabAuth) -> None
 
 def test_verify_bookorbit_raises_on_failure(auth: HomelabAuth) -> None:
     with (
-        patch("services.bookorbit.wait_for_bookorbit"),
-        patch("services.bookorbit.bookorbit_login", return_value=False),
+        patch("homelab_auth.services.bookorbit.wait_for_bookorbit"),
+        patch("homelab_auth.services.bookorbit.bookorbit_login", return_value=False),
         pytest.raises(RuntimeError, match="BookOrbit shared credential login failed"),
     ):
         verify_bookorbit(auth)

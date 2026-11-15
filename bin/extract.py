@@ -1,52 +1,32 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+"""Validate and prepare extraction target directories."""
 
-import subprocess
+import shutil
 import sys
-import os
-import errno
-import logging
+from pathlib import Path
 
-## taken from http://stackoverflow.com/a/377028/198348
-def which(program):
-    def is_exe(program):
-        return os.path.isfile(program) and os.access(program, os.X_OK)
 
-    fpath, fname = os.path.split(program)
-    if fpath:
-        if is_exe(program):
-            return program
-    else:
-        for path in os.environ["PATH"].split(os.pathsep):
-            exe_file = os.path.join(path, program)
-            if is_exe(exe_file):
-                return exe_file
-    return None
+def which(program: str) -> str | None:
+    return shutil.which(program)
 
-## taken from http://stackoverflow.com/a/5032238/198348
-def make_sure_path_exists(path):
-    try:
-        os.makedirs(path)
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
+
+def make_sure_path_exists(path: Path | str) -> None:
+    Path(path).mkdir(parents=True, exist_ok=True)
+
 
 if __name__ == "__main__":
-    ## to make sure commands exist:
-    #commands = ["7z", "unrar", "bunzip2", "gunzip", "wicked"]
-    #for command in commands:
-        #print("%s %s" % (command, which(command)))
+    if len(sys.argv) != 3:
+        print("only 2 arguments taken", file=sys.stderr)
+        sys.exit(1)
 
-    ## make some assertions... 
-
-    print(len(sys.argv))
-    assert len(sys.argv) == 2+1, "only 2 arguments taken"
-    assert os.path.isfile(sys.argv[1]), "file doesn't exist"
+    if not Path(sys.argv[1]).is_file():
+        print("file doesn't exist", file=sys.stderr)
+        sys.exit(1)
 
     try:
         make_sure_path_exists(sys.argv[2])
-    except Exception as e:
-        print >>sys.stderr, e
+    except OSError as e:
+        print(e, file=sys.stderr)
+        sys.exit(1)
 
     print("cool, passed!")
-
-

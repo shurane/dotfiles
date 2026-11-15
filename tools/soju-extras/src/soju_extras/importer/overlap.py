@@ -58,9 +58,7 @@ def deduplicate_overlap(preferred: Path, secondary: Path, output: Path) -> Overl
         root = Path(temporary)
         with closing(sqlite3.connect(root / "counts.db")) as db, db:
             db.execute("PRAGMA cache_size=-8192")
-            db.execute(
-                "CREATE TABLE counts(line BLOB PRIMARY KEY, remaining INTEGER) WITHOUT ROWID"
-            )
+            db.execute("CREATE TABLE counts(line BLOB PRIMARY KEY, remaining INTEGER) WITHOUT ROWID")
 
             with closing(db.cursor()) as cursor, (root / "output").open("xb") as destination:
 
@@ -74,8 +72,7 @@ def deduplicate_overlap(preferred: Path, secondary: Path, output: Path) -> Overl
 
                 for batch in batched(primary_rows(), 5000, strict=False):
                     cursor.executemany(
-                        "INSERT INTO counts VALUES (?,1) ON CONFLICT(line) DO UPDATE "
-                        "SET remaining=remaining+1",
+                        "INSERT INTO counts VALUES (?,1) ON CONFLICT(line) DO UPDATE SET remaining=remaining+1",
                         batch,
                     )
                 for line in _lines(secondary):

@@ -107,9 +107,7 @@ def reuse_file(
     if prior_hash is None:
         # Bootstrap snapshots written before encoded source hashes were recorded.
         prior_hash = (
-            entry.sha256
-            if entry.encoding == "plain"
-            else (entry.stored_sha256 if entry.encoding == "zstd" else None)
+            entry.sha256 if entry.encoding == "plain" else (entry.stored_sha256 if entry.encoding == "zstd" else None)
         )
     if prior_hash is not None:
         if source_hash != prior_hash:
@@ -152,9 +150,7 @@ def pack_file(
                 destination,
                 "wb",
                 options={
-                    zstd.CompressionParameter.nb_workers: 2
-                    if before.st_size >= 8 * 1024 * 1024
-                    else 0,
+                    zstd.CompressionParameter.nb_workers: 2 if before.st_size >= 8 * 1024 * 1024 else 0,
                     zstd.CompressionParameter.checksum_flag: 1,
                 },
             ) as writer:
@@ -192,11 +188,7 @@ def pack_tree(
     """Input is a private staging tree. No source symlinks are followed."""
     destination.mkdir(mode=0o700)
     prior = (
-        {
-            entry.path: entry
-            for entry in read_manifest(previous).entries
-            if isinstance(entry, FileEntry)
-        }
+        {entry.path: entry for entry in read_manifest(previous).entries if isinstance(entry, FileEntry)}
         if previous
         else {}
     )

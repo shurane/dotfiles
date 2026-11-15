@@ -5,7 +5,6 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
-
 from soju_extras.importer.cli import SojuLogImporter
 from soju_extras.importer.overlap import deduplicate_overlap
 

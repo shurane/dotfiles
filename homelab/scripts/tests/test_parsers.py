@@ -4,16 +4,15 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-
-from download_anpanman import parse_range_spec as parse_anpanman_range
-from download_numberblocks import SEASON_PLAYLISTS, parse_seasons
-from sync_maruko import (
+from homelab_scripts.download_anpanman import parse_range_spec as parse_anpanman_range
+from homelab_scripts.download_numberblocks import SEASON_PLAYLISTS, parse_seasons
+from homelab_scripts.sync_maruko import (
     clean_ass_text,
     extract_english_title_from_mkv,
     extract_english_title_via_ffmpeg,
     extract_english_title_via_py_extractor,
 )
-from sync_maruko import (
+from homelab_scripts.sync_maruko import (
     parse_range_spec as parse_maruko_range,
 )
 
@@ -157,6 +156,6 @@ def test_mkv_extractors_reconciliation(tmp_path: Path) -> None:
     assert extract_english_title_from_mkv(mkv_path, reconcile=True) == expected
 
     # 4. Verify reconciliation prefers ffmpeg on discrepancy
-    with patch("sync_maruko.extract_english_title_via_py_extractor", return_value="Divergent Title"):
+    with patch("homelab_scripts.sync_maruko.extract_english_title_via_py_extractor", return_value="Divergent Title"):
         reconciled = extract_english_title_from_mkv(mkv_path, reconcile=True)
         assert reconciled == expected

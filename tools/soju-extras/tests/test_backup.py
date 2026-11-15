@@ -12,8 +12,6 @@ from typing import Literal
 
 import pytest
 from pydantic import ValidationError
-from whenever import Date, Instant
-
 from soju_extras.backup.models import (
     BackupConfig,
     CopySource,
@@ -38,6 +36,7 @@ from soju_extras.backup.snapshot import (
     verify_snapshot,
 )
 from soju_extras.export_fs.storage import export_lock
+from whenever import Date, Instant
 
 
 def stamp(day: str, hour: str = "120000") -> str:
@@ -222,9 +221,7 @@ def test_invalid_receipt_aborts_pruning(tmp_path: Path) -> None:
     assert old.exists()
 
 
-def test_full_backup_restore_and_hardlink_reuse(
-    config: BackupConfig, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_full_backup_restore_and_hardlink_reuse(config: BackupConfig, monkeypatch: pytest.MonkeyPatch) -> None:
     fake_clock(monkeypatch, "2026-10-01T12:00:00Z", "2026-10-02T12:00:00Z")
     first = create_backup(config)
     verify_snapshot(first)
@@ -246,9 +243,7 @@ def test_failed_transfer_never_completes_or_prunes_then_retry_succeeds(
     first = create_backup(config)
     remote_config = config.model_copy(
         update={
-            "remote": Remote(
-                host="pi@raspy.lan", identity_file=Path("/key"), known_hosts=Path("/hosts")
-            ),
+            "remote": Remote(host="pi@raspy.lan", identity_file=Path("/key"), known_hosts=Path("/hosts")),
             "retention": Retention(daily=1, weekly=0, monthly=0),
         }
     )
@@ -263,9 +258,7 @@ def test_failed_transfer_never_completes_or_prunes_then_retry_succeeds(
     assert (config.root / stamp("2026-10-01")).exists()
     assert not (config.root / stamp("2026-10-01") / RECEIPT).exists()
     monkeypatch.setattr("soju_extras.backup.runner.deliver", lambda *_args: None)
-    monkeypatch.setattr(
-        "soju_extras.backup.runner.complete", lambda path, _remote: complete(path, None)
-    )
+    monkeypatch.setattr("soju_extras.backup.runner.complete", lambda path, _remote: complete(path, None))
     last = create_backup(remote_config)
     assert completed(config.root) == [last.name]
     assert not first.exists()

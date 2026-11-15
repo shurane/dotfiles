@@ -2,15 +2,15 @@ import json
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import download_anpanman
-from download_anpanman import load_anpanman_metadata
+from homelab_scripts import download_anpanman
+from homelab_scripts.download_anpanman import load_anpanman_metadata
 
 if TYPE_CHECKING:
     import pytest
 
 
 def test_maruko_metadata_json_structure() -> None:
-    json_path = Path(__file__).resolve().parent.parent / "maruko_metadata.json"
+    json_path = Path(__file__).resolve().parent.parent / "src" / "homelab_scripts" / "maruko_metadata.json"
     assert json_path.exists(), "maruko_metadata.json must exist in homelab/scripts"
 
     data = json.loads(json_path.read_text(encoding="utf-8"))
@@ -27,7 +27,7 @@ def test_maruko_metadata_json_structure() -> None:
 
 
 def test_anpanman_metadata_json_structure() -> None:
-    json_path = Path(__file__).resolve().parent.parent / "anpanman_metadata.json"
+    json_path = Path(__file__).resolve().parent.parent / "src" / "homelab_scripts" / "anpanman_metadata.json"
     assert json_path.exists(), "anpanman_metadata.json must exist in homelab/scripts"
 
     data = json.loads(json_path.read_text(encoding="utf-8"))
@@ -56,7 +56,7 @@ def test_load_anpanman_metadata_corrupt_fallback(tmp_path: Path, monkeypatch: py
     corrupt_file = tmp_path / "anpanman_metadata.json"
     corrupt_file.write_text("CORRUPTED NOT JSON {{{", encoding="utf-8")
 
-    monkeypatch.setattr(download_anpanman, "__file__", str(tmp_path / "download_anpanman.py"))
+    monkeypatch.setattr(download_anpanman, "__file__", str(tmp_path / "homelab_scripts.download_anpanman.py"))
     monkeypatch.setattr(Path, "home", lambda: tmp_path / "fake_home")
 
     result = load_anpanman_metadata()

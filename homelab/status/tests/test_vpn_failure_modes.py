@@ -6,9 +6,8 @@ import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
-from models import StatusContext, TargetConnection
-from services.gluetun import (
+from homelab_status.models import StatusContext, TargetConnection
+from homelab_status.services.gluetun import (
     IpDetails,
     _format_bytes,
     _parse_dns_whoami,
@@ -209,8 +208,8 @@ async def test_vpn_healthy_all_checks_pass() -> None:
     host_ip = IpDetails("198.51.100.1", "US", "WA", "Seattle", "AS6079 RCN")
 
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
     ):
         report = await run_vpn_deep_check(ctx)
 
@@ -251,8 +250,8 @@ async def test_failure_mode_killswitch_tunnel_down() -> None:
     host_ip = IpDetails("198.51.100.1", "US", "WA", "Seattle", "AS6079 RCN")
 
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=None)),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=None)),
     ):
         report = await run_vpn_deep_check(ctx)
 
@@ -271,8 +270,8 @@ async def test_failure_mode_ip_leak() -> None:
     leaked_ip = IpDetails("198.51.100.1", "US", "WA", "Seattle", "AS6079 RCN")
 
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=leaked_ip)),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=leaked_ip)),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=leaked_ip)),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=leaked_ip)),
     ):
         report = await run_vpn_deep_check(ctx)
 
@@ -291,8 +290,8 @@ async def test_failure_mode_port_forwarding_desync() -> None:
     host_ip = IpDetails("198.51.100.1", "US")
 
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
     ):
         report = await run_vpn_deep_check(ctx)
 
@@ -311,8 +310,8 @@ async def test_failure_mode_namespace_isolation_broken() -> None:
     host_ip = IpDetails("198.51.100.1", "US")
 
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
     ):
         report = await run_vpn_deep_check(ctx)
 
@@ -332,8 +331,8 @@ async def test_failure_mode_qbittorrent_api_down() -> None:
     host_ip = IpDetails("198.51.100.1", "US")
 
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
     ):
         report = await run_vpn_deep_check(ctx)
 
@@ -352,8 +351,8 @@ async def test_failure_mode_interface_unbound_warning() -> None:
     host_ip = IpDetails("198.51.100.1", "US")
 
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
     ):
         report = await run_vpn_deep_check(ctx)
 
@@ -371,8 +370,8 @@ async def test_failure_mode_upnp_enabled() -> None:
     host_ip = IpDetails("198.51.100.1", "US")
 
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
     ):
         report = await run_vpn_deep_check(ctx)
 
@@ -394,8 +393,8 @@ async def test_adversarial_ghost_port_forward() -> None:
     host_ip = IpDetails("198.51.100.1", "US")
 
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
     ):
         report = await run_vpn_deep_check(ctx)
 
@@ -408,7 +407,7 @@ async def test_adversarial_ghost_port_forward() -> None:
 @pytest.mark.anyio
 async def test_adversarial_stale_cache_bypass() -> None:
     """Adversarial check: /tmp/gluetun/ip has a cached VPN IP, but live egress leaked."""
-    from services.gluetun import _fetch_gluetun_ip
+    from homelab_status.services.gluetun import _fetch_gluetun_ip
 
     ctx = MagicMock()
     # If container tries to query live ipinfo.io, it returns the LEAKED host IP!
@@ -449,8 +448,8 @@ async def test_vpn_inspection_routes() -> None:
     ctx_local = _create_mock_context(exec_map=_default_exec_map())
     ctx_local.connection = local_conn
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=IpDetails("198.51.100.1"))),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=IpDetails("185.107.44.204"))),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=IpDetails("198.51.100.1"))),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=IpDetails("185.107.44.204"))),
     ):
         report_local = await run_vpn_deep_check(ctx_local)
     assert report_local.checks[0].name == "Inspection Route"
@@ -467,8 +466,8 @@ async def test_vpn_inspection_routes() -> None:
     ctx_lan = _create_mock_context(exec_map=_default_exec_map())
     ctx_lan.connection = lan_conn
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=IpDetails("198.51.100.1"))),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=IpDetails("185.107.44.204"))),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=IpDetails("198.51.100.1"))),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=IpDetails("185.107.44.204"))),
     ):
         report_lan = await run_vpn_deep_check(ctx_lan)
     assert report_lan.checks[0].name == "Inspection Route"
@@ -484,8 +483,8 @@ async def test_vpn_inspection_routes() -> None:
     ctx_ts = _create_mock_context(exec_map=_default_exec_map())
     ctx_ts.connection = ts_conn
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=IpDetails("198.51.100.1"))),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=IpDetails("185.107.44.204"))),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=IpDetails("198.51.100.1"))),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=IpDetails("185.107.44.204"))),
     ):
         report_ts = await run_vpn_deep_check(ctx_ts)
     assert report_ts.checks[0].name == "Inspection Route"
@@ -506,8 +505,8 @@ async def test_failure_mode_dns_resolver_leak() -> None:
     vpn_ip = IpDetails("185.107.44.204", "NL", "North Brabant", "Roosendaal", "AS43350 NForce")
 
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
     ):
         report = await run_vpn_deep_check(ctx)
 
@@ -525,8 +524,8 @@ async def test_failure_mode_peer_swarm_ip_leak() -> None:
     vpn_ip = IpDetails("185.107.44.204", "NL", "North Brabant", "Roosendaal", "AS43350 NForce")
 
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
     ):
         report = await run_vpn_deep_check(ctx)
 
@@ -545,8 +544,8 @@ async def test_peer_swarm_ip_pending() -> None:
     vpn_ip = IpDetails("185.107.44.204", "NL", "North Brabant", "Roosendaal", "AS43350 NForce")
 
     with (
-        patch("services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
-        patch("services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
+        patch("homelab_status.services.gluetun._fetch_host_ip", AsyncMock(return_value=host_ip)),
+        patch("homelab_status.services.gluetun._fetch_gluetun_ip", AsyncMock(return_value=vpn_ip)),
     ):
         report = await run_vpn_deep_check(ctx)
 

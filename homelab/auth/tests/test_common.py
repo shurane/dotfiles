@@ -3,9 +3,8 @@ from pathlib import Path
 
 import pytest
 import typer
-
-from common import build_options, format_path, load_env, wait_for_sqlite_table
-from models import ServiceName
+from homelab_auth.common import build_options, format_path, load_env, wait_for_sqlite_table
+from homelab_auth.models import ServiceName
 
 
 def test_load_env_parses_simple_quoted_and_ignored_lines(tmp_path: Path) -> None:

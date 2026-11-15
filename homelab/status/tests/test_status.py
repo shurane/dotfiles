@@ -7,10 +7,7 @@ import sys
 import xml.etree.ElementTree as ET
 
 import pytest
-from pydantic import ValidationError
-from typer.testing import CliRunner
-
-from config import (
+from homelab_status.config import (
     classify_route,
     format_speed,
     get_ssh_user,
@@ -18,9 +15,11 @@ from config import (
     resolve_target_connection,
     resolve_target_host,
 )
-from main import app
-from models import HealthStatus, HomelabConfig, ServiceResult
-from services import CHECK_REGISTRY
+from homelab_status.main import app
+from homelab_status.models import HealthStatus, HomelabConfig, ServiceResult
+from homelab_status.services import CHECK_REGISTRY
+from pydantic import ValidationError
+from typer.testing import CliRunner
 
 runner = CliRunner()
 
@@ -55,7 +54,7 @@ def test_get_ssh_user(monkeypatch: pytest.MonkeyPatch) -> None:
     assert get_ssh_user("custom_user") == "custom_user"
 
     env_mock = {"HOMELAB_SSH_USER": "ssh_admin", "HOMELAB_USERNAME": "generic_user"}
-    monkeypatch.setattr("config.get_env_setting", lambda k, d="": env_mock.get(k, d))
+    monkeypatch.setattr("homelab_status.config.get_env_setting", lambda k, d="": env_mock.get(k, d))
     assert get_ssh_user() == "ssh_admin"
 
     env_mock.pop("HOMELAB_SSH_USER")
@@ -255,8 +254,8 @@ def test_cli_samba_help() -> None:
 async def test_check_qbittorrent_interface_binding() -> None:
     from unittest.mock import AsyncMock, MagicMock, patch
 
-    from models import StatusContext
-    from services.qbittorrent import check_qbittorrent
+    from homelab_status.models import StatusContext
+    from homelab_status.services.qbittorrent import check_qbittorrent
 
     ctx = MagicMock(spec=StatusContext)
     ctx.base_url = MagicMock(return_value="http://127.0.0.1:8080")
@@ -380,7 +379,7 @@ def test_homelab_config_validation() -> None:
 
 
 def test_container_name_enum() -> None:
-    from models import ContainerName
+    from homelab_status.models import ContainerName
 
     assert len(ContainerName) == 12
     for member in ContainerName:

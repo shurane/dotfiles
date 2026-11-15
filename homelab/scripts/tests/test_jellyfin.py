@@ -3,9 +3,8 @@ from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
 import httpx
+from homelab_scripts.jellyfin import get_jellyfin_config, refresh
 from rich.console import Console
-
-from jellyfin import get_jellyfin_config, refresh
 
 if TYPE_CHECKING:
     import pytest
@@ -42,14 +41,14 @@ def test_get_jellyfin_config_missing(tmp_path: Path, monkeypatch: pytest.MonkeyP
 
 
 def test_refresh_missing_config(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("jellyfin.get_jellyfin_config", lambda *args, **kwargs: None)
+    monkeypatch.setattr("homelab_scripts.jellyfin.get_jellyfin_config", lambda *args, **kwargs: None)
     dummy_console = Console(quiet=True)
     assert refresh(console=dummy_console, dry_run=False) is False
 
 
 def test_refresh_dry_run(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        "jellyfin.get_jellyfin_config",
+        "homelab_scripts.jellyfin.get_jellyfin_config",
         lambda *args, **kwargs: ("https://jellyfin.example.com", "fake_key"),
     )
     mock_post = MagicMock()
@@ -64,7 +63,7 @@ def test_refresh_dry_run(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_refresh_success_http_204(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        "jellyfin.get_jellyfin_config",
+        "homelab_scripts.jellyfin.get_jellyfin_config",
         lambda *args, **kwargs: ("https://jellyfin.example.com", "key_999"),
     )
     mock_post = MagicMock(return_value=httpx.Response(204))
@@ -82,7 +81,7 @@ def test_refresh_success_http_204(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_refresh_failure_http_status(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        "jellyfin.get_jellyfin_config",
+        "homelab_scripts.jellyfin.get_jellyfin_config",
         lambda *args, **kwargs: ("https://jellyfin.example.com", "key_999"),
     )
     mock_post = MagicMock(return_value=httpx.Response(401))
@@ -94,7 +93,7 @@ def test_refresh_failure_http_status(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_refresh_network_exception(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        "jellyfin.get_jellyfin_config",
+        "homelab_scripts.jellyfin.get_jellyfin_config",
         lambda *args, **kwargs: ("https://jellyfin.example.com", "key_999"),
     )
     mock_post = MagicMock(side_effect=httpx.ConnectTimeout("Connection timed out"))

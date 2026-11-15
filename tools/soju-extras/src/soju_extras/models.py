@@ -12,9 +12,7 @@ from whenever import Instant
 from soju_extras.time import parse_timestamp
 
 # Regex patterns for WeeChat log parsing
-LOG_FILENAME_RE = re.compile(
-    r"^irc\.(?P<network>[^.]+)\.(?P<target>.+)\.weechatlog(?:\.[1-9][0-9]*)?(?:\.gz|\.zst)?$"
-)
+LOG_FILENAME_RE = re.compile(r"^irc\.(?P<network>[^.]+)\.(?P<target>.+)\.weechatlog(?:\.[1-9][0-9]*)?(?:\.gz|\.zst)?$")
 # Strips ANSI escape codes, WeeChat color/format codes, and IRC color codes
 COLOR_STRIP_RE = re.compile(
     r"\x1b\[[0-9;]*[a-zA-Z]|\x19(?:\d{2}|F\d{2}|B\d{2}|\*|\-|\/|b|i|u|r|v)?|"
@@ -70,21 +68,13 @@ class WeeChatLogRecord(BaseModel):
             sender_nick = content.split(" ")[0].lstrip("@+~&%")
             clean_text = content
             hm_match = re.search(r"\(([^)]+@[^)]+)\)", content)
-            sender_hostmask = (
-                f"{sender_nick}!{hm_match.group(1)}"
-                if hm_match
-                else f"{sender_nick}!unknown@unknown"
-            )
+            sender_hostmask = f"{sender_nick}!{hm_match.group(1)}" if hm_match else f"{sender_nick}!unknown@unknown"
         elif prefix == "<--":
             kind = MessageKind.QUIT if "quit" in content.lower() else MessageKind.PART
             sender_nick = content.split(" ")[0].lstrip("@+~&%")
             clean_text = content
             hm_match = re.search(r"\(([^)]+@[^)]+)\)", content)
-            sender_hostmask = (
-                f"{sender_nick}!{hm_match.group(1)}"
-                if hm_match
-                else f"{sender_nick}!unknown@unknown"
-            )
+            sender_hostmask = f"{sender_nick}!{hm_match.group(1)}" if hm_match else f"{sender_nick}!unknown@unknown"
         elif prefix == "--":
             m_notice = re.match(r"^(?:Pv)?Notice\(([^)]+)\):\s*(.*)$", content)
             if m_notice:
@@ -108,9 +98,7 @@ class WeeChatLogRecord(BaseModel):
             if content.startswith(("/me ", "\x01ACTION ")):
                 kind = MessageKind.ACTION
                 sender_nick = clean_prefix
-                clean_text = (
-                    content.removeprefix("\x01ACTION ").removesuffix("\x01").removeprefix("/me ")
-                )
+                clean_text = content.removeprefix("\x01ACTION ").removesuffix("\x01").removeprefix("/me ")
             elif clean_prefix.startswith("*") and len(clean_prefix) > 1:
                 kind = MessageKind.ACTION
                 sender_nick = clean_prefix.lstrip("*")

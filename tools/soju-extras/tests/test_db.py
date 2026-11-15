@@ -4,7 +4,6 @@ import sqlite3
 from pathlib import Path
 
 import pytest
-
 from soju_extras.db import execute, open_soju_db, query_rows, transaction
 from soju_extras.resolver import IDRow
 
@@ -33,9 +32,7 @@ def test_transaction_commits_and_rolls_back(soju_db: Path) -> None:
             raise KeyboardInterrupt
     with open_soju_db(soju_db) as db:
         assert query_rows(db, IDRow, "SELECT id FROM MessageTarget WHERE target = '#committed'")
-        assert not query_rows(
-            db, IDRow, "SELECT id FROM MessageTarget WHERE target = '#rolled-back'"
-        )
+        assert not query_rows(db, IDRow, "SELECT id FROM MessageTarget WHERE target = '#rolled-back'")
 
 
 def test_uri_filename(soju_db: Path) -> None:
@@ -64,7 +61,6 @@ def test_query_streams_and_releases_lock_on_early_exit(soju_db: Path) -> None:
 
 def test_query_validation_failure_releases_lock(soju_db: Path) -> None:
     from pydantic import ValidationError
-
     from soju_extras.db import query
 
     with open_soju_db(soju_db) as db:
@@ -126,9 +122,7 @@ def test_failed_commit_rolls_back_and_connection_remains_usable(soju_db: Path) -
         assert query_rows(db, IDRow, "SELECT id FROM child")[0].id == 42
 
 
-def test_connection_setup_failure_closes_connection(
-    soju_db: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_connection_setup_failure_closes_connection(soju_db: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     from collections.abc import Sequence
 
     import soju_extras.db as database
@@ -160,6 +154,4 @@ def test_returning_query_does_not_commit_enclosing_transaction(soju_db: Path) ->
                 assert next(rows).id > 0
             assert db.in_transaction
             raise RuntimeError("consumer failed after query closed")
-        assert (
-            query_rows(db, IDRow, "SELECT id FROM MessageTarget WHERE target = '#returning'") == []
-        )
+        assert query_rows(db, IDRow, "SELECT id FROM MessageTarget WHERE target = '#returning'") == []

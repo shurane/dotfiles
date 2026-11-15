@@ -3,7 +3,6 @@
 from pathlib import Path
 
 import pytest
-
 from soju_extras.db import execute, open_soju_db, transaction
 from soju_extras.resolver import SojuTargetResolver
 

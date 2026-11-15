@@ -3,7 +3,6 @@
 from unittest.mock import patch
 
 import pytest
-
 from bitwarden_extras.client import (
     BitwardenClient,
     VaultLockedError,
@@ -87,4 +86,3 @@ class TestClientSyncAndFetch:
         client = BitwardenClient()
         with pytest.raises(BitwardenError, match="Failed to parse"):
             client.fetch_via_cli()
-

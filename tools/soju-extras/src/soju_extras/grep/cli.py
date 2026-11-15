@@ -26,9 +26,7 @@ def execute_search(query: SearchQuery) -> list[SearchResult]:
         JOIN Network n ON t.network = n.id
         WHERE MessageFTS MATCH ?
     """
-    params: list[SQLValue] = [
-        query.pattern if query.raw_fts else sanitize_fts5_query(query.pattern)
-    ]
+    params: list[SQLValue] = [query.pattern if query.raw_fts else sanitize_fts5_query(query.pattern)]
     if query.target:
         sql += " AND t.target = ? COLLATE NOCASE"
         params.append(query.target)
@@ -63,9 +61,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("-n", "--network")
     parser.add_argument("-d", "--db-path", type=Path, default=Path("/var/lib/soju/main.db"))
     parser.add_argument("-l", "--limit", type=int, default=100)
-    parser.add_argument(
-        "--raw-fts", action="store_true", help="Pass FTS5 syntax to SQLite unchanged"
-    )
+    parser.add_argument("--raw-fts", action="store_true", help="Pass FTS5 syntax to SQLite unchanged")
     try:
         query = SearchQuery.model_validate(vars(parser.parse_args(argv)))
         results = execute_search(query)

@@ -6,11 +6,11 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
-
 from soju_extras.export_fs.cli import SojuFSExporter
 from soju_extras.grep.cli import execute_search
 from soju_extras.importer.cli import SojuLogImporter
 from soju_extras.models import SearchQuery
+
 from tests.conftest import add_message
 
 
@@ -70,9 +70,7 @@ def test_import_repeat_preserves_real_repetitions(soju_db: Path, tmp_path: Path)
 def test_import_offset_and_fraction(soju_db: Path, tmp_path: Path) -> None:
     logs = tmp_path / "logs"
     logs.mkdir()
-    (logs / "irc.libera.#python.weechatlog").write_text(
-        "2026-09-30 10:00:00.123-05:00\talice\thello\n"
-    )
+    (logs / "irc.libera.#python.weechatlog").write_text("2026-09-30 10:00:00.123-05:00\talice\thello\n")
     SojuLogImporter(logs_dir=logs, db_path=soju_db).run()
     with closing(sqlite3.connect(soju_db)) as db:
         assert db.execute("SELECT time FROM Message").fetchone()[0] == "2026-09-30T15:00:00.123Z"

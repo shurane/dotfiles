@@ -185,7 +185,7 @@ def run_repl(
                 )
                 continue
             execute_sql(current_conn, query_str, console=console)
-        except (KeyboardInterrupt, EOFError):
+        except KeyboardInterrupt, EOFError:
             console.print("\n[dim]Exiting...[/dim]")
             break
         except sqlite3.Error as e:

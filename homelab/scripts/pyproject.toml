@@ -1,6 +1,11 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "homelab-scripts"
 version = "0.1.0"
+description = "Collection of scripts and utilities for homelab"
 readme = "README.md"
 requires-python = "==3.14.*"
 dependencies = [
@@ -11,130 +16,22 @@ dependencies = [
   "py-subtitle-extractor>=1.0.6",
   "pykakasi>=2.3.0",
   "rich>=13.9.4",
-  "yt-dlp>=2026.10.26",
-  "yt-dlp-ejs>=0.8.0",
+  "typer>=0.15.1",
+  "whenever>=0.11.0",
+  "yt-dlp>=2025.1.26",
 ]
 
 [project.scripts]
-download-anpanman = "download_anpanman:main"
-download-numberblocks = "download_numberblocks:main"
-build-anpanman-metadata = "build_anpanman_metadata:main"
-build-maruko-metadata = "build_maruko_metadata:main"
-sync-maruko = "sync_maruko:main"
-jellyfin-scan = "jellyfin:main"
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+download-anpanman = "homelab_scripts.download_anpanman:main"
+download-numberblocks = "homelab_scripts.download_numberblocks:main"
+build-anpanman-metadata = "homelab_scripts.build_anpanman_metadata:main"
+build-maruko-metadata = "homelab_scripts.build_maruko_metadata:main"
+sync-maruko = "homelab_scripts.sync_maruko:main"
+jellyfin-scan = "homelab_scripts.jellyfin:main"
 
 [tool.hatch.build.targets.wheel]
-only-include = [
-  "download_anpanman.py",
-  "download_numberblocks.py",
-  "build_anpanman_metadata.py",
-  "build_maruko_metadata.py",
-  "sync_maruko.py",
-  "jellyfin.py",
-  "anpanman_metadata.json",
-  "maruko_metadata.json",
-  "README.md",
-]
-
-[dependency-groups]
-dev = [
-  "pytest>=8.0.0",
-  "ruff>=0.16.1",
-  "ty>=0.0.95",
-]
-
-[tool.ruff]
-target-version = "py314"
-line-length = 120
-src = [".", "tests"]
-
-[tool.ruff.lint]
-select = [
-  "E",      # pycodestyle errors
-  "W",      # pycodestyle warnings
-  "F",      # Pyflakes
-  "I",      # isort
-  "UP",     # pyupgrade (Python 3.14 idioms)
-  "B",      # flake8-bugbear
-  "SIM",    # flake8-simplify
-  "C4",     # flake8-comprehensions
-  "PIE",    # flake8-pie
-  "RUF",    # Ruff-specific rules
-  "ANN",    # flake8-annotations
-  "ASYNC",  # flake8-async
-  "PT",     # flake8-pytest-style
-  "RET",    # flake8-return
-  "RSE",    # flake8-raise
-  "SLF",    # flake8-self
-  "PERF",   # Perflint
-  "FURB",   # refurb
-  "FLY",    # flynt
-  "T20",    # flake8-print
-  "S",      # flake8-bandit (security)
-  "PTH",    # flake8-use-pathlib (modern pathlib)
-  "ARG",    # flake8-unused-arguments
-  "A",      # flake8-builtins (no shadowing)
-  "TC",     # flake8-type-checking (clean import graph)
-  "PGH",    # pygrep-hooks (ban blanket noqa and type: ignore)
-  "T10",    # flake8-debugger (ban breakpoint/pdb)
-  "ERA",    # eradicate (ban commented-out code)
-  "PLE",    # Pylint Error (fatal errors)
-  "LOG",    # flake8-logging (correct logging calls)
-  "SLOT",   # flake8-slots (slots on subclasses of builtins)
-  "ISC",    # flake8-implicit-str-concat (collection string concatenation safety)
-  "TID",    # flake8-tidy-imports (banned APIs)
-]
-ignore = [
-  "ANN401",    # Any allowed where appropriate for dynamic data/JSON
-  "T201",      # CLI console prints are intentional in scripts
-  "ASYNC240",  # Synchronous Path operations in CLI scripts are intentional
-  "S314",      # XML parsing using standard library (Python 3.14 bundles expat >= 2.6 with native protection)
-  "S405",      # xml.etree import check (paired with S314)
-  "ISC001",    # Single-line implicit concatenation (formatter compatibility)
-]
-
-[tool.ruff.lint.per-file-ignores]
-"tests/*" = ["ANN", "SLF001", "T201", "S", "ARG"]
-
-[tool.ruff.lint.flake8-tidy-imports.banned-api]
-"datetime".msg = "Use `whenever` instead of standard library `datetime`."
-
-[tool.ruff.lint.flake8-type-checking]
-exempt-modules = ["typing", "pathlib"]
-
-[tool.ty.rules]
-missing-direct-dependency = "error"
-blanket-ignore-comment = "error"
-unused-ignore-comment = "error"
-unused-type-ignore-comment = "error"
-unused-awaitable = "error"
-redundant-cast = "error"
-disjoint-cast = "error"
-missing-override-decorator = "error"
-possibly-missing-submodule = "error"
-deprecated = "error"
-truthiness-test-of-callable = "error"
-truthiness-test-of-iterable = "error"
-redundant-condition = "error"
-invalid-ignore-comment = "error"
-ignore-comment-unknown-rule = "error"
-pydantic-discarded-extra-argument = "error"
-division-by-zero = "error"
-ineffective-final = "error"
-redundant-final-classvar = "error"
-useless-overload-body = "error"
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"
-docstring-code-format = true
+packages = ["src/homelab_scripts"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["."]
+pythonpath = ["src"]

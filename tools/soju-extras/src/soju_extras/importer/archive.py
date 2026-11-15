@@ -146,9 +146,7 @@ def prepare_history(
                 outputs[str(relative)] = expected
                 stored[str(relative)] = (root / relative).stat().st_size
         total = sum(item.records for item in sources.values())
-        archived = sum(
-            item.records for path, item in outputs.items() if path.startswith("archives/")
-        )
+        archived = sum(item.records for path, item in outputs.items() if path.startswith("archives/"))
         imported = sum(item.records for path, item in outputs.items() if path.startswith("import/"))
         if total != archived + imported or sum(s.bytes for s in sources.values()) != sum(
             s.bytes for s in outputs.values()
@@ -190,9 +188,7 @@ def main() -> None:
         )
     except (OSError, ValueError, zstd.ZstdError) as error:
         parser.exit(2, f"{error}\n")
-    print(
-        f"Verified {result.archived_records:,} archived and {result.import_records:,} import records"
-    )
+    print(f"Verified {result.archived_records:,} archived and {result.import_records:,} import records")
 
 
 if __name__ == "__main__":

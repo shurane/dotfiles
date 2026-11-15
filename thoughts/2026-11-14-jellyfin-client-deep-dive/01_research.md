@@ -39,6 +39,7 @@ The goal is to enrich connected client tracking in `homelab/status` (both the `-
 ```python
 import ipaddress
 
+
 def classify_client_route(ip_str: str | None) -> tuple[str, str]:
     if not ip_str:
         return ("Unknown", "")

@@ -23,10 +23,7 @@ class SnapshotAPI:
         return int(result)
 
     def infolist_fields(self, pointer: str) -> str:
-        return ",".join(
-            f"{'i' if isinstance(value, int) else 's'}:{name}"
-            for name, value in self.record.items()
-        )
+        return ",".join(f"{'i' if isinstance(value, int) else 's'}:{name}" for name, value in self.record.items())
 
     def infolist_string(self, pointer: str, name: str) -> str:
         value = self.record[name]
@@ -75,7 +72,5 @@ def test_snapshot_markers_include_events_and_report_trimmed_history(
     script["finish_buffer"]()
     assert len(script["markers"]) == 4
     assert {marker["timestamp"] for marker in script["markers"]} == {"2026-09-20T06:43:34.123Z"}
-    assert script["unread"] == [
-        {"network": "libera", "target": "#trimmed", "scope": "retained_lines"}
-    ]
+    assert script["unread"] == [{"network": "libera", "target": "#trimmed", "scope": "retained_lines"}]
     assert script["unresolved"] == []

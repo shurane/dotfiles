@@ -3,9 +3,9 @@
 from pathlib import Path
 
 import pytest
-
 from soju_extras.grep.cli import execute_search, main
 from soju_extras.models import SearchQuery
+
 from tests.conftest import add_message
 
 
@@ -29,9 +29,7 @@ def test_literal_search_accepts_punctuation(soju_db: Path, pattern: str) -> None
 def test_search_filters_order_and_limit(soju_db: Path) -> None:
     add_message(soju_db, "hello first")
     add_message(soju_db, "hello second")
-    query = SearchQuery(
-        pattern="hello", target="#python", network="libera", limit=1, db_path=soju_db
-    )
+    query = SearchQuery(pattern="hello", target="#python", network="libera", limit=1, db_path=soju_db)
     assert "second" in execute_search(query)[0].text
     assert execute_search(query.model_copy(update={"target": "#other"})) == []
 

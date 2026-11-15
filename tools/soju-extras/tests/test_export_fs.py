@@ -7,9 +7,9 @@ from contextlib import closing
 from pathlib import Path
 
 import pytest
-
 from soju_extras.export_fs.cli import SojuFSExporter, main
 from soju_extras.export_fs.storage import export_lock
+
 from tests.conftest import add_message
 from tests.test_regressions import exported_text
 
@@ -32,9 +32,7 @@ def test_incremental_and_bounded(soju_db: Path, tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize("committed", [False, True])
-def test_process_death_before_or_after_checkpoint(
-    soju_db: Path, tmp_path: Path, committed: bool
-) -> None:
+def test_process_death_before_or_after_checkpoint(soju_db: Path, tmp_path: Path, committed: bool) -> None:
     out = tmp_path / "out"
     add_message(soju_db, "original")
     SojuFSExporter(soju_db, out).run()
@@ -53,9 +51,7 @@ def terminate(value):
 exporter.set_last_synced_id = terminate
 exporter.run()
 """
-    result = subprocess.run(
-        [sys.executable, "-c", script, str(soju_db), str(out), str(committed)], check=False
-    )
+    result = subprocess.run([sys.executable, "-c", script, str(soju_db), str(out), str(committed)], check=False)
     assert result.returncode == 99
     assert (out / ".append-journal.json").exists()
     if not committed:
@@ -88,9 +84,7 @@ def test_path_encoding_and_symlink_escape(soju_db: Path, tmp_path: Path) -> None
     exporter = SojuFSExporter(soju_db, tmp_path / "out")
     record = exporter.fetch_new_records(0)[0]
     paths = [
-        exporter.get_target_log_path(
-            record.model_copy(update={"network": "/tmp/../outside", "target": value})
-        )
+        exporter.get_target_log_path(record.model_copy(update={"network": "/tmp/../outside", "target": value}))
         for value in ["#a/b", "#a_b", "..", "%2E%2E"]
     ]
     assert len(set(paths)) == 4
@@ -139,9 +133,7 @@ def test_changed_compression_or_missing_checkpoint_rejected(soju_db: Path, tmp_p
         (":alice!u@h PRIVMSG #python :\x01ACTION waves\x01", "* alice waves"),
     ],
 )
-def test_real_event_rows_with_null_text(
-    soju_db: Path, tmp_path: Path, raw: str, expected: str
-) -> None:
+def test_real_event_rows_with_null_text(soju_db: Path, tmp_path: Path, raw: str, expected: str) -> None:
     with closing(sqlite3.connect(soju_db)) as db, db:
         db.execute(
             "INSERT INTO Message(target,raw,time,sender,text) VALUES(1,?,'2026-09-30T10:00:00.000Z','alice',NULL)",
@@ -212,9 +204,7 @@ def test_backfill_is_inserted_chronologically_without_losing_archived_history(
 
 
 @pytest.mark.parametrize("batch_size", [1, 10])
-def test_initial_export_sorts_out_of_order_ids(
-    soju_db: Path, tmp_path: Path, batch_size: int
-) -> None:
+def test_initial_export_sorts_out_of_order_ids(soju_db: Path, tmp_path: Path, batch_size: int) -> None:
     add_message(soju_db, "later", time="2026-09-30T11:00:00.000Z")
     add_message(soju_db, "earlier", time="2026-09-30T09:00:00.000Z")
     add_message(soju_db, "same time", time="2026-09-30T09:00:00.000Z")
@@ -229,9 +219,7 @@ def test_initial_export_sorts_out_of_order_ids(
 
 @pytest.mark.parametrize("compress", [False, True])
 @pytest.mark.parametrize("stage", ["before_replace", "before_checkpoint", "after_checkpoint"])
-def test_backfill_process_death_and_retry(
-    soju_db: Path, tmp_path: Path, compress: bool, stage: str
-) -> None:
+def test_backfill_process_death_and_retry(soju_db: Path, tmp_path: Path, compress: bool, stage: str) -> None:
     import gzip
 
     out = tmp_path / "out"
@@ -260,19 +248,14 @@ os.replace = replace
 exporter.set_last_synced_id = checkpoint
 exporter.run()
 """
-    result = subprocess.run(
-        [sys.executable, "-c", script, str(soju_db), str(out), str(compress), stage], check=False
-    )
+    result = subprocess.run([sys.executable, "-c", script, str(soju_db), str(out), str(compress), stage], check=False)
     assert result.returncode == 99
     assert (out / ".append-journal.json").exists()
     exporter = SojuFSExporter(soju_db, out, compress=compress)
     exporter.run()
     exporter.run()
     paths = sorted(out.rglob("*.log.gz" if compress else "*.log"))
-    contents = [
-        gzip.decompress(path.read_bytes()).decode() if compress else path.read_text()
-        for path in paths
-    ]
+    contents = [gzip.decompress(path.read_bytes()).decode() if compress else path.read_text() for path in paths]
     assert [line.split("> ")[1] for line in contents[0].splitlines()] == ["backfill", "original"]
     assert [line.split("> ")[1] for line in contents[1].splitlines()] == ["other day"]
     assert exporter.get_last_synced_id() == 3

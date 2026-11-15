@@ -62,7 +62,7 @@ class BitwardenClient:
             with urllib.request.urlopen(req, timeout=timeout) as resp:  # noqa: S310
                 raw = resp.read().decode("utf-8")
                 return json.loads(raw) if raw else {}
-        except (urllib.error.URLError, TimeoutError, KeyError, json.JSONDecodeError, OSError):
+        except urllib.error.URLError, TimeoutError, KeyError, json.JSONDecodeError, OSError:
             return None
 
     def run_bw_cli(self, args: list[str], check: bool = False) -> subprocess.CompletedProcess[str]:
@@ -82,16 +82,14 @@ class BitwardenClient:
         combined_output = f"{res.stdout}\n{res.stderr}"
         if "Master password" in combined_output or "Vault is locked" in combined_output:
             raise VaultLockedError(
-                "Vault is locked and BW_SESSION is not set.\n"
-                "Please run: export BW_SESSION=$(bw unlock --raw)"
+                "Vault is locked and BW_SESSION is not set.\nPlease run: export BW_SESSION=$(bw unlock --raw)"
             )
 
         if res.returncode != 0:
             err = res.stderr.strip()
             if "BW_SESSION" not in os.environ:
                 raise VaultLockedError(
-                    "Vault is locked and BW_SESSION is not set.\n"
-                    "Please run: export BW_SESSION=$(bw unlock --raw)"
+                    "Vault is locked and BW_SESSION is not set.\nPlease run: export BW_SESSION=$(bw unlock --raw)"
                 )
             if check:
                 raise BitwardenError(f"Bitwarden CLI error: {err}")
@@ -120,14 +118,11 @@ class BitwardenClient:
 
         if locked_url:
             raise VaultLockedError(
-                f"Vault is locked on 'bw serve' ({locked_url}).\n"
-                "Please run: export BW_SESSION=$(bw unlock --raw)"
+                f"Vault is locked on 'bw serve' ({locked_url}).\nPlease run: export BW_SESSION=$(bw unlock --raw)"
             )
 
         if server_url:
-            raise ServeConnectionError(
-                f"Could not connect to custom Bitwarden server at {server_url}"
-            )
+            raise ServeConnectionError(f"Could not connect to custom Bitwarden server at {server_url}")
 
         return None
 
@@ -163,12 +158,7 @@ class BitwardenClient:
         f_json = self.http_request(f"{base_url}/list/object/folders", timeout=timeout)
         i_json = self.http_request(f"{base_url}/list/object/items", timeout=timeout)
 
-        if (
-            not f_json
-            or not f_json.get("success", True)
-            or not i_json
-            or not i_json.get("success", True)
-        ):
+        if not f_json or not f_json.get("success", True) or not i_json or not i_json.get("success", True):
             return None
 
         folders: list[dict[str, Any]] = f_json.get("data", {}).get("data", [])
@@ -221,9 +211,7 @@ class BitwardenClient:
                 sync_info = ""
                 if last_sync_dt:
                     age = int((Instant.now() - last_sync_dt).total("seconds"))
-                    sync_info = (
-                        f" (synced {age}s ago)" if age < 60 else f" (synced {age // 60}m ago)"
-                    )
+                    sync_info = f" (synced {age}s ago)" if age < 60 else f" (synced {age // 60}m ago)"
                 return serve_data[0], serve_data[1], f"Connected to bw serve{sync_info}"
 
         if server_url:
