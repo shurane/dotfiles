@@ -16,9 +16,10 @@ from typing import TYPE_CHECKING, Any
 
 import anyio
 import httpx
+import humanize
 from rich.panel import Panel
 from rich.table import Table
-from whenever import Instant
+from whenever import SYSTEM_TZ, Instant
 
 from common import format_bytes, format_connection_badge, format_route_line, render_command_header
 from models import ContainerName, HealthStatus, ServiceResult, StatusContext, TargetConnection
@@ -159,9 +160,7 @@ def normalize_hostname(host: str | None) -> str | None:
     return h or None
 
 
-_PLAYBACK_LOG_PATTERN = re.compile(
-    r"^(?P<user>.+?)\s+is playing\s+(?P<title>.+?)\s+on\s+(?P<device>.+)$"
-)
+_PLAYBACK_LOG_PATTERN = re.compile(r"^(?P<user>.+?)\s+is playing\s+(?P<title>.+?)\s+on\s+(?P<device>.+)$")
 
 
 def _resolve_ip_hostname(ip: str, timeout: float = 0.15) -> str | None:
@@ -281,6 +280,17 @@ def _format_relative_time(inst: Instant, now: Instant | None = None) -> str:
     if days < 7:
         return f"{days}d {rem_hours}h ago" if rem_hours > 0 else f"{days}d ago"
     return f"{days}d ago"
+
+
+def _format_playback_time(inst: Instant, now: Instant | None = None) -> str:
+    """Format an Instant into short time (hh:mm) and humanized relative duration (e.g. '08:34 • an hour ago')."""
+    if now is None:
+        now = Instant.now()
+    local_dt = inst.to_tz(SYSTEM_TZ)
+    short_time = f"{local_dt.hour:02d}:{local_dt.minute:02d}"
+    diff_sec = max(0.0, (now - inst).total("seconds"))
+    duration_ago = humanize.naturaltime(diff_sec)
+    return f"{short_time} • {duration_ago}"
 
 
 def _parse_qsv_speed(output: str) -> str:
@@ -444,9 +454,7 @@ async def _gather_jellyfin_raw_data(ctx: StatusContext) -> JellyfinRawData:
 
                 async def _get_activity() -> None:
                     with contextlib.suppress(httpx.HTTPError, KeyError, ValueError):
-                        a_res = await client.get(
-                            "/System/ActivityLog/Entries", params={"limit": 200}, headers=headers
-                        )
+                        a_res = await client.get("/System/ActivityLog/Entries", params={"limit": 200}, headers=headers)
                         if a_res.status_code == 200:
                             raw.activity_entries = a_res.json().get("Items", [])
 
@@ -747,7 +755,7 @@ def evaluate_jellyfin_report(
             return None
         try:
             return Instant.parse_iso(dt_str)
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             return None
 
     # Map session device IDs to endpoints
@@ -902,7 +910,7 @@ def evaluate_jellyfin_report(
             parsed_history.append(
                 PlaybackHistoryItem(
                     timestamp=dt.format_iso(),
-                    relative_time=_format_relative_time(dt, now),
+                    relative_time=_format_playback_time(dt, now),
                     username=user,
                     media_title=title,
                     device_name=dev_name,
@@ -1022,7 +1030,7 @@ def render_jellyfin_deep_report(report: JellyfinDeepReport, console: Console) ->
             show_header=True,
             header_style="bold cyan",
         )
-        history_table.add_column("Time", style="cyan", width=14)
+        history_table.add_column("Time", style="cyan", width=22)
         history_table.add_column("Media Title", style="bold green")
         history_table.add_column("User", style="yellow", width=12)
         history_table.add_column("Client / Device", style="magenta", width=26)
@@ -1200,29 +1208,23 @@ async def check_jellyfin(ctx: StatusContext) -> ServiceResult:
                     badge_inner = f"{short_plat} on {c.device_name}"
                 route_str = f" [dim]•[/dim] {c.route_badge}" if c.route_badge else ""
                 time_str = f" [dim]({c.relative_time})[/dim]" if c.relative_time else ""
-                client_lines.append(
-                    f"  • [bold cyan]{c.app_name}[/bold cyan]: {badge_inner}{route_str}{time_str}"
-                )
+                client_lines.append(f"  • [bold cyan]{c.app_name}[/bold cyan]: {badge_inner}{route_str}{time_str}")
             branches.append("\n".join(client_lines))
 
         # Recent plays branch (up to last 10 items)
         if report.plays_last_24h_count > 0:
             play_lines = [f"📜 Recent Plays (24h): [bold green]{report.plays_last_24h_count} item(s)[/bold green]"]
             for p in report.recent_playback[:10]:
-                dev_str = (
-                    f" on {p.client_name}"
-                    if p.client_name
-                    else (f" on {p.device_name}" if p.device_name else "")
-                )
+                dev_str = f" on {p.client_name}" if p.client_name else (f" on {p.device_name}" if p.device_name else "")
                 play_lines.append(
-                    f"  • [bold yellow]\"{p.media_title}\"[/bold yellow][dim]{dev_str} ({p.relative_time})[/dim]"
+                    f'  • [bold yellow]"{p.media_title}"[/bold yellow][dim]{dev_str} ({p.relative_time})[/dim]'
                 )
             branches.append("\n".join(play_lines))
         elif report.recent_playback:
             last_p = report.recent_playback[0]
             cl_str = f" ({last_p.client_name})" if last_p.client_name else ""
             branches.append(
-                f"📜 Recent Plays: [dim]0 in 24h • Last:[/dim] [bold yellow]\"{last_p.media_title}\"[/bold yellow] "
+                f'📜 Recent Plays: [dim]0 in 24h • Last:[/dim] [bold yellow]"{last_p.media_title}"[/bold yellow] '
                 f"[dim]on {last_p.device_name}{cl_str} ({last_p.relative_time})[/dim]"
             )
 

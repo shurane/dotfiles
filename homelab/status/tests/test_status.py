@@ -313,11 +313,13 @@ async def test_check_qbittorrent_interface_binding() -> None:
 
 def test_homelab_config_validation() -> None:
     # 1. Valid configuration with default ssh_user
-    cfg = HomelabConfig.model_validate({
-        "HOMELAB_PASSWORD": "secret_password",
-        "HOSTNAME_BASE": "example.com",
-        "HOMELAB_LAN_SUBNET": "192.168.1.0/24",
-    })
+    cfg = HomelabConfig.model_validate(
+        {
+            "HOMELAB_PASSWORD": "secret_password",
+            "HOSTNAME_BASE": "example.com",
+            "HOMELAB_LAN_SUBNET": "192.168.1.0/24",
+        }
+    )
     assert cfg.password == "secret_password"
     assert cfg.base_domain == "example.com"
     assert cfg.lan_subnet == "192.168.1.0/24"
@@ -325,13 +327,15 @@ def test_homelab_config_validation() -> None:
     assert cfg.effective_ssh_user == "username"
 
     # 2. SSH user override
-    cfg_ssh = HomelabConfig.model_validate({
-        "HOMELAB_PASSWORD": "secret_password",
-        "HOSTNAME_BASE": "example.com",
-        "HOMELAB_LAN_SUBNET": "192.168.1.0/24",
-        "HOMELAB_USERNAME": "alice",
-        "HOMELAB_SSH_USER": "admin",
-    })
+    cfg_ssh = HomelabConfig.model_validate(
+        {
+            "HOMELAB_PASSWORD": "secret_password",
+            "HOSTNAME_BASE": "example.com",
+            "HOMELAB_LAN_SUBNET": "192.168.1.0/24",
+            "HOMELAB_USERNAME": "alice",
+            "HOMELAB_SSH_USER": "admin",
+        }
+    )
     assert cfg_ssh.username == "alice"
     assert cfg_ssh.ssh_user == "admin"
     assert cfg_ssh.effective_ssh_user == "admin"
@@ -350,23 +354,29 @@ def test_homelab_config_validation() -> None:
 
     # 6. Empty values
     with pytest.raises(ValidationError):
-        HomelabConfig.model_validate({
-            "HOMELAB_PASSWORD": "",
-            "HOSTNAME_BASE": "example.com",
-            "HOMELAB_LAN_SUBNET": "192.168.1.0/24",
-        })
+        HomelabConfig.model_validate(
+            {
+                "HOMELAB_PASSWORD": "",
+                "HOSTNAME_BASE": "example.com",
+                "HOMELAB_LAN_SUBNET": "192.168.1.0/24",
+            }
+        )
     with pytest.raises(ValidationError):
-        HomelabConfig.model_validate({
-            "HOMELAB_PASSWORD": "secret_password",
-            "HOSTNAME_BASE": "",
-            "HOMELAB_LAN_SUBNET": "192.168.1.0/24",
-        })
+        HomelabConfig.model_validate(
+            {
+                "HOMELAB_PASSWORD": "secret_password",
+                "HOSTNAME_BASE": "",
+                "HOMELAB_LAN_SUBNET": "192.168.1.0/24",
+            }
+        )
     with pytest.raises(ValidationError):
-        HomelabConfig.model_validate({
-            "HOMELAB_PASSWORD": "secret_password",
-            "HOSTNAME_BASE": "example.com",
-            "HOMELAB_LAN_SUBNET": "",
-        })
+        HomelabConfig.model_validate(
+            {
+                "HOMELAB_PASSWORD": "secret_password",
+                "HOSTNAME_BASE": "example.com",
+                "HOMELAB_LAN_SUBNET": "",
+            }
+        )
 
 
 def test_container_name_enum() -> None:

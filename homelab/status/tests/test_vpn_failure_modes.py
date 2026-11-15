@@ -48,9 +48,7 @@ def _create_mock_context(
     ctx.connection = TargetConnection("server.lan", "192.168.1.10", "lan", "Direct LAN")
 
     c_gluetun = _make_mock_container("homelab-gluetun-1", status=gluetun_status, health=gluetun_health)
-    c_qbt = _make_mock_container(
-        "homelab-qbittorrent-1", status=qbt_status, net_mode=qbt_net_mode
-    )
+    c_qbt = _make_mock_container("homelab-qbittorrent-1", status=qbt_status, net_mode=qbt_net_mode)
 
     async def _get_container(name: str, full: bool = False) -> MagicMock | None:
         if "gluetun" in name:
@@ -89,12 +87,7 @@ def _create_mock_context(
             p_code, p_out = mapping.get("api/v2/app/preferences", (0, ""))
             m_code, m_out = mapping.get("api/v2/sync/maindata", (0, ""))
             t_code, t_out = mapping.get("api/v2/transfer/info", (0, ""))
-            batch_out = (
-                f"===PREFS===\n{p_out}\n"
-                f"===MAINDATA===\n{m_out}\n"
-                f"===TRANSFER===\n{t_out}\n"
-                "===END==="
-            )
+            batch_out = f"===PREFS===\n{p_out}\n===MAINDATA===\n{m_out}\n===TRANSFER===\n{t_out}\n===END==="
             overall_code = p_code or m_code or t_code
             return (overall_code, batch_out)
 
@@ -129,25 +122,31 @@ def _default_exec_map(
         f"ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:{forwarded_port}\n"
         f"ACCEPT     udp  --  0.0.0.0/0            0.0.0.0/0            udp dpt:{forwarded_port}\n"
     )
-    prefs_json = json.dumps({
-        "listen_port": qbt_port,
-        "current_network_interface": bound_interface,
-        "upnp": upnp,
-    })
-    maindata_json = json.dumps({
-        "server_state": {
+    prefs_json = json.dumps(
+        {
+            "listen_port": qbt_port,
+            "current_network_interface": bound_interface,
+            "upnp": upnp,
+        }
+    )
+    maindata_json = json.dumps(
+        {
+            "server_state": {
+                "connection_status": conn_status,
+                "dl_info_speed": 10240,
+                "up_info_speed": 5120,
+            },
+            "torrents": {"hash1": {}, "hash2": {}},
+        }
+    )
+    transfer_json = json.dumps(
+        {
             "connection_status": conn_status,
-            "dl_info_speed": 10240,
-            "up_info_speed": 5120,
-        },
-        "torrents": {"hash1": {}, "hash2": {}},
-    })
-    transfer_json = json.dumps({
-        "connection_status": conn_status,
-        "dht_nodes": dht_nodes,
-        "last_external_address_v4": ext_v4,
-        "last_external_address_v6": ext_v6,
-    })
+            "dht_nodes": dht_nodes,
+            "last_external_address_v4": ext_v4,
+            "last_external_address_v6": ext_v6,
+        }
+    )
 
     return {
         "ip -s link show dev tun0": (0, sample_tun),
@@ -555,4 +554,3 @@ async def test_peer_swarm_ip_pending() -> None:
     assert "qBittorrent Peer External IP" in c_dict
     assert c_dict["qBittorrent Peer External IP"].warning is True
     assert "Pending peer connection" in c_dict["qBittorrent Peer External IP"].details
-

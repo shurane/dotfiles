@@ -172,9 +172,7 @@ def _parse_smb_json(json_str: str) -> tuple[str | None, list[SmbClientSession], 
     locks: list[SmbLockInfo] = []
     raw_locks = data.get("open_files") or {}
     lock_items = (
-        raw_locks.values()
-        if isinstance(raw_locks, dict)
-        else (raw_locks if isinstance(raw_locks, list) else [])
+        raw_locks.values() if isinstance(raw_locks, dict) else (raw_locks if isinstance(raw_locks, list) else [])
     )
     for lk in lock_items:
         if not isinstance(lk, dict):
@@ -361,8 +359,7 @@ def evaluate_samba_report(raw: SambaRawData, connection: TargetConnection | None
                 name="TCP Port 445 Reachability",
                 passed=True,
                 details=(
-                    f"Port 445 open on {target_host} • "
-                    f"Latency: [bold cyan]{raw.port_445_latency_ms:.1f}ms[/bold cyan]"
+                    f"Port 445 open on {target_host} • Latency: [bold cyan]{raw.port_445_latency_ms:.1f}ms[/bold cyan]"
                 ),
             )
         )
@@ -555,8 +552,7 @@ def render_samba_deep_report(report: SambaDeepReport, console: Console) -> None:
         if shares_lines:
             shares_block = "\n".join(shares_lines)
             shares_section = (
-                f"• [bold]Shares Active ([bold cyan]{len(report.shares)}[/bold cyan] total):[/bold]\n"
-                f"{shares_block}\n"
+                f"• [bold]Shares Active ([bold cyan]{len(report.shares)}[/bold cyan] total):[/bold]\n{shares_block}\n"
             )
         else:
             styled_shares = [f"[bold magenta]{s}[/bold magenta]" for s in report.shares]

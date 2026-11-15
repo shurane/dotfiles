@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 from models import StatusContext, TargetConnection
 from services.jellyfin import (
     JellyfinRawData,
+    _format_playback_time,
     _format_relative_time,
     _parse_qsv_speed,
     _parse_vainfo_driver,
@@ -409,6 +410,27 @@ def test_format_relative_time() -> None:
     assert _format_relative_time(now - hours(2) - minutes(10), now) == "2h 10m ago"
     assert _format_relative_time(now - hours(77), now) == "3d 5h ago"
     assert _format_relative_time(now - hours(14 * 24), now) == "14d ago"
+
+
+def test_format_playback_time() -> None:
+    from whenever import SYSTEM_TZ, Instant, hours, minutes
+
+    now = Instant.now()
+    local_now = now.to_tz(SYSTEM_TZ)
+    expected_hm = f"{local_now.hour:02d}:{local_now.minute:02d}"
+
+    # Same timestamp -> "HH:mm • now"
+    assert _format_playback_time(now, now) == f"{expected_hm} • now"
+
+    # 5 minutes ago
+    five_min_ago = now - minutes(5)
+    local_five = five_min_ago.to_tz(SYSTEM_TZ)
+    assert _format_playback_time(five_min_ago, now) == f"{local_five.hour:02d}:{local_five.minute:02d} • 5 minutes ago"
+
+    # 2 hours ago
+    two_hours_ago = now - hours(2)
+    local_two = two_hours_ago.to_tz(SYSTEM_TZ)
+    assert _format_playback_time(two_hours_ago, now) == f"{local_two.hour:02d}:{local_two.minute:02d} • 2 hours ago"
 
 
 def test_classify_client_route() -> None:

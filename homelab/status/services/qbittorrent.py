@@ -522,8 +522,7 @@ def evaluate_qbittorrent_report(
     up_s = format_speed(state.up_speed)
     ratio = state.global_ratio
     swarm_details = (
-        f"Speeds: {dl_s} ↓, {up_s} ↑ • Swarm: {state.dht_nodes} DHT nodes, "
-        f"{state.total_peers} peers • Ratio: {ratio}"
+        f"Speeds: {dl_s} ↓, {up_s} ↑ • Swarm: {state.dht_nodes} DHT nodes, {state.total_peers} peers • Ratio: {ratio}"
     )
     report.checks.append(
         QbittorrentCheckItem(
@@ -787,9 +786,7 @@ async def check_qbittorrent(ctx: StatusContext) -> ServiceResult:
                 upnp_enabled = bool(prefs.get("upnp", False))
 
                 if iface in ("tun0", "wg0"):
-                    branches.append(
-                        f"🔒 Interface: [bold green]{iface}[/bold green] [dim]• Port: {listen_port}[/dim]"
-                    )
+                    branches.append(f"🔒 Interface: [bold green]{iface}[/bold green] [dim]• Port: {listen_port}[/dim]")
                 else:
                     status = HealthStatus.UNHEALTHY
                     branches.append(

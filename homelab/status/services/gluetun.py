@@ -211,6 +211,7 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
         raw.qbt_net_mode = host_config.get("NetworkMode", "")
 
     async with anyio.create_task_group() as tg:
+
         async def fetch_host() -> None:
             raw.host_ip = await _fetch_host_ip(ctx)
 
@@ -220,13 +221,13 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
         async def exec_gluetun_local() -> None:
             batch_cmd = (
                 "sh -c '"
-                "echo \"===TUN===\"; ip -s link show dev tun0 2>/dev/null; echo \"\"; "
-                "echo \"===RESOLV===\"; cat /etc/resolv.conf 2>/dev/null; echo \"\"; "
-                "echo \"===V6===\"; ip -6 route 2>/dev/null; echo \"\"; "
-                "echo \"===PORT===\"; cat /tmp/gluetun/forwarded_port 2>/dev/null; echo \"\"; "
-                "echo \"===IPTABLES===\"; iptables -nL INPUT 2>/dev/null; echo \"\"; "
-                "echo \"===NETSTAT===\"; netstat -tuln 2>/dev/null; echo \"\"; "
-                "echo \"===END===\""
+                'echo "===TUN==="; ip -s link show dev tun0 2>/dev/null; echo ""; '
+                'echo "===RESOLV==="; cat /etc/resolv.conf 2>/dev/null; echo ""; '
+                'echo "===V6==="; ip -6 route 2>/dev/null; echo ""; '
+                'echo "===PORT==="; cat /tmp/gluetun/forwarded_port 2>/dev/null; echo ""; '
+                'echo "===IPTABLES==="; iptables -nL INPUT 2>/dev/null; echo ""; '
+                'echo "===NETSTAT==="; netstat -tuln 2>/dev/null; echo ""; '
+                'echo "===END==="'
                 "'"
             )
             code, out = await ctx.exec_container(ContainerName.GLUETUN, batch_cmd)
@@ -244,17 +245,15 @@ async def _gather_vpn_raw_data(ctx: StatusContext) -> VpnRawData:
             )
 
         async def exec_dns_whoami() -> None:
-            _, raw.dns_whoami_raw = await ctx.exec_container(
-                ContainerName.GLUETUN, "nslookup whoami.akamai.net"
-            )
+            _, raw.dns_whoami_raw = await ctx.exec_container(ContainerName.GLUETUN, "nslookup whoami.akamai.net")
 
         async def exec_qbt() -> None:
             batch_qbt = (
                 "sh -c '"
-                "echo \"===PREFS===\"; wget -qO- http://127.0.0.1:8080/api/v2/app/preferences 2>/dev/null; "
-                "echo \"\n===MAINDATA===\"; wget -qO- http://127.0.0.1:8080/api/v2/sync/maindata 2>/dev/null; "
-                "echo \"\n===TRANSFER===\"; wget -qO- http://127.0.0.1:8080/api/v2/transfer/info 2>/dev/null; "
-                "echo \"\n===END===\""
+                'echo "===PREFS==="; wget -qO- http://127.0.0.1:8080/api/v2/app/preferences 2>/dev/null; '
+                'echo "\n===MAINDATA==="; wget -qO- http://127.0.0.1:8080/api/v2/sync/maindata 2>/dev/null; '
+                'echo "\n===TRANSFER==="; wget -qO- http://127.0.0.1:8080/api/v2/transfer/info 2>/dev/null; '
+                'echo "\n===END==="'
                 "'"
             )
             code, out = await ctx.exec_container(ContainerName.QBITTORRENT, batch_qbt)

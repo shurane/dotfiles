@@ -146,8 +146,7 @@ def resolve_target_connection(explicit_host: str | None = None) -> TargetConnect
         target_host = env_host
     else:
         console.print(
-            "[bold red]Error:[/bold red] Target host not specified. "
-            "Provide --host / -H or set HOMELAB_HOSTNAME in .env"
+            "[bold red]Error:[/bold red] Target host not specified. Provide --host / -H or set HOMELAB_HOSTNAME in .env"
         )
         sys.exit(1)
 
