@@ -324,14 +324,11 @@ def verify_jellyfin(auth: HomelabAuth) -> None:
 
 
 def check_jellyfin(auth: HomelabAuth) -> bool:
-    with httpx.Client(timeout=httpx.Timeout(5.0, connect=0.5)) as client, contextlib.suppress(httpx.HTTPError):
-        if jellyfin_login(client, auth.username, auth.password) is not None:
-            return True
-    db_path = ROOT / "jellyfin" / "config" / "data" / "jellyfin.db"
-    if db_path.exists():
-        with contextlib.suppress(sqlite3.Error, OSError), sqlite3.connect(db_path) as db:
-            row = db.execute("select Username from Users where Username = ?", (auth.username,)).fetchone()
-            return row is not None
+    with (
+        contextlib.suppress(httpx.HTTPError, OSError),
+        httpx.Client(timeout=httpx.Timeout(5.0, connect=0.5)) as client,
+    ):
+        return jellyfin_login(client, auth.username, auth.password) is not None
     return False
 
 

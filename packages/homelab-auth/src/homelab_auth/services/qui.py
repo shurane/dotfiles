@@ -74,20 +74,15 @@ def verify_qui(auth: HomelabAuth) -> None:
 
 
 def check_qui(auth: HomelabAuth) -> bool:
-    with contextlib.suppress(httpx.HTTPError, OSError), httpx.Client(timeout=5) as client:
+    with (
+        contextlib.suppress(httpx.HTTPError, OSError),
+        httpx.Client(timeout=httpx.Timeout(5.0, connect=0.5)) as client,
+    ):
         res = client.post(
             f"{QUI_URL}/api/auth/login",
             json={"username": auth.username, "password": auth.password},
         )
-        if res.status_code == 200:
-            return True
-
-    db_path = ROOT / "qui" / "config" / "qui.db"
-    if not db_path.exists():
-        return False
-    with contextlib.suppress(Exception), sqlite3.connect(db_path) as db:
-        row: tuple[str] | None = db.execute("select username from user where id = 1").fetchone()
-        return row is not None and row[0] == auth.username
+        return res.status_code == 200
     return False
 
 
