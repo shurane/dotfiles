@@ -39,16 +39,15 @@ def _maybe_dispatch_remote(config: MediaConfig, raw_args: list[str]) -> bool:
     raise typer.Exit(code=proc.returncode)
 
 
-def _run_scan_command(
-    subcommand: str,
-    *,
-    json_output: bool,
-    verbose: bool,
-    offline: bool,
+@app.command()
+def plan(
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON GapReport."),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show skipped extras and details."),
+    offline: bool = typer.Option(False, "--offline", help="Skip qBittorrent status check."),
 ) -> None:
-    """Shared implementation for read-only scan commands (status and plan)."""
+    """Preview planned hardlinks, in-progress torrents, review flags, and skipped extras."""
     config = load_config()
-    args = [subcommand]
+    args = ["plan"]
     if json_output:
         args.append("--json")
     if verbose:
@@ -62,26 +61,6 @@ def _run_scan_command(
         typer.echo(report.model_dump_json(indent=2))
         return
     render_gap_report(report, console=console, verbose=verbose)
-
-
-@app.command()
-def status(
-    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON GapReport."),
-    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show skipped extras and details."),
-    offline: bool = typer.Option(False, "--offline", help="Skip qBittorrent status check."),
-) -> None:
-    """Inspect in-progress torrents, pending media gaps, review items, and extras."""
-    _run_scan_command("status", json_output=json_output, verbose=verbose, offline=offline)
-
-
-@app.command()
-def plan(
-    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON GapReport."),
-    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show skipped extras and details."),
-    offline: bool = typer.Option(False, "--offline", help="Skip qBittorrent status check."),
-) -> None:
-    """Preview planned hardlinks and target folder mappings without modifying disk."""
-    _run_scan_command("plan", json_output=json_output, verbose=verbose, offline=offline)
 
 
 @app.command()

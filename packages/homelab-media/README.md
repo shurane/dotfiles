@@ -5,10 +5,7 @@ Fast, typed Python 3.14 CLI tool for auditing media library gaps between `/mnt/m
 ## Usage
 
 ```bash
-# Overview of in-progress torrents, sync gaps, flagged reviews, and skipped extras
-media status
-
-# Preview exact planned hardlink operations (or machine-readable JSON)
+# Preview exact planned hardlink operations, in-progress torrents, and skipped extras
 media plan
 media plan --json
 
