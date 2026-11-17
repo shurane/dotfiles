@@ -56,8 +56,8 @@ exporter.run()
     assert (out / ".append-journal.json").exists()
     if not committed:
         # Simulate a torn compressed append; recovery must remove those bytes too.
-        with next(out.rglob("*.gz")).open("ab") as stream:
-            stream.write(b"partial gzip member")
+        with next(out.rglob("*.zst")).open("ab") as stream:
+            stream.write(b"partial zstd frame")
     SojuFSExporter(soju_db, out).run()
     content = exported_text(out)
     assert len(content.splitlines()) == 3
@@ -71,7 +71,7 @@ def test_corrupt_checkpoint_and_bad_timestamp_fail(soju_db: Path, tmp_path: Path
     (out / ".last_synced_id").write_text("broken")
     add_message(soju_db)
     assert main(["--db-path", str(soju_db), "--output-dir", str(out)]) == 2
-    assert not list(out.rglob("*.gz"))
+    assert not list(out.rglob("*.zst"))
     (out / ".last_synced_id").unlink()
     with closing(sqlite3.connect(soju_db)) as db, db:
         db.execute("UPDATE Message SET time = 'invalid'")
@@ -144,6 +144,20 @@ def test_real_event_rows_with_null_text(soju_db: Path, tmp_path: Path, raw: str,
     assert expected in exported_text(out)
 
 
+def test_non_utf8_raw_bytes_decoded_with_replacement(soju_db: Path, tmp_path: Path) -> None:
+    raw_latin1 = (
+        b"@time=2026-10-04T21:14:23.017Z :Ratler!~ratler@stderr.eu JOIN #python Ratler :R\xf6ka hasch p\xe5 Venus"
+    )
+    with closing(sqlite3.connect(soju_db)) as db, db:
+        db.execute(
+            "INSERT INTO Message(target,raw,time,sender,text) VALUES(1,CAST(? AS TEXT),'2026-10-04T21:14:23.017Z','Ratler',NULL)",
+            (raw_latin1,),
+        )
+    out = tmp_path / "out"
+    assert SojuFSExporter(soju_db, out).run() == 0
+    assert "Joins: Ratler (Ratler!~ratler@stderr.eu)" in exported_text(out)
+
+
 @pytest.mark.parametrize("dry_run", [False, True])
 def test_live_writes_do_not_extend_run(
     soju_db: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, dry_run: bool
@@ -176,7 +190,7 @@ def test_live_writes_do_not_extend_run(
 def test_backfill_is_inserted_chronologically_without_losing_archived_history(
     soju_db: Path, tmp_path: Path, compress: bool
 ) -> None:
-    import gzip
+    from compression import zstd
 
     out = tmp_path / "out"
     add_message(soju_db, "archived", time="2026-09-30T10:00:00.000Z")
@@ -193,8 +207,8 @@ def test_backfill_is_inserted_chronologically_without_losing_archived_history(
     add_message(soju_db, "middle", time="2026-09-30T10:30:00.000Z")
     exporter.run()
     exporter.run()
-    path = next(out.rglob("*.log.gz" if compress else "*.log"))
-    text = gzip.decompress(path.read_bytes()).decode() if compress else path.read_text()
+    path = next(out.rglob("*.log.zst" if compress else "*.log"))
+    text = zstd.decompress(path.read_bytes()).decode() if compress else path.read_text()
     assert [line.split("> ")[1] for line in text.splitlines()] == [
         "backfill",
         "archived",
@@ -220,7 +234,7 @@ def test_initial_export_sorts_out_of_order_ids(soju_db: Path, tmp_path: Path, ba
 @pytest.mark.parametrize("compress", [False, True])
 @pytest.mark.parametrize("stage", ["before_replace", "before_checkpoint", "after_checkpoint"])
 def test_backfill_process_death_and_retry(soju_db: Path, tmp_path: Path, compress: bool, stage: str) -> None:
-    import gzip
+    from compression import zstd
 
     out = tmp_path / "out"
     add_message(soju_db, "original", time="2026-09-30T10:00:00.000Z")
@@ -254,8 +268,8 @@ exporter.run()
     exporter = SojuFSExporter(soju_db, out, compress=compress)
     exporter.run()
     exporter.run()
-    paths = sorted(out.rglob("*.log.gz" if compress else "*.log"))
-    contents = [gzip.decompress(path.read_bytes()).decode() if compress else path.read_text() for path in paths]
+    paths = sorted(out.rglob("*.log.zst" if compress else "*.log"))
+    contents = [zstd.decompress(path.read_bytes()).decode() if compress else path.read_text() for path in paths]
     assert [line.split("> ")[1] for line in contents[0].splitlines()] == ["backfill", "original"]
     assert [line.split("> ")[1] for line in contents[1].splitlines()] == ["other day"]
     assert exporter.get_last_synced_id() == 3
@@ -267,19 +281,19 @@ exporter.run()
 def test_legacy_unsorted_archive_is_repaired_without_dropping_duplicates(
     soju_db: Path, tmp_path: Path, compress: bool
 ) -> None:
-    import gzip
+    from compression import zstd
 
     out = tmp_path / "out"
     add_message(soju_db, "original", time="2026-09-30T10:00:00.000Z")
     SojuFSExporter(soju_db, out, compress=compress).run()
-    path = next(out.rglob("*.log.gz" if compress else "*.log"))
+    path = next(out.rglob("*.log.zst" if compress else "*.log"))
     # Simulate an older exporter, including its second-resolution timestamps.
     legacy = "[08:00:00] <alice> legacy\n" * 2
     with path.open("ab") as stream:
-        stream.write(gzip.compress(legacy.encode()) if compress else legacy.encode())
+        stream.write(zstd.compress(legacy.encode()) if compress else legacy.encode())
     add_message(soju_db, "new", time="2026-09-30T12:00:00.000Z")
     SojuFSExporter(soju_db, out, compress=compress).run()
-    text = gzip.decompress(path.read_bytes()).decode() if compress else path.read_text()
+    text = zstd.decompress(path.read_bytes()).decode() if compress else path.read_text()
     assert [line.split("> ")[1] for line in text.splitlines()] == [
         "legacy",
         "legacy",
@@ -287,3 +301,27 @@ def test_legacy_unsorted_archive_is_repaired_without_dropping_duplicates(
         "new",
     ]
     assert not list(out.rglob(".soju-reorder-*"))
+
+
+def test_export_validates_and_creates_target_directory_once_per_batch(
+    soju_db: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import os
+
+    for day in range(1, 6):
+        add_message(soju_db, f"msg {day}", time=f"2026-09-0{day}T10:00:00.000Z")
+    out = tmp_path / "out"
+    exporter = SojuFSExporter(soju_db, out, batch_size=10)
+    lstats = 0
+    orig_lstat = os.lstat
+
+    def counting_lstat(path: os.PathLike[str] | str, *, dir_fd: int | None = None) -> os.stat_result:
+        nonlocal lstats
+        if str(path).startswith(str(out)):
+            lstats += 1
+        return orig_lstat(path, dir_fd=dir_fd)
+
+    monkeypatch.setattr(os, "lstat", counting_lstat)
+    assert exporter.run() == 0
+    # 5 ancestor dirs (users..#python) + 5 daily log files + 5 top-level metadata/lock checks = 15 lstats (0 os.stat).
+    assert lstats == 15

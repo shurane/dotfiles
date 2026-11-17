@@ -457,3 +457,76 @@ def test_local_copy_exclusions_and_symlinks_without_rsync(
     assert (staged / "soju/nested/main.db").read_bytes() == b"content"
     assert (staged / "soju/other/.export.lock").read_bytes() == b"content"
     assert (staged / "soju/nested/link").readlink() == Path("../main.db")
+
+
+def test_verify_snapshot_caches_parent_directory_lstats(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import os
+
+    raw = tmp_path / "raw"
+    channel = raw / "users/u/networks/n/channels/#c"
+    channel.mkdir(parents=True)
+    for day in range(1, 6):
+        (channel / f"2026-10-0{day}.log").write_bytes(f"day {day}\n".encode())
+    snapshot = tmp_path / "snapshot"
+    pack_tree(raw, snapshot, stamp("2026-10-01"))
+
+    lstats = 0
+    orig_lstat = os.lstat
+
+    def counting_lstat(path: os.PathLike[str] | str, *, dir_fd: int | None = None) -> os.stat_result:
+        nonlocal lstats
+        lstats += 1
+        return orig_lstat(path, dir_fd=dir_fd)
+
+    monkeypatch.setattr(os, "lstat", counting_lstat)
+    verify_snapshot(snapshot)
+    # 1 manifest symlink check + 5 parent dirs + 5 files = 11 lstats (instead of 6 * 5 = 30).
+    assert lstats <= 12
+
+
+def test_pack_and_verify_open_each_file_once(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from typing import IO, Any
+
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    (raw / "plain.txt").write_bytes(b"plain text\n" * 50)
+    with gzip.open(raw / "gzipped.gz", "wb") as gz:
+        gz.write(b"gzipped text\n" * 50)
+    with zstd.open(raw / "compressed.zst", "wb") as zs:
+        zs.write(b"zstd text\n" * 50)
+
+    opens: list[tuple[Path, str]] = []
+    orig_open = Path.open
+
+    def counting_open(
+        self: Path,
+        mode: str = "r",
+        buffering: int = -1,
+        encoding: str | None = None,
+        errors: str | None = None,
+        newline: str | None = None,
+    ) -> IO[Any]:
+        opens.append((self, mode))
+        return orig_open(
+            self,
+            mode,
+            buffering=buffering,
+            encoding=encoding,
+            errors=errors,
+            newline=newline,
+        )
+
+    snapshot = tmp_path / "snapshot"
+    monkeypatch.setattr(Path, "open", counting_open)
+    pack_tree(raw, snapshot, stamp("2026-10-01"))
+    # Each source file is opened exactly once ("rb"), and each destination is opened once ("wb").
+    source_reads = [p.name for p, m in opens if p.parent == raw and "r" in m]
+    dest_writes = [p.name for p, m in opens if p.parent == snapshot and "w" in m]
+    assert sorted(source_reads) == ["compressed.zst", "gzipped.gz", "plain.txt"]
+    assert sorted(dest_writes) == ["compressed.zst", "gzipped.zst", "plain.txt.zst"]
+
+    opens.clear()
+    verify_snapshot(snapshot)
+    # verify_snapshot opens each stored .zst payload once (plus manifest.json via read_bytes).
+    verified_reads = [p.name for p, m in opens if p.parent == snapshot and m == "rb"]
+    assert sorted(verified_reads) == ["compressed.zst", "gzipped.zst", "manifest.json", "plain.txt.zst"]

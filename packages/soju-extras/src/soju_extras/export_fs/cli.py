@@ -5,7 +5,8 @@ import os
 import sqlite3
 import stat
 import sys
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
+from compression import zstd
 from pathlib import Path
 from urllib.parse import quote
 from uuid import uuid4
@@ -20,7 +21,6 @@ from soju_extras.export_fs.storage import (
     ExportIdentity,
     FileOffset,
     atomic_write,
-    durable_mkdir,
     export_lock,
     sync_directory,
 )
@@ -77,6 +77,7 @@ class SojuFSExporter:
         self,
         db_path: Path,
         output_dir: Path,
+        *,
         state_file: Path | None = None,
         compress: bool = True,
         dry_run: bool = False,
@@ -165,13 +166,20 @@ class SojuFSExporter:
 
     def _contained_path(self, relative: str) -> Path:
         path = self.output_dir / relative
-        if not path.resolve().is_relative_to(self.output_dir):
-            raise ValueError(f"Output path escapes the export directory: {relative!r}")
+        cur = self.output_dir
+        for part in Path(relative).parts:
+            cur = cur / part
+            try:
+                st = cur.lstat()
+            except FileNotFoundError:
+                break
+            if stat.S_ISLNK(st.st_mode):
+                raise ValueError(f"Output path escapes the export directory: {relative!r}")
         return path
 
     def get_target_log_path(self, record: ExportedLogRecord) -> Path:
         kind = "channels" if record.target.startswith(("#", "&", "!", "+")) else "users"
-        ext = ".log.gz" if self.compress else ".log"
+        ext = ".log.zst" if self.compress else ".log"
         path = (
             Path("users")
             / path_component(record.username)
@@ -183,6 +191,28 @@ class SojuFSExporter:
         )
         return self._contained_path(str(path))
 
+    def _rollback_entry(self, entry: FileOffset) -> None:
+        path = self._contained_path(entry.relative_path)
+        if entry.backup_path is not None:
+            backup = self._contained_path(entry.backup_path)
+            if backup.exists():
+                backup.replace(path)
+            # No backup means replacement had not started, or a previous
+            # recovery already restored the original via atomic rename.
+            elif not path.exists() or path.stat().st_size != entry.size:
+                raise ValueError(f"Cannot recover replacement without its backup: {path}")
+        elif entry.size is None:
+            path.unlink(missing_ok=True)
+        else:
+            if not path.exists() or path.stat().st_size < entry.size:
+                raise ValueError(f"Cannot recover shortened/missing output: {path}")
+            with path.open("r+b") as stream:
+                stream.truncate(entry.size)
+                stream.flush()
+                os.fsync(stream.fileno())
+        if path.parent.exists():
+            sync_directory(path.parent)
+
     def _recover(self) -> None:
         if not self.journal_file.exists():
             return
@@ -191,26 +221,7 @@ class SojuFSExporter:
         if checkpoint == journal.previous_id:
             self._log_orders.clear()
             for entry in journal.files:
-                path = self._contained_path(entry.relative_path)
-                if entry.backup_path is not None:
-                    backup = self._contained_path(entry.backup_path)
-                    if backup.exists():
-                        backup.replace(path)
-                    # No backup means replacement had not started, or a previous
-                    # recovery already restored the original via atomic rename.
-                    elif not path.exists() or path.stat().st_size != entry.size:
-                        raise ValueError(f"Cannot recover replacement without its backup: {path}")
-                elif entry.size is None:
-                    path.unlink(missing_ok=True)
-                else:
-                    if not path.exists() or path.stat().st_size < entry.size:
-                        raise ValueError(f"Cannot recover shortened/missing output: {path}")
-                    with path.open("r+b") as stream:
-                        stream.truncate(entry.size)
-                        stream.flush()
-                        os.fsync(stream.fileno())
-                if path.parent.exists():
-                    sync_directory(path.parent)
+                self._rollback_entry(entry)
         elif checkpoint != journal.latest_id:
             raise ValueError("Checkpoint does not match the pending export journal")
         for entry in journal.files:
@@ -222,91 +233,122 @@ class SojuFSExporter:
         self.journal_file.unlink()
         sync_directory(self.output_dir)
 
-    def append_records_to_disk(self, records: list[ExportedLogRecord]) -> None:
+    def _replace_entry(self, path: Path, entry: FileOffset, lines: list[str], order: LogOrder) -> None:
+        if entry.backup_path is None or entry.replacement_path is None or entry.sort_path is None:
+            raise RuntimeError("Missing replacement or sort path for backup entry")
+        backup = self._contained_path(entry.backup_path)
+        replacement = self._contained_path(entry.replacement_path)
+        sort_file = self._contained_path(entry.sort_path)
+        os.link(path, backup)
+        sync_directory(path.parent)
+        rewrite_log(path, replacement, sort_file, lines, compress=self.compress, ordered=order.ordered)
+        replacement.chmod(stat.S_IMODE(path.stat().st_mode))
+        with replacement.open("rb") as stream:
+            os.fsync(stream.fileno())
+        replacement.replace(path)
+        sync_directory(path.parent)
+        self._remember_order(path, LogOrder(max(order.latest, line_time(lines[-1]))))
+
+    def _prepare_target_dirs(self, rel_dirs: Iterable[Path]) -> list[Path]:
+        ancestor_dirs = {parent for rel_dir in rel_dirs for parent in (rel_dir, *rel_dir.parents) if str(parent) != "."}
+        missing: list[Path] = []
+        for rel in sorted(ancestor_dirs):
+            cur = self.output_dir / rel
+            try:
+                st = cur.lstat()
+            except FileNotFoundError:
+                missing.append(cur)
+                continue
+            if stat.S_ISLNK(st.st_mode) or not stat.S_ISDIR(st.st_mode):
+                raise ValueError(f"Output path escapes the export directory: {rel.as_posix()!r}")
+        return missing
+
+    def _group_records(self, records: list[ExportedLogRecord]) -> tuple[dict[Path, list[str]], list[Path]]:
         buffers: dict[Path, list[str]] = {}
-        paths: dict[tuple[str, str, str, str], Path] = {}
+        target_dirs: dict[tuple[str, str, str], Path] = {}
+        rel_dirs: list[Path] = []
+        ext = ".log.zst" if self.compress else ".log"
         for record in records:
-            key = (
-                record.username,
-                record.network,
-                record.target,
-                record.timestamp.format_iso()[:10],
-            )
-            if key not in paths:
-                paths[key] = self.get_target_log_path(record)
-            buffers.setdefault(paths[key], []).append(self.format_log_line(record))
+            target_key = (record.username, record.network, record.target)
+            if target_key not in target_dirs:
+                kind = "channels" if record.target.startswith(("#", "&", "!", "+")) else "users"
+                rel_dir = (
+                    Path("users")
+                    / path_component(record.username)
+                    / "networks"
+                    / path_component(record.network)
+                    / kind
+                    / path_component(record.target)
+                )
+                rel_dirs.append(rel_dir)
+                target_dirs[target_key] = self.output_dir / rel_dir
+            path = target_dirs[target_key] / (record.timestamp.format_iso()[:10] + ext)
+            buffers.setdefault(path, []).append(self.format_log_line(record))
+        return buffers, self._prepare_target_dirs(rel_dirs)
+
+    def append_records_to_disk(self, records: list[ExportedLogRecord]) -> None:
+        buffers, missing_dirs = self._group_records(records)
         entries: list[FileOffset] = []
         orders: dict[Path, LogOrder] = {}
+        buffers_by_rel: dict[str, Path] = {}
         for path, lines in buffers.items():
             lines.sort(key=line_time)
-            order = self._get_log_order(path)
+            order, size = self._get_log_order(path)
             orders[path] = order
             relative_path = str(path.relative_to(self.output_dir))
+            buffers_by_rel[relative_path] = path
             if not order.ordered or (order.latest and line_time(lines[0]) < order.latest):
                 temporary = path.parent / (".soju-reorder-" + uuid4().hex)
                 relative_temp = str(temporary.relative_to(self.output_dir))
                 entries.append(
                     FileOffset(
                         relative_path=relative_path,
-                        size=path.stat().st_size,
+                        size=size,
                         backup_path=relative_temp + ".before",
                         replacement_path=relative_temp + ".after",
                         sort_path=relative_temp + ".sqlite",
                     )
                 )
             else:
-                entries.append(
-                    FileOffset(
-                        relative_path=relative_path,
-                        size=path.stat().st_size if path.exists() else None,
-                    )
-                )
+                entries.append(FileOffset(relative_path=relative_path, size=size))
         journal = AppendJournal(previous_id=self.get_last_synced_id(), latest_id=records[-1].msg_id, files=entries)
         atomic_write(self.journal_file, journal.model_dump_json())
+        for cur in missing_dirs:
+            cur.mkdir(exist_ok=True)
+        for parent in sorted({cur.parent for cur in missing_dirs}, reverse=True):
+            sync_directory(parent)
+        synced_parents: set[Path] = set()
         for entry in entries:
-            path = self._contained_path(entry.relative_path)
+            path = buffers_by_rel[entry.relative_path]
             lines = buffers[path]
-            durable_mkdir(path.parent)
             if entry.backup_path is not None:
-                if entry.replacement_path is None or entry.sort_path is None:
-                    raise RuntimeError("Missing replacement or sort path for backup entry")
-                backup = self._contained_path(entry.backup_path)
-                replacement = self._contained_path(entry.replacement_path)
-                sort_file = self._contained_path(entry.sort_path)
-                os.link(path, backup)
-                sync_directory(path.parent)
-                rewrite_log(
-                    path,
-                    replacement,
-                    sort_file,
-                    lines,
-                    compress=self.compress,
-                    ordered=orders[path].ordered,
-                )
-                replacement.chmod(stat.S_IMODE(path.stat().st_mode))
-                with replacement.open("rb") as stream:
-                    os.fsync(stream.fileno())
-                replacement.replace(path)
+                self._replace_entry(path, entry, lines, orders[path])
             else:
-                write_log(path, lines, compress=self.compress, append=True)
-            sync_directory(path.parent)
-            self._remember_order(path, LogOrder(max(orders[path].latest, line_time(lines[-1]))))
+                info = write_log(path, lines, compress=self.compress, append=True)
+                if entry.size is None:
+                    synced_parents.add(path.parent)
+                self._remember_order(path, LogOrder(max(orders[path].latest, line_time(lines[-1]))), info=info)
+        for parent in synced_parents:
+            sync_directory(parent)
 
-    def _get_log_order(self, path: Path) -> LogOrder:
-        if not path.exists():
-            return LogOrder()
-        info = path.stat()
+    def _get_log_order(self, path: Path) -> tuple[LogOrder, int | None]:
+        try:
+            info = path.lstat()
+        except FileNotFoundError:
+            return LogOrder(), None
+        if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode):
+            raise ValueError(f"Output path escapes the export directory: {path}")
         cached = self._log_orders.get(path)
         if cached is not None and cached[:2] == (info.st_size, info.st_mtime_ns):
-            return cached[2]
-        return inspect_log(path, compress=self.compress)
+            return cached[2], info.st_size
+        return inspect_log(path, compress=self.compress), info.st_size
 
-    def _remember_order(self, path: Path, order: LogOrder) -> None:
+    def _remember_order(self, path: Path, order: LogOrder, *, info: os.stat_result | None = None) -> None:
         # Bound metadata independently of the number of destinations in a history.
         if path not in self._log_orders and len(self._log_orders) >= 128:
             self._log_orders.pop(next(iter(self._log_orders)))
-        info = path.stat()
-        self._log_orders[path] = (info.st_size, info.st_mtime_ns, order)
+        st = info if info is not None else path.stat()
+        self._log_orders[path] = (st.st_size, st.st_mtime_ns, order)
 
     def _run(self, force_all: bool, since_id: int | None) -> int:
         identity = ExportIdentity(
@@ -386,13 +428,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         exporter = SojuFSExporter(
             args.db_path,
             args.output_dir,
-            args.state_file,
+            state_file=args.state_file,
             compress=not args.uncompressed,
             dry_run=args.dry_run,
             batch_size=args.batch_size,
         )
         return exporter.run(args.force_all, args.since_id)
-    except (OSError, sqlite3.Error, ValueError) as exc:
+    except (OSError, sqlite3.Error, ValueError, zstd.ZstdError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 2
 

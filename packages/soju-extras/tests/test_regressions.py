@@ -1,7 +1,7 @@
 """Behavioral regressions against the real schema, including interrupted writes."""
 
-import gzip
 import sqlite3
+from compression import zstd
 from contextlib import closing
 from pathlib import Path
 
@@ -15,7 +15,7 @@ from tests.conftest import add_message
 
 
 def exported_text(root: Path) -> str:
-    return "".join(gzip.decompress(p.read_bytes()).decode() for p in sorted(root.rglob("*.log.gz")))
+    return "".join(zstd.decompress(p.read_bytes()).decode() for p in sorted(root.rglob("*.log.zst")))
 
 
 def test_search_real_fts_schema(soju_db: Path) -> None:

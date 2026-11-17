@@ -24,6 +24,7 @@ def open_soju_db(path: Path | str, *, readonly: bool = False) -> Generator[sqlit
         )
     ) as conn:
         conn.row_factory = sqlite3.Row
+        conn.text_factory = lambda b: b.decode("utf-8", errors="replace")
         execute(conn, "PRAGMA foreign_keys = ON")
         execute(conn, "PRAGMA temp_store = FILE")
         if readonly:

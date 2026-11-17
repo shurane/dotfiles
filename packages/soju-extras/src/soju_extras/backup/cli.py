@@ -24,7 +24,7 @@ class Arguments(argparse.Namespace):
     timezone: str = "America/Chicago"
 
 
-def main() -> None:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="action", required=True)
     for action, description in (
@@ -42,6 +42,11 @@ def main() -> None:
             for period, count in (("daily", 7), ("weekly", 4), ("monthly", 6)):
                 command.add_argument("--" + period, type=int, default=count)
             command.add_argument("--timezone", default="America/Chicago")
+    return parser
+
+
+def main() -> None:
+    parser = build_parser()
     args = parser.parse_args(namespace=Arguments())
     try:
         match args.action:

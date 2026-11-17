@@ -2,16 +2,17 @@
 
 import gzip
 import hashlib
+import io
 import os
 import shutil
 import sqlite3
 import stat
-from collections.abc import Generator
+from collections.abc import Buffer, Generator, Sequence
 from compression import zstd
 from contextlib import closing, contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import BinaryIO, Literal
+from typing import BinaryIO, Literal, override
 
 from pydantic import BaseModel, ConfigDict
 
@@ -64,6 +65,57 @@ def backup_database(source: Path, destination: Path) -> None:
     check_database(destination)
 
 
+class _HashingStream(io.RawIOBase):
+    """Wrap a binary stream, updating a SHA-256 digest on every read or write."""
+
+    def __init__(
+        self,
+        stream: io.BufferedReader | io.BufferedWriter,
+        digest: hashlib._Hash,
+        tee: io.BufferedWriter | None = None,
+    ) -> None:
+        self._stream = stream
+        self._digest = digest
+        self._tee = tee
+
+    @override
+    def read(self, size: int = -1, /) -> bytes:
+        chunk = self._stream.read(size)
+        if chunk:
+            self._digest.update(chunk)
+            if self._tee is not None:
+                self._tee.write(chunk)
+        return chunk
+
+    @override
+    def readinto(self, buffer: Buffer, /) -> int:
+        n = self._stream.readinto(buffer)
+        if n:
+            view = memoryview(buffer)[:n]
+            self._digest.update(view)
+            if self._tee is not None:
+                self._tee.write(view)
+        return n
+
+    @override
+    def write(self, b: Buffer, /) -> int:
+        self._digest.update(b)
+        return self._stream.write(b)
+
+    @override
+    def flush(self) -> None:
+        if not self._stream.closed:
+            self._stream.flush()
+
+    @override
+    def readable(self) -> bool:
+        return True
+
+    @override
+    def writable(self) -> bool:
+        return True
+
+
 def sha256(path: Path) -> str:
     with path.open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
@@ -94,11 +146,28 @@ def decoded_digest(path: Path, encoding: Literal["plain", "gzip", "zstd"]) -> tu
     return size, digest.hexdigest()
 
 
+def verify_zstd_payload(path: Path) -> tuple[str, int, str]:
+    """Single-pass verification returning (stored_sha256, decoded_size, decoded_sha256)."""
+    stored_digest = hashlib.sha256()
+    decoded_digest_obj = hashlib.sha256()
+    size = 0
+    with path.open("rb") as raw:
+        hashed = _HashingStream(raw, stored_digest)
+        with zstd.open(hashed, "rb") as reader:  # type: ignore[arg-type]
+            while chunk := reader.read(1024 * 1024):
+                decoded_digest_obj.update(chunk)
+                size += len(chunk)
+        while hashed.read(1024 * 1024):
+            pass
+    return stored_digest.hexdigest(), size, decoded_digest_obj.hexdigest()
+
+
 def reuse_file(
     source: Path,
     destination: Path,
     previous: Path,
     entry: FileEntry,
+    *,
     source_hash: str,
     mode: int,
 ) -> FileEntry | None:
@@ -115,7 +184,7 @@ def reuse_file(
     elif decoded_digest(source, entry.encoding) != (entry.size, entry.sha256):
         return None
     try:
-        old = stored_file(previous, entry.stored)
+        old = _regular_stored_file(previous, entry.stored)
     except OSError, ValueError:
         return None
     if sha256(old) != entry.stored_sha256:
@@ -136,46 +205,76 @@ def pack_file(
         "gzip" if source.suffix == ".gz" else "zstd" if source.suffix == ".zst" else "plain"
     )
     digest = hashlib.sha256()
+    source_digest = hashlib.sha256()
+    stored_digest = hashlib.sha256()
     size = 0
-    before = source.stat()
-    with decoded(source, encoding) as reader:
-        if encoding == "zstd":
-            # Validate its decoded contents; reuse the already compressed bytes.
-            while chunk := reader.read(1024 * 1024):
-                digest.update(chunk)
-                size += len(chunk)
-            shutil.copyfile(source, destination)
-        else:
-            with zstd.open(
-                destination,
-                "wb",
-                options={
-                    zstd.CompressionParameter.nb_workers: 2 if before.st_size >= 8 * 1024 * 1024 else 0,
-                    zstd.CompressionParameter.checksum_flag: 1,
-                },
-            ) as writer:
-                writer.write(b"")  # Emit a valid frame even when the source is empty.
-                while chunk := reader.read(1024 * 1024):
-                    digest.update(chunk)
-                    size += len(chunk)
-                    writer.write(chunk)
-    after = source.stat()
-    if (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
-        raise ValueError(f"Source changed while packing: {source}")
-    destination.chmod(0o600)
-    os.utime(destination, ns=(before.st_atime_ns, before.st_mtime_ns))
-    with destination.open("rb") as stream:
-        os.fsync(stream.fileno())
+    with source.open("rb") as raw_source:
+        before = os.fstat(raw_source.fileno())
+        with destination.open("wb") as raw_dest:
+            if encoding == "zstd":
+                # Validate decoded contents while streaming raw bytes to destination in one pass.
+                hashed_source = _HashingStream(raw_source, source_digest, tee=raw_dest)
+                with zstd.open(hashed_source, "rb") as reader:
+                    while chunk := reader.read(1024 * 1024):
+                        digest.update(chunk)
+                        size += len(chunk)
+                while hashed_source.read(1024 * 1024):
+                    pass
+            else:
+                hashed_source = _HashingStream(raw_source, source_digest)
+                hashed_dest = _HashingStream(raw_dest, stored_digest)
+                with zstd.open(
+                    hashed_dest,
+                    "wb",
+                    options={
+                        zstd.CompressionParameter.nb_workers: 2 if before.st_size >= 8 * 1024 * 1024 else 0,
+                        zstd.CompressionParameter.checksum_flag: 1,
+                    },
+                ) as writer:
+                    writer.write(b"")  # Emit a valid frame even when the source is empty.
+                    if encoding == "gzip":
+                        with gzip.GzipFile(fileobj=hashed_source, mode="rb") as gz_reader:  # type: ignore[arg-type]
+                            while chunk := gz_reader.read(1024 * 1024):
+                                digest.update(chunk)
+                                size += len(chunk)
+                                writer.write(chunk)
+                        while hashed_source.read(1024 * 1024):
+                            pass
+                    else:
+                        while chunk := hashed_source.read(1024 * 1024):
+                            digest.update(chunk)
+                            size += len(chunk)
+                            writer.write(chunk)
+            after = os.fstat(raw_source.fileno())
+            if (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
+                raise ValueError(f"Source changed while packing: {source}")
+            raw_dest.flush()
+            os.fchmod(raw_dest.fileno(), 0o600)
+            os.utime(raw_dest.fileno(), ns=(before.st_atime_ns, before.st_mtime_ns))
+            os.fsync(raw_dest.fileno())
+    actual_source_hash = source_hash if source_hash is not None else source_digest.hexdigest()
     return FileEntry(
         path=relative,
         stored=stored,
         mode=stat.S_IMODE(before.st_mode),
         size=size,
         sha256=digest.hexdigest(),
-        stored_sha256=sha256(destination),
+        stored_sha256=actual_source_hash if encoding == "zstd" else stored_digest.hexdigest(),
         encoding=encoding,
-        source_sha256=source_hash if source_hash is not None else sha256(source),
+        source_sha256=actual_source_hash,
     )
+
+
+def _stored_name(relative: str, stored_paths: set[str]) -> str:
+    stored = (
+        relative[:-3] + ".zst"
+        if relative.endswith(".gz")
+        else (relative if relative.endswith(".zst") else relative + ".zst")
+    )
+    if stored in stored_paths or stored in (MANIFEST, RECEIPT):
+        raise ValueError(f"Compressed path collision: {relative}")
+    stored_paths.add(stored)
+    return stored
 
 
 def pack_tree(
@@ -187,47 +286,51 @@ def pack_tree(
 ) -> Manifest:
     """Input is a private staging tree. No source symlinks are followed."""
     destination.mkdir(mode=0o700)
-    prior = (
-        {entry.path: entry for entry in read_manifest(previous).entries if isinstance(entry, FileEntry)}
-        if previous
-        else {}
-    )
+    prior: dict[str, FileEntry] = {}
+    if previous is not None:
+        prior_manifest = read_manifest(previous)
+        _validate_snapshot_dirs(previous, prior_manifest.entries)
+        prior = {entry.path: entry for entry in prior_manifest.entries if isinstance(entry, FileEntry)}
     entries: list[SnapshotEntry] = []
     stored_paths: set[str] = set()
+    synced_dirs: set[Path] = {destination}
     for path in sorted(source.rglob("*")):
         relative = path.relative_to(source).as_posix()
         info = path.lstat()
         mode = stat.S_IMODE(info.st_mode)
-        if path.is_symlink():
+        if stat.S_ISLNK(info.st_mode):
             entries.append(SymlinkEntry(path=relative, mode=mode, target=str(path.readlink())))
-        elif path.is_dir():
+        elif stat.S_ISDIR(info.st_mode):
             entries.append(DirectoryEntry(path=relative, mode=mode))
-        elif path.is_file():
-            stored = (
-                relative[:-3] + ".zst"
-                if relative.endswith(".gz")
-                else (relative if relative.endswith(".zst") else relative + ".zst")
-            )
-            if stored in stored_paths or stored in (MANIFEST, RECEIPT):
-                raise ValueError(f"Compressed path collision: {relative}")
-            stored_paths.add(stored)
+            out_dir = destination / relative
+            out_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+            synced_dirs.add(out_dir)
+        elif stat.S_ISREG(info.st_mode):
+            stored = _stored_name(relative, stored_paths)
             output = destination / stored
-            output.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-            source_hash = sha256(path)
+            if output.parent not in synced_dirs:
+                output.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                synced_dirs.add(output.parent)
             old = prior.get(relative)
             entry = None
+            source_hash: str | None = None
             if previous is not None and old is not None and old.stored == stored:
-                entry = reuse_file(path, output, previous, old, source_hash, mode)
-            if entry is None:
-                entry = pack_file(path, output, relative, stored, source_hash=source_hash)
-            entries.append(entry)
+                source_hash = sha256(path)
+                entry = reuse_file(
+                    path,
+                    output,
+                    previous,
+                    old,
+                    source_hash=source_hash,
+                    mode=mode,
+                )
+            entries.append(entry or pack_file(path, output, relative, stored, source_hash=source_hash))
         else:
             raise ValueError(f"Cannot back up special file: {path}")
     manifest = Manifest(snapshot=name, entries=entries)
     atomic_write(destination / MANIFEST, manifest.model_dump_json(indent=2) + "\n")
-    for directory in sorted((p for p in destination.rglob("*") if p.is_dir()), reverse=True):
+    for directory in sorted(synced_dirs, reverse=True):
         sync_directory(directory)
-    sync_directory(destination)
     return manifest
 
 
@@ -240,25 +343,87 @@ def read_manifest(root: Path) -> Manifest:
 
 def stored_file(root: Path, relative: str) -> Path:
     path = root / relative
-    if path.is_symlink() or path.resolve() != path.absolute() or not path.is_file():
+    cur = root
+    parts = Path(relative).parts
+    for i, part in enumerate(parts):
+        cur = cur / part
+        try:
+            st = cur.lstat()
+        except OSError as error:
+            raise ValueError(f"Expected a regular stored file: {relative}") from error
+        if stat.S_ISLNK(st.st_mode):
+            raise ValueError(f"Expected a regular stored file: {relative}")
+        is_last = i == len(parts) - 1
+        if is_last and not stat.S_ISREG(st.st_mode):
+            raise ValueError(f"Expected a regular stored file: {relative}")
+        if not is_last and not stat.S_ISDIR(st.st_mode):
+            raise ValueError(f"Expected a regular stored file: {relative}")
+    return path
+
+
+def _validate_snapshot_dirs(root: Path, entries: Sequence[SnapshotEntry]) -> None:
+    parents = {
+        str(parent)
+        for entry in entries
+        if isinstance(entry, FileEntry)
+        for parent in Path(entry.stored).parents
+        if str(parent) != "."
+    }
+    for rel_dir in sorted(parents):
+        cur = root / rel_dir
+        try:
+            st = cur.lstat()
+        except OSError as error:
+            raise ValueError(f"Expected a regular stored file: {rel_dir}") from error
+        if stat.S_ISLNK(st.st_mode) or not stat.S_ISDIR(st.st_mode):
+            raise ValueError(f"Expected a regular stored file: {rel_dir}")
+
+
+def _regular_stored_file(root: Path, relative: str) -> Path:
+    path = root / relative
+    try:
+        st = path.lstat()
+    except OSError as error:
+        raise ValueError(f"Expected a regular stored file: {relative}") from error
+    if stat.S_ISLNK(st.st_mode) or not stat.S_ISREG(st.st_mode):
         raise ValueError(f"Expected a regular stored file: {relative}")
     return path
 
 
 def verify_snapshot(root: Path) -> Manifest:
     manifest = read_manifest(root)
+    _validate_snapshot_dirs(root, manifest.entries)
     for entry in manifest.entries:
         if isinstance(entry, FileEntry):
-            path = stored_file(root, entry.stored)
-            if sha256(path) != entry.stored_sha256:
-                raise ValueError(f"Stored checksum mismatch: {entry.path}")
+            path = _regular_stored_file(root, entry.stored)
             try:
-                contents = decoded_digest(path, "zstd")
+                stored_hash, size, decoded_hash = verify_zstd_payload(path)
             except (EOFError, zstd.ZstdError) as error:
+                if sha256(path) != entry.stored_sha256:
+                    raise ValueError(f"Stored checksum mismatch: {entry.path}") from error
                 raise ValueError(f"Invalid Zstandard payload: {entry.path}") from error
-            if contents != (entry.size, entry.sha256):
+            if stored_hash != entry.stored_sha256:
+                raise ValueError(f"Stored checksum mismatch: {entry.path}")
+            if (size, decoded_hash) != (entry.size, entry.sha256):
                 raise ValueError(f"Decoded checksum mismatch: {entry.path}")
     return manifest
+
+
+def _restore_file_entry(root: Path, stage: Path, entry: FileEntry) -> None:
+    output = stage / entry.path
+    output.parent.mkdir(parents=True, exist_ok=True)
+    source = _regular_stored_file(root, entry.stored)
+    if entry.encoding == "zstd":
+        shutil.copyfile(source, output)
+    else:
+        with zstd.open(source, "rb") as reader:
+            if entry.encoding == "gzip":
+                with gzip.open(output, "wb") as writer:
+                    shutil.copyfileobj(reader, writer, 1024 * 1024)
+            else:
+                with output.open("wb") as writer:
+                    shutil.copyfileobj(reader, writer, 1024 * 1024)
+    output.chmod(entry.mode)
 
 
 def restore_snapshot(root: Path, destination: Path) -> None:
@@ -274,23 +439,12 @@ def restore_snapshot(root: Path, destination: Path) -> None:
         stage = Path(temporary) / "tree"
         stage.mkdir(mode=0o700)
         for entry in manifest.entries:
-            output = stage / entry.path
-            output.parent.mkdir(parents=True, exist_ok=True)
             if isinstance(entry, DirectoryEntry):
+                output = stage / entry.path
+                output.parent.mkdir(parents=True, exist_ok=True)
                 output.mkdir(exist_ok=True)
             elif isinstance(entry, FileEntry):
-                source = stored_file(root, entry.stored)
-                if entry.encoding == "zstd":
-                    shutil.copyfile(source, output)
-                else:
-                    with zstd.open(source, "rb") as reader:
-                        if entry.encoding == "gzip":
-                            with gzip.open(output, "wb") as writer:
-                                shutil.copyfileobj(reader, writer, 1024 * 1024)
-                        else:
-                            with output.open("wb") as writer:
-                                shutil.copyfileobj(reader, writer, 1024 * 1024)
-                output.chmod(entry.mode)
+                _restore_file_entry(root, stage, entry)
         # Create links last: no restoration writes can traverse a restored link.
         for entry in manifest.entries:
             if isinstance(entry, SymlinkEntry):

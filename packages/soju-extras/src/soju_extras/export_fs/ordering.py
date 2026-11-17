@@ -1,9 +1,9 @@
 """Chronological daily logs with streaming merges and disk-backed legacy repair."""
 
-import gzip
 import os
 import sqlite3
 from collections.abc import Generator, Iterable, Iterator
+from compression import zstd
 from contextlib import closing, contextmanager
 from dataclasses import dataclass
 from heapq import merge
@@ -37,7 +37,7 @@ def line_time(line: str) -> str:
 @contextmanager
 def read_log(path: Path, *, compress: bool) -> Generator[Iterator[str]]:
     with (
-        gzip.open(path, "rt", encoding="utf-8", newline="") if compress else path.open(encoding="utf-8", newline="")
+        zstd.open(path, "rt", encoding="utf-8", newline="") if compress else path.open(encoding="utf-8", newline="")
     ) as stream:
         yield iter(stream)
 
@@ -53,10 +53,14 @@ def inspect_log(path: Path, *, compress: bool) -> LogOrder:
     return LogOrder(latest, ordered)
 
 
-def write_log(path: Path, lines: Iterable[str], *, compress: bool, append: bool) -> None:
+def write_log(path: Path, lines: Iterable[str], *, compress: bool, append: bool) -> os.stat_result:
     with path.open("ab" if append else "xb") as stream:
         if compress:
-            with gzip.GzipFile(fileobj=stream, mode="wb", filename="", mtime=0, compresslevel=6) as compressed:
+            with zstd.ZstdFile(
+                stream,
+                mode="wb",
+                options={zstd.CompressionParameter.checksum_flag: 1},
+            ) as compressed:
                 for line in lines:
                     compressed.write(line.encode("utf-8"))
         else:
@@ -64,6 +68,7 @@ def write_log(path: Path, lines: Iterable[str], *, compress: bool, append: bool)
                 stream.write(line.encode("utf-8"))
         stream.flush()
         os.fsync(stream.fileno())
+        return os.fstat(stream.fileno())
 
 
 def rewrite_log(

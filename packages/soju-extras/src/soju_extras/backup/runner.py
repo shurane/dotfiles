@@ -3,10 +3,10 @@
 import os
 import shlex
 import shutil
+import stat
 import subprocess
 import time
 from collections.abc import Sequence
-from functools import partial
 from pathlib import Path, PurePosixPath
 from tempfile import TemporaryDirectory
 
@@ -20,13 +20,12 @@ from soju_extras.backup.snapshot import (
     backup_database,
     pack_tree,
     sha256,
-    verify_snapshot,
 )
 from soju_extras.export_fs.storage import atomic_write, export_lock, sync_directory
 
 
-def run(argv: Sequence[str], *, env: dict[str, str] | None = None) -> str:
-    return subprocess.run(argv, check=True, text=True, stdout=subprocess.PIPE, env=env).stdout  # noqa: S603
+def run(argv: Sequence[str], *, env: dict[str, str] | None = None, timeout: float = 1800.0) -> str:
+    return subprocess.run(argv, check=True, text=True, stdout=subprocess.PIPE, env=env, timeout=timeout).stdout  # noqa: S603
 
 
 def flush_weechat(config: BackupConfig) -> None:
@@ -37,6 +36,7 @@ def flush_weechat(config: BackupConfig) -> None:
         ["pgrep", "-u", checkpoint.user, "-x", "weechat"],  # noqa: S607
         stdout=subprocess.DEVNULL,
         check=False,
+        timeout=10.0,
     )
     if result.returncode == 1:
         return  # Saved configuration remains available while the client is stopped.
@@ -52,7 +52,8 @@ def flush_weechat(config: BackupConfig) -> None:
             str(checkpoint.command),
             "core",
             "/soju_backup_checkpoint",
-        ]
+        ],
+        timeout=30.0,
     )
     deadline = time.monotonic() + 60
     while not checkpoint.ready_file.is_file():
@@ -61,33 +62,60 @@ def flush_weechat(config: BackupConfig) -> None:
         time.sleep(0.1)
 
 
-def ignored_names(source: CopySource, directory: str, names: list[str]) -> set[str]:
-    """Use stdlib glob matching for source-relative paths and basename patterns."""
-    parent = Path(directory)
-    ignored: set[str] = set()
-    for name in names:
-        path = parent / name
+def _is_ignored(source: CopySource, relative: str, name: str, *, is_dir: bool) -> bool:
+    for pattern in source.excludes:
+        if pattern.endswith("/") and not is_dir:
+            continue
+        anchored = pattern.startswith("/")
+        glob = pattern.strip("/")
+        candidate = relative if anchored or "/" in glob else name
+        if PurePosixPath(candidate).full_match(glob):
+            return True
+    return False
+
+
+def _copy_file_preserving_mode(src: str | os.PathLike[str], dst: str | os.PathLike[str]) -> str:
+    with Path(src).open("rb") as fsrc, Path(dst).open("wb") as fdst:
+        st = os.fstat(fsrc.fileno())
+        shutil.copyfileobj(fsrc, fdst, 1024 * 1024)
+        os.fchmod(fdst.fileno(), stat.S_IMODE(st.st_mode))
+        os.utime(fdst.fileno(), ns=(st.st_atime_ns, st.st_mtime_ns))
+    return str(dst)
+
+
+def _copy_dir_tree(source: CopySource, src_dir: Path, dst_dir: Path, mode: int) -> None:
+    dst_dir.mkdir(parents=True, exist_ok=True)
+    with os.scandir(src_dir) as entries:
+        children = sorted(entries, key=lambda e: e.name)
+    for entry in children:
+        path = Path(entry.path)
         relative = path.relative_to(source.source).as_posix()
-        for pattern in source.excludes:
-            if pattern.endswith("/") and (path.is_symlink() or not path.is_dir()):
-                continue
-            anchored = pattern.startswith("/")
-            glob = pattern.strip("/")
-            candidate = relative if anchored or "/" in glob else name
-            if PurePosixPath(candidate).full_match(glob):
-                ignored.add(name)
-                break
-    return ignored
+        is_symlink = entry.is_symlink()
+        is_dir = not is_symlink and entry.is_dir(follow_symlinks=False)
+        if _is_ignored(source, relative, entry.name, is_dir=is_dir):
+            continue
+        dst_path = dst_dir / entry.name
+        if is_symlink:
+            dst_path.symlink_to(path.readlink())
+        elif is_dir:
+            st = entry.stat(follow_symlinks=False)
+            _copy_dir_tree(source, path, dst_path, stat.S_IMODE(st.st_mode))
+        else:
+            _copy_file_preserving_mode(path, dst_path)
+    dst_dir.chmod(mode)
 
 
 def copy_sources(config: BackupConfig, stage: Path) -> None:
     for source in config.sources:
         destination = stage / source.destination
         destination.parent.mkdir(parents=True, exist_ok=True)
-        if source.source.is_dir() and not source.source.is_symlink():
-            shutil.copytree(source.source, destination, symlinks=True, ignore=partial(ignored_names, source))
+        st = source.source.lstat()
+        if stat.S_ISDIR(st.st_mode):
+            _copy_dir_tree(source, source.source, destination, stat.S_IMODE(st.st_mode))
+        elif stat.S_ISLNK(st.st_mode):
+            destination.symlink_to(source.source.readlink())
         else:
-            shutil.copy2(source.source, destination, follow_symlinks=False)
+            _copy_file_preserving_mode(source.source, destination)
 
 
 def remote_environment(remote: Remote) -> dict[str, str]:
@@ -102,6 +130,12 @@ def remote_environment(remote: Remote) -> dict[str, str]:
                 "IdentitiesOnly=yes",
                 "-o",
                 "BatchMode=yes",
+                "-o",
+                "ConnectTimeout=15",
+                "-o",
+                "ServerAliveInterval=15",
+                "-o",
+                "ServerAliveCountMax=3",
                 "-o",
                 "StrictHostKeyChecking=yes",
                 "-o",
@@ -159,7 +193,6 @@ def create_backup(config: BackupConfig) -> Path:
                 backup_database(config.database, raw / config.database_destination)
             packed = Path(temporary) / "snapshot"
             pack_tree(raw, packed, name, previous=config.root / previous if previous else None)
-            verify_snapshot(packed)
             packed.rename(destination)
             sync_directory(config.root)
         if config.remote:

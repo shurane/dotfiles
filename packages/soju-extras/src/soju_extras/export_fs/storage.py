@@ -61,11 +61,19 @@ def atomic_write(path: Path, content: str) -> None:
         sync_directory(path.parent)
 
 
+def _path_exists_lstat(path: Path) -> bool:
+    try:
+        path.lstat()
+    except FileNotFoundError:
+        return False
+    return True
+
+
 def durable_mkdir(path: Path) -> None:
     """Persist newly created parent directory entries before checkpointing files."""
     missing: list[Path] = []
     parent = path
-    while not parent.exists():
+    while not _path_exists_lstat(parent):
         missing.append(parent)
         parent = parent.parent
     for directory in reversed(missing):

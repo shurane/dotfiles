@@ -166,7 +166,7 @@ def extend(options: Options, database: Path, start: int, end: int, phrases: list
                 for channel, messages in lines.items():
                     path = (
                         logs
-                        / f"users/benchmark/networks/synthetic/channels/#channel-{channel:02}/{day}.log.gz"
+                        / f"users/benchmark/networks/synthetic/channels/#channel-{channel:02}/{day}.log.zst"
                     )
                     path.parent.mkdir(parents=True, exist_ok=True)
                     write_log(path, messages, compress=True, append=path.exists())
@@ -203,7 +203,7 @@ def measure(config_path: Path, count: int, phase: Phase) -> Result:
     elapsed = time.perf_counter() - started
     after = resource.getrusage(resource.RUSAGE_SELF)
     children_after = resource.getrusage(resource.RUSAGE_CHILDREN)
-    logs = list(config.export_directory.rglob("*.gz"))
+    logs = list(config.export_directory.rglob("*.zst"))
     return Result(
         messages=count,
         phase=phase,

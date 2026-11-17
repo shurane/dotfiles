@@ -3,7 +3,7 @@
 Python 3.14+ tools for Soju's SQLite message history:
 
 - `sojugrep`: full-text search, with literal terms or explicit FTS5 syntax.
-- `soju-export-fs`: incremental export to daily text or gzip logs.
+- `soju-export-fs`: incremental export to daily text or zstd logs.
 - `weechat-to-soju`: repeatable imports of plain, gzip, or zstd WeeChat logs.
 
 ## Install and check
@@ -210,8 +210,8 @@ soju-export-fs --output-dir ./logs --dry-run
 
 Logs are grouped by user, network, target, and UTC date. Names are reversibly
 percent-encoded for filesystem safety; ordinary channel names such as `#python`
-remain readable. Unnamed networks use their server address. Gzip output appends
-standard concatenated gzip members for appends. Each run fixes an upper message ID so a
+remain readable. Unnamed networks use their server address. Zstandard output appends
+standard concatenated zstd frames for appends. Each run fixes an upper message ID so a
 busy live database cannot extend that run indefinitely.
 
 Daily files are chronological, including when older history is imported later.
@@ -334,7 +334,7 @@ Tests use the actual upstream Soju schema, pinned with its source and license in
 [`tests/fixtures`](tests/fixtures/README.md). They cover FTS triggers, repeated
 imports, transaction rollback, timestamps/DST, unnamed networks, CLI errors,
 bounded batches, and subprocess death before and after checkpoint replacement.
-They also verify recovery after partial gzip output, interruption around backfill
+They also verify recovery after partial zstd output, interruption around backfill
 replacements, and preservation of archived messages deleted by database retention.
 
 Run measurements in separate processes so peak RSS is comparable:
