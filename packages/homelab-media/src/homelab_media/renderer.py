@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.markup import escape
-from rich.panel import Panel
 from rich.text import Text
 
 from homelab_media.models import MediaKind
@@ -148,7 +147,7 @@ def render_gap_report(
         f"Extras skipped: [dim]{len(report.skipped_extras)}[/dim]  |  "
         f"Conflicts: [bold red]{len(report.conflicts)}[/bold red]"
     )
-    out.print(Panel(summary_text, title="homelab-media plan", border_style="blue"))
+    out.print(f"[bold blue]homelab-media plan[/bold blue] · {summary_text}", soft_wrap=True, highlight=False)
 
     if report.in_progress:
         _print_section_header(out, "In-Progress Torrents (Protected)", style="bold yellow")
