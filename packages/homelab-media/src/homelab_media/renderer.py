@@ -33,7 +33,7 @@ def _format_bytes(num_bytes: int) -> str:
 
 
 def _format_episode_ranges(actions: list[SyncAction]) -> str:
-    """Compact TV SyncActions into concise season/episode ranges (e.g. 'S01E01-E12 (12)')."""
+    """Compact TV SyncActions into concise season/episode ranges (e.g. 'S01E01-E12')."""
     by_season: dict[int, list[int]] = defaultdict(list)
     extra_labels: list[str] = []
 
@@ -59,8 +59,7 @@ def _format_episode_ranges(actions: list[SyncAction]) -> str:
         parts.append(f"S{season:02d}{','.join(ranges)}")
 
     parts.extend(sorted(extra_labels))
-    summary = ", ".join(parts) if parts else "episodes"
-    return f"{summary} ({len(actions)})"
+    return ", ".join(parts) if parts else "episodes"
 
 
 def _relative_target_folder(act: SyncAction) -> str:
@@ -112,22 +111,17 @@ def render_gap_report(
         for act in report.ready_to_sync:
             grouped[(act.kind, act.torrent_name, _relative_target_folder(act))].append(act)
 
-        t_sync = Table(title="Ready to Sync (/mnt/mango/media/...)", show_lines=False)
-        t_sync.add_column("Target", style="green")
-        t_sync.add_column("Items", style="cyan")
-        t_sync.add_column("Size", justify="right")
-        t_sync.add_column("Match", style="dim")
-        t_sync.add_column("Source Torrent", style="dim", overflow="ellipsis", max_width=44)
-
+        out.print("\n[bold]Ready to Sync (/mnt/mango/media/...)[/bold]")
         for (kind, torrent_name, rel_target), items in sorted(grouped.items(), key=lambda kv: kv[0][2]):
-            total_size = sum(i.file_size for i in items)
-            items_label = (
-                f"movie ({len(items)})" if kind == MediaKind.MOVIE else _format_episode_ranges(items)
-            )
+            total_size = _format_bytes(sum(i.file_size for i in items))
             reason = REASON_LABELS.get(items[0].reason, items[0].reason.lower())
-            t_sync.add_row(rel_target, items_label, _format_bytes(total_size), reason, torrent_name)
-
-        out.print(t_sync)
+            segments = [f"[green]{rel_target}[/green]"]
+            if kind == MediaKind.TV:
+                segments.append(f"[cyan]{_format_episode_ranges(items)}[/cyan]")
+            segments.extend(
+                [f"[white]{total_size}[/white]", f"[yellow]{reason}[/yellow]", f"[dim]{torrent_name}[/dim]"]
+            )
+            out.print(" / ".join(segments))
     else:
         out.print("[green]No pending media gaps detected.[/green]")
 

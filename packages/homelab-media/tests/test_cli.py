@@ -96,4 +96,4 @@ def test_format_episode_ranges_compacts_contiguous_and_gaps() -> None:
         )
         for ep in (1, 2, 3, 5, 6, 8)
     ]
-    assert _format_episode_ranges(actions) == "S01E01-E03,E05-E06,E08 (6)"
+    assert _format_episode_ranges(actions) == "S01E01-E03,E05-E06,E08"
