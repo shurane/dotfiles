@@ -121,7 +121,7 @@ def render_gap_report(
             segments.extend(
                 [f"[white]{total_size}[/white]", f"[yellow]{reason}[/yellow]", f"[dim]{torrent_name}[/dim]"]
             )
-            out.print(" / ".join(segments))
+            out.print(" / ".join(segments), soft_wrap=True)
     else:
         out.print("[green]No pending media gaps detected.[/green]")
 
