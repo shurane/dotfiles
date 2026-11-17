@@ -239,10 +239,12 @@ def render_gap_report(
                 label = f"{sk.source_file.name}/" if is_dir else sk.source_file.name
                 ext = "" if is_dir else Path(sk.source_file.name).suffix.lower()
                 reason_label = _skipped_reason_label(sk.reason)
+                item_text = _ls_styled(label, ls_colors, is_dir=is_dir, ext=ext)
+                item_text.stylize(f"link {sk.source_file.absolute().as_uri()}")
                 out.print(
                     Text.assemble(
                         Text("  "),
-                        _ls_styled(label, ls_colors, is_dir=is_dir, ext=ext),
+                        item_text,
                         Text(" · ", style="dim"),
                         Text(reason_label, style="yellow"),
                     ),
