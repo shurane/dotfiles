@@ -314,7 +314,7 @@ def test_end_to_end_realistic_library_sync_and_render(tmp_path: Path) -> None:
         verbose=True,
     )
     rendered = buf.getvalue()
-    print(rendered)
+    print(f"\n{rendered}")
     assert "movies/Movie One (2014)" in rendered
     assert "parsed" in rendered
     assert "tv/Show Alpha (2019)" in rendered
