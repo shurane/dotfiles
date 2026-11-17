@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import os
+import stat
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from homelab_media.models import ActionType, MediaKind, PathTraversalSecurityError, SyncAction
+from homelab_media.models import ActionType, PathTraversalSecurityError, SyncAction
 from homelab_media.parser import assert_safe_target
 
 if TYPE_CHECKING:
@@ -38,7 +39,7 @@ def execute_sync(
 
         source = action.source_file
         target = action.target_file
-        media_root = config.media_tv_dir if action.kind == MediaKind.TV else config.media_movies_dir
+        media_root = config.media_root(action.kind)
 
         try:
             assert_safe_target(target, media_root, follow_symlinks=True)
@@ -46,14 +47,25 @@ def execute_sync(
             summary.errors.append(f"{source.name}: {exc}")
             continue
 
-        if source.is_symlink() or not source.is_file():
+        try:
+            src_st = source.lstat()
+        except OSError:
             summary.errors.append(f"Refusing non-regular or symlink source: {source}")
             continue
+        if not stat.S_ISREG(src_st.st_mode):
+            summary.errors.append(f"Refusing non-regular or symlink source: {source}")
+            continue
+        src_ino = src_st.st_ino
 
-        src_ino = source.stat(follow_symlinks=False).st_ino
+        try:
+            tgt_ino = target.lstat().st_ino
+        except FileNotFoundError:
+            tgt_ino = None
+        except OSError as exc:
+            summary.errors.append(f"Failed to stat target {target}: {exc}")
+            continue
 
-        if target.exists():
-            tgt_ino = target.stat(follow_symlinks=False).st_ino
+        if tgt_ino is not None:
             if tgt_ino == src_ino:
                 summary.already_synced_count += 1
                 continue
@@ -70,10 +82,19 @@ def execute_sync(
         try:
             target.parent.mkdir(parents=True, exist_ok=True)
             os.link(source, target)
-            post_ino = target.stat(follow_symlinks=False).st_ino
+            post_ino = target.lstat().st_ino
             if post_ino != src_ino:
                 summary.errors.append(f"Inode mismatch after hardlink for {target}")
                 continue
+        except FileExistsError:
+            tgt_ino = target.lstat().st_ino
+            if tgt_ino == src_ino:
+                summary.already_synced_count += 1
+                continue
+            summary.errors.append(
+                f"Conflict at {target}: already exists with different inode ({tgt_ino} != {src_ino})"
+            )
+            continue
         except OSError as exc:
             summary.errors.append(f"Failed to hardlink {source} -> {target}: {exc}")
             continue

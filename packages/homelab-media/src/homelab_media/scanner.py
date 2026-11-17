@@ -24,6 +24,9 @@ from homelab_media.models import (
     TorrentItem,
 )
 from homelab_media.parser import (
+    CONFIDENCE_REVIEW_THRESHOLD,
+    CONFIDENCE_TMDB,
+    FolderIndex,
     ParentResolution,
     assert_safe_target,
     build_folder_index,
@@ -31,6 +34,7 @@ from homelab_media.parser import (
     parse_movie_target,
     parse_torrent_metadata,
     parse_tv_target,
+    tv_target_path,
 )
 
 if TYPE_CHECKING:
@@ -50,10 +54,13 @@ UNSTABLE_TORRENT_STATES: frozenset[str] = frozenset(
         "stalledDL",
     }
 )
+PARTIAL_SUFFIXES: tuple[str, ...] = (".part", ".parts", ".!qB")
 
 
 @dataclass(slots=True)
-class _PendingTmdbItem:
+class _Candidate:
+    """A parsed candidate media file awaiting conflict check, review, or TMDB resolution."""
+
     kind: MediaKind
     torrent_name: str
     source_file: Path
@@ -63,8 +70,18 @@ class _PendingTmdbItem:
     media_subdir: Path
     parent_res: ParentResolution
     target_file: Path
-    season_num: int | None
-    ep_val: int | str | None
+    season_num: int | None = None
+    ep_val: int | str | None = None
+
+
+@dataclass(slots=True)
+class _TorrentWalk:
+    """Result of walking one torrent once."""
+
+    files: list[tuple[os.DirEntry[str], Path]] = field(default_factory=list)
+    pruned_dirs: list[Path] = field(default_factory=list)
+    has_partial: bool = False
+    has_syncignore: bool = False
 
 
 def _index_media_library(media_dir: Path) -> tuple[set[int], set[str]]:
@@ -74,26 +91,18 @@ def _index_media_library(media_dir: Path) -> tuple[set[int], set[str]]:
     if not media_dir.is_dir():
         return inodes, top_folders
 
-    stack: list[Path] = []
-    with os.scandir(media_dir) as it:
-        for entry in it:
-            if entry.is_symlink():
-                continue
-            if entry.is_dir(follow_symlinks=False):
-                top_folders.add(entry.name)
-                stack.append(Path(entry.path))
-            elif entry.is_file(follow_symlinks=False):
-                inodes.add(entry.inode())
-
+    stack: list[tuple[Path, bool]] = [(media_dir, True)]
     while stack:
-        current = stack.pop()
+        current, is_root = stack.pop()
         try:
             with os.scandir(current) as it:
                 for entry in it:
                     if entry.is_symlink():
                         continue
                     if entry.is_dir(follow_symlinks=False):
-                        stack.append(Path(entry.path))
+                        if is_root:
+                            top_folders.add(entry.name)
+                        stack.append((Path(entry.path), False))
                     elif entry.is_file(follow_symlinks=False):
                         inodes.add(entry.inode())
         except OSError:
@@ -105,19 +114,6 @@ def _index_media_library(media_dir: Path) -> tuple[set[int], set[str]]:
 def _is_torrent_in_progress(torrent: TorrentItem) -> bool:
     """Return True if torrent is incomplete or in an unstable state."""
     return torrent.progress < 1.0 or torrent.state in UNSTABLE_TORRENT_STATES
-
-
-PARTIAL_SUFFIXES: tuple[str, ...] = (".part", ".parts", ".!qB")
-
-
-@dataclass(slots=True)
-class _TorrentWalk:
-    """Result of walking one torrent once."""
-
-    files: list[tuple[os.DirEntry[str], Path]] = field(default_factory=list)
-    pruned_dirs: list[Path] = field(default_factory=list)
-    has_partial: bool = False
-    has_syncignore: bool = False
 
 
 def _walk_torrent(item_path: Path) -> _TorrentWalk:
@@ -183,6 +179,199 @@ def scan_media_gaps(
             tmdb.close()
 
 
+def _index_qbittorrent(
+    report: GapReport,
+    qb_future: Future[tuple[bool, list[TorrentItem]]] | None,
+) -> tuple[dict[str, TorrentItem], set[str]]:
+    """Populate report.in_progress and return (torrent_by_key, in_progress_names)."""
+    torrent_by_key: dict[str, TorrentItem] = {}
+    in_progress_names: set[str] = set()
+    if qb_future is None:
+        report.qbittorrent_online = False
+        return torrent_by_key, in_progress_names
+
+    qb_online, torrents = qb_future.result()
+    report.qbittorrent_online = qb_online
+    for t in torrents:
+        keys = (t.name, t.content_path.name) if t.content_path.name else (t.name,)
+        for key in keys:
+            torrent_by_key[key] = t
+        if _is_torrent_in_progress(t):
+            report.in_progress.append(t)
+            in_progress_names.update(keys)
+    return torrent_by_key, in_progress_names
+
+
+def _scan_torrent_entry(
+    top_entry: os.DirEntry[str],
+    *,
+    kind: MediaKind,
+    media_subdir: Path,
+    media_inodes: set[int],
+    folder_index: FolderIndex,
+    tracked: bool,
+    tmdb_configured: bool,
+    report: GapReport,
+    review_groups: dict[tuple[MediaKind, str, str], ReviewItem],
+    pending_tmdb: list[_Candidate],
+) -> None:
+    """Inspect a single top-level torrent directory or file and populate `report`."""
+    torrent_name = top_entry.name
+    item_path = Path(top_entry.path)
+
+    if top_entry.is_dir(follow_symlinks=False):
+        walk = _walk_torrent(item_path)
+        if walk.has_partial:
+            return
+        syncignore = load_syncignore(item_path) if walk.has_syncignore else None
+    elif top_entry.is_file(follow_symlinks=False):
+        walk = _TorrentWalk(files=[(top_entry, Path(top_entry.name))])
+        syncignore = None
+    else:
+        return
+
+    def _skip(source: Path, reason: str, size: int = 0) -> None:
+        report.skipped_extras.append(
+            SyncAction(
+                torrent_name=torrent_name,
+                source_file=source,
+                kind=kind,
+                action_type=ActionType.SKIP_EXTRA,
+                reason=reason,
+                file_size=size,
+                tracked_by_qbittorrent=tracked,
+            )
+        )
+
+    for pruned_dir in walk.pruned_dirs:
+        _skip(pruned_dir, f"BLACKLISTED_DIR:{pruned_dir.name}")
+
+    torrent_meta = None
+    for entry, rel_path in walk.files:
+        source_file = Path(entry.path)
+        if entry.name == ".syncignore":
+            continue
+
+        if syncignore is not None and (ignore_reason := syncignore.match(rel_path)):
+            report.ignored_items.append(
+                SyncAction(
+                    torrent_name=torrent_name,
+                    source_file=source_file,
+                    kind=kind,
+                    action_type=ActionType.IGNORED,
+                    reason=ignore_reason,
+                    tracked_by_qbittorrent=tracked,
+                )
+            )
+            continue
+
+        if entry.inode() in media_inodes:
+            report.already_synced_count += 1
+            continue
+
+        try:
+            st = entry.stat(follow_symlinks=False)
+        except OSError:
+            continue
+
+        skip, skip_reason = is_extra_or_auxiliary(rel_path, entry.name, st.st_size, kind)
+        if skip:
+            _skip(source_file, skip_reason, st.st_size)
+            continue
+
+        if torrent_meta is None:
+            torrent_meta = parse_torrent_metadata(torrent_name, kind)
+
+        if kind == MediaKind.MOVIE:
+            parsed_movie = parse_movie_target(
+                torrent_name,
+                rel_path.as_posix(),
+                entry.name,
+                folder_index,
+                media_subdir,
+                torrent_meta=torrent_meta,
+            )
+            cand = _Candidate(
+                kind=kind,
+                torrent_name=torrent_name,
+                source_file=source_file,
+                source_ino=entry.inode(),
+                file_size=st.st_size,
+                tracked=tracked,
+                media_subdir=media_subdir,
+                parent_res=parsed_movie.parent,
+                target_file=parsed_movie.target_path,
+            )
+        else:
+            parsed_tv = parse_tv_target(
+                torrent_name,
+                rel_path.as_posix(),
+                entry.name,
+                folder_index,
+                media_subdir,
+                torrent_meta=torrent_meta,
+            )
+            if parsed_tv is None:
+                _skip(source_file, "NO_EPISODE_TAG", st.st_size)
+                continue
+            cand = _Candidate(
+                kind=kind,
+                torrent_name=torrent_name,
+                source_file=source_file,
+                source_ino=entry.inode(),
+                file_size=st.st_size,
+                tracked=tracked,
+                media_subdir=media_subdir,
+                parent_res=parsed_tv.parent,
+                target_file=parsed_tv.target_path,
+                season_num=parsed_tv.season,
+                ep_val=parsed_tv.episode_value,
+            )
+
+        if cand.parent_res.reason == "MISSING_YEAR_QUERY_TMDB" and tmdb_configured:
+            pending_tmdb.append(cand)
+            continue
+
+        _finalize_item(cand, report=report, review_groups=review_groups, tmdb_candidates=[])
+
+
+def _resolve_pending_tmdb(
+    pending_tmdb: list[_Candidate],
+    *,
+    pool: ThreadPoolExecutor,
+    tmdb: TmdbClient,
+    report: GapReport,
+    review_groups: dict[tuple[MediaKind, str, str], ReviewItem],
+) -> None:
+    """Resolve missing-year candidates against TMDB in parallel and finalize them."""
+    unique_queries = {(c.kind, c.parent_res.folder_name) for c in pending_tmdb}
+    tmdb_futures = {key: pool.submit(tmdb.resolve, key[0], key[1]) for key in unique_queries}
+    tmdb_results = {key: fut.result() for key, fut in tmdb_futures.items()}
+
+    for cand in pending_tmdb:
+        best_match, tmdb_candidates = tmdb_results[(cand.kind, cand.parent_res.folder_name)]
+        if best_match is not None:
+            cand.parent_res = ParentResolution(
+                folder_name=best_match.folder_name,
+                confidence=CONFIDENCE_TMDB,
+                reason="TMDB_MATCH",
+            )
+            if cand.kind == MediaKind.MOVIE:
+                cand.target_file = movie_target_path(
+                    cand.media_subdir, best_match.folder_name, cand.source_file.name
+                )
+            else:
+                cand.target_file = tv_target_path(
+                    cand.media_subdir,
+                    best_match.folder_name,
+                    cand.season_num or 1,
+                    cand.target_file.name,
+                )
+            assert_safe_target(cand.target_file, cand.media_subdir)
+
+        _finalize_item(cand, report=report, review_groups=review_groups, tmdb_candidates=tmdb_candidates)
+
+
 def _scan_with_clients(
     config: MediaConfig,
     report: GapReport,
@@ -192,8 +381,6 @@ def _scan_with_clients(
     qb_client: QBittorrentClient | None,
     use_qbittorrent: bool,
 ) -> GapReport:
-    torrent_by_key: dict[str, TorrentItem] = {}
-    in_progress_names: set[str] = set()
     qb_future: Future[tuple[bool, list[TorrentItem]]] | None = None
 
     with ThreadPoolExecutor(max_workers=4) as pool:
@@ -204,302 +391,100 @@ def _scan_with_clients(
                 config.qbittorrent_pass,
             )
             qb_future = pool.submit(client.fetch_torrents)
-        else:
-            report.qbittorrent_online = False
 
-        tv_inodes, existing_shows = _index_media_library(config.media_tv_dir)
-        movie_inodes, existing_movies = _index_media_library(config.media_movies_dir)
-        tv_folder_index = build_folder_index(existing_shows)
-        movie_folder_index = build_folder_index(existing_movies)
+        indexed_by_kind = {
+            kind: _index_media_library(config.media_root(kind))
+            for kind in (MediaKind.TV, MediaKind.MOVIE)
+        }
+        torrent_by_key, in_progress_names = _index_qbittorrent(report, qb_future)
 
-        if qb_future is not None:
-            qb_online, torrents = qb_future.result()
-            report.qbittorrent_online = qb_online
-            for t in torrents:
-                torrent_by_key[t.name] = t
-                if t.content_path.name:
-                    torrent_by_key[t.content_path.name] = t
-                if _is_torrent_in_progress(t):
-                    report.in_progress.append(t)
-                    in_progress_names.add(t.name)
-                    if t.content_path.name:
-                        in_progress_names.add(t.content_path.name)
-
-        review_counter = 0
         review_groups: dict[tuple[MediaKind, str, str], ReviewItem] = {}
-        pending_tmdb: list[_PendingTmdbItem] = []
+        pending_tmdb: list[_Candidate] = []
 
-        for kind, torrents_subdir, media_subdir, media_inodes, existing_folders in (
-            (MediaKind.TV, config.torrents_tv_dir, config.media_tv_dir, tv_inodes, tv_folder_index),
-            (MediaKind.MOVIE, config.torrents_movies_dir, config.media_movies_dir, movie_inodes, movie_folder_index),
-        ):
+        for kind in (MediaKind.TV, MediaKind.MOVIE):
+            torrents_subdir = config.torrents_root(kind)
             if not torrents_subdir.is_dir():
                 continue
+            media_inodes, existing_folders = indexed_by_kind[kind]
+            folder_index = build_folder_index(existing_folders)
+            media_subdir = config.media_root(kind)
 
             with os.scandir(torrents_subdir) as root_it:
                 top_entries = sorted(root_it, key=lambda e: e.name)
 
             for top_entry in top_entries:
-                if top_entry.is_symlink():
+                if top_entry.is_symlink() or top_entry.name in in_progress_names:
                     continue
-
-                torrent_name = top_entry.name
-                item_path = Path(top_entry.path)
-                qb_item = torrent_by_key.get(torrent_name)
-                tracked = qb_item is not None
-
-                if torrent_name in in_progress_names:
-                    continue
-                if top_entry.is_dir(follow_symlinks=False):
-                    walk = _walk_torrent(item_path)
-                    if walk.has_partial:
-                        continue
-                    syncignore = load_syncignore(item_path) if walk.has_syncignore else None
-                elif top_entry.is_file(follow_symlinks=False):
-                    walk = _TorrentWalk(files=[(top_entry, Path(top_entry.name))])
-                    syncignore = None
-                else:
-                    continue
-
-                files, pruned_dirs = walk.files, walk.pruned_dirs
-                for pruned_dir in pruned_dirs:
-                    report.skipped_extras.append(
-                        SyncAction(
-                            torrent_name=torrent_name,
-                            source_file=pruned_dir,
-                            kind=kind,
-                            action_type=ActionType.SKIP_EXTRA,
-                            reason=f"BLACKLISTED_DIR:{pruned_dir.name}",
-                            tracked_by_qbittorrent=tracked,
-                        )
-                    )
-
-                torrent_meta = None
-                for entry, rel_path in files:
-                    source_file = Path(entry.path)
-
-                    if entry.name == ".syncignore":
-                        continue
-
-                    if syncignore is not None and (ignore_reason := syncignore.match(rel_path)):
-                        report.ignored_items.append(
-                            SyncAction(
-                                torrent_name=torrent_name,
-                                source_file=source_file,
-                                kind=kind,
-                                action_type=ActionType.IGNORED,
-                                reason=ignore_reason,
-                                tracked_by_qbittorrent=tracked,
-                            )
-                        )
-                        continue
-
-                    if entry.inode() in media_inodes:
-                        report.already_synced_count += 1
-                        continue
-
-                    try:
-                        st = entry.stat(follow_symlinks=False)
-                    except OSError:
-                        continue
-
-                    skip, skip_reason = is_extra_or_auxiliary(rel_path, entry.name, st.st_size, kind)
-                    if skip:
-                        report.skipped_extras.append(
-                            SyncAction(
-                                torrent_name=torrent_name,
-                                source_file=source_file,
-                                kind=kind,
-                                action_type=ActionType.SKIP_EXTRA,
-                                reason=skip_reason,
-                                file_size=st.st_size,
-                                tracked_by_qbittorrent=tracked,
-                            )
-                        )
-                        continue
-
-                    if torrent_meta is None:
-                        torrent_meta = parse_torrent_metadata(torrent_name, kind)
-
-                    if kind == MediaKind.MOVIE:
-                        parsed_movie = parse_movie_target(
-                            torrent_name,
-                            rel_path.as_posix(),
-                            entry.name,
-                            existing_folders,
-                            media_subdir,
-                            torrent_meta=torrent_meta,
-                        )
-                        parent_res = parsed_movie.parent
-                        target_file = parsed_movie.target_path
-                        season_num: int | None = None
-                        ep_val: int | str | None = None
-                    else:
-                        parsed_tv = parse_tv_target(
-                            torrent_name,
-                            rel_path.as_posix(),
-                            entry.name,
-                            existing_folders,
-                            media_subdir,
-                            torrent_meta=torrent_meta,
-                        )
-                        if parsed_tv is None:
-                            report.skipped_extras.append(
-                                SyncAction(
-                                    torrent_name=torrent_name,
-                                    source_file=source_file,
-                                    kind=kind,
-                                    action_type=ActionType.SKIP_EXTRA,
-                                    reason="NO_EPISODE_TAG",
-                                    file_size=st.st_size,
-                                    tracked_by_qbittorrent=tracked,
-                                )
-                            )
-                            continue
-                        parent_res = parsed_tv.parent
-                        target_file = parsed_tv.target_path
-                        season_num = parsed_tv.season
-                        ep_val = parsed_tv.episode_value
-
-                    if parent_res.reason == "MISSING_YEAR_QUERY_TMDB" and tmdb.is_configured:
-                        pending_tmdb.append(
-                            _PendingTmdbItem(
-                                kind=kind,
-                                torrent_name=torrent_name,
-                                source_file=source_file,
-                                source_ino=entry.inode(),
-                                file_size=st.st_size,
-                                tracked=tracked,
-                                media_subdir=media_subdir,
-                                parent_res=parent_res,
-                                target_file=target_file,
-                                season_num=season_num,
-                                ep_val=ep_val,
-                            )
-                        )
-                        continue
-
-                    review_counter = _finalize_item(
-                        report=report,
-                        review_groups=review_groups,
-                        review_counter=review_counter,
-                        kind=kind,
-                        torrent_name=torrent_name,
-                        source_file=source_file,
-                        source_ino=entry.inode(),
-                        file_size=st.st_size,
-                        tracked=tracked,
-                        media_subdir=media_subdir,
-                        parent_res=parent_res,
-                        target_file=target_file,
-                        season_num=season_num,
-                        ep_val=ep_val,
-                        tmdb_candidates=[],
-                    )
-
-        if pending_tmdb:
-            unique_queries = {(item.kind, item.parent_res.folder_name) for item in pending_tmdb}
-            tmdb_futures = {key: pool.submit(tmdb.resolve, key[0], key[1]) for key in unique_queries}
-            tmdb_results = {key: fut.result() for key, fut in tmdb_futures.items()}
-
-            for item in pending_tmdb:
-                best_match, tmdb_candidates = tmdb_results[(item.kind, item.parent_res.folder_name)]
-                parent_res = item.parent_res
-                target_file = item.target_file
-
-                if best_match is not None:
-                    parent_res = ParentResolution(
-                        folder_name=best_match.folder_name,
-                        confidence=0.95,
-                        reason="TMDB_MATCH",
-                    )
-                    if item.kind == MediaKind.MOVIE:
-                        target_file = movie_target_path(
-                            item.media_subdir, best_match.folder_name, item.source_file.name
-                        )
-                    else:
-                        target_file = (
-                            item.media_subdir
-                            / best_match.folder_name
-                            / f"Season {item.season_num or 1:02d}"
-                            / target_file.name
-                        )
-                    assert_safe_target(target_file, item.media_subdir)
-
-                review_counter = _finalize_item(
+                _scan_torrent_entry(
+                    top_entry,
+                    kind=kind,
+                    media_subdir=media_subdir,
+                    media_inodes=media_inodes,
+                    folder_index=folder_index,
+                    tracked=top_entry.name in torrent_by_key,
+                    tmdb_configured=tmdb.is_configured,
                     report=report,
                     review_groups=review_groups,
-                    review_counter=review_counter,
-                    kind=item.kind,
-                    torrent_name=item.torrent_name,
-                    source_file=item.source_file,
-                    source_ino=item.source_ino,
-                    file_size=item.file_size,
-                    tracked=item.tracked,
-                    media_subdir=item.media_subdir,
-                    parent_res=parent_res,
-                    target_file=target_file,
-                    season_num=item.season_num,
-                    ep_val=item.ep_val,
-                    tmdb_candidates=tmdb_candidates,
+                    pending_tmdb=pending_tmdb,
                 )
+
+        if pending_tmdb:
+            _resolve_pending_tmdb(
+                pending_tmdb,
+                pool=pool,
+                tmdb=tmdb,
+                report=report,
+                review_groups=review_groups,
+            )
 
     report.scan_duration_ms = round((time.perf_counter_ns() - start_ns) / 1_000_000, 2)
     return report
 
 
 def _finalize_item(
+    cand: _Candidate,
     *,
     report: GapReport,
     review_groups: dict[tuple[MediaKind, str, str], ReviewItem],
-    review_counter: int,
-    kind: MediaKind,
-    torrent_name: str,
-    source_file: Path,
-    source_ino: int,
-    file_size: int,
-    tracked: bool,
-    media_subdir: Path,
-    parent_res: ParentResolution,
-    target_file: Path,
-    season_num: int | None,
-    ep_val: int | str | None,
     tmdb_candidates: list[TmdbMatch],
-) -> int:
-    """Check conflicts/confidence and append the finalized item to GapReport."""
-    if target_file.exists():
-        try:
-            target_ino = target_file.stat(follow_symlinks=False).st_ino
-        except OSError:
-            target_ino = -1
-        if target_ino == source_ino:
+) -> None:
+    """Check conflicts/confidence and append the finalized candidate to GapReport."""
+    try:
+        target_ino = cand.target_file.stat(follow_symlinks=False).st_ino
+    except FileNotFoundError:
+        target_ino = None
+    except OSError:
+        target_ino = -1
+
+    if target_ino is not None:
+        if target_ino == cand.source_ino:
             report.already_synced_count += 1
-            return review_counter
+            return
         report.conflicts.append(
             SyncAction(
-                torrent_name=torrent_name,
-                source_file=source_file,
-                target_file=target_file,
-                kind=kind,
+                torrent_name=cand.torrent_name,
+                source_file=cand.source_file,
+                target_file=cand.target_file,
+                kind=cand.kind,
                 action_type=ActionType.CONFLICT,
                 reason="TARGET_EXISTS_DIFFERENT_INODE",
-                file_size=file_size,
-                season=season_num,
-                episode=ep_val,
-                tracked_by_qbittorrent=tracked,
+                file_size=cand.file_size,
+                season=cand.season_num,
+                episode=cand.ep_val,
+                tracked_by_qbittorrent=cand.tracked,
             )
         )
-        return review_counter
+        return
 
-    if parent_res.confidence < 0.85:
-        group_key = (kind, torrent_name, parent_res.reason)
+    parent_res = cand.parent_res
+    if parent_res.confidence < CONFIDENCE_REVIEW_THRESHOLD:
+        group_key = (cand.kind, cand.torrent_name, parent_res.reason)
         if group_key not in review_groups:
-            review_counter += 1
             if tmdb_candidates:
                 candidates = [
                     CandidateOption(
                         option_id=f"opt-{idx}",
-                        target_path=media_subdir / m.folder_name,
+                        target_path=cand.media_subdir / m.folder_name,
                         description=f"TMDB match: '{m.folder_name}' (id={m.tmdb_id})",
                     )
                     for idx, m in enumerate(tmdb_candidates, start=1)
@@ -508,7 +493,7 @@ def _finalize_item(
                 candidates = [
                     CandidateOption(
                         option_id="opt-1",
-                        target_path=media_subdir / parent_res.folder_name,
+                        target_path=cand.media_subdir / parent_res.folder_name,
                         description=f"Use proposed folder '{parent_res.folder_name}'",
                     )
                 ]
@@ -516,7 +501,7 @@ def _finalize_item(
                     candidates.append(
                         CandidateOption(
                             option_id="opt-2",
-                            target_path=media_subdir / parent_res.existing_mismatch,
+                            target_path=cand.media_subdir / parent_res.existing_mismatch,
                             description=f"Use existing folder '{parent_res.existing_mismatch}'",
                         )
                     )
@@ -527,34 +512,33 @@ def _finalize_item(
                 else f"Missing release year for '{parent_res.folder_name}'; verify via TMDB/TVDB"
             )
             rev_item = ReviewItem(
-                id=f"rev-{review_counter:03d}",
-                torrent_name=torrent_name,
-                kind=kind,
+                id=f"rev-{len(review_groups) + 1:03d}",
+                torrent_name=cand.torrent_name,
+                kind=cand.kind,
                 issue=parent_res.reason,
                 confidence=parent_res.confidence,
                 message=msg,
                 candidates=candidates,
-                source_files=[source_file],
+                source_files=[cand.source_file],
             )
             review_groups[group_key] = rev_item
             report.flagged_for_review.append(rev_item)
         else:
-            review_groups[group_key].source_files.append(source_file)
-        return review_counter
+            review_groups[group_key].source_files.append(cand.source_file)
+        return
 
     report.ready_to_sync.append(
         SyncAction(
-            torrent_name=torrent_name,
-            source_file=source_file,
-            target_file=target_file,
-            kind=kind,
+            torrent_name=cand.torrent_name,
+            source_file=cand.source_file,
+            target_file=cand.target_file,
+            kind=cand.kind,
             action_type=ActionType.SYNC,
             reason=parent_res.reason,
-            file_size=file_size,
+            file_size=cand.file_size,
             confidence=parent_res.confidence,
-            season=season_num,
-            episode=ep_val,
-            tracked_by_qbittorrent=tracked,
+            season=cand.season_num,
+            episode=cand.ep_val,
+            tracked_by_qbittorrent=cand.tracked,
         )
     )
-    return review_counter

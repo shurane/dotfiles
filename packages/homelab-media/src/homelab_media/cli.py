@@ -107,8 +107,8 @@ def sync(
                 raise typer.Exit(code=2)
 
             chosen_folder = cand.target_path.name
-            torrents_root = config.torrents_tv_dir if rev.kind == MediaKind.TV else config.torrents_movies_dir
-            media_subdir = config.media_tv_dir if rev.kind == MediaKind.TV else config.media_movies_dir
+            torrents_root = config.torrents_root(rev.kind)
+            media_subdir = config.media_root(rev.kind)
             torrent_dir = torrents_root / rev.torrent_name
 
             for src in rev.source_files:
@@ -180,7 +180,7 @@ def ignore(
         args.extend(["--pattern", pattern])
     _maybe_dispatch_remote(config, args)
 
-    base = config.torrents_tv_dir if kind == MediaKind.TV else config.torrents_movies_dir
+    base = config.torrents_root(kind)
     target_dir = Path(torrent_dir) if Path(torrent_dir).is_absolute() else (base / torrent_dir)
     if not target_dir.is_dir():
         console.print(f"[red]Torrent directory not found: {target_dir}[/red]")

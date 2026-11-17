@@ -11,6 +11,8 @@ from homelab_core.network import get_ssh_user
 from homelab_core.services import Service, resolve_service_url
 from pydantic import BaseModel, ConfigDict, Field
 
+from homelab_media.models import MediaKind
+
 
 class MediaConfig(BaseModel):
     """Configuration for homelab-media scanner, clients, and remote dispatch."""
@@ -49,6 +51,14 @@ class MediaConfig(BaseModel):
     def media_movies_dir(self) -> Path:
         """Return the movies media library directory."""
         return self.media_dir / "movies"
+
+    def torrents_root(self, kind: MediaKind) -> Path:
+        """Return the torrents root directory for the given MediaKind."""
+        return self.torrents_tv_dir if kind == MediaKind.TV else self.torrents_movies_dir
+
+    def media_root(self, kind: MediaKind) -> Path:
+        """Return the media library root directory for the given MediaKind."""
+        return self.media_tv_dir if kind == MediaKind.TV else self.media_movies_dir
 
 
 def load_config(env_path: Path | None = None) -> MediaConfig:

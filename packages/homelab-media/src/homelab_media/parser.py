@@ -25,6 +25,16 @@ FAST_ANIME_EP_RE = re.compile(r"\s-\s(\d{1,3})(?:v\d)?(?:\s*[\(\[]|\s*$)")
 NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
 UNSAFE_FS_CHARS_RE = re.compile(r'[*?"<>|\x00-\x1f]')
 
+CONFIDENCE_EXACT = 1.0
+CONFIDENCE_TMDB = 0.95
+CONFIDENCE_REVIEW_THRESHOLD = 0.85
+CONFIDENCE_NEEDS_REVIEW = 0.70
+
+
+def _as_int(val: object) -> int | None:
+    """Return int(val) if val is an int, else None."""
+    return int(val) if isinstance(val, int) else None
+
 
 @dataclass(frozen=True, slots=True)
 class ParentResolution:
@@ -172,13 +182,13 @@ def resolve_parent_folder(
         if parsed_year is not None and ex_year != parsed_year:
             return ParentResolution(
                 folder_name=f"{clean_title} ({parsed_year})",
-                confidence=0.70,
+                confidence=CONFIDENCE_NEEDS_REVIEW,
                 reason="STRUCTURAL_MISMATCH",
                 existing_mismatch=existing,
             )
         return ParentResolution(
             folder_name=existing,
-            confidence=1.0,
+            confidence=CONFIDENCE_EXACT,
             reason="EXACT_EXISTING_MATCH",
         )
 
@@ -186,14 +196,14 @@ def resolve_parent_folder(
     if parsed_year is not None:
         return ParentResolution(
             folder_name=f"{clean_title} ({parsed_year})",
-            confidence=1.0,
+            confidence=CONFIDENCE_EXACT,
             reason="PARSED_TITLE_YEAR",
         )
 
     # 3. Missing year -> flag for TMDB/review
     return ParentResolution(
         folder_name=clean_title,
-        confidence=0.70,
+        confidence=CONFIDENCE_NEEDS_REVIEW,
         reason="MISSING_YEAR_QUERY_TMDB",
     )
 
@@ -205,6 +215,11 @@ def movie_target_path(media_movies_dir: Path, folder_name: str, filename: str) -
     if disc_match := CD_DISC_RE.search(path.stem):
         disc_suffix = f" - cd{int(disc_match.group(2))}"
     return media_movies_dir / folder_name / f"{folder_name}{disc_suffix}{path.suffix.lower()}"
+
+
+def tv_target_path(media_tv_dir: Path, folder_name: str, season: int, episode_filename: str) -> Path:
+    """Build `<root>/<Folder>/Season NN/<episode_filename>`; the single source of truth for TV targets."""
+    return media_tv_dir / folder_name / f"Season {season:02d}" / episode_filename
 
 
 def parse_movie_target(
@@ -222,8 +237,7 @@ def parse_movie_target(
     meta_file = {} if has_torrent_title_year else _guess_metadata(filename, "movie")
 
     title = str(meta_torrent.get("title") or meta_file.get("title") or Path(torrent_name).stem)
-    year_raw = meta_torrent.get("year") or meta_file.get("year")
-    year = int(year_raw) if isinstance(year_raw, int) else None
+    year = _as_int(meta_torrent.get("year") or meta_file.get("year"))
 
     parent = resolve_parent_folder(MediaKind.MOVIE, title, year, existing_movies)
     target_path = movie_target_path(media_movies_dir, parent.folder_name, filename)
@@ -267,17 +281,14 @@ def parse_tv_target(
             episode_tag = f"S{season:02d}E{ep_start:02d}"
             episode_val = ep_start
         show_title = str(meta_torrent["title"])
-        year_raw = meta_torrent.get("year")
-        year = int(year_raw) if isinstance(year_raw, int) else None
+        year = _as_int(meta_torrent.get("year"))
     elif anime_match and meta_torrent.get("title"):
-        season_raw = meta_torrent.get("season")
-        season = int(season_raw) if isinstance(season_raw, int) else 1
+        season = _as_int(meta_torrent.get("season")) or 1
         ep_num = int(anime_match.group(1))
         episode_tag = f"S{season:02d}E{ep_num:02d}"
         episode_val = ep_num
         show_title = str(meta_torrent["title"])
-        year_raw = meta_torrent.get("year")
-        year = int(year_raw) if isinstance(year_raw, int) else None
+        year = _as_int(meta_torrent.get("year"))
     else:
         meta_file = _guess_metadata(filename, "episode")
 
@@ -291,11 +302,8 @@ def parse_tv_target(
         show_title = str(
             meta_torrent.get("title") or meta_rel.get("title") or meta_file.get("title") or Path(torrent_name).stem
         )
-        year_raw = meta_torrent.get("year") or meta_rel.get("year") or meta_file.get("year")
-        year = int(year_raw) if isinstance(year_raw, int) else None
-
-        season_raw = meta_file.get("season") or meta_rel.get("season") or meta_torrent.get("season")
-        season = int(season_raw) if isinstance(season_raw, int) else 1
+        year = _as_int(meta_torrent.get("year") or meta_rel.get("year") or meta_file.get("year"))
+        season = _as_int(meta_file.get("season") or meta_rel.get("season") or meta_torrent.get("season")) or 1
 
         if isinstance(episode_raw, list):
             ep_nums = [int(e) for e in episode_raw]
@@ -310,8 +318,7 @@ def parse_tv_target(
     parent = resolve_parent_folder(MediaKind.TV, show_title, year, existing_shows)
     ext = Path(filename).suffix.lower()
 
-    season_dir = f"Season {season:02d}"
-    target_path = media_tv_dir / parent.folder_name / season_dir / f"{episode_tag}{ext}"
+    target_path = tv_target_path(media_tv_dir, parent.folder_name, season, f"{episode_tag}{ext}")
     assert_safe_target(target_path, media_tv_dir)
 
     return TVParseResult(
