@@ -26,6 +26,7 @@ from homelab_media.models import (
 from homelab_media.parser import (
     ParentResolution,
     assert_safe_target,
+    build_folder_index,
     movie_target_path,
     parse_movie_target,
     parse_torrent_metadata,
@@ -208,6 +209,8 @@ def _scan_with_clients(
 
         tv_inodes, existing_shows = _index_media_library(config.media_tv_dir)
         movie_inodes, existing_movies = _index_media_library(config.media_movies_dir)
+        tv_folder_index = build_folder_index(existing_shows)
+        movie_folder_index = build_folder_index(existing_movies)
 
         if qb_future is not None:
             qb_online, torrents = qb_future.result()
@@ -227,8 +230,8 @@ def _scan_with_clients(
         pending_tmdb: list[_PendingTmdbItem] = []
 
         for kind, torrents_subdir, media_subdir, media_inodes, existing_folders in (
-            (MediaKind.TV, config.torrents_tv_dir, config.media_tv_dir, tv_inodes, existing_shows),
-            (MediaKind.MOVIE, config.torrents_movies_dir, config.media_movies_dir, movie_inodes, existing_movies),
+            (MediaKind.TV, config.torrents_tv_dir, config.media_tv_dir, tv_inodes, tv_folder_index),
+            (MediaKind.MOVIE, config.torrents_movies_dir, config.media_movies_dir, movie_inodes, movie_folder_index),
         ):
             if not torrents_subdir.is_dir():
                 continue

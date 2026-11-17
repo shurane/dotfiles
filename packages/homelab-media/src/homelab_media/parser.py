@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 from guessit import guessit  # type: ignore[import-untyped]
 
@@ -66,11 +70,32 @@ def sanitize_folder_name(name: str) -> str:
     return re.sub(r"\s+", " ", cleaned).strip(" .")
 
 
-def assert_safe_target(target_path: Path, media_root: Path) -> Path:
-    """Verify target_path stays strictly inside media_root to prevent path traversal."""
-    resolved_root = media_root.resolve()
-    resolved_target = target_path.resolve()
-    if not resolved_target.is_relative_to(resolved_root):
+def assert_safe_target(
+    target_path: Path,
+    media_root: Path,
+    *,
+    follow_symlinks: bool = False,
+) -> Path:
+    """Verify target_path stays strictly inside media_root to prevent path traversal.
+
+    By default performs a pure lexical normalization check (zero filesystem lstat syscalls)
+    suitable for scanning thousands of candidate targets. Pass `follow_symlinks=True` at
+    execution time (before os.link) to also resolve any symlinks on disk.
+    """
+    target_str = str(target_path)
+    root_str = str(media_root)
+    if "\x00" in target_str or "\x00" in root_str:
+        msg = "Target or root path contains NUL byte"
+        raise PathTraversalSecurityError(msg)
+
+    if follow_symlinks:
+        resolved_root = media_root.resolve()
+        resolved_target = target_path.resolve()
+    else:
+        resolved_root = Path(os.path.abspath(root_str))  # noqa: PTH100
+        resolved_target = Path(os.path.abspath(target_str))  # noqa: PTH100
+
+    if resolved_target == resolved_root or not resolved_target.is_relative_to(resolved_root):
         msg = f"Target path {resolved_target} escapes media root {resolved_root}"
         raise PathTraversalSecurityError(msg)
     return resolved_target
@@ -106,50 +131,56 @@ def parse_torrent_metadata(torrent_name: str, kind: MediaKind) -> dict[str, Any]
     return _guess_metadata(torrent_name, media_type)
 
 
+FolderIndex = dict[str, tuple[str, int | None]]
+
+
+def build_folder_index(existing_folders: Iterable[str]) -> FolderIndex:
+    """Pre-compute normalized title -> (folder_name, year) for O(1) parent matching.
+
+    Iterates in sorted order and keeps the first match per normalized title, matching
+    the deterministic precedence of the linear scan.
+    """
+    index: FolderIndex = {}
+    for existing in sorted(existing_folders):
+        m = FOLDER_YEAR_RE.match(existing)
+        if m:
+            norm = _normalize_title_key(m.group("title").strip())
+            year: int | None = int(m.group("year"))
+        else:
+            norm = _normalize_title_key(existing)
+            year = None
+        if norm not in index:
+            index[norm] = (existing, year)
+    return index
+
+
 def resolve_parent_folder(
     _kind: MediaKind,
     parsed_title: str,
     parsed_year: int | None,
-    existing_folders: set[str],
+    existing_folders: set[str] | FolderIndex,
 ) -> ParentResolution:
     """Resolve the canonical <Title> (<Year>) parent folder against existing media directories."""
     clean_title = _smart_title_case(parsed_title)
     target_norm = _normalize_title_key(clean_title)
 
-    # 1. Check existing media folders for exact or normalized match
-    for existing in sorted(existing_folders):
-        m = FOLDER_YEAR_RE.match(existing)
-        if m:
-            ex_title = m.group("title").strip()
-            ex_year = int(m.group("year"))
-            if _normalize_title_key(ex_title) == target_norm:
-                if parsed_year is not None and parsed_year != ex_year:
-                    proposed = f"{clean_title} ({parsed_year})"
-                    return ParentResolution(
-                        folder_name=proposed,
-                        confidence=0.70,
-                        reason="STRUCTURAL_MISMATCH",
-                        existing_mismatch=existing,
-                    )
-                return ParentResolution(
-                    folder_name=existing,
-                    confidence=1.0,
-                    reason="EXACT_EXISTING_MATCH",
-                )
-        elif _normalize_title_key(existing) == target_norm:
-            if parsed_year is not None:
-                proposed = f"{clean_title} ({parsed_year})"
-                return ParentResolution(
-                    folder_name=proposed,
-                    confidence=0.70,
-                    reason="STRUCTURAL_MISMATCH",
-                    existing_mismatch=existing,
-                )
+    index = existing_folders if isinstance(existing_folders, dict) else build_folder_index(existing_folders)
+
+    # 1. Check existing media folders for O(1) normalized match
+    if match := index.get(target_norm):
+        existing, ex_year = match
+        if parsed_year is not None and ex_year != parsed_year:
             return ParentResolution(
-                folder_name=existing,
-                confidence=1.0,
-                reason="EXACT_EXISTING_MATCH",
+                folder_name=f"{clean_title} ({parsed_year})",
+                confidence=0.70,
+                reason="STRUCTURAL_MISMATCH",
+                existing_mismatch=existing,
             )
+        return ParentResolution(
+            folder_name=existing,
+            confidence=1.0,
+            reason="EXACT_EXISTING_MATCH",
+        )
 
     # 2. New folder with Title + Year
     if parsed_year is not None:
@@ -180,7 +211,7 @@ def parse_movie_target(
     torrent_name: str,
     _rel_path: str,
     filename: str,
-    existing_movies: set[str],
+    existing_movies: set[str] | FolderIndex,
     media_movies_dir: Path,
     *,
     torrent_meta: dict[str, Any] | None = None,
@@ -205,7 +236,7 @@ def parse_tv_target(
     torrent_name: str,
     rel_path: str,
     filename: str,
-    existing_shows: set[str],
+    existing_shows: set[str] | FolderIndex,
     media_tv_dir: Path,
     *,
     torrent_meta: dict[str, Any] | None = None,

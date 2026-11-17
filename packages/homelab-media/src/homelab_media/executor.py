@@ -41,7 +41,7 @@ def execute_sync(
         media_root = config.media_tv_dir if action.kind == MediaKind.TV else config.media_movies_dir
 
         try:
-            assert_safe_target(target, media_root)
+            assert_safe_target(target, media_root, follow_symlinks=True)
         except PathTraversalSecurityError as exc:
             summary.errors.append(f"{source.name}: {exc}")
             continue
