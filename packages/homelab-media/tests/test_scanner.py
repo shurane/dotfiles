@@ -273,6 +273,14 @@ def test_end_to_end_realistic_library_sync_and_render(tmp_path: Path) -> None:
     # 6. In-progress torrent (must be protected)
     _make_dummy_video(cfg.torrents_tv_dir / "Show.Active.2026" / "Show.Active.S01E01.mkv")
 
+    # 7. .syncignore directory exclusion
+    show_ignored = cfg.torrents_tv_dir / "Show.Ignored.2024"
+    _make_dummy_video(show_ignored / "Show.Ignored.S01E01.mkv")
+    (show_ignored / ".syncignore").write_text("# Ignore entire folder\n", encoding="utf-8")
+
+    # 8. Ambiguous missing-year movie -> Flagged for Review
+    _make_dummy_video(cfg.torrents_movies_dir / "Movie.Ambiguous.1080p.mkv")
+
     mock_qb = MagicMock()
     mock_qb.fetch_torrents.return_value = (
         True,
@@ -282,21 +290,28 @@ def test_end_to_end_realistic_library_sync_and_render(tmp_path: Path) -> None:
         ],
     )
 
+    def _tmdb_side_effect(_kind, q: str):
+        if "Gamma" in q:
+            return TmdbMatch(tmdb_id=101, title="Show Gamma", original_title="Show Gamma", year=2026), []
+        if "Delta" in q:
+            return TmdbMatch(tmdb_id=102, title="Show Delta: Subtitle", original_title="Show Delta", year=2026), []
+        return (
+            None,
+            [
+                TmdbMatch(tmdb_id=201, title="Movie Ambiguous", original_title="Movie Ambiguous", year=2024),
+                TmdbMatch(tmdb_id=202, title="Movie Ambiguous", original_title="Movie Ambiguous", year=1998),
+            ],
+        )
+
     mock_tmdb = MagicMock()
     mock_tmdb.is_configured = True
-    mock_tmdb.resolve.side_effect = lambda _kind, q: (
-        (TmdbMatch(tmdb_id=101, title="Show Gamma", original_title="Show Gamma", year=2026), [])
-        if "Gamma" in q
-        else (
-            TmdbMatch(tmdb_id=102, title="Show Delta: Subtitle", original_title="Show Delta", year=2026),
-            [],
-        )
-    )
+    mock_tmdb.resolve.side_effect = _tmdb_side_effect
 
     report1 = scan_media_gaps(cfg, qb_client=mock_qb, tmdb_client=mock_tmdb, use_qbittorrent=True)
     assert report1.already_synced_count == 6  # 1 movie + 5 Show Alpha episodes
     assert len(report1.in_progress) == 1
-    assert report1.flagged_for_review == []
+    assert any(i.source_file.name == "Show.Ignored.S01E01.mkv" for i in report1.ignored_items)
+    assert len(report1.flagged_for_review) == 1
     assert len(report1.conflicts) == 1
     assert report1.conflicts[0].reason == "TARGET_EXISTS_DIFFERENT_INODE"
     assert len(report1.ready_to_sync) == 12  # 2 movies + 1 Alpha + 4 Beta + 3 Gamma + 2 Delta
@@ -324,6 +339,8 @@ def test_end_to_end_realistic_library_sync_and_render(tmp_path: Path) -> None:
     assert "S01E01-E04" in rendered
     assert "tv/Show Delta - Subtitle (2026)" in rendered
     assert "tmdb" in rendered
+    assert "Flagged for Review" in rendered
+    assert "Movie Ambiguous (2024)" in rendered
     assert "Conflicts" in rendered
     assert "TARGET_EXISTS_DIFFERENT_INODE" in rendered
     assert "Skipped Extras & Auxiliary Files" in rendered
