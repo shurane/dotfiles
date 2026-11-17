@@ -245,7 +245,7 @@ def render_gap_report(
                     Text.assemble(
                         Text("  "),
                         _ls_styled(label, ls_colors, is_dir=is_dir, ext=ext),
-                        Text(" / ", style="dim"),
+                        Text(" · ", style="dim"),
                         Text(reason_label, style="yellow"),
                     ),
                     soft_wrap=True,
