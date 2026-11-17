@@ -216,17 +216,15 @@ def render_gap_report(
         _print_section_header(out, "Skipped Extras & Auxiliary Files", style="bold magenta")
         for torrent_name in sorted(skipped_by_torrent, key=str.lower):
             items = skipped_by_torrent[torrent_name]
-            link_path = items[0].source_file if len(items) == 1 else items[0].source_file.parent
-            file_uri = link_path.absolute().as_uri()
-            out.print(
-                Text.assemble(
-                    _ls_styled(f"{torrent_name}/", ls_colors, is_dir=True),
-                    Text(" ", style="dim"),
-                    Text("torrent", style=f"dim link {file_uri}"),
-                ),
-                soft_wrap=True,
-                highlight=False,
+            link_path = (
+                items[0].source_file
+                if items[0].source_file.name == torrent_name
+                else items[0].source_file.parent
             )
+            file_uri = link_path.absolute().as_uri()
+            header_text = _ls_styled(f"{torrent_name}/", ls_colors, is_dir=True)
+            header_text.stylize(f"link {file_uri}")
+            out.print(header_text, soft_wrap=True, highlight=False)
 
             dir_items = sorted(
                 (sk for sk in items if sk.reason.startswith("BLACKLISTED_DIR:")),
