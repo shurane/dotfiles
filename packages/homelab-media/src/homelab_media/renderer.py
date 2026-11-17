@@ -148,7 +148,6 @@ def render_gap_report(
         f"qBittorrent: {qb_badge} | "
         f"Scan: [cyan]{report.scan_duration_ms:.1f} ms[/cyan] | "
         f"Synced: [green]{synced_files}/{total_files} files[/green] | "
-        f"Gaps: [bold cyan]{len(grouped)}[/bold cyan] | "
         f"Review: [bold yellow]{len(report.flagged_for_review)}[/bold yellow] | "
         f"Extras skipped: [dim]{len(report.skipped_extras)}[/dim] | "
         f"Conflicts: [bold red]{len(report.conflicts)}[/bold red]"
