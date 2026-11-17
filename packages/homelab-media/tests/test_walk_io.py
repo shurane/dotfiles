@@ -38,7 +38,10 @@ def scandir_calls(monkeypatch: pytest.MonkeyPatch) -> list[str]:
     return calls
 
 
-def test_each_torrent_directory_scanned_exactly_once(tmp_path: Path, scandir_calls: list[str]) -> None:
+def test_each_torrent_directory_scanned_exactly_once_and_pruned_dirs_never_opened(
+    tmp_path: Path,
+    scandir_calls: list[str],
+) -> None:
     cfg = _cfg(tmp_path)
     show = cfg.torrents_tv_dir / "Show.2020.S01.1080p"
     for e in range(1, 4):
@@ -49,7 +52,7 @@ def test_each_torrent_directory_scanned_exactly_once(tmp_path: Path, scandir_cal
     scan_media_gaps(cfg, use_qbittorrent=False)
 
     in_torrent = [c for c in scandir_calls if c.startswith(str(show))]
-    assert sorted(in_torrent) == sorted([str(show), str(show / "Season 01"), str(show / "Extras")])
+    assert sorted(in_torrent) == sorted([str(show), str(show / "Season 01")])
 
 
 def test_single_file_movies_do_not_rescan_the_torrents_root(tmp_path: Path, scandir_calls: list[str]) -> None:
@@ -132,14 +135,70 @@ def test_nested_partial_file_skips_whole_torrent(tmp_path: Path, marker: str) ->
     assert report.already_synced_count == 0
 
 
-def test_partial_marker_inside_pruned_dir_still_skips_torrent(tmp_path: Path) -> None:
+def test_non_video_and_keyword_extras_never_call_stat(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     cfg = _cfg(tmp_path)
     show = cfg.torrents_tv_dir / "Show.2020.S01.1080p"
-    _video(show / "Show.2020.S01E01.mkv")
-    (show / "Extras").mkdir()
-    (show / "Extras" / "bonus.mkv.!qB").write_bytes(b"x")
+    show.mkdir(parents=True)
+    (show / "readme.nfo").write_text("info", encoding="utf-8")
+    (show / "subs.srt").write_text("1", encoding="utf-8")
+    _video(show / "Show.2020.S01E01.Sample.mkv", size=5 * 1024 * 1024)
 
-    assert scan_media_gaps(cfg, use_qbittorrent=False).ready_to_sync == []
+    stat_calls: list[str] = []
+    real_scandir = os.scandir
+
+    class _ProxyEntry:
+        def __init__(self, inner: os.DirEntry[str]) -> None:
+            self._inner = inner
+
+        def __getattr__(self, name: str) -> object:
+            return getattr(self._inner, name)
+
+        def stat(self, *, follow_symlinks: bool = True) -> os.stat_result:
+            stat_calls.append(self._inner.name)
+            return self._inner.stat(follow_symlinks=follow_symlinks)
+
+    class _ProxyScandir:
+        def __init__(self, path: str | os.PathLike[str]) -> None:
+            self._cm = real_scandir(path)
+
+        def __enter__(self) -> list[_ProxyEntry]:
+            return [_ProxyEntry(e) for e in self._cm.__enter__()]
+
+        def __exit__(self, *args: object) -> None:
+            self._cm.__exit__(*args)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(os, "scandir", _ProxyScandir)
+    report = scan_media_gaps(cfg, use_qbittorrent=False)
+
+    assert len(report.skipped_extras) == 3
+    assert stat_calls == []
+
+
+def test_conflict_detection_uses_in_memory_library_index_without_stat(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    cfg = _cfg(tmp_path)
+    _video(cfg.torrents_movies_dir / "Dune.2021.1080p.mkv")
+    existing_target = cfg.media_movies_dir / "Dune (2021)" / "Dune (2021).mkv"
+    _video(existing_target)  # different inode -> conflict
+
+    target_stats: list[str] = []
+    real_stat = Path.stat
+
+    def counting_stat(self: Path, *a: object, **k: object) -> os.stat_result:
+        if self == existing_target:
+            target_stats.append(str(self))
+        return real_stat(self, *a, **k)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(Path, "stat", counting_stat)
+    report = scan_media_gaps(cfg, use_qbittorrent=False)
+
+    assert len(report.conflicts) == 1
+    assert target_stats == []
 
 
 def test_empty_directories_and_empty_torrent_dir(tmp_path: Path) -> None:

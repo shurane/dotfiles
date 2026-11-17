@@ -42,6 +42,33 @@ def is_pruned_dir(dirname: str) -> bool:
     return dirname.strip().lower() in PRUNED_DIR_NAMES
 
 
+def check_name_skip(rel_path: str | Path, filename: str) -> str:
+    """Return a skip reason if the path/filename can be skipped without calling stat(), else ''."""
+    ext = Path(filename).suffix.lower()
+    if ext not in VIDEO_EXTENSIONS:
+        return f"NON_VIDEO_EXT:{ext or 'none'}"
+
+    for part in Path(rel_path).parts[:-1]:
+        if is_pruned_dir(part):
+            return f"BLACKLISTED_DIR:{part}"
+
+    if match := EXTRA_KEYWORD_RE.search(Path(filename).stem):
+        return f"EXTRA_KEYWORD:{match.group(1).lower()}"
+
+    return ""
+
+
+def check_size_skip(file_size: int, kind: MediaKind) -> str:
+    """Return a skip reason if the video file size is below minimum thresholds, else ''."""
+    if file_size < MIN_VALID_VIDEO_BYTES:
+        return "TINY_OR_SPARSE_FILE"
+
+    if kind == MediaKind.MOVIE and file_size < MIN_MOVIE_FEATURE_BYTES:
+        return "SMALL_MOVIE_PROMO_OR_SAMPLE"
+
+    return ""
+
+
 def is_extra_or_auxiliary(
     rel_path: str | Path,
     filename: str,
@@ -52,26 +79,8 @@ def is_extra_or_auxiliary(
 
     Returns (should_skip, reason_code).
     """
-    ext = Path(filename).suffix.lower()
-    if ext not in VIDEO_EXTENSIONS:
-        return True, f"NON_VIDEO_EXT:{ext or 'none'}"
-
-    rel_parts = Path(rel_path).parts[:-1]
-    for part in rel_parts:
-        if is_pruned_dir(part):
-            return True, f"BLACKLISTED_DIR:{part}"
-
-    stem = Path(filename).stem
-    if match := EXTRA_KEYWORD_RE.search(stem):
-        return True, f"EXTRA_KEYWORD:{match.group(1).lower()}"
-
-    if file_size < MIN_VALID_VIDEO_BYTES:
-        return True, "TINY_OR_SPARSE_FILE"
-
-    if kind == MediaKind.MOVIE and file_size < MIN_MOVIE_FEATURE_BYTES:
-        return True, "SMALL_MOVIE_PROMO_OR_SAMPLE"
-
-    return False, ""
+    reason = check_name_skip(rel_path, filename) or check_size_skip(file_size, kind)
+    return bool(reason), reason
 
 
 @dataclass(frozen=True, slots=True)

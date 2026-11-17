@@ -13,7 +13,7 @@ from whenever import Instant
 
 from homelab_media.clients.qbittorrent import QBittorrentClient
 from homelab_media.clients.tmdb import TmdbClient, TmdbMatch
-from homelab_media.filter import is_extra_or_auxiliary, is_pruned_dir, load_syncignore
+from homelab_media.filter import check_name_skip, check_size_skip, is_pruned_dir, load_syncignore
 from homelab_media.models import (
     ActionType,
     CandidateOption,
@@ -84,12 +84,20 @@ class _TorrentWalk:
     has_syncignore: bool = False
 
 
-def _index_media_library(media_dir: Path) -> tuple[set[int], set[str]]:
-    """Single-pass os.scandir inode index and top-level folder names for a media root."""
-    inodes: set[int] = set()
-    top_folders: set[str] = set()
+@dataclass(slots=True)
+class _LibraryIndex:
+    """In-memory snapshot of a media library root (TV or movies) from a single walk."""
+
+    inodes: set[int] = field(default_factory=set)
+    top_folders: set[str] = field(default_factory=set)
+    target_inodes: dict[Path, int] = field(default_factory=dict)
+
+
+def _index_media_library(media_dir: Path) -> _LibraryIndex:
+    """Single-pass os.scandir index of inodes, top-level folders, and target paths."""
+    idx = _LibraryIndex()
     if not media_dir.is_dir():
-        return inodes, top_folders
+        return idx
 
     stack: list[tuple[Path, bool]] = [(media_dir, True)]
     while stack:
@@ -101,14 +109,16 @@ def _index_media_library(media_dir: Path) -> tuple[set[int], set[str]]:
                         continue
                     if entry.is_dir(follow_symlinks=False):
                         if is_root:
-                            top_folders.add(entry.name)
+                            idx.top_folders.add(entry.name)
                         stack.append((Path(entry.path), False))
                     elif entry.is_file(follow_symlinks=False):
-                        inodes.add(entry.inode())
+                        ino = entry.inode()
+                        idx.inodes.add(ino)
+                        idx.target_inodes[Path(entry.path)] = ino
         except OSError:
             continue
 
-    return inodes, top_folders
+    return idx
 
 
 def _is_torrent_in_progress(torrent: TorrentItem) -> bool:
@@ -117,31 +127,30 @@ def _is_torrent_in_progress(torrent: TorrentItem) -> bool:
 
 
 def _walk_torrent(item_path: Path) -> _TorrentWalk:
-    """Walk a torrent directory exactly once (one scandir per directory).
+    """Walk a torrent directory once (one scandir per non-pruned directory).
 
-    Collects regular files outside pruned extras trees, records the pruned dirs, and
-    aborts early if any partial-download marker is found (including inside pruned
-    trees, which are scanned for markers only).
+    Pruned extras directories (Extras/, Sample/, Subs/, Featurettes/, etc.) are
+    recorded and skipped without opening or descending into them. Aborts early
+    if any partial-download marker (.part, .parts, .!qB) is found.
     """
     walk = _TorrentWalk()
-    stack: list[tuple[Path, bool]] = [(item_path, False)]
+    stack: list[Path] = [item_path]
     while stack:
-        current, in_pruned = stack.pop()
+        current = stack.pop()
         try:
             with os.scandir(current) as it:
                 for entry in it:
                     if entry.is_symlink():
                         continue
                     if entry.is_dir(follow_symlinks=False):
-                        child_pruned = in_pruned
-                        if not in_pruned and is_pruned_dir(entry.name):
+                        if is_pruned_dir(entry.name):
                             walk.pruned_dirs.append(Path(entry.path))
-                            child_pruned = True
-                        stack.append((Path(entry.path), child_pruned))
+                            continue
+                        stack.append(Path(entry.path))
                     elif entry.name.endswith(PARTIAL_SUFFIXES):
                         walk.has_partial = True
                         return walk
-                    elif not in_pruned and entry.is_file(follow_symlinks=False):
+                    elif entry.is_file(follow_symlinks=False):
                         if entry.name == ".syncignore" and current == item_path:
                             walk.has_syncignore = True
                         walk.files.append((entry, Path(entry.path).relative_to(item_path)))
@@ -207,7 +216,7 @@ def _scan_torrent_entry(
     *,
     kind: MediaKind,
     media_subdir: Path,
-    media_inodes: set[int],
+    lib_index: _LibraryIndex,
     folder_index: FolderIndex,
     tracked: bool,
     tmdb_configured: bool,
@@ -265,8 +274,13 @@ def _scan_torrent_entry(
             )
             continue
 
-        if entry.inode() in media_inodes:
+        if entry.inode() in lib_index.inodes:
             report.already_synced_count += 1
+            continue
+
+        # Check extension and extra keywords before touching stat() on disk.
+        if name_skip := check_name_skip(rel_path, entry.name):
+            _skip(source_file, name_skip)
             continue
 
         try:
@@ -274,9 +288,8 @@ def _scan_torrent_entry(
         except OSError:
             continue
 
-        skip, skip_reason = is_extra_or_auxiliary(rel_path, entry.name, st.st_size, kind)
-        if skip:
-            _skip(source_file, skip_reason, st.st_size)
+        if size_skip := check_size_skip(st.st_size, kind):
+            _skip(source_file, size_skip, st.st_size)
             continue
 
         if torrent_meta is None:
@@ -332,12 +345,19 @@ def _scan_torrent_entry(
             pending_tmdb.append(cand)
             continue
 
-        _finalize_item(cand, report=report, review_groups=review_groups, tmdb_candidates=[])
+        _finalize_item(
+            cand,
+            target_inodes=lib_index.target_inodes,
+            report=report,
+            review_groups=review_groups,
+            tmdb_candidates=[],
+        )
 
 
 def _resolve_pending_tmdb(
     pending_tmdb: list[_Candidate],
     *,
+    indexed_by_kind: dict[MediaKind, _LibraryIndex],
     pool: ThreadPoolExecutor,
     tmdb: TmdbClient,
     report: GapReport,
@@ -369,7 +389,13 @@ def _resolve_pending_tmdb(
                 )
             assert_safe_target(cand.target_file, cand.media_subdir)
 
-        _finalize_item(cand, report=report, review_groups=review_groups, tmdb_candidates=tmdb_candidates)
+        _finalize_item(
+            cand,
+            target_inodes=indexed_by_kind[cand.kind].target_inodes,
+            report=report,
+            review_groups=review_groups,
+            tmdb_candidates=tmdb_candidates,
+        )
 
 
 def _scan_with_clients(
@@ -405,8 +431,8 @@ def _scan_with_clients(
             torrents_subdir = config.torrents_root(kind)
             if not torrents_subdir.is_dir():
                 continue
-            media_inodes, existing_folders = indexed_by_kind[kind]
-            folder_index = build_folder_index(existing_folders)
+            lib_index = indexed_by_kind[kind]
+            folder_index = build_folder_index(lib_index.top_folders)
             media_subdir = config.media_root(kind)
 
             with os.scandir(torrents_subdir) as root_it:
@@ -419,7 +445,7 @@ def _scan_with_clients(
                     top_entry,
                     kind=kind,
                     media_subdir=media_subdir,
-                    media_inodes=media_inodes,
+                    lib_index=lib_index,
                     folder_index=folder_index,
                     tracked=top_entry.name in torrent_by_key,
                     tmdb_configured=tmdb.is_configured,
@@ -431,6 +457,7 @@ def _scan_with_clients(
         if pending_tmdb:
             _resolve_pending_tmdb(
                 pending_tmdb,
+                indexed_by_kind=indexed_by_kind,
                 pool=pool,
                 tmdb=tmdb,
                 report=report,
@@ -444,18 +471,13 @@ def _scan_with_clients(
 def _finalize_item(
     cand: _Candidate,
     *,
+    target_inodes: dict[Path, int],
     report: GapReport,
     review_groups: dict[tuple[MediaKind, str, str], ReviewItem],
     tmdb_candidates: list[TmdbMatch],
 ) -> None:
     """Check conflicts/confidence and append the finalized candidate to GapReport."""
-    try:
-        target_ino = cand.target_file.stat(follow_symlinks=False).st_ino
-    except FileNotFoundError:
-        target_ino = None
-    except OSError:
-        target_ino = -1
-
+    target_ino = target_inodes.get(cand.target_file)
     if target_ino is not None:
         if target_ino == cand.source_ino:
             report.already_synced_count += 1
