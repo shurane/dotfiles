@@ -6,6 +6,7 @@ from collections import defaultdict
 from typing import TYPE_CHECKING
 
 from rich.console import Console
+from rich.markup import escape
 from rich.panel import Panel
 from rich.table import Table
 
@@ -115,13 +116,13 @@ def render_gap_report(
         for (kind, torrent_name, rel_target), items in sorted(grouped.items(), key=lambda kv: kv[0][2]):
             total_size = _format_bytes(sum(i.file_size for i in items))
             reason = REASON_LABELS.get(items[0].reason, items[0].reason.lower())
-            segments = [f"[green]{rel_target}[/green]"]
+            segments = [f"[green]{escape(rel_target)}[/green]"]
             if kind == MediaKind.TV:
                 segments.append(f"[cyan]{_format_episode_ranges(items)}[/cyan]")
             segments.extend(
-                [f"[white]{total_size}[/white]", f"[yellow]{reason}[/yellow]", f"[dim]{torrent_name}[/dim]"]
+                [f"[white]{total_size}[/white]", f"[yellow]{reason}[/yellow]", f"[dim]{escape(torrent_name)}[/dim]"]
             )
-            out.print(" / ".join(segments), soft_wrap=True)
+            out.print(" / ".join(segments), soft_wrap=True, highlight=False)
     else:
         out.print("[green]No pending media gaps detected.[/green]")
 
