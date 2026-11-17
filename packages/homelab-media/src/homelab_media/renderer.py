@@ -36,6 +36,8 @@ _PREFIX_LABELS: dict[str, str] = {
     ReasonCode.SYNCIGNORE_PATTERN: ".syncignore ({detail})",
 }
 
+_IEC_STEP = 1024.0
+
 
 def reason_label(reason: str) -> str:
     """Convert an internal reason code into a concise human-readable label."""
@@ -51,9 +53,9 @@ def format_bytes(num_bytes: int) -> str:
     """Format byte count into human-readable IEC units."""
     val = float(num_bytes)
     for unit in ("B", "KiB", "MiB", "GiB", "TiB"):
-        if val < 1024.0 or unit == "TiB":
+        if val < _IEC_STEP or unit == "TiB":
             return f"{val:.1f} {unit}" if unit != "B" else f"{int(val)} B"
-        val /= 1024.0
+        val /= _IEC_STEP
     return f"{num_bytes} B"
 
 
@@ -138,6 +140,73 @@ def _is_directory_action(act: SyncAction, torrent_name: str) -> bool:
     )
 
 
+def _render_ready_section(
+    out: Console,
+    grouped: dict[tuple[MediaKind, str, str], list[SyncAction]],
+) -> None:
+    """Render the Ready to Sync section (or a green no-gaps message when empty)."""
+    if not grouped:
+        out.print("[green]No pending media gaps detected.[/green]")
+        return
+
+    print_section_header(out, "Ready to Sync (/mnt/mango/media/...)", style="bold cyan")
+    for (kind, _torrent_name, rel_target), items in sorted(grouped.items(), key=lambda kv: kv[0][2]):
+        total_size = format_bytes(sum(i.file_size for i in items))
+        reason = reason_label(items[0].reason)
+        link_path = items[0].source_file if len(items) == 1 else items[0].source_file.parent
+        file_uri = link_path.absolute().as_uri()
+        segments = [f"[green]{escape(rel_target)}[/green]"]
+        if kind == MediaKind.TV:
+            segments.append(f"[cyan]{format_episode_ranges(items)}[/cyan]")
+        segments.extend(
+            [
+                f"[white]{total_size}[/white]",
+                f"[yellow]{reason}[/yellow]",
+                f"[dim][link={file_uri}]torrent[/link][/dim]",
+            ]
+        )
+        out.print(" / ".join(segments), soft_wrap=True, highlight=False)
+
+
+def _render_skipped_section(out: Console, verbose_skipped: list[SyncAction]) -> None:
+    """Render the verbose Skipped Extras & Auxiliary Files tree."""
+    ls_colors = parse_ls_colors()
+    skipped_by_torrent: dict[str, list[SyncAction]] = defaultdict(list)
+    for sk in verbose_skipped:
+        skipped_by_torrent[sk.torrent_name].append(sk)
+
+    print_section_header(out, "Skipped Extras & Auxiliary Files", style="bold magenta")
+    for torrent_name in sorted(skipped_by_torrent, key=str.lower):
+        items = skipped_by_torrent[torrent_name]
+        link_path = (
+            items[0].source_file if items[0].source_file.name == torrent_name else items[0].source_file.parent
+        )
+        header_text = ls_styled(f"{torrent_name}/", ls_colors, is_dir=True)
+        header_text.stylize(f"link {link_path.absolute().as_uri()}")
+        out.print(header_text, soft_wrap=True, highlight=False)
+
+        ordered = sorted(
+            items,
+            key=lambda s: (not _is_directory_action(s, torrent_name), s.source_file.name.lower()),
+        )
+        for sk in ordered:
+            is_dir = _is_directory_action(sk, torrent_name)
+            label = f"{sk.source_file.name}/" if is_dir else sk.source_file.name
+            ext = "" if is_dir else Path(sk.source_file.name).suffix.lower()
+            item_text = ls_styled(label, ls_colors, is_dir=is_dir, ext=ext)
+            item_text.stylize(f"link {sk.source_file.absolute().as_uri()}")
+            out.print(
+                Text.assemble(
+                    Text("  "),
+                    item_text,
+                    Text(" · ", style="dim"),
+                    Text(reason_label(sk.reason), style="yellow"),
+                ),
+                soft_wrap=True,
+                highlight=False,
+            )
+
+
 def render_gap_report(
     report: GapReport,
     console: Console | None = None,
@@ -176,26 +245,7 @@ def render_gap_report(
                 highlight=False,
             )
 
-    if grouped:
-        print_section_header(out, "Ready to Sync (/mnt/mango/media/...)", style="bold cyan")
-        for (kind, _torrent_name, rel_target), items in sorted(grouped.items(), key=lambda kv: kv[0][2]):
-            total_size = format_bytes(sum(i.file_size for i in items))
-            reason = reason_label(items[0].reason)
-            link_path = items[0].source_file if len(items) == 1 else items[0].source_file.parent
-            file_uri = link_path.absolute().as_uri()
-            segments = [f"[green]{escape(rel_target)}[/green]"]
-            if kind == MediaKind.TV:
-                segments.append(f"[cyan]{format_episode_ranges(items)}[/cyan]")
-            segments.extend(
-                [
-                    f"[white]{total_size}[/white]",
-                    f"[yellow]{reason}[/yellow]",
-                    f"[dim][link={file_uri}]torrent[/link][/dim]",
-                ]
-            )
-            out.print(" / ".join(segments), soft_wrap=True, highlight=False)
-    else:
-        out.print("[green]No pending media gaps detected.[/green]")
+    _render_ready_section(out, grouped)
 
     if report.flagged_for_review:
         print_section_header(out, "Flagged for Review (Use --resolve ID=OPT)", style="bold yellow")
@@ -220,47 +270,7 @@ def render_gap_report(
             )
 
     if verbose and verbose_skipped:
-        ls_colors = parse_ls_colors()
-        skipped_by_torrent: dict[str, list[SyncAction]] = defaultdict(list)
-        for sk in verbose_skipped:
-            skipped_by_torrent[sk.torrent_name].append(sk)
-
-        print_section_header(out, "Skipped Extras & Auxiliary Files", style="bold magenta")
-        for torrent_name in sorted(skipped_by_torrent, key=str.lower):
-            items = skipped_by_torrent[torrent_name]
-            link_path = (
-                items[0].source_file if items[0].source_file.name == torrent_name else items[0].source_file.parent
-            )
-            file_uri = link_path.absolute().as_uri()
-            header_text = ls_styled(f"{torrent_name}/", ls_colors, is_dir=True)
-            header_text.stylize(f"link {file_uri}")
-            out.print(header_text, soft_wrap=True, highlight=False)
-
-            dir_items = sorted(
-                (sk for sk in items if _is_directory_action(sk, torrent_name)),
-                key=lambda s: s.source_file.name.lower(),
-            )
-            file_items = sorted(
-                (sk for sk in items if not _is_directory_action(sk, torrent_name)),
-                key=lambda s: s.source_file.name.lower(),
-            )
-            for sk in [*dir_items, *file_items]:
-                is_dir = _is_directory_action(sk, torrent_name)
-                label = f"{sk.source_file.name}/" if is_dir else sk.source_file.name
-                ext = "" if is_dir else Path(sk.source_file.name).suffix.lower()
-                reason = reason_label(sk.reason)
-                item_text = ls_styled(label, ls_colors, is_dir=is_dir, ext=ext)
-                item_text.stylize(f"link {sk.source_file.absolute().as_uri()}")
-                out.print(
-                    Text.assemble(
-                        Text("  "),
-                        item_text,
-                        Text(" · ", style="dim"),
-                        Text(reason, style="yellow"),
-                    ),
-                    soft_wrap=True,
-                    highlight=False,
-                )
+        _render_skipped_section(out, verbose_skipped)
 
 
 def render_execution_summary(

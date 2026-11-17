@@ -7,10 +7,12 @@ from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock
 
+import pytest
+import typer
 from conftest import make_test_config as _setup_dirs
 from homelab_media import cli
 from homelab_media.config import MediaConfig
-from homelab_media.models import ActionType, GapReport, MediaKind, SyncAction
+from homelab_media.models import ActionType, CandidateOption, GapReport, MediaKind, ReviewItem, SyncAction
 from homelab_media.remote import SSH_BASE_OPTS, dispatch_remote
 from homelab_media.renderer import format_episode_ranges, render_gap_report
 from rich.console import Console
@@ -172,3 +174,32 @@ def test_render_gap_report_verbose_compacts_skipped_extras(tmp_path: Path, monke
     assert "small promo" in output
     assert "pruned dir" in output
     assert "non-video" in output
+
+
+def test_resolve_review_specs_rejects_invalid_specs_and_unknown_ids(tmp_path: Path) -> None:
+    cfg = _setup_dirs(tmp_path)
+    report = GapReport(
+        flagged_for_review=[
+            ReviewItem(
+                id="rev-001",
+                torrent_name="Mystery.Show",
+                kind=MediaKind.TV,
+                issue="MISSING_YEAR_QUERY_TMDB",
+                confidence=0.70,
+                message="msg",
+                candidates=[
+                    CandidateOption(
+                        option_id="opt-1",
+                        target_path=cfg.media_tv_dir / "Mystery Show (2020)",
+                        description="desc",
+                    )
+                ],
+                source_files=[],
+            )
+        ]
+    )
+
+    for bad_spec in (["no-equals"], ["=opt-1"], ["rev-001="], ["rev-999=opt-1"], ["rev-001=opt-99"]):
+        with pytest.raises(typer.Exit) as exc_info:
+            cli._resolve_review_specs(bad_spec, report, cfg)
+        assert exc_info.value.exit_code == 2

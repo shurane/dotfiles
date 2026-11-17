@@ -20,13 +20,10 @@ class MediaKind(StrEnum):
 
 
 class ActionType(StrEnum):
-    """Classification of a media file or torrent during gap scanning."""
+    """Classification of a media file or directory action during gap scanning."""
 
     SYNC = "SYNC"
-    ALREADY_SYNCED = "ALREADY_SYNCED"
-    FLAGGED_FOR_REVIEW = "FLAGGED_FOR_REVIEW"
     SKIP_EXTRA = "SKIP_EXTRA"
-    SKIP_IN_PROGRESS = "SKIP_IN_PROGRESS"
     IGNORED = "IGNORED"
     CONFLICT = "CONFLICT"
 
