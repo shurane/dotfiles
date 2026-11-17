@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import fnmatch
 import re
+from dataclasses import dataclass
 from pathlib import Path
 
 from homelab_media.models import MediaKind
@@ -73,49 +74,61 @@ def is_extra_or_auxiliary(
     return False, ""
 
 
+@dataclass(frozen=True, slots=True)
+class SyncIgnore:
+    """A parsed .syncignore. An existing file with zero active patterns ignores the whole directory."""
+
+    patterns: tuple[str, ...] = ()
+
+    @property
+    def ignore_all(self) -> bool:
+        return not self.patterns
+
+    def match(self, rel_file_path: Path) -> str:
+        """Return the ignore reason code for rel_file_path, or '' if it is not ignored."""
+        if self.ignore_all:
+            return "SYNCIGNORE_DIR"
+        rel_posix = rel_file_path.as_posix()
+        name = rel_file_path.name
+        for pat in self.patterns:
+            clean_pat = pat.lstrip("/")
+            if (
+                fnmatch.fnmatch(rel_posix, clean_pat)
+                or fnmatch.fnmatch(name, clean_pat)
+                or (clean_pat.endswith("/") and rel_posix.startswith(clean_pat))
+            ):
+                return f"SYNCIGNORE_PATTERN:{pat}"
+        return ""
+
+
+def load_syncignore(torrent_dir: Path) -> SyncIgnore | None:
+    """Read torrent_dir/.syncignore once. Returns None when the file does not exist."""
+    try:
+        text = (torrent_dir / ".syncignore").read_text(encoding="utf-8", errors="replace")
+    except (FileNotFoundError, NotADirectoryError, IsADirectoryError):
+        return None
+    lines = (raw.strip() for raw in text.splitlines())
+    return SyncIgnore(tuple(line for line in lines if line and not line.startswith("#")))
+
+
 def parse_syncignore(syncignore_path: Path) -> tuple[bool, list[str]]:
     """Parse a .syncignore file.
 
     Returns (ignore_entire_dir, patterns).
     An existing .syncignore with zero active patterns ignores the entire directory.
     """
-    if not syncignore_path.is_file():
+    parsed = load_syncignore(syncignore_path.parent) if syncignore_path.name == ".syncignore" else None
+    if parsed is None:
         return False, []
-
-    patterns: list[str] = []
-    for raw_line in syncignore_path.read_text(encoding="utf-8", errors="replace").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#"):
-            continue
-        patterns.append(line)
-
-    if not patterns:
-        return True, []
-    return False, patterns
+    return parsed.ignore_all, list(parsed.patterns)
 
 
 def check_syncignore(torrent_dir: Path, rel_file_path: Path) -> tuple[bool, str]:
     """Check whether rel_file_path inside torrent_dir is excluded by .syncignore.
 
-    Returns (is_ignored, reason).
+    Returns (is_ignored, reason). Prefer load_syncignore() + SyncIgnore.match() when
+    checking many files from one directory so the file is only read once.
     """
-    syncignore_file = torrent_dir / ".syncignore"
-    ignore_all, patterns = parse_syncignore(syncignore_file)
-    if ignore_all:
-        return True, "SYNCIGNORE_DIR"
-
-    if not patterns:
-        return False, ""
-
-    rel_posix = rel_file_path.as_posix()
-    name = rel_file_path.name
-    for pat in patterns:
-        clean_pat = pat.lstrip("/")
-        if (
-            fnmatch.fnmatch(rel_posix, clean_pat)
-            or fnmatch.fnmatch(name, clean_pat)
-            or (clean_pat.endswith("/") and rel_posix.startswith(clean_pat))
-        ):
-            return True, f"SYNCIGNORE_PATTERN:{pat}"
-
-    return False, ""
+    syncignore = load_syncignore(torrent_dir)
+    reason = syncignore.match(rel_file_path) if syncignore else ""
+    return bool(reason), reason

@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 import time
 from concurrent.futures import Future, ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -13,7 +13,7 @@ from whenever import Instant
 
 from homelab_media.clients.qbittorrent import QBittorrentClient
 from homelab_media.clients.tmdb import TmdbClient, TmdbMatch
-from homelab_media.filter import check_syncignore, is_extra_or_auxiliary, is_pruned_dir
+from homelab_media.filter import is_extra_or_auxiliary, is_pruned_dir, load_syncignore
 from homelab_media.models import (
     ActionType,
     CandidateOption,
@@ -106,65 +106,51 @@ def _is_torrent_in_progress(torrent: TorrentItem) -> bool:
     return torrent.progress < 1.0 or torrent.state in UNSTABLE_TORRENT_STATES
 
 
-def _dir_has_partial_files(root: Path) -> bool:
-    """Quick check for .part/.parts files inside an untracked directory."""
-    stack = [root]
-    while stack:
-        current = stack.pop()
-        try:
-            with os.scandir(current) as it:
-                for entry in it:
-                    if entry.is_symlink():
-                        continue
-                    if entry.is_dir(follow_symlinks=False):
-                        stack.append(Path(entry.path))
-                    elif entry.name.endswith((".part", ".parts", ".!qB")):
-                        return True
-        except OSError:
-            continue
-    return False
+PARTIAL_SUFFIXES: tuple[str, ...] = (".part", ".parts", ".!qB")
 
 
-def _iter_torrent_files(
-    item_path: Path,
-    torrent_root: Path,
-) -> tuple[list[tuple[os.DirEntry[str], Path]], list[Path]]:
-    """Walk item_path using os.scandir, pruning blacklisted extra trees and skipping symlinks.
+@dataclass(slots=True)
+class _TorrentWalk:
+    """Result of walking one torrent once."""
 
-    Returns (files_with_rel_paths, pruned_extra_dirs).
+    files: list[tuple[os.DirEntry[str], Path]] = field(default_factory=list)
+    pruned_dirs: list[Path] = field(default_factory=list)
+    has_partial: bool = False
+    has_syncignore: bool = False
+
+
+def _walk_torrent(item_path: Path) -> _TorrentWalk:
+    """Walk a torrent directory exactly once (one scandir per directory).
+
+    Collects regular files outside pruned extras trees, records the pruned dirs, and
+    aborts early if any partial-download marker is found (including inside pruned
+    trees, which are scanned for markers only).
     """
-    collected: list[tuple[os.DirEntry[str], Path]] = []
-    pruned_dirs: list[Path] = []
-    if item_path.is_symlink():
-        return collected, pruned_dirs
-
-    if item_path.is_file():
-        with os.scandir(torrent_root) as it:
-            for entry in it:
-                if entry.name == item_path.name and not entry.is_symlink():
-                    collected.append((entry, Path(entry.name)))
-                    break
-        return collected, pruned_dirs
-
-    stack: list[Path] = [item_path]
+    walk = _TorrentWalk()
+    stack: list[tuple[Path, bool]] = [(item_path, False)]
     while stack:
-        current = stack.pop()
+        current, in_pruned = stack.pop()
         try:
             with os.scandir(current) as it:
                 for entry in it:
                     if entry.is_symlink():
                         continue
                     if entry.is_dir(follow_symlinks=False):
-                        if is_pruned_dir(entry.name):
-                            pruned_dirs.append(Path(entry.path))
-                            continue
-                        stack.append(Path(entry.path))
-                    elif entry.is_file(follow_symlinks=False):
-                        rel = Path(entry.path).relative_to(item_path)
-                        collected.append((entry, rel))
+                        child_pruned = in_pruned
+                        if not in_pruned and is_pruned_dir(entry.name):
+                            walk.pruned_dirs.append(Path(entry.path))
+                            child_pruned = True
+                        stack.append((Path(entry.path), child_pruned))
+                    elif entry.name.endswith(PARTIAL_SUFFIXES):
+                        walk.has_partial = True
+                        return walk
+                    elif not in_pruned and entry.is_file(follow_symlinks=False):
+                        if entry.name == ".syncignore" and current == item_path:
+                            walk.has_syncignore = True
+                        walk.files.append((entry, Path(entry.path).relative_to(item_path)))
         except OSError:
             continue
-    return collected, pruned_dirs
+    return walk
 
 
 def scan_media_gaps(
@@ -261,10 +247,18 @@ def _scan_with_clients(
 
                 if torrent_name in in_progress_names:
                     continue
-                if top_entry.is_dir(follow_symlinks=False) and _dir_has_partial_files(item_path):
+                if top_entry.is_dir(follow_symlinks=False):
+                    walk = _walk_torrent(item_path)
+                    if walk.has_partial:
+                        continue
+                    syncignore = load_syncignore(item_path) if walk.has_syncignore else None
+                elif top_entry.is_file(follow_symlinks=False):
+                    walk = _TorrentWalk(files=[(top_entry, Path(top_entry.name))])
+                    syncignore = None
+                else:
                     continue
 
-                files, pruned_dirs = _iter_torrent_files(item_path, torrents_subdir)
+                files, pruned_dirs = walk.files, walk.pruned_dirs
                 for pruned_dir in pruned_dirs:
                     report.skipped_extras.append(
                         SyncAction(
@@ -284,20 +278,18 @@ def _scan_with_clients(
                     if entry.name == ".syncignore":
                         continue
 
-                    if top_entry.is_dir(follow_symlinks=False):
-                        ignored, ignore_reason = check_syncignore(item_path, rel_path)
-                        if ignored:
-                            report.ignored_items.append(
-                                SyncAction(
-                                    torrent_name=torrent_name,
-                                    source_file=source_file,
-                                    kind=kind,
-                                    action_type=ActionType.IGNORED,
-                                    reason=ignore_reason,
-                                    tracked_by_qbittorrent=tracked,
-                                )
+                    if syncignore is not None and (ignore_reason := syncignore.match(rel_path)):
+                        report.ignored_items.append(
+                            SyncAction(
+                                torrent_name=torrent_name,
+                                source_file=source_file,
+                                kind=kind,
+                                action_type=ActionType.IGNORED,
+                                reason=ignore_reason,
+                                tracked_by_qbittorrent=tracked,
                             )
-                            continue
+                        )
+                        continue
 
                     if entry.inode() in media_inodes:
                         report.already_synced_count += 1
