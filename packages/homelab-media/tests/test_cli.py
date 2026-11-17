@@ -8,7 +8,9 @@ from unittest.mock import MagicMock
 
 from homelab_media import cli
 from homelab_media.config import MediaConfig
+from homelab_media.models import ActionType, MediaKind, SyncAction
 from homelab_media.remote import SSH_BASE_OPTS, dispatch_remote
+from homelab_media.renderer import _format_episode_ranges
 from typer.testing import CliRunner
 
 runner = CliRunner()
@@ -79,3 +81,19 @@ def test_remote_dispatch_uses_connect_timeout(monkeypatch) -> None:
     proc = dispatch_remote(cfg, ["plan", "--json"])
     assert proc.returncode == 0
     assert any("ConnectTimeout=5" in cmd for cmd in calls)
+
+
+def test_format_episode_ranges_compacts_contiguous_and_gaps() -> None:
+    actions = [
+        SyncAction(
+            torrent_name="Show",
+            source_file=Path(f"ep{ep}.mkv"),
+            kind=MediaKind.TV,
+            action_type=ActionType.SYNC,
+            reason="PARSED_TITLE_YEAR",
+            season=1,
+            episode=ep,
+        )
+        for ep in (1, 2, 3, 5, 6, 8)
+    ]
+    assert _format_episode_ranges(actions) == "S01E01-E03,E05-E06,E08 (6)"

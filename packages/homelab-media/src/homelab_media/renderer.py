@@ -2,15 +2,24 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from homelab_media.models import MediaKind
+
 if TYPE_CHECKING:
     from homelab_media.executor import ExecutionSummary
-    from homelab_media.models import GapReport
+    from homelab_media.models import GapReport, SyncAction
+
+REASON_LABELS: dict[str, str] = {
+    "EXACT_EXISTING_MATCH": "existing",
+    "PARSED_TITLE_YEAR": "parsed",
+    "TMDB_MATCH": "tmdb",
+}
 
 
 def _format_bytes(num_bytes: int) -> str:
@@ -23,13 +32,52 @@ def _format_bytes(num_bytes: int) -> str:
     return f"{num_bytes} B"
 
 
+def _format_episode_ranges(actions: list[SyncAction]) -> str:
+    """Compact TV SyncActions into concise season/episode ranges (e.g. 'S01E01-E12 (12)')."""
+    by_season: dict[int, list[int]] = defaultdict(list)
+    extra_labels: list[str] = []
+
+    for act in actions:
+        season = act.season if act.season is not None else 1
+        if isinstance(act.episode, int):
+            by_season[season].append(act.episode)
+        elif act.episode is not None:
+            extra_labels.append(f"S{season:02d}E{act.episode}")
+
+    parts: list[str] = []
+    for season in sorted(by_season):
+        eps = sorted(set(by_season[season]))
+        ranges: list[str] = []
+        start = prev = eps[0]
+        for ep in eps[1:]:
+            if ep == prev + 1:
+                prev = ep
+            else:
+                ranges.append(f"E{start:02d}-E{prev:02d}" if start != prev else f"E{start:02d}")
+                start = prev = ep
+        ranges.append(f"E{start:02d}-E{prev:02d}" if start != prev else f"E{start:02d}")
+        parts.append(f"S{season:02d}{','.join(ranges)}")
+
+    parts.extend(sorted(extra_labels))
+    summary = ", ".join(parts) if parts else "episodes"
+    return f"{summary} ({len(actions)})"
+
+
+def _relative_target_folder(act: SyncAction) -> str:
+    """Return compact 'tv/<Show (Year)>' or 'movies/<Movie (Year)>' without /mnt/mango/media prefix."""
+    if act.target_file is None:
+        return "-"
+    folder = act.target_file.parent.parent.name if act.kind == MediaKind.TV else act.target_file.parent.name
+    return f"{act.kind.value}/{folder}"
+
+
 def render_gap_report(
     report: GapReport,
     console: Console | None = None,
     *,
     verbose: bool = False,
 ) -> None:
-    """Render a GapReport as structured Rich panels and tables."""
+    """Render a GapReport as compact, scannable Rich panels and tables."""
     out = console or Console()
     qb_badge = "[green]online[/green]" if report.qbittorrent_online else "[yellow]offline (disk mode)[/yellow]"
 
@@ -42,7 +90,7 @@ def render_gap_report(
         f"Extras skipped: [dim]{len(report.skipped_extras)}[/dim]  |  "
         f"Conflicts: [bold red]{len(report.conflicts)}[/bold red]"
     )
-    out.print(Panel(summary_text, title="homelab-media status", border_style="blue"))
+    out.print(Panel(summary_text, title="homelab-media plan", border_style="blue"))
 
     if report.in_progress:
         t_prog = Table(title="In-Progress Torrents (Protected)", show_lines=False)
@@ -60,26 +108,25 @@ def render_gap_report(
         out.print(t_prog)
 
     if report.ready_to_sync:
-        t_sync = Table(title="Ready to Sync (Missing Hardlinks)", show_lines=False)
-        t_sync.add_column("Kind", style="magenta", width=7)
-        t_sync.add_column("Source", style="white")
-        t_sync.add_column("Target", style="green")
-        t_sync.add_column("Size", justify="right")
-        t_sync.add_column("Reason", style="dim")
+        grouped: dict[tuple[MediaKind, str, str], list[SyncAction]] = defaultdict(list)
         for act in report.ready_to_sync:
-            src_disp = (
-                f"{act.torrent_name}/{act.source_file.name}"
-                if act.source_file.name != act.torrent_name
-                else act.torrent_name
+            grouped[(act.kind, act.torrent_name, _relative_target_folder(act))].append(act)
+
+        t_sync = Table(title="Ready to Sync (/mnt/mango/media/...)", show_lines=False)
+        t_sync.add_column("Target", style="green")
+        t_sync.add_column("Items", style="cyan")
+        t_sync.add_column("Size", justify="right")
+        t_sync.add_column("Match", style="dim")
+        t_sync.add_column("Source Torrent", style="dim", overflow="ellipsis", max_width=44)
+
+        for (kind, torrent_name, rel_target), items in sorted(grouped.items(), key=lambda kv: kv[0][2]):
+            total_size = sum(i.file_size for i in items)
+            items_label = (
+                f"movie ({len(items)})" if kind == MediaKind.MOVIE else _format_episode_ranges(items)
             )
-            tgt_disp = str(act.target_file) if act.target_file else "-"
-            t_sync.add_row(
-                act.kind.value,
-                src_disp,
-                tgt_disp,
-                _format_bytes(act.file_size),
-                act.reason,
-            )
+            reason = REASON_LABELS.get(items[0].reason, items[0].reason.lower())
+            t_sync.add_row(rel_target, items_label, _format_bytes(total_size), reason, torrent_name)
+
         out.print(t_sync)
     else:
         out.print("[green]No pending media gaps detected.[/green]")
