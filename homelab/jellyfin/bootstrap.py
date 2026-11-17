@@ -178,7 +178,7 @@ def print_colorized_diff(diff_lines: list[str]) -> None:
     """Print unified diff lines with syntax-highlighted red/green coloring."""
     for line in diff_lines:
         line_str = line.rstrip("\n")
-        if line_str.startswith("---") or line_str.startswith("+++"):
+        if line_str.startswith("---", "+++"):
             console.print(f"[bold white]{line_str}[/]")
         elif line_str.startswith("@@"):
             console.print(f"[bold cyan]{line_str}[/]")
