@@ -1,8 +1,9 @@
-"""Service clients for qBittorrent and Jellyfin."""
+"""HTTP API clients for qBittorrent, Jellyfin, and TMDB."""
 
 from __future__ import annotations
 
-from homelab_media.clients.jellyfin import JellyfinClient
-from homelab_media.clients.qbittorrent import QBittorrentClient
+import httpx
 
-__all__ = ["JellyfinClient", "QBittorrentClient"]
+DEFAULT_HTTP_TIMEOUT = httpx.Timeout(5.0, connect=2.0)
+
+__all__ = ["DEFAULT_HTTP_TIMEOUT"]

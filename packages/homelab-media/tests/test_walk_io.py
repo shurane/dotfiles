@@ -6,23 +6,12 @@ import os
 from pathlib import Path
 
 import pytest
-from homelab_media.config import MediaConfig
+from conftest import make_sparse_video as _video
+from conftest import make_test_config as _cfg
+from homelab_media import parser as hm_parser
 from homelab_media.filter import SyncIgnore, load_syncignore
-from homelab_media.models import ActionType
+from homelab_media.models import ActionType, ReasonCode
 from homelab_media.scanner import scan_media_gaps
-
-
-def _cfg(tmp_path: Path) -> MediaConfig:
-    for d in ("torrents/tv", "torrents/movies", "media/tv", "media/movies"):
-        (tmp_path / d).mkdir(parents=True)
-    return MediaConfig(torrents_dir=tmp_path / "torrents", media_dir=tmp_path / "media")
-
-
-def _video(path: Path, size: int = 100 * 1024 * 1024) -> Path:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("wb") as f:
-        f.truncate(size)
-    return path
 
 
 @pytest.fixture
@@ -105,19 +94,50 @@ def test_torrents_without_syncignore_never_attempt_a_read(tmp_path: Path, monkey
     assert ".syncignore" not in attempts
 
 
-def test_empty_syncignore_ignores_every_file_individually(tmp_path: Path) -> None:
+def test_empty_syncignore_short_circuits_and_reports_syncignore(
+    tmp_path: Path,
+    scandir_calls: list[str],
+) -> None:
     cfg = _cfg(tmp_path)
     show = cfg.torrents_tv_dir / "Show.2020.S01.1080p"
     for e in range(1, 4):
-        _video(show / f"Show.2020.S01E{e:02d}.mkv")
+        _video(show / "Season 01" / f"Show.2020.S01E{e:02d}.mkv")
     (show / ".syncignore").write_text("# nothing\n\n", encoding="utf-8")
+    scandir_calls.clear()
 
     report = scan_media_gaps(cfg, use_qbittorrent=False)
 
     assert report.ready_to_sync == []
-    assert {i.reason for i in report.ignored_items} == {"SYNCIGNORE_DIR"}
-    assert all(i.action_type == ActionType.IGNORED for i in report.ignored_items)
-    assert len(report.ignored_items) == 3
+    assert len(report.ignored_items) == 1
+    assert report.ignored_items[0].source_file == show / ".syncignore"
+    assert report.ignored_items[0].reason == ReasonCode.SYNCIGNORE_DIR
+    assert report.ignored_items[0].action_type == ActionType.IGNORED
+    # Subdirectory Season 01 was never opened because root .syncignore short-circuited!
+    assert str(show / "Season 01") not in scandir_calls
+
+
+def test_resolve_parent_folder_called_once_per_multi_episode_torrent(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    cfg = _cfg(tmp_path)
+    show = cfg.torrents_tv_dir / "Show.2020.S01.1080p"
+    for e in range(1, 7):
+        _video(show / f"Show.2020.S01E{e:02d}.mkv")
+
+    calls: list[str] = []
+    real_resolve = hm_parser.resolve_parent_folder
+
+    def counting_resolve(*a: object, **k: object) -> hm_parser.ParentResolution:
+        calls.append(str(a[1]))
+        return real_resolve(*a, **k)  # type: ignore[arg-type]
+
+    monkeypatch.setattr("homelab_media.scanner.resolve_parent_folder", counting_resolve)
+    monkeypatch.setattr("homelab_media.parser.resolve_parent_folder", counting_resolve)
+    report = scan_media_gaps(cfg, use_qbittorrent=False)
+
+    assert len(report.ready_to_sync) == 6
+    assert len(calls) == 1
 
 
 @pytest.mark.parametrize("marker", [".part", ".parts", ".!qB"])

@@ -7,13 +7,13 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
+from conftest import make_test_config as _cfg
 from homelab_media.clients.tmdb import TmdbMatch
-from homelab_media.config import MediaConfig
 from homelab_media.executor import execute_sync
 from homelab_media.models import ActionType, MediaKind, PathTraversalSecurityError, SyncAction
 from homelab_media.parser import assert_safe_target, build_folder_index, resolve_parent_folder
+from homelab_media.renderer import reason_label
 from homelab_media.scanner import scan_media_gaps
-from homelab_media.ui import reason_label
 
 
 @pytest.mark.parametrize(
@@ -36,12 +36,6 @@ from homelab_media.ui import reason_label
 )
 def test_reason_label_snapshot(reason: str, label: str) -> None:
     assert reason_label(reason) == label
-
-
-def _cfg(tmp_path: Path) -> MediaConfig:
-    for d in ("torrents/tv", "torrents/movies", "media/tv", "media/movies"):
-        (tmp_path / d).mkdir(parents=True)
-    return MediaConfig(torrents_dir=tmp_path / "torrents", media_dir=tmp_path / "media")
 
 
 def test_tmdb_multidisc_movie_keeps_disc_suffix(tmp_path: Path) -> None:

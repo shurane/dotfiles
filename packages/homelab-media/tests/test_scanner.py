@@ -7,30 +7,14 @@ from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock
 
+from conftest import make_sparse_video as _make_dummy_video
+from conftest import make_test_config as _make_config
 from homelab_media.clients.tmdb import TmdbMatch
-from homelab_media.config import MediaConfig
 from homelab_media.executor import execute_sync
 from homelab_media.models import ActionType, TorrentItem
 from homelab_media.renderer import render_gap_report
 from homelab_media.scanner import scan_media_gaps
 from rich.console import Console
-
-
-def _make_dummy_video(path: Path, size: int = 100 * 1024 * 1024) -> None:
-    """Create a sparse regular file of the given size for testing without disk bloat."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("wb") as f:
-        f.truncate(size)
-
-
-def _make_config(tmp_path: Path) -> MediaConfig:
-    torrents = tmp_path / "torrents"
-    media = tmp_path / "media"
-    (torrents / "tv").mkdir(parents=True)
-    (torrents / "movies").mkdir(parents=True)
-    (media / "tv").mkdir(parents=True)
-    (media / "movies").mkdir(parents=True)
-    return MediaConfig(torrents_dir=torrents, media_dir=media)
 
 
 def test_inode_alias_discovery_marks_already_synced(tmp_path: Path) -> None:
@@ -310,7 +294,7 @@ def test_end_to_end_realistic_library_sync_and_render(tmp_path: Path) -> None:
     report1 = scan_media_gaps(cfg, qb_client=mock_qb, tmdb_client=mock_tmdb, use_qbittorrent=True)
     assert report1.already_synced_count == 6  # 1 movie + 5 Show Alpha episodes
     assert len(report1.in_progress) == 1
-    assert any(i.source_file.name == "Show.Ignored.S01E01.mkv" for i in report1.ignored_items)
+    assert any(i.source_file.name == ".syncignore" for i in report1.ignored_items)
     assert len(report1.flagged_for_review) == 1
     assert len(report1.conflicts) == 1
     assert report1.conflicts[0].reason == "TARGET_EXISTS_DIFFERENT_INODE"

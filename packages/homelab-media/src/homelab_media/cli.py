@@ -136,7 +136,6 @@ def sync(
                         kind=rev.kind,
                         action_type=ActionType.SYNC,
                         reason=f"RESOLVED:{rev_id}={opt_id}",
-                        file_size=src.stat().st_size if src.exists() else 0,
                         season=season_num,
                         episode=ep_val,
                     )

@@ -5,11 +5,19 @@ from __future__ import annotations
 import httpx
 from homelab_core.services import make_jellyfin_auth_headers
 
+from homelab_media.clients import DEFAULT_HTTP_TIMEOUT
+
 
 class JellyfinClient:
     """Thin wrapper around the Jellyfin REST API for library refresh."""
 
-    def __init__(self, base_url: str, api_key: str, *, timeout: float = 5.0) -> None:
+    def __init__(
+        self,
+        base_url: str,
+        api_key: str,
+        *,
+        timeout: float | httpx.Timeout = DEFAULT_HTTP_TIMEOUT,
+    ) -> None:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.timeout = timeout

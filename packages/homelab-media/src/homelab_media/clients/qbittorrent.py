@@ -7,9 +7,8 @@ from typing import Any
 
 import httpx
 
+from homelab_media.clients import DEFAULT_HTTP_TIMEOUT as DEFAULT_TIMEOUT
 from homelab_media.models import TorrentItem
-
-DEFAULT_TIMEOUT = httpx.Timeout(5.0, connect=2.0)
 
 
 class QBittorrentClient:

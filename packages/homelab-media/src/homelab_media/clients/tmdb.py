@@ -2,18 +2,15 @@
 
 from __future__ import annotations
 
-import re
 import threading
 from dataclasses import dataclass
 from typing import Any, Self
 
 import httpx
 
+from homelab_media.clients import DEFAULT_HTTP_TIMEOUT as DEFAULT_TIMEOUT
 from homelab_media.models import MediaKind
-from homelab_media.parser import sanitize_folder_name
-
-NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
-DEFAULT_TIMEOUT = httpx.Timeout(5.0, connect=2.0)
+from homelab_media.parser import normalize_title_key, sanitize_folder_name
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,10 +27,6 @@ class TmdbMatch:
         """Format sanitized canonical <Title> (<Year>) directory name."""
         clean = sanitize_folder_name(self.title)
         return f"{clean} ({self.year})" if self.year is not None else clean
-
-
-def _norm(text: str) -> str:
-    return NON_ALNUM_RE.sub("", text.lower())
 
 
 class TmdbClient:
@@ -89,7 +82,7 @@ class TmdbClient:
 
     def search(self, kind: MediaKind, query: str) -> list[TmdbMatch]:
         """Search TMDB for TV shows or movies matching query, with per-scan caching."""
-        cache_key = (kind, _norm(query))
+        cache_key = (kind, normalize_title_key(query))
         with self._lock:
             if cache_key in self._cache:
                 return self._cache[cache_key]
@@ -139,8 +132,12 @@ class TmdbClient:
         if not matches:
             return None, []
 
-        q_norm = _norm(query)
-        exact = [m for m in matches if _norm(m.title) == q_norm or _norm(m.original_title) == q_norm]
+        q_norm = normalize_title_key(query)
+        exact = [
+            m
+            for m in matches
+            if normalize_title_key(m.title) == q_norm or normalize_title_key(m.original_title) == q_norm
+        ]
         if len(exact) == 1:
             return exact[0], matches
         if len(exact) > 1:

@@ -7,7 +7,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from homelab_media.models import MediaKind
+from homelab_media.models import MediaKind, ReasonCode
 
 VIDEO_EXTENSIONS: frozenset[str] = frozenset({".mkv", ".mp4", ".avi", ".m4v", ".webm", ".ts"})
 
@@ -46,14 +46,14 @@ def check_name_skip(rel_path: str | Path, filename: str) -> str:
     """Return a skip reason if the path/filename can be skipped without calling stat(), else ''."""
     ext = Path(filename).suffix.lower()
     if ext not in VIDEO_EXTENSIONS:
-        return f"NON_VIDEO_EXT:{ext or 'none'}"
+        return f"{ReasonCode.NON_VIDEO_EXT}:{ext or 'none'}"
 
     for part in Path(rel_path).parts[:-1]:
         if is_pruned_dir(part):
-            return f"BLACKLISTED_DIR:{part}"
+            return f"{ReasonCode.BLACKLISTED_DIR}:{part}"
 
     if match := EXTRA_KEYWORD_RE.search(Path(filename).stem):
-        return f"EXTRA_KEYWORD:{match.group(1).lower()}"
+        return f"{ReasonCode.EXTRA_KEYWORD}:{match.group(1).lower()}"
 
     return ""
 
@@ -61,10 +61,10 @@ def check_name_skip(rel_path: str | Path, filename: str) -> str:
 def check_size_skip(file_size: int, kind: MediaKind) -> str:
     """Return a skip reason if the video file size is below minimum thresholds, else ''."""
     if file_size < MIN_VALID_VIDEO_BYTES:
-        return "TINY_OR_SPARSE_FILE"
+        return ReasonCode.TINY_OR_SPARSE_FILE
 
     if kind == MediaKind.MOVIE and file_size < MIN_MOVIE_FEATURE_BYTES:
-        return "SMALL_MOVIE_PROMO_OR_SAMPLE"
+        return ReasonCode.SMALL_MOVIE_PROMO_OR_SAMPLE
 
     return ""
 
@@ -96,7 +96,7 @@ class SyncIgnore:
     def match(self, rel_file_path: Path) -> str:
         """Return the ignore reason code for rel_file_path, or '' if it is not ignored."""
         if self.ignore_all:
-            return "SYNCIGNORE_DIR"
+            return ReasonCode.SYNCIGNORE_DIR
         rel_posix = rel_file_path.as_posix()
         name = rel_file_path.name
         for pat in self.patterns:
@@ -106,7 +106,7 @@ class SyncIgnore:
                 or fnmatch.fnmatch(name, clean_pat)
                 or (clean_pat.endswith("/") and rel_posix.startswith(clean_pat))
             ):
-                return f"SYNCIGNORE_PATTERN:{pat}"
+                return f"{ReasonCode.SYNCIGNORE_PATTERN}:{pat}"
         return ""
 
 

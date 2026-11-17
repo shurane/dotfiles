@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 from guessit import guessit  # type: ignore[import-untyped]
 
-from homelab_media.models import MediaKind, PathTraversalSecurityError
+from homelab_media.models import MediaKind, PathTraversalSecurityError, ReasonCode
 
 FOLDER_YEAR_RE = re.compile(r"^(?P<title>.+?)\s*\((?P<year>\d{4})\)$")
 CD_DISC_RE = re.compile(r"(?:^|[._\-\s])(cd|disc|disk)[._\-\s]?(\d+)(?:$|[._\-\s])", re.IGNORECASE)
@@ -29,6 +29,8 @@ CONFIDENCE_EXACT = 1.0
 CONFIDENCE_TMDB = 0.95
 CONFIDENCE_REVIEW_THRESHOLD = 0.85
 CONFIDENCE_NEEDS_REVIEW = 0.70
+
+FolderIndex = dict[str, tuple[str, int | None]]
 
 
 def _as_int(val: object) -> int | None:
@@ -65,7 +67,7 @@ class TVParseResult:
     target_path: Path
 
 
-def _normalize_title_key(title: str) -> str:
+def normalize_title_key(title: str) -> str:
     """Normalize a title to lowercase alphanumeric tokens for fuzzy folder comparison."""
     return NON_ALNUM_RE.sub("", title.lower())
 
@@ -141,9 +143,6 @@ def parse_torrent_metadata(torrent_name: str, kind: MediaKind) -> dict[str, Any]
     return _guess_metadata(torrent_name, media_type)
 
 
-FolderIndex = dict[str, tuple[str, int | None]]
-
-
 def build_folder_index(existing_folders: Iterable[str]) -> FolderIndex:
     """Pre-compute normalized title -> (folder_name, year) for O(1) parent matching.
 
@@ -154,10 +153,10 @@ def build_folder_index(existing_folders: Iterable[str]) -> FolderIndex:
     for existing in sorted(existing_folders):
         m = FOLDER_YEAR_RE.match(existing)
         if m:
-            norm = _normalize_title_key(m.group("title").strip())
+            norm = normalize_title_key(m.group("title").strip())
             year: int | None = int(m.group("year"))
         else:
-            norm = _normalize_title_key(existing)
+            norm = normalize_title_key(existing)
             year = None
         if norm not in index:
             index[norm] = (existing, year)
@@ -172,7 +171,7 @@ def resolve_parent_folder(
 ) -> ParentResolution:
     """Resolve the canonical <Title> (<Year>) parent folder against existing media directories."""
     clean_title = _smart_title_case(parsed_title)
-    target_norm = _normalize_title_key(clean_title)
+    target_norm = normalize_title_key(clean_title)
 
     index = existing_folders if isinstance(existing_folders, dict) else build_folder_index(existing_folders)
 
@@ -183,13 +182,13 @@ def resolve_parent_folder(
             return ParentResolution(
                 folder_name=f"{clean_title} ({parsed_year})",
                 confidence=CONFIDENCE_NEEDS_REVIEW,
-                reason="STRUCTURAL_MISMATCH",
+                reason=ReasonCode.STRUCTURAL_MISMATCH,
                 existing_mismatch=existing,
             )
         return ParentResolution(
             folder_name=existing,
             confidence=CONFIDENCE_EXACT,
-            reason="EXACT_EXISTING_MATCH",
+            reason=ReasonCode.EXACT_EXISTING_MATCH,
         )
 
     # 2. New folder with Title + Year
@@ -197,14 +196,14 @@ def resolve_parent_folder(
         return ParentResolution(
             folder_name=f"{clean_title} ({parsed_year})",
             confidence=CONFIDENCE_EXACT,
-            reason="PARSED_TITLE_YEAR",
+            reason=ReasonCode.PARSED_TITLE_YEAR,
         )
 
     # 3. Missing year -> flag for TMDB/review
     return ParentResolution(
         folder_name=clean_title,
         confidence=CONFIDENCE_NEEDS_REVIEW,
-        reason="MISSING_YEAR_QUERY_TMDB",
+        reason=ReasonCode.MISSING_YEAR_QUERY_TMDB,
     )
 
 
@@ -222,24 +221,35 @@ def tv_target_path(media_tv_dir: Path, folder_name: str, season: int, episode_fi
     return media_tv_dir / folder_name / f"Season {season:02d}" / episode_filename
 
 
+def _format_episode_tag(season: int, ep_start: int, ep_end: int | None = None) -> tuple[str, int | str]:
+    """Format `(episode_tag, episode_value)` for single or multi-episode TV files."""
+    if ep_end is not None and ep_end != ep_start:
+        ep_lo, ep_hi = min(ep_start, ep_end), max(ep_start, ep_end)
+        return f"S{season:02d}E{ep_lo:02d}-E{ep_hi:02d}", f"{ep_lo}-{ep_hi}"
+    return f"S{season:02d}E{ep_start:02d}", ep_start
+
+
 def parse_movie_target(
     torrent_name: str,
-    _rel_path: str,
     filename: str,
     existing_movies: set[str] | FolderIndex,
     media_movies_dir: Path,
     *,
     torrent_meta: dict[str, Any] | None = None,
+    precomputed_parent: ParentResolution | None = None,
 ) -> MovieParseResult:
     """Parse movie title, year, and optional disc number to compute target path."""
-    meta_torrent = torrent_meta if torrent_meta is not None else _guess_metadata(torrent_name, "movie")
-    has_torrent_title_year = bool(meta_torrent.get("title") and meta_torrent.get("year"))
-    meta_file = {} if has_torrent_title_year else _guess_metadata(filename, "movie")
+    if precomputed_parent is not None:
+        parent = precomputed_parent
+    else:
+        meta_torrent = torrent_meta if torrent_meta is not None else _guess_metadata(torrent_name, "movie")
+        has_torrent_title_year = bool(meta_torrent.get("title") and meta_torrent.get("year"))
+        meta_file = {} if has_torrent_title_year else _guess_metadata(filename, "movie")
 
-    title = str(meta_torrent.get("title") or meta_file.get("title") or Path(torrent_name).stem)
-    year = _as_int(meta_torrent.get("year") or meta_file.get("year"))
+        title = str(meta_torrent.get("title") or meta_file.get("title") or Path(torrent_name).stem)
+        year = _as_int(meta_torrent.get("year") or meta_file.get("year"))
+        parent = resolve_parent_folder(MediaKind.MOVIE, title, year, existing_movies)
 
-    parent = resolve_parent_folder(MediaKind.MOVIE, title, year, existing_movies)
     target_path = movie_target_path(media_movies_dir, parent.folder_name, filename)
     assert_safe_target(target_path, media_movies_dir)
 
@@ -254,6 +264,7 @@ def parse_tv_target(
     media_tv_dir: Path,
     *,
     torrent_meta: dict[str, Any] | None = None,
+    precomputed_parent: ParentResolution | None = None,
 ) -> TVParseResult | None:
     """Parse TV show title, season, and episode(s) to compute target path.
 
@@ -271,22 +282,13 @@ def parse_tv_target(
     if fast_match and meta_torrent.get("title"):
         season = int(fast_match.group(1))
         ep_start = int(fast_match.group(2))
-        ep_end_str = fast_match.group(3)
-        if ep_end_str is not None:
-            ep_end = int(ep_end_str)
-            ep_lo, ep_hi = min(ep_start, ep_end), max(ep_start, ep_end)
-            episode_tag = f"S{season:02d}E{ep_lo:02d}-E{ep_hi:02d}"
-            episode_val: int | str = f"{ep_lo}-{ep_hi}"
-        else:
-            episode_tag = f"S{season:02d}E{ep_start:02d}"
-            episode_val = ep_start
+        ep_end = int(fast_match.group(3)) if fast_match.group(3) is not None else None
+        episode_tag, episode_val = _format_episode_tag(season, ep_start, ep_end)
         show_title = str(meta_torrent["title"])
         year = _as_int(meta_torrent.get("year"))
     elif anime_match and meta_torrent.get("title"):
         season = _as_int(meta_torrent.get("season")) or 1
-        ep_num = int(anime_match.group(1))
-        episode_tag = f"S{season:02d}E{ep_num:02d}"
-        episode_val = ep_num
+        episode_tag, episode_val = _format_episode_tag(season, int(anime_match.group(1)))
         show_title = str(meta_torrent["title"])
         year = _as_int(meta_torrent.get("year"))
     else:
@@ -307,15 +309,15 @@ def parse_tv_target(
 
         if isinstance(episode_raw, list):
             ep_nums = [int(e) for e in episode_raw]
-            ep_lo, ep_hi = min(ep_nums), max(ep_nums)
-            episode_tag = f"S{season:02d}E{ep_lo:02d}-E{ep_hi:02d}"
-            episode_val = f"{ep_lo}-{ep_hi}"
+            episode_tag, episode_val = _format_episode_tag(season, min(ep_nums), max(ep_nums))
         else:
-            ep_num = int(episode_raw)
-            episode_tag = f"S{season:02d}E{ep_num:02d}"
-            episode_val = ep_num
+            episode_tag, episode_val = _format_episode_tag(season, int(episode_raw))
 
-    parent = resolve_parent_folder(MediaKind.TV, show_title, year, existing_shows)
+    parent = (
+        precomputed_parent
+        if precomputed_parent is not None
+        else resolve_parent_folder(MediaKind.TV, show_title, year, existing_shows)
+    )
     ext = Path(filename).suffix.lower()
 
     target_path = tv_target_path(media_tv_dir, parent.folder_name, season, f"{episode_tag}{ext}")
@@ -343,7 +345,6 @@ def resolve_target_with_folder(
     if kind == MediaKind.MOVIE:
         parsed_m = parse_movie_target(
             torrent_name,
-            rel_path,
             filename,
             {safe_folder},
             media_subdir,

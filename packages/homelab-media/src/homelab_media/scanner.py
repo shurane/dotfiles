@@ -13,12 +13,13 @@ from whenever import Instant
 
 from homelab_media.clients.qbittorrent import QBittorrentClient
 from homelab_media.clients.tmdb import TmdbClient, TmdbMatch
-from homelab_media.filter import check_name_skip, check_size_skip, is_pruned_dir, load_syncignore
+from homelab_media.filter import SyncIgnore, check_name_skip, check_size_skip, is_pruned_dir, load_syncignore
 from homelab_media.models import (
     ActionType,
     CandidateOption,
     GapReport,
     MediaKind,
+    ReasonCode,
     ReviewItem,
     SyncAction,
     TorrentItem,
@@ -28,12 +29,14 @@ from homelab_media.parser import (
     CONFIDENCE_TMDB,
     FolderIndex,
     ParentResolution,
+    _as_int,
     assert_safe_target,
     build_folder_index,
     movie_target_path,
     parse_movie_target,
     parse_torrent_metadata,
     parse_tv_target,
+    resolve_parent_folder,
     tv_target_path,
 )
 
@@ -81,7 +84,7 @@ class _TorrentWalk:
     files: list[tuple[os.DirEntry[str], Path]] = field(default_factory=list)
     pruned_dirs: list[Path] = field(default_factory=list)
     has_partial: bool = False
-    has_syncignore: bool = False
+    syncignore: SyncIgnore | None = None
 
 
 @dataclass(slots=True)
@@ -129,14 +132,19 @@ def _is_torrent_in_progress(torrent: TorrentItem) -> bool:
 def _walk_torrent(item_path: Path) -> _TorrentWalk:
     """Walk a torrent directory once (one scandir per non-pruned directory).
 
-    Pruned extras directories (Extras/, Sample/, Subs/, Featurettes/, etc.) are
-    recorded and skipped without opening or descending into them. Aborts early
-    if any partial-download marker (.part, .parts, .!qB) is found.
+    - Pruned extras directories (Extras/, Sample/, Subs/, Featurettes/, etc.) are
+      recorded and skipped without opening or descending into them.
+    - If a root `.syncignore` has zero patterns (`ignore_all`), short-circuits
+      immediately before descending into any subdirectories.
+    - Aborts early if any partial-download marker (.part, .parts, .!qB) is found.
     """
     walk = _TorrentWalk()
     stack: list[Path] = [item_path]
     while stack:
         current = stack.pop()
+        subdirs: list[Path] = []
+        pruned_here: list[Path] = []
+        found_root_syncignore = False
         try:
             with os.scandir(current) as it:
                 for entry in it:
@@ -144,18 +152,28 @@ def _walk_torrent(item_path: Path) -> _TorrentWalk:
                         continue
                     if entry.is_dir(follow_symlinks=False):
                         if is_pruned_dir(entry.name):
-                            walk.pruned_dirs.append(Path(entry.path))
+                            pruned_here.append(Path(entry.path))
                             continue
-                        stack.append(Path(entry.path))
+                        subdirs.append(Path(entry.path))
                     elif entry.name.endswith(PARTIAL_SUFFIXES):
                         walk.has_partial = True
                         return walk
                     elif entry.is_file(follow_symlinks=False):
                         if entry.name == ".syncignore" and current == item_path:
-                            walk.has_syncignore = True
+                            found_root_syncignore = True
+                            continue
                         walk.files.append((entry, Path(entry.path).relative_to(item_path)))
         except OSError:
             continue
+
+        if found_root_syncignore:
+            walk.syncignore = load_syncignore(item_path)
+            if walk.syncignore is not None and walk.syncignore.ignore_all:
+                walk.files.clear()
+                return walk
+
+        walk.pruned_dirs.extend(pruned_here)
+        stack.extend(subdirs)
     return walk
 
 
@@ -232,7 +250,19 @@ def _scan_torrent_entry(
         walk = _walk_torrent(item_path)
         if walk.has_partial:
             return
-        syncignore = load_syncignore(item_path) if walk.has_syncignore else None
+        syncignore = walk.syncignore
+        if syncignore is not None and syncignore.ignore_all:
+            report.ignored_items.append(
+                SyncAction(
+                    torrent_name=torrent_name,
+                    source_file=item_path / ".syncignore",
+                    kind=kind,
+                    action_type=ActionType.IGNORED,
+                    reason=ReasonCode.SYNCIGNORE_DIR,
+                    tracked_by_qbittorrent=tracked,
+                )
+            )
+            return
     elif top_entry.is_file(follow_symlinks=False):
         walk = _TorrentWalk(files=[(top_entry, Path(top_entry.name))])
         syncignore = None
@@ -253,9 +283,10 @@ def _scan_torrent_entry(
         )
 
     for pruned_dir in walk.pruned_dirs:
-        _skip(pruned_dir, f"BLACKLISTED_DIR:{pruned_dir.name}")
+        _skip(pruned_dir, f"{ReasonCode.BLACKLISTED_DIR}:{pruned_dir.name}")
 
     torrent_meta = None
+    torrent_parent: ParentResolution | None = None
     for entry, rel_path in walk.files:
         source_file = Path(entry.path)
         if entry.name == ".syncignore":
@@ -294,15 +325,26 @@ def _scan_torrent_entry(
 
         if torrent_meta is None:
             torrent_meta = parse_torrent_metadata(torrent_name, kind)
+            if title_raw := torrent_meta.get("title"):
+                # Pre-compute parent folder once for the whole torrent when title is known
+                # (for movies only when year is also known; for TV whenever title is known).
+                year_val = _as_int(torrent_meta.get("year"))
+                if kind == MediaKind.TV or year_val is not None:
+                    torrent_parent = resolve_parent_folder(
+                        kind,
+                        str(title_raw),
+                        year_val,
+                        folder_index,
+                    )
 
         if kind == MediaKind.MOVIE:
             parsed_movie = parse_movie_target(
                 torrent_name,
-                rel_path.as_posix(),
                 entry.name,
                 folder_index,
                 media_subdir,
                 torrent_meta=torrent_meta,
+                precomputed_parent=torrent_parent,
             )
             cand = _Candidate(
                 kind=kind,
@@ -323,9 +365,10 @@ def _scan_torrent_entry(
                 folder_index,
                 media_subdir,
                 torrent_meta=torrent_meta,
+                precomputed_parent=torrent_parent,
             )
             if parsed_tv is None:
-                _skip(source_file, "NO_EPISODE_TAG", st.st_size)
+                _skip(source_file, ReasonCode.NO_EPISODE_TAG, st.st_size)
                 continue
             cand = _Candidate(
                 kind=kind,
@@ -341,7 +384,7 @@ def _scan_torrent_entry(
                 ep_val=parsed_tv.episode_value,
             )
 
-        if cand.parent_res.reason == "MISSING_YEAR_QUERY_TMDB" and tmdb_configured:
+        if cand.parent_res.reason == ReasonCode.MISSING_YEAR_QUERY_TMDB and tmdb_configured:
             pending_tmdb.append(cand)
             continue
 
@@ -374,7 +417,7 @@ def _resolve_pending_tmdb(
             cand.parent_res = ParentResolution(
                 folder_name=best_match.folder_name,
                 confidence=CONFIDENCE_TMDB,
-                reason="TMDB_MATCH",
+                reason=ReasonCode.TMDB_MATCH,
             )
             if cand.kind == MediaKind.MOVIE:
                 cand.target_file = movie_target_path(
@@ -489,7 +532,7 @@ def _finalize_item(
                 target_file=cand.target_file,
                 kind=cand.kind,
                 action_type=ActionType.CONFLICT,
-                reason="TARGET_EXISTS_DIFFERENT_INODE",
+                reason=ReasonCode.TARGET_EXISTS_DIFFERENT_INODE,
                 file_size=cand.file_size,
                 season=cand.season_num,
                 episode=cand.ep_val,

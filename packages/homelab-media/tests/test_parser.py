@@ -20,7 +20,6 @@ def test_movie_standard_title_and_year(tmp_path: Path) -> None:
     res = parse_movie_target(
         "The.Lego.Movie.2014.1080p.BluRay.x264",
         "The.Lego.Movie.2014.1080p.BluRay.x264.mkv",
-        "The.Lego.Movie.2014.1080p.BluRay.x264.mkv",
         existing_movies=set(),
         media_movies_dir=tmp_path,
     )
@@ -31,7 +30,6 @@ def test_movie_standard_title_and_year(tmp_path: Path) -> None:
 
 def test_movie_title_with_year_number_fantasia_2000(tmp_path: Path) -> None:
     res = parse_movie_target(
-        "Fantasia.2000.1999.1080p.BluRay.mkv",
         "Fantasia.2000.1999.1080p.BluRay.mkv",
         "Fantasia.2000.1999.1080p.BluRay.mkv",
         existing_movies=set(),
@@ -45,7 +43,6 @@ def test_movie_special_characters_preserved(tmp_path: Path) -> None:
     kiki = parse_movie_target(
         "Kiki's.Delivery.Service.1989.1080p.mkv",
         "Kiki's.Delivery.Service.1989.1080p.mkv",
-        "Kiki's.Delivery.Service.1989.1080p.mkv",
         existing_movies=set(),
         media_movies_dir=tmp_path,
     )
@@ -54,14 +51,12 @@ def test_movie_special_characters_preserved(tmp_path: Path) -> None:
     ralph = parse_movie_target(
         "Wreck-It.Ralph.2012.1080p.mkv",
         "Wreck-It.Ralph.2012.1080p.mkv",
-        "Wreck-It.Ralph.2012.1080p.mkv",
         existing_movies=set(),
         media_movies_dir=tmp_path,
     )
     assert ralph.parent.folder_name == "Wreck-It Ralph (2012)"
 
     gladiator = parse_movie_target(
-        "Gladiator.II.2024.1080p.mkv",
         "Gladiator.II.2024.1080p.mkv",
         "Gladiator.II.2024.1080p.mkv",
         existing_movies=set(),
@@ -74,13 +69,11 @@ def test_movie_multi_disc_cd1_cd2(tmp_path: Path) -> None:
     cd1 = parse_movie_target(
         "Some.Epic.2003.DVDRip",
         "Some.Epic.2003.CD1.avi",
-        "Some.Epic.2003.CD1.avi",
         existing_movies=set(),
         media_movies_dir=tmp_path,
     )
     cd2 = parse_movie_target(
         "Some.Epic.2003.DVDRip",
-        "Some.Epic.2003.CD2.avi",
         "Some.Epic.2003.CD2.avi",
         existing_movies=set(),
         media_movies_dir=tmp_path,
@@ -202,7 +195,6 @@ def test_fast_path_skips_guessit_for_foldered_movie_and_anime_episode(tmp_path: 
 
     res_m = parse_movie_target(
         torrent_name_m,
-        "The.Lego.Movie.2014.2160p.mkv",
         "The.Lego.Movie.2014.2160p.mkv",
         existing_movies=set(),
         media_movies_dir=tmp_path,

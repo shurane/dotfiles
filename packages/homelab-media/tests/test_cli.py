@@ -7,26 +7,16 @@ from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock
 
+from conftest import make_test_config as _setup_dirs
 from homelab_media import cli
 from homelab_media.config import MediaConfig
 from homelab_media.models import ActionType, GapReport, MediaKind, SyncAction
 from homelab_media.remote import SSH_BASE_OPTS, dispatch_remote
-from homelab_media.renderer import render_gap_report
-from homelab_media.ui import format_episode_ranges
+from homelab_media.renderer import format_episode_ranges, render_gap_report
 from rich.console import Console
 from typer.testing import CliRunner
 
 runner = CliRunner()
-
-
-def _setup_dirs(tmp_path: Path) -> MediaConfig:
-    torrents = tmp_path / "torrents"
-    media = tmp_path / "media"
-    (torrents / "tv").mkdir(parents=True)
-    (torrents / "movies").mkdir(parents=True)
-    (media / "tv").mkdir(parents=True)
-    (media / "movies").mkdir(parents=True)
-    return MediaConfig(torrents_dir=torrents, media_dir=media)
 
 
 def test_cli_plan_json_and_sync_resolve_preserves_season_rel_path(tmp_path: Path, monkeypatch) -> None:

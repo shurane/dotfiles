@@ -31,6 +31,28 @@ class ActionType(StrEnum):
     CONFLICT = "CONFLICT"
 
 
+class ReasonCode(StrEnum):
+    """Canonical reason codes and prefixes attached to SyncActions and ReviewItems."""
+
+    # Sync / resolution reasons
+    EXACT_EXISTING_MATCH = "EXACT_EXISTING_MATCH"
+    PARSED_TITLE_YEAR = "PARSED_TITLE_YEAR"
+    TMDB_MATCH = "TMDB_MATCH"
+    STRUCTURAL_MISMATCH = "STRUCTURAL_MISMATCH"
+    MISSING_YEAR_QUERY_TMDB = "MISSING_YEAR_QUERY_TMDB"
+    TARGET_EXISTS_DIFFERENT_INODE = "TARGET_EXISTS_DIFFERENT_INODE"
+
+    # Skip / ignore reasons & prefixes
+    BLACKLISTED_DIR = "BLACKLISTED_DIR"
+    NON_VIDEO_EXT = "NON_VIDEO_EXT"
+    EXTRA_KEYWORD = "EXTRA_KEYWORD"
+    SMALL_MOVIE_PROMO_OR_SAMPLE = "SMALL_MOVIE_PROMO_OR_SAMPLE"
+    TINY_OR_SPARSE_FILE = "TINY_OR_SPARSE_FILE"
+    NO_EPISODE_TAG = "NO_EPISODE_TAG"
+    SYNCIGNORE_DIR = "SYNCIGNORE_DIR"
+    SYNCIGNORE_PATTERN = "SYNCIGNORE_PATTERN"
+
+
 class TorrentItem(BaseModel):
     """Represents a torrent download state from qBittorrent."""
 
