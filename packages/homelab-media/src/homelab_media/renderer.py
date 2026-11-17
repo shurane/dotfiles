@@ -113,14 +113,20 @@ def render_gap_report(
             grouped[(act.kind, act.torrent_name, _relative_target_folder(act))].append(act)
 
         out.print("\n[bold]Ready to Sync (/mnt/mango/media/...)[/bold]")
-        for (kind, torrent_name, rel_target), items in sorted(grouped.items(), key=lambda kv: kv[0][2]):
+        for (kind, _torrent_name, rel_target), items in sorted(grouped.items(), key=lambda kv: kv[0][2]):
             total_size = _format_bytes(sum(i.file_size for i in items))
             reason = REASON_LABELS.get(items[0].reason, items[0].reason.lower())
+            link_path = items[0].source_file if len(items) == 1 else items[0].source_file.parent
+            file_uri = link_path.absolute().as_uri()
             segments = [f"[green]{escape(rel_target)}[/green]"]
             if kind == MediaKind.TV:
                 segments.append(f"[cyan]{_format_episode_ranges(items)}[/cyan]")
             segments.extend(
-                [f"[white]{total_size}[/white]", f"[yellow]{reason}[/yellow]", f"[dim]{escape(torrent_name)}[/dim]"]
+                [
+                    f"[white]{total_size}[/white]",
+                    f"[yellow]{reason}[/yellow]",
+                    f"[dim][link={file_uri}]torrent[/link][/dim]",
+                ]
             )
             out.print(" / ".join(segments), soft_wrap=True, highlight=False)
     else:

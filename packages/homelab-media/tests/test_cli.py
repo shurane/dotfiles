@@ -3,14 +3,16 @@
 from __future__ import annotations
 
 import json
+from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock
 
 from homelab_media import cli
 from homelab_media.config import MediaConfig
-from homelab_media.models import ActionType, MediaKind, SyncAction
+from homelab_media.models import ActionType, GapReport, MediaKind, SyncAction
 from homelab_media.remote import SSH_BASE_OPTS, dispatch_remote
-from homelab_media.renderer import _format_episode_ranges
+from homelab_media.renderer import _format_episode_ranges, render_gap_report
+from rich.console import Console
 from typer.testing import CliRunner
 
 runner = CliRunner()
@@ -97,3 +99,28 @@ def test_format_episode_ranges_compacts_contiguous_and_gaps() -> None:
         for ep in (1, 2, 3, 5, 6, 8)
     ]
     assert _format_episode_ranges(actions) == "S01E01-E03,E05-E06,E08"
+
+
+def test_render_gap_report_emits_osc8_torrent_link(tmp_path: Path) -> None:
+    src = tmp_path / "torrents" / "movies" / "Supergirl (2026)" / "Supergirl.mp4"
+    tgt = tmp_path / "media" / "movies" / "Supergirl (2026)" / "Supergirl (2026).mp4"
+    report = GapReport(
+        ready_to_sync=[
+            SyncAction(
+                torrent_name="Supergirl (2026)",
+                source_file=src,
+                target_file=tgt,
+                kind=MediaKind.MOVIE,
+                action_type=ActionType.SYNC,
+                reason="PARSED_TITLE_YEAR",
+                file_size=2 * 1024 * 1024 * 1024,
+            )
+        ]
+    )
+    buf = StringIO()
+    console = Console(file=buf, force_terminal=True, color_system="truecolor", width=160)
+    render_gap_report(report, console=console)
+    output = buf.getvalue()
+    assert "\x1b]8;" in output
+    assert "file://" in output
+    assert "torrent" in output
