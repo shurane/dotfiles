@@ -139,12 +139,12 @@ def render_gap_report(
     qb_badge = "[green]online[/green]" if report.qbittorrent_online else "[yellow]offline (disk mode)[/yellow]"
 
     summary_text = (
-        f"qBittorrent: {qb_badge}  |  "
-        f"Scan: [cyan]{report.scan_duration_ms:.1f} ms[/cyan]  |  "
-        f"Synced: [green]{report.already_synced_count}[/green]  |  "
-        f"Gaps: [bold cyan]{len(report.ready_to_sync)}[/bold cyan]  |  "
-        f"Review: [bold yellow]{len(report.flagged_for_review)}[/bold yellow]  |  "
-        f"Extras skipped: [dim]{len(report.skipped_extras)}[/dim]  |  "
+        f"qBittorrent: {qb_badge} | "
+        f"Scan: [cyan]{report.scan_duration_ms:.1f} ms[/cyan] | "
+        f"Synced: [green]{report.already_synced_count}[/green] | "
+        f"Gaps: [bold cyan]{len(report.ready_to_sync)}[/bold cyan] | "
+        f"Review: [bold yellow]{len(report.flagged_for_review)}[/bold yellow] | "
+        f"Extras skipped: [dim]{len(report.skipped_extras)}[/dim] | "
         f"Conflicts: [bold red]{len(report.conflicts)}[/bold red]"
     )
     out.print(f"[bold blue]homelab-media plan[/bold blue] · {summary_text}", soft_wrap=True, highlight=False)
