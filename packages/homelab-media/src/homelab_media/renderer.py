@@ -106,44 +106,21 @@ def _ls_styled(
     return Text(label, style=fallback)
 
 
-def _format_skipped_summary(items: list[SyncAction], ls_colors: dict[str, str]) -> Text:
-    """List skipped extras/auxiliary items sorted directories-first with LS_COLORS."""
-    dir_items = sorted(
-        (sk for sk in items if sk.reason.startswith("BLACKLISTED_DIR:")),
-        key=lambda s: s.source_file.name.lower(),
-    )
-    file_items = sorted(
-        (sk for sk in items if not sk.reason.startswith("BLACKLISTED_DIR:")),
-        key=lambda s: s.source_file.name.lower(),
-    )
-
-    tokens: list[Text] = []
-    for sk in dir_items:
-        t = _ls_styled(f"{sk.source_file.name}/", ls_colors, is_dir=True)
-        t.append(" (dir)", style="dim")
-        tokens.append(t)
-
-    for sk in file_items:
-        ext = Path(sk.source_file.name).suffix.lower()
-        t = _ls_styled(sk.source_file.name, ls_colors, ext=ext)
-        if sk.reason.startswith("EXTRA_KEYWORD:"):
-            t.append(f" ({sk.reason.split(':', 1)[1]})", style="dim")
-        elif sk.reason == "SMALL_MOVIE_PROMO_OR_SAMPLE":
-            t.append(" (promo)", style="dim")
-        elif sk.reason == "TINY_OR_SPARSE_FILE":
-            t.append(" (<1 MiB)", style="dim")
-        elif sk.reason == "NO_EPISODE_TAG":
-            t.append(" (no episode)", style="dim")
-        elif not sk.reason.startswith("NON_VIDEO_EXT:"):
-            t.append(f" ({sk.reason.lower()})", style="dim")
-        tokens.append(t)
-
-    out_text = Text()
-    for idx, tok in enumerate(tokens):
-        if idx > 0:
-            out_text.append(", ", style="dim")
-        out_text.append_text(tok)
-    return out_text
+def _skipped_reason_label(reason: str) -> str:
+    """Convert an internal skip reason code into a concise human-readable label."""
+    if reason.startswith("BLACKLISTED_DIR:"):
+        return "pruned dir"
+    if reason.startswith("NON_VIDEO_EXT:"):
+        return "non-video"
+    if reason.startswith("EXTRA_KEYWORD:"):
+        return reason.split(":", 1)[1]
+    if reason == "SMALL_MOVIE_PROMO_OR_SAMPLE":
+        return "small promo"
+    if reason == "TINY_OR_SPARSE_FILE":
+        return "<1 MiB"
+    if reason == "NO_EPISODE_TAG":
+        return "no episode"
+    return reason.lower()
 
 
 def _print_section_header(out: Console, title: str, *, style: str) -> None:
@@ -241,14 +218,39 @@ def render_gap_report(
             items = skipped_by_torrent[torrent_name]
             link_path = items[0].source_file if len(items) == 1 else items[0].source_file.parent
             file_uri = link_path.absolute().as_uri()
-            line = Text.assemble(
-                Text(torrent_name, style="white"),
-                Text(" / ", style="dim"),
-                _format_skipped_summary(items, ls_colors),
-                Text(" / ", style="dim"),
-                Text("torrent", style=f"dim link {file_uri}"),
+            out.print(
+                Text.assemble(
+                    _ls_styled(f"{torrent_name}/", ls_colors, is_dir=True),
+                    Text(" ", style="dim"),
+                    Text("torrent", style=f"dim link {file_uri}"),
+                ),
+                soft_wrap=True,
+                highlight=False,
             )
-            out.print(line, soft_wrap=True, highlight=False)
+
+            dir_items = sorted(
+                (sk for sk in items if sk.reason.startswith("BLACKLISTED_DIR:")),
+                key=lambda s: s.source_file.name.lower(),
+            )
+            file_items = sorted(
+                (sk for sk in items if not sk.reason.startswith("BLACKLISTED_DIR:")),
+                key=lambda s: s.source_file.name.lower(),
+            )
+            for sk in [*dir_items, *file_items]:
+                is_dir = sk.reason.startswith("BLACKLISTED_DIR:")
+                label = f"{sk.source_file.name}/" if is_dir else sk.source_file.name
+                ext = "" if is_dir else Path(sk.source_file.name).suffix.lower()
+                reason_label = _skipped_reason_label(sk.reason)
+                out.print(
+                    Text.assemble(
+                        Text("  "),
+                        _ls_styled(label, ls_colors, is_dir=is_dir, ext=ext),
+                        Text(" / ", style="dim"),
+                        Text(reason_label, style="yellow"),
+                    ),
+                    soft_wrap=True,
+                    highlight=False,
+                )
 
 
 def render_execution_summary(

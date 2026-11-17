@@ -178,3 +178,6 @@ def test_render_gap_report_verbose_compacts_skipped_extras(tmp_path: Path, monke
     idx_poster = output.index("poster.png")
     idx_readme = output.index("readme.txt")
     assert idx_screens < idx_subs < idx_etrg < idx_poster < idx_readme
+    assert "small promo" in output
+    assert "pruned dir" in output
+    assert "non-video" in output
