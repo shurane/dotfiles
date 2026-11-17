@@ -225,92 +225,120 @@ def test_pruned_extra_dirs_reported_in_skipped_extras(tmp_path: Path) -> None:
 
 
 def test_end_to_end_realistic_library_sync_and_render(tmp_path: Path) -> None:
-    """Anonymized end-to-end test mirroring a full multi-show/movie library sync lifecycle."""
+    """Anonymized end-to-end test covering reasons, conflicts, in-progress, and --verbose output."""
     cfg = _make_config(tmp_path)
 
     # 1. Existing synced movie + movie with pruned Featurettes and Sample
-    existing_movie = cfg.torrents_movies_dir / "Movie.Existing.2012.1080p"
-    _make_dummy_video(existing_movie / "Movie.Existing.2012.1080p.mkv")
-    _make_dummy_video(existing_movie / "Movie.Existing.2012.Sample.mkv")
+    existing_movie = cfg.torrents_movies_dir / "Solar.Echo.2012.1080p"
+    _make_dummy_video(existing_movie / "Solar.Echo.2012.1080p.mkv")
+    _make_dummy_video(existing_movie / "Solar.Echo.2012.Sample.mkv")
     _make_dummy_video(existing_movie / "Featurettes" / "MakingOf.mkv")
     (existing_movie / "readme.txt").write_text("info", encoding="utf-8")
-    (cfg.media_movies_dir / "Movie Existing (2012)").mkdir(parents=True)
+    (cfg.media_movies_dir / "Solar Echo (2012)").mkdir(parents=True)
     os.link(
-        existing_movie / "Movie.Existing.2012.1080p.mkv",
-        cfg.media_movies_dir / "Movie Existing (2012)" / "Movie Existing (2012).mkv",
+        existing_movie / "Solar.Echo.2012.1080p.mkv",
+        cfg.media_movies_dir / "Solar Echo (2012)" / "Solar Echo (2012).mkv",
     )
 
-    # 2. Unsynced movies
-    _make_dummy_video(cfg.torrents_movies_dir / "Movie One (2014) [2160p]" / "Movie.One.2014.mkv")
-    _make_dummy_video(cfg.torrents_movies_dir / "Movie Two (2026) [1080p]" / "Movie.Two.2026.mp4")
+    # 2. Unsynced movies (parsed) + 1 movie conflict (existing different inode)
+    _make_dummy_video(cfg.torrents_movies_dir / "Orbital Drift (2014) [2160p]" / "Orbital.Drift.2014.mkv")
+    _make_dummy_video(cfg.torrents_movies_dir / "Paper Lanterns (2026) [1080p]" / "Paper.Lanterns.2026.mp4")
+    _make_dummy_video(cfg.torrents_movies_dir / "Crimson.Crown.2025.1080p.mkv")
+    _make_dummy_video(cfg.media_movies_dir / "Crimson Crown (2025)" / "Crimson Crown (2025).mkv")
 
-    # 3. Partial TV season missing 1 episode
-    show_alpha = cfg.torrents_tv_dir / "Show.Alpha.2019.S01.1080p"
-    alpha_media = cfg.media_tv_dir / "Show Alpha (2019)" / "Season 01"
-    alpha_media.mkdir(parents=True)
+    # 3. Partial TV season missing 1 episode (existing)
+    show_bakery = cfg.torrents_tv_dir / "Midnight.Bakery.2019.S01.1080p"
+    bakery_media = cfg.media_tv_dir / "Midnight Bakery (2019)" / "Season 01"
+    bakery_media.mkdir(parents=True)
     for ep in range(1, 6):
-        src = show_alpha / f"Show.Alpha.S01E{ep:02d}.mkv"
+        src = show_bakery / f"Midnight.Bakery.S01E{ep:02d}.mkv"
         _make_dummy_video(src)
-        os.link(src, alpha_media / f"S01E{ep:02d}.mkv")
-    _make_dummy_video(show_alpha / "Show.Alpha.S01E06.mkv")
+        os.link(src, bakery_media / f"S01E{ep:02d}.mkv")
+    _make_dummy_video(show_bakery / "Midnight.Bakery.S01E06.mkv")
 
-    # 4. Full season TV show with year in torrent name
-    show_beta = cfg.torrents_tv_dir / "Show.Beta.2026.S01.1080p"
+    # 4. Full season TV show with year in torrent name (parsed)
+    show_harbor = cfg.torrents_tv_dir / "Cloud.Harbor.2026.S01.1080p"
     for ep in range(1, 5):
-        _make_dummy_video(show_beta / f"Show.Beta.S01E{ep:02d}.mkv")
+        _make_dummy_video(show_harbor / f"Cloud.Harbor.S01E{ep:02d}.mkv")
 
     # 5. Missing-year anime resolved via TMDB (including colon sanitization)
-    show_gamma = cfg.torrents_tv_dir / "[Group] Show Gamma (01-03) [Batch]"
+    show_compass = cfg.torrents_tv_dir / "[Group] Crimson Compass (01-03) [Batch]"
     for ep in range(1, 4):
-        _make_dummy_video(show_gamma / f"[Group] Show Gamma - {ep:02d} (1080p).mkv")
+        _make_dummy_video(show_compass / f"[Group] Crimson Compass - {ep:02d} (1080p).mkv")
 
-    show_delta = cfg.torrents_tv_dir / "Show Delta"
+    show_guild = cfg.torrents_tv_dir / "Clockwork Guild"
     for ep in range(1, 3):
-        _make_dummy_video(show_delta / f"Show.Delta.S01E{ep:02d}.mkv")
+        _make_dummy_video(show_guild / f"Clockwork.Guild.S01E{ep:02d}.mkv")
 
     # 6. In-progress torrent (must be protected)
-    _make_dummy_video(cfg.torrents_tv_dir / "Show.Active.2026" / "Show.Active.S01E01.mkv")
+    _make_dummy_video(cfg.torrents_tv_dir / "Starlight.Express.2026" / "Starlight.Express.S01E01.mkv")
 
     mock_qb = MagicMock()
     mock_qb.fetch_torrents.return_value = (
         True,
         [
-            TorrentItem(hash="1", name="Show.Active.2026", progress=0.62, state="downloading"),
-            TorrentItem(hash="2", name="Show.Alpha.2019.S01.1080p", progress=1.0, state="stalledUP"),
+            TorrentItem(hash="1", name="Starlight.Express.2026", progress=0.62, state="downloading"),
+            TorrentItem(hash="2", name="Midnight.Bakery.2019.S01.1080p", progress=1.0, state="stalledUP"),
         ],
     )
 
     mock_tmdb = MagicMock()
     mock_tmdb.is_configured = True
     mock_tmdb.resolve.side_effect = lambda _kind, q: (
-        (TmdbMatch(tmdb_id=101, title="Show Gamma", original_title="Show Gamma", year=2026), [])
-        if "Gamma" in q
-        else (TmdbMatch(tmdb_id=102, title="Show Delta: Subtitle", original_title="Show Delta", year=2026), [])
+        (TmdbMatch(tmdb_id=101, title="Crimson Compass", original_title="Crimson Compass", year=2026), [])
+        if "Compass" in q
+        else (
+            TmdbMatch(tmdb_id=102, title="Clockwork Guild: Return of the Sun", original_title="Clockwork", year=2026),
+            [],
+        )
     )
 
     report1 = scan_media_gaps(cfg, qb_client=mock_qb, tmdb_client=mock_tmdb, use_qbittorrent=True)
-    assert report1.already_synced_count == 6  # 1 movie + 5 Alpha episodes
+    assert report1.already_synced_count == 6  # 1 movie + 5 Midnight Bakery episodes
     assert len(report1.in_progress) == 1
     assert report1.flagged_for_review == []
-    assert report1.conflicts == []
-    assert len(report1.ready_to_sync) == 12  # 2 movies + 1 Alpha + 4 Beta + 3 Gamma + 2 Delta
+    assert len(report1.conflicts) == 1
+    assert report1.conflicts[0].reason == "TARGET_EXISTS_DIFFERENT_INODE"
+    assert len(report1.ready_to_sync) == 12  # 2 movies + 1 Bakery + 4 Harbor + 3 Compass + 2 Guild
     assert len(report1.skipped_extras) == 3  # Sample.mkv, Featurettes/, readme.txt
 
+    reasons_by_torrent = {a.torrent_name: a.reason for a in report1.ready_to_sync}
+    assert reasons_by_torrent["Orbital Drift (2014) [2160p]"] == "PARSED_TITLE_YEAR"
+    assert reasons_by_torrent["Midnight.Bakery.2019.S01.1080p"] == "EXACT_EXISTING_MATCH"
+    assert reasons_by_torrent["Clockwork Guild"] == "TMDB_MATCH"
+
     buf = StringIO()
-    render_gap_report(report1, console=Console(file=buf, force_terminal=True, color_system="truecolor", width=160))
+    render_gap_report(
+        report1,
+        console=Console(file=buf, force_terminal=True, color_system="truecolor", width=180),
+        verbose=True,
+    )
     rendered = buf.getvalue()
-    assert "movies/Movie One (2014)" in rendered
-    assert "tv/Show Alpha (2019)" in rendered
+    assert "movies/Orbital Drift (2014)" in rendered
+    assert "parsed" in rendered
+    assert "tv/Midnight Bakery (2019)" in rendered
+    assert "existing" in rendered
     assert "S01E06" in rendered
-    assert "tv/Show Beta (2026)" in rendered
+    assert "tv/Cloud Harbor (2026)" in rendered
     assert "S01E01-E04" in rendered
-    assert "tv/Show Delta - Subtitle (2026)" in rendered
+    assert "tv/Clockwork Guild - Return of the Sun (2026)" in rendered
+    assert "tmdb" in rendered
+    assert "Conflicts" in rendered
+    assert "TARGET_EXISTS_DIFFERENT_INODE" in rendered
+    assert "Skipped Extras & Auxiliary Files" in rendered
+    assert "Featurettes/" in rendered
+    assert "pruned dir" in rendered
+    assert "Solar.Echo.2012.Sample.mkv" in rendered
+    assert "sample" in rendered
+    assert "readme.txt" in rendered
+    assert "non-video" in rendered
 
     summary = execute_sync(report1.ready_to_sync, cfg, dry_run=False)
     assert summary.linked_count == 12
     assert summary.errors == []
-    assert (alpha_media / "S01E06.mkv").stat().st_ino == (show_alpha / "Show.Alpha.S01E06.mkv").stat().st_ino
+    assert (bakery_media / "S01E06.mkv").stat().st_ino == (show_bakery / "Midnight.Bakery.S01E06.mkv").stat().st_ino
 
     report2 = scan_media_gaps(cfg, qb_client=mock_qb, tmdb_client=mock_tmdb, use_qbittorrent=True)
     assert report2.ready_to_sync == []
     assert report2.already_synced_count == 18
+    assert len(report2.conflicts) == 1
