@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "homelab-media"
+version = "0.1.0"
+description = "Fast, typed CLI media library scanner and hardlink synchronizer for homelab"
+readme = "README.md"
+requires-python = "==3.14.*"
+dependencies = [
+  "homelab-core",
+  "guessit>=3.8.0",
+  "httpx>=0.28.1",
+  "pydantic>=2.10.0",
+  "python-dotenv>=1.0.0",
+  "rich>=13.9.4",
+  "typer>=0.15.1",
+  "whenever>=0.11.0",
+]
+
+[project.scripts]
+media = "homelab_media.cli:app"
+homelab-media = "homelab_media.cli:app"
+media-sync = "homelab_media.cli:app"
+sync-media = "homelab_media.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/homelab_media"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
