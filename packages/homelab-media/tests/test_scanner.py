@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -10,7 +11,9 @@ from homelab_media.clients.tmdb import TmdbMatch
 from homelab_media.config import MediaConfig
 from homelab_media.executor import execute_sync
 from homelab_media.models import ActionType, TorrentItem
+from homelab_media.renderer import render_gap_report
 from homelab_media.scanner import scan_media_gaps
+from rich.console import Console
 
 
 def _make_dummy_video(path: Path, size: int = 100 * 1024 * 1024) -> None:
@@ -219,3 +222,95 @@ def test_pruned_extra_dirs_reported_in_skipped_extras(tmp_path: Path) -> None:
     report = scan_media_gaps(cfg, use_qbittorrent=False)
     assert len(report.ready_to_sync) == 1
     assert any(s.reason == "BLACKLISTED_DIR:Featurettes" for s in report.skipped_extras)
+
+
+def test_end_to_end_realistic_library_sync_and_render(tmp_path: Path) -> None:
+    """Anonymized end-to-end test mirroring a full multi-show/movie library sync lifecycle."""
+    cfg = _make_config(tmp_path)
+
+    # 1. Existing synced movie + movie with pruned Featurettes and Sample
+    existing_movie = cfg.torrents_movies_dir / "Movie.Existing.2012.1080p"
+    _make_dummy_video(existing_movie / "Movie.Existing.2012.1080p.mkv")
+    _make_dummy_video(existing_movie / "Movie.Existing.2012.Sample.mkv")
+    _make_dummy_video(existing_movie / "Featurettes" / "MakingOf.mkv")
+    (existing_movie / "readme.txt").write_text("info", encoding="utf-8")
+    (cfg.media_movies_dir / "Movie Existing (2012)").mkdir(parents=True)
+    os.link(
+        existing_movie / "Movie.Existing.2012.1080p.mkv",
+        cfg.media_movies_dir / "Movie Existing (2012)" / "Movie Existing (2012).mkv",
+    )
+
+    # 2. Unsynced movies
+    _make_dummy_video(cfg.torrents_movies_dir / "Movie One (2014) [2160p]" / "Movie.One.2014.mkv")
+    _make_dummy_video(cfg.torrents_movies_dir / "Movie Two (2026) [1080p]" / "Movie.Two.2026.mp4")
+
+    # 3. Partial TV season missing 1 episode
+    show_alpha = cfg.torrents_tv_dir / "Show.Alpha.2019.S01.1080p"
+    alpha_media = cfg.media_tv_dir / "Show Alpha (2019)" / "Season 01"
+    alpha_media.mkdir(parents=True)
+    for ep in range(1, 6):
+        src = show_alpha / f"Show.Alpha.S01E{ep:02d}.mkv"
+        _make_dummy_video(src)
+        os.link(src, alpha_media / f"S01E{ep:02d}.mkv")
+    _make_dummy_video(show_alpha / "Show.Alpha.S01E06.mkv")
+
+    # 4. Full season TV show with year in torrent name
+    show_beta = cfg.torrents_tv_dir / "Show.Beta.2026.S01.1080p"
+    for ep in range(1, 5):
+        _make_dummy_video(show_beta / f"Show.Beta.S01E{ep:02d}.mkv")
+
+    # 5. Missing-year anime resolved via TMDB (including colon sanitization)
+    show_gamma = cfg.torrents_tv_dir / "[Group] Show Gamma (01-03) [Batch]"
+    for ep in range(1, 4):
+        _make_dummy_video(show_gamma / f"[Group] Show Gamma - {ep:02d} (1080p).mkv")
+
+    show_delta = cfg.torrents_tv_dir / "Show Delta"
+    for ep in range(1, 3):
+        _make_dummy_video(show_delta / f"Show.Delta.S01E{ep:02d}.mkv")
+
+    # 6. In-progress torrent (must be protected)
+    _make_dummy_video(cfg.torrents_tv_dir / "Show.Active.2026" / "Show.Active.S01E01.mkv")
+
+    mock_qb = MagicMock()
+    mock_qb.fetch_torrents.return_value = (
+        True,
+        [
+            TorrentItem(hash="1", name="Show.Active.2026", progress=0.62, state="downloading"),
+            TorrentItem(hash="2", name="Show.Alpha.2019.S01.1080p", progress=1.0, state="stalledUP"),
+        ],
+    )
+
+    mock_tmdb = MagicMock()
+    mock_tmdb.is_configured = True
+    mock_tmdb.resolve.side_effect = lambda _kind, q: (
+        (TmdbMatch(tmdb_id=101, title="Show Gamma", original_title="Show Gamma", year=2026), [])
+        if "Gamma" in q
+        else (TmdbMatch(tmdb_id=102, title="Show Delta: Subtitle", original_title="Show Delta", year=2026), [])
+    )
+
+    report1 = scan_media_gaps(cfg, qb_client=mock_qb, tmdb_client=mock_tmdb, use_qbittorrent=True)
+    assert report1.already_synced_count == 6  # 1 movie + 5 Alpha episodes
+    assert len(report1.in_progress) == 1
+    assert report1.flagged_for_review == []
+    assert report1.conflicts == []
+    assert len(report1.ready_to_sync) == 12  # 2 movies + 1 Alpha + 4 Beta + 3 Gamma + 2 Delta
+    assert len(report1.skipped_extras) == 3  # Sample.mkv, Featurettes/, readme.txt
+
+    buf = StringIO()
+    render_gap_report(report1, console=Console(file=buf, force_terminal=True, color_system="truecolor", width=160))
+    rendered = buf.getvalue()
+    assert "movies/Movie One (2014)" in rendered
+    assert "tv/Show Alpha (2019)" in rendered
+    assert "S01E06" in rendered
+    assert "tv/Show Beta (2026)" in rendered
+    assert "S01E01-E04" in rendered
+    assert "tv/Show Delta - Subtitle (2026)" in rendered
+
+    summary = execute_sync(report1.ready_to_sync, cfg, dry_run=False)
+    assert summary.linked_count == 12
+    assert summary.errors == []
+    assert (alpha_media / "S01E06.mkv").stat().st_ino == (show_alpha / "Show.Alpha.S01E06.mkv").stat().st_ino
+
+    report2 = scan_media_gaps(cfg, qb_client=mock_qb, tmdb_client=mock_tmdb, use_qbittorrent=True)
+    assert report2.ready_to_sync == []
+    assert report2.already_synced_count == 18
