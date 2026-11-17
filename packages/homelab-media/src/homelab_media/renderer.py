@@ -119,6 +119,10 @@ def _skipped_reason_label(reason: str) -> str:
         return "<1 MiB"
     if reason == "NO_EPISODE_TAG":
         return "no episode"
+    if reason == "SYNCIGNORE_DIR":
+        return ".syncignore"
+    if reason.startswith("SYNCIGNORE_PATTERN:"):
+        return f".syncignore ({reason.split(':', 1)[1]})"
     return reason.lower()
 
 
@@ -145,12 +149,13 @@ def render_gap_report(
     unsynced_files = len(report.ready_to_sync)
     total_files = report.already_synced_count + unsynced_files
     unsynced_color = "bold cyan" if unsynced_files > 0 else "green"
+    verbose_skipped = [*report.skipped_extras, *report.ignored_items]
     summary_text = (
         f"qBittorrent: {qb_badge} | "
         f"Scan: [cyan]{report.scan_duration_ms:.1f} ms[/cyan] | "
         f"Unsynced: [{unsynced_color}]{unsynced_files}/{total_files} files[/{unsynced_color}] | "
         f"Review: [bold yellow]{len(report.flagged_for_review)}[/bold yellow] | "
-        f"Extras skipped: [dim]{len(report.skipped_extras)}[/dim] | "
+        f"Skipped: [dim]{len(verbose_skipped)}[/dim] | "
         f"Conflicts: [bold red]{len(report.conflicts)}[/bold red]"
     )
     out.print(f"[bold blue]homelab-media plan[/bold blue] · {summary_text}", soft_wrap=True, highlight=False)
@@ -208,10 +213,10 @@ def render_gap_report(
                 highlight=False,
             )
 
-    if verbose and report.skipped_extras:
+    if verbose and verbose_skipped:
         ls_colors = _parse_ls_colors()
         skipped_by_torrent: dict[str, list[SyncAction]] = defaultdict(list)
-        for sk in report.skipped_extras:
+        for sk in verbose_skipped:
             skipped_by_torrent[sk.torrent_name].append(sk)
 
         _print_section_header(out, "Skipped Extras & Auxiliary Files", style="bold magenta")

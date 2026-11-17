@@ -280,6 +280,9 @@ def _scan_with_clients(
                 for entry, rel_path in files:
                     source_file = Path(entry.path)
 
+                    if entry.name == ".syncignore":
+                        continue
+
                     if top_entry.is_dir(follow_symlinks=False):
                         ignored, ignore_reason = check_syncignore(item_path, rel_path)
                         if ignored:

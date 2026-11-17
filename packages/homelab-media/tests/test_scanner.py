@@ -350,6 +350,8 @@ def test_end_to_end_realistic_library_sync_and_render(tmp_path: Path) -> None:
     assert "sample" in rendered
     assert "readme.txt" in rendered
     assert "non-video" in rendered
+    assert "Show.Ignored.2024/" in rendered
+    assert ".syncignore" in rendered
 
     summary = execute_sync(report1.ready_to_sync, cfg, dry_run=False)
     assert summary.linked_count == 12
