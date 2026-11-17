@@ -124,3 +124,38 @@ def test_render_gap_report_emits_osc8_torrent_link(tmp_path: Path) -> None:
     assert "\x1b]8;" in output
     assert "file://" in output
     assert "torrent" in output
+
+
+def test_render_gap_report_verbose_compacts_skipped_extras(tmp_path: Path) -> None:
+    report = GapReport(
+        skipped_extras=[
+            SyncAction(
+                torrent_name="Wreck-It.Ralph.2012",
+                source_file=tmp_path / "Wreck-It.Ralph.2012" / "ETRG.mp4",
+                kind=MediaKind.MOVIE,
+                action_type=ActionType.SKIP_EXTRA,
+                reason="SMALL_MOVIE_PROMO_OR_SAMPLE",
+            ),
+            SyncAction(
+                torrent_name="Wreck-It.Ralph.2012",
+                source_file=tmp_path / "Wreck-It.Ralph.2012" / "readme.txt",
+                kind=MediaKind.MOVIE,
+                action_type=ActionType.SKIP_EXTRA,
+                reason="NON_VIDEO_EXT:.txt",
+            ),
+            SyncAction(
+                torrent_name="Wreck-It.Ralph.2012",
+                source_file=tmp_path / "Wreck-It.Ralph.2012" / "poster.png",
+                kind=MediaKind.MOVIE,
+                action_type=ActionType.SKIP_EXTRA,
+                reason="NON_VIDEO_EXT:.png",
+            ),
+        ]
+    )
+    buf = StringIO()
+    console = Console(file=buf, force_terminal=True, color_system="truecolor", width=160)
+    render_gap_report(report, console=console, verbose=True)
+    output = buf.getvalue()
+    assert "Wreck-It.Ralph.2012" in output
+    assert "ETRG.mp4 (promo)" in output
+    assert "2x (.png, .txt)" in output

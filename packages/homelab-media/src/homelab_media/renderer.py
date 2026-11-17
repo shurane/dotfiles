@@ -71,6 +71,39 @@ def _relative_target_folder(act: SyncAction) -> str:
     return f"{act.kind.value}/{folder}"
 
 
+def _format_skipped_summary(items: list[SyncAction]) -> str:
+    """Summarize skipped extras/auxiliary items for a single torrent into a compact label."""
+    named: list[str] = []
+    non_video_exts: set[str] = set()
+    non_video_count = 0
+
+    for sk in items:
+        name = escape(sk.source_file.name)
+        if sk.reason.startswith("NON_VIDEO_EXT:"):
+            ext = sk.reason.split(":", 1)[1]
+            non_video_exts.add(ext)
+            non_video_count += 1
+        elif sk.reason.startswith("BLACKLISTED_DIR:"):
+            named.append(f"{name}/ (dir)")
+        elif sk.reason.startswith("EXTRA_KEYWORD:"):
+            kw = sk.reason.split(":", 1)[1]
+            named.append(f"{name} ({kw})")
+        elif sk.reason == "SMALL_MOVIE_PROMO_OR_SAMPLE":
+            named.append(f"{name} (promo)")
+        elif sk.reason == "TINY_OR_SPARSE_FILE":
+            named.append(f"{name} (<1 MiB)")
+        elif sk.reason == "NO_EPISODE_TAG":
+            named.append(f"{name} (no episode)")
+        else:
+            named.append(f"{name} ({sk.reason.lower()})")
+
+    parts = sorted(named)
+    if non_video_count > 0:
+        exts_str = ", ".join(sorted(non_video_exts))
+        parts.append(f"{non_video_count}x ({exts_str})")
+    return ", ".join(parts)
+
+
 def render_gap_report(
     report: GapReport,
     console: Console | None = None,
@@ -153,13 +186,22 @@ def render_gap_report(
         out.print(t_conf)
 
     if verbose and report.skipped_extras:
-        t_skip = Table(title="Skipped Extras & Auxiliary Files", show_lines=False)
-        t_skip.add_column("Torrent", style="dim")
-        t_skip.add_column("File")
-        t_skip.add_column("Reason", style="yellow")
+        skipped_by_torrent: dict[str, list[SyncAction]] = defaultdict(list)
         for sk in report.skipped_extras:
-            t_skip.add_row(sk.torrent_name, sk.source_file.name, sk.reason)
-        out.print(t_skip)
+            skipped_by_torrent[sk.torrent_name].append(sk)
+
+        out.print("\n[bold]Skipped Extras & Auxiliary Files[/bold]")
+        for torrent_name in sorted(skipped_by_torrent):
+            items = skipped_by_torrent[torrent_name]
+            link_path = items[0].source_file if len(items) == 1 else items[0].source_file.parent
+            file_uri = link_path.absolute().as_uri()
+            summary = _format_skipped_summary(items)
+            out.print(
+                f"[white]{escape(torrent_name)}[/white] / [yellow]{summary}[/yellow] "
+                f"/ [dim][link={file_uri}]torrent[/link][/dim]",
+                soft_wrap=True,
+                highlight=False,
+            )
 
 
 def render_execution_summary(
