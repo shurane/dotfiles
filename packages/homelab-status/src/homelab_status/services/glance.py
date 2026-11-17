@@ -17,7 +17,7 @@ async def check_glance(ctx: StatusContext) -> ServiceResult:
     t0 = time.perf_counter()
 
     try:
-        async with httpx.AsyncClient(base_url=f"https://{ctx.base_domain}", timeout=ctx.http_timeout) as client:
+        async with httpx.AsyncClient(base_url=ctx.base_url(), timeout=ctx.http_timeout) as client:
             res = await client.get("/")
             elapsed = (time.perf_counter() - t0) * 1000
 

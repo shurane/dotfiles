@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
 import httpx
+from homelab_core.services import make_jellyfin_auth_headers
 from homelab_scripts.jellyfin import get_jellyfin_config, refresh
 from rich.console import Console
 
@@ -74,7 +75,7 @@ def test_refresh_success_http_204(monkeypatch: pytest.MonkeyPatch) -> None:
 
     mock_post.assert_called_once_with(
         "https://jellyfin.example.com/Library/Refresh",
-        headers={"Authorization": 'MediaBrowser Token="key_999"'},
+        headers=make_jellyfin_auth_headers(token="key_999", client="homelab-scripts"),
         timeout=10.0,
     )
 

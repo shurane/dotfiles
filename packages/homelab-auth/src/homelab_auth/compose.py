@@ -1,15 +1,40 @@
-import contextlib
+from __future__ import annotations
+
 import subprocess
 from typing import TYPE_CHECKING
 
-import docker
+from homelab_core.docker import (
+    compose_stop as core_compose_stop,
+)
+from homelab_core.docker import (
+    compose_up as core_compose_up,
+)
+from homelab_core.docker import (
+    exec_container,
+    get_compose_container,
+    get_docker_client,
+    list_compose_containers,
+)
+from homelab_core.errors import HomelabError
 
 from homelab_auth.config import ROOT
 
 if TYPE_CHECKING:
     from pathlib import Path
 
+    import docker
     from docker.models.containers import Container
+
+__all__ = [
+    "compose_container",
+    "compose_containers",
+    "compose_exec",
+    "compose_service",
+    "compose_stop",
+    "compose_up",
+    "docker_client",
+    "run",
+]
 
 
 def run(command: list[str], cwd: Path | str | None = None) -> None:
@@ -17,7 +42,10 @@ def run(command: list[str], cwd: Path | str | None = None) -> None:
 
 
 def docker_client() -> docker.DockerClient:
-    return docker.from_env()
+    client = get_docker_client()
+    if client is None:
+        raise RuntimeError("failed to connect to Docker daemon")
+    return client
 
 
 def compose_service(stack: str, service: str | None = None) -> str:
@@ -26,69 +54,46 @@ def compose_service(stack: str, service: str | None = None) -> str:
 
 def compose_containers(stack: str, service: str | None = None) -> list[Container]:
     service = compose_service(stack, service)
-    client = docker_client()
-    return client.containers.list(
-        all=True,
-        filters={"label": [f"com.docker.compose.service={service}"]},
-    )
+    return list_compose_containers(docker_client(), service)
 
 
 def compose_container(stack: str, service: str | None = None) -> Container:
     service = compose_service(stack, service)
-    containers = compose_containers(stack, service)
-    if len(containers) != 1:
-        raise RuntimeError(f"expected one Compose container for {stack}/{service}, found {len(containers)}")
-    return containers[0]
+    client = docker_client()
+    try:
+        container = get_compose_container(client, service)
+    except HomelabError as exc:
+        raise RuntimeError(str(exc)) from exc
+    if container is None:
+        raise RuntimeError(
+            f"expected one Compose container for {stack}/{service}, found 0"
+        )
+    return container
 
 
 def compose_up(stack: str, service: str | None = None) -> None:
-    service = compose_service(stack, service)
-    containers = compose_containers(stack, service)
-    if len(containers) == 1:
-        container = containers[0]
-        container.reload()
-        if container.status not in {"running", "restarting"}:
-            container.start()
-        return
-    if len(containers) > 1:
-        raise RuntimeError(f"expected at most one Compose container for {stack}/{service}, found {len(containers)}")
-
-    # docker-py manages Docker Engine resources, but it does not apply Compose
-    # YAML. Keep first creation/reconciliation on the Compose CLI.
-    cwd = ROOT if (ROOT / "docker-compose.yml").exists() else ROOT / stack
-    run(["docker", "compose", "up", "-d", service], cwd=cwd)
+    svc_name = compose_service(stack, service)
+    try:
+        core_compose_up(svc_name, client=docker_client(), compose_dir=ROOT)
+    except HomelabError as exc:
+        raise RuntimeError(str(exc)) from exc
 
 
 def compose_exec(stack: str, command: list[str], service: str | None = None) -> None:
     service = compose_service(stack, service)
-    result = compose_container(stack, service).exec_run(command, stdout=True, stderr=True)
-    if result.exit_code != 0:
-        output_text = result.output.decode(errors="replace") if isinstance(result.output, bytes) else str(result.output)
-        raise RuntimeError(f"{stack}/{service} exec failed with exit code {result.exit_code}:\n{output_text}")
+    container = compose_container(stack, service)
+    try:
+        exec_container(container, command, check=True)
+    except HomelabError as exc:
+        raise RuntimeError(
+            f"{stack}/{service} exec failed with exit code:\n{exc}"
+        ) from exc
 
 
 def compose_stop(stack: str, service: str | None = None) -> None:
-    container = compose_container(stack, service)
-    container.stop()
+    svc_name = compose_service(stack, service)
+    try:
+        core_compose_stop(svc_name, client=docker_client())
+    except HomelabError as exc:
+        raise RuntimeError(str(exc)) from exc
 
-
-def get_container_ip(service: str, network: str = "proxy-tier") -> str | None:
-    """Look up a Compose service container's IPv4 address on the specified Docker network."""
-    with contextlib.suppress(Exception):
-        client = docker_client()
-        containers = client.containers.list(filters={"label": [f"com.docker.compose.service={service}"]})
-        if not containers:
-            return None
-        c = containers[0]
-        net_mode = c.attrs.get("HostConfig", {}).get("NetworkMode", "")
-        if net_mode.startswith("container:"):
-            parent_id = net_mode.split("container:", 1)[1]
-            c = client.containers.get(parent_id)
-        networks = c.attrs.get("NetworkSettings", {}).get("Networks", {})
-        net_info = networks.get(network)
-        if net_info and net_info.get("IPAddress"):
-            return str(net_info["IPAddress"])
-        for net in networks.values():
-            if net.get("IPAddress"):
-                return str(net["IPAddress"])
-    return None

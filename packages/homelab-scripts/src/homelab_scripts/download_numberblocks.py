@@ -2,6 +2,7 @@ import argparse
 import sys
 from pathlib import Path
 
+import yt_dlp
 from rich.console import Console
 
 from homelab_scripts import jellyfin
@@ -57,8 +58,6 @@ def download_season(
     episodes: str | None = None,
 ) -> int:
     """Download playlist using yt_dlp as an imported library strictly as MKV."""
-    import yt_dlp
-
     outtmpl = str(target_dir / f"Numberblocks S{season}E%(playlist_index)02d %(clean_title)s.%(ext)s")
 
     args: list[str] = [

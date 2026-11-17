@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from homelab_auth.models import HomelabAuth, ServiceName
+from homelab_auth.models import HomelabAuth, Service
 from homelab_auth.services.bookorbit import (
     apply_bookorbit,
     bookorbit_login,
@@ -17,7 +17,7 @@ def auth() -> HomelabAuth:
 
 
 def test_bookorbit_service_name_enum() -> None:
-    assert ServiceName.BOOKORBIT == "bookorbit"
+    assert Service.BOOKORBIT == "bookorbit"
 
 
 def test_bookorbit_login_success() -> None:

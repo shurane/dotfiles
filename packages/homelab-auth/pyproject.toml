@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "Deterministic authentication bootstrapper and credential manager for homelab"
 requires-python = "==3.14.*"
 dependencies = [
+  "homelab-core",
   "anyio>=4.8.0",
   "bcrypt>=5.0.0",
   "docker>=7.1.0",
@@ -27,6 +28,3 @@ auth = "homelab_auth.cli:typer_main"
 [tool.hatch.build.targets.wheel]
 packages = ["src/homelab_auth"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]

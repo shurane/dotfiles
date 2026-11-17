@@ -31,6 +31,7 @@ from rich.progress import (
 from rich.table import Table
 
 from homelab_scripts import jellyfin
+from homelab_scripts.common import parse_range_spec
 
 console = Console()
 
@@ -72,28 +73,6 @@ class DownloadResult:
     bytes_downloaded: int
     duration_seconds: float
     error_message: str | None = None
-
-
-def parse_range_spec(range_str: str) -> set[int]:
-    """Parse comma/hyphen range string like '1', '1,2,3', '1-20', or 'all' into a set of integers."""
-    range_str = range_str.strip().lower()
-    if range_str in ("all", "*"):
-        return set(range(1, 601))
-
-    numbers: set[int] = set()
-    for part in range_str.split(","):
-        part = part.strip()
-        if "-" in part:
-            start_s, end_s = part.split("-", 1)
-            start, end = int(start_s), int(end_s)
-            if start > end:
-                raise ValueError(f"Invalid inverted range: '{part}' (start {start} must be <= end {end})")
-            numbers.update(range(start, end + 1))
-        elif part.isdigit():
-            numbers.add(int(part))
-        else:
-            raise ValueError(f"Invalid range specification: {part}")
-    return numbers
 
 
 async def fetch_archive_files(

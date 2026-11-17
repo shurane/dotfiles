@@ -1,9 +1,8 @@
-import contextlib
 import sys
-import time
 from typing import TYPE_CHECKING, Any
 
 import httpx
+from homelab_core.services import wait_for_http
 
 from homelab_auth.common import ensure_state_dir
 from homelab_auth.compose import compose_up
@@ -21,15 +20,14 @@ if TYPE_CHECKING:
 
 
 def wait_for_arcane(client: httpx.Client, timeout_seconds: int = 60) -> None:
-    url = f"{ARCANE_URL}/api/health"
-    deadline = time.monotonic() + timeout_seconds
-    while time.monotonic() < deadline:
-        with contextlib.suppress(httpx.HTTPError, ValueError):
-            response = client.get(url)
-            if response.status_code == 200 and response.json().get("status") == "UP":
-                return
-        time.sleep(2)
-    raise RuntimeError(f"timed out waiting for {url}")
+    """Wait for Arcane health endpoint to report UP."""
+    wait_for_http(
+        client,
+        f"{ARCANE_URL}/api/health",
+        timeout_seconds=float(timeout_seconds),
+        predicate=lambda r: r.json().get("status") == "UP",
+    )
+
 
 
 def arcane_login(client: httpx.Client, username: str, password: str) -> bool:

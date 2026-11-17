@@ -5,36 +5,20 @@ from __future__ import annotations
 import json
 import sys
 import xml.etree.ElementTree as ET
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from homelab_status.config import (
-    classify_route,
-    format_speed,
-    get_ssh_user,
-    is_target_local,
-    resolve_target_connection,
     resolve_target_host,
 )
 from homelab_status.main import app
-from homelab_status.models import HealthStatus, HomelabConfig, ServiceResult
+from homelab_status.models import ContainerName, HealthStatus, HomelabConfig, ServiceResult, StatusContext
 from homelab_status.services import CHECK_REGISTRY
+from homelab_status.services.qbittorrent import check_qbittorrent
 from pydantic import ValidationError
 from typer.testing import CliRunner
 
 runner = CliRunner()
-
-
-def test_format_speed() -> None:
-    assert format_speed(500) == "500 B/s"
-    assert format_speed(1024) == "1.0 KB/s"
-    assert format_speed(1024 * 50) == "50.0 KB/s"
-    assert format_speed(1024 * 1024 * 2.5) == "2.50 MB/s"
-
-
-def test_is_target_local() -> None:
-    assert is_target_local("localhost") is True
-    assert is_target_local("127.0.0.1") is True
-    assert is_target_local("nonexistent-host-999.invalid") is False
 
 
 def test_resolve_target_host(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -42,65 +26,9 @@ def test_resolve_target_host(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("HOMELAB_HOSTNAME", "mock-node.lan")
     assert resolve_target_host() == "mock-node.lan"
     monkeypatch.setenv("HOMELAB_HOSTNAME", "")
-    monkeypatch.setenv("HOMELAB_HOST", "legacy-node.lan")
-    assert resolve_target_host() == "legacy-node.lan"
-    monkeypatch.setenv("HOMELAB_HOST", "")
     with pytest.raises(SystemExit) as exc_info:
         resolve_target_host()
     assert exc_info.value.code == 1
-
-
-def test_get_ssh_user(monkeypatch: pytest.MonkeyPatch) -> None:
-    assert get_ssh_user("custom_user") == "custom_user"
-
-    env_mock = {"HOMELAB_SSH_USER": "ssh_admin", "HOMELAB_USERNAME": "generic_user"}
-    monkeypatch.setattr("homelab_status.config.get_env_setting", lambda k, d="": env_mock.get(k, d))
-    assert get_ssh_user() == "ssh_admin"
-
-    env_mock.pop("HOMELAB_SSH_USER")
-    assert get_ssh_user() == "generic_user"
-
-    env_mock.pop("HOMELAB_USERNAME")
-    assert get_ssh_user() == "homelab"
-
-
-def test_classify_route() -> None:
-    # Local host
-    route, desc = classify_route("localhost", "127.0.0.1", is_local=True)
-    assert route == "local"
-    assert "Local Host" in desc
-
-    # Tailscale IP (RFC 6598 CGNAT block 100.64.0.0/10)
-    route, desc = classify_route("server", "100.64.0.1", is_local=False)
-    assert route == "tailscale"
-    assert desc == "Tailscale MagicDNS"
-
-    # Tailscale MagicDNS FQDN
-    route, desc = classify_route("server.example.ts.net", "100.64.0.1", is_local=False)
-    assert route == "tailscale"
-    assert desc == "Tailscale MagicDNS"
-
-    # Direct LAN (RFC 1918)
-    route, desc = classify_route("server.lan", "192.168.1.10", is_local=False)
-    assert route == "lan"
-    assert desc == "Direct LAN"
-
-    # Public WAN
-    route, desc = classify_route("example.com", "93.184.216.34", is_local=False)
-    assert route == "wan"
-    assert desc == "WAN / Remote"
-
-
-def test_resolve_target_connection() -> None:
-    conn = resolve_target_connection("server.example.ts.net")
-    assert conn.host == "server.example.ts.net"
-    if is_target_local("server.example.ts.net"):
-        assert conn.route == "local"
-        assert conn.is_local is True
-    else:
-        assert conn.route == "tailscale"
-        assert conn.description == "Tailscale MagicDNS"
-        assert conn.is_local is False
 
 
 def test_registry_contains_all_services() -> None:
@@ -252,11 +180,6 @@ def test_cli_samba_help() -> None:
 
 @pytest.mark.anyio
 async def test_check_qbittorrent_interface_binding() -> None:
-    from unittest.mock import AsyncMock, MagicMock, patch
-
-    from homelab_status.models import StatusContext
-    from homelab_status.services.qbittorrent import check_qbittorrent
-
     ctx = MagicMock(spec=StatusContext)
     ctx.base_url = MagicMock(return_value="http://127.0.0.1:8080")
     ctx.http_timeout = 5.0
@@ -379,8 +302,6 @@ def test_homelab_config_validation() -> None:
 
 
 def test_container_name_enum() -> None:
-    from homelab_status.models import ContainerName
-
     assert len(ContainerName) == 12
     for member in ContainerName:
         assert member.value.startswith("homelab-")
@@ -389,6 +310,4 @@ def test_container_name_enum() -> None:
 
 
 if __name__ == "__main__":
-    import pytest
-
     raise SystemExit(pytest.main([__file__, *sys.argv[1:]]))

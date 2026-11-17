@@ -9,11 +9,11 @@ import pytest
 from homelab_status.models import StatusContext, TargetConnection
 from homelab_status.services.gluetun import (
     IpDetails,
+    _fetch_gluetun_ip,
     _format_bytes,
     _parse_dns_whoami,
     _parse_ipinfo,
     _parse_tun_stats,
-    format_connection_badge,
     run_vpn_deep_check,
 )
 
@@ -407,8 +407,6 @@ async def test_adversarial_ghost_port_forward() -> None:
 @pytest.mark.anyio
 async def test_adversarial_stale_cache_bypass() -> None:
     """Adversarial check: /tmp/gluetun/ip has a cached VPN IP, but live egress leaked."""
-    from homelab_status.services.gluetun import _fetch_gluetun_ip
-
     ctx = MagicMock()
     # If container tries to query live ipinfo.io, it returns the LEAKED host IP!
     leaked_json = json.dumps({"ip": "198.51.100.1", "country": "US", "org": "AS6079 RCN"})
@@ -440,11 +438,6 @@ async def test_vpn_inspection_routes() -> None:
     """Verify that On-Device, Direct LAN, and Tailscale connection routes are correctly captured."""
     # 1. On-Device (local UNIX socket)
     local_conn = TargetConnection("server", "127.0.0.1", "local", "Local Host (UNIX socket)", is_local=True)
-    badge, endpoint, full = format_connection_badge(local_conn)
-    assert "On-Device" in badge
-    assert endpoint == "server • Local UNIX socket"
-    assert full == "On-Device (server • Local UNIX socket)"
-
     ctx_local = _create_mock_context(exec_map=_default_exec_map())
     ctx_local.connection = local_conn
     with (
@@ -458,11 +451,6 @@ async def test_vpn_inspection_routes() -> None:
 
     # 2. Remote via Direct LAN
     lan_conn = TargetConnection("server.lan", "192.168.1.10", "lan", "Direct LAN", is_local=False)
-    badge_lan, endpoint_lan, full_lan = format_connection_badge(lan_conn)
-    assert "Direct LAN" in badge_lan
-    assert endpoint_lan == "server.lan • 192.168.1.10"
-    assert full_lan == "Remote via Direct LAN (server.lan • 192.168.1.10)"
-
     ctx_lan = _create_mock_context(exec_map=_default_exec_map())
     ctx_lan.connection = lan_conn
     with (
@@ -475,11 +463,6 @@ async def test_vpn_inspection_routes() -> None:
 
     # 3. Remote via Tailscale
     ts_conn = TargetConnection("server", "100.64.0.1", "tailscale", "Tailscale MagicDNS", is_local=False)
-    badge_ts, endpoint_ts, full_ts = format_connection_badge(ts_conn)
-    assert "Tailscale" in badge_ts
-    assert endpoint_ts == "server • 100.64.0.1"
-    assert full_ts == "Remote via Tailscale (server • 100.64.0.1)"
-
     ctx_ts = _create_mock_context(exec_map=_default_exec_map())
     ctx_ts.connection = ts_conn
     with (

@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 from typing import TYPE_CHECKING
 
 import httpx
+from homelab_core.services import make_jellyfin_auth_headers
 
 from homelab_auth.common import ensure_state_dir
 from homelab_auth.compose import compose_stop, compose_up
@@ -51,19 +52,13 @@ JELLYFIN_PREFERENCE_KINDS = range(13)
 
 
 def jellyfin_auth_headers(token: str | None = None) -> dict[str, str]:
-    auth_parts = [
-        'MediaBrowser Client="HomelabBootstrap"',
-        'Device="HomelabBootstrap"',
-        'DeviceId="homelab-bootstrap"',
-        'Version="1.0"',
-    ]
-    if token:
-        auth_parts.append(f'Token="{token}"')
-    auth_header = ", ".join(auth_parts)
-    return {
-        "Authorization": auth_header,
-        "X-Emby-Authorization": auth_header,
-    }
+    return make_jellyfin_auth_headers(
+        token=token,
+        client="HomelabBootstrap",
+        device="HomelabBootstrap",
+        device_id="homelab-bootstrap",
+        version="1.0",
+    )
 
 
 def jellyfin_login(client: httpx.Client, username: str, password: str) -> JellyfinAuthResponse | None:

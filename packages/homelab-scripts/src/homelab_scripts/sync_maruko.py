@@ -17,6 +17,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from homelab_scripts import jellyfin
+from homelab_scripts.common import parse_range_spec
 
 console = Console()
 METADATA_PATH = Path(__file__).resolve().parent / "maruko_metadata.json"
@@ -29,24 +30,6 @@ def load_metadata() -> dict[str, dict]:
         except Exception as e:
             console.print(f"[yellow]Warning: Failed to read {METADATA_PATH}: {e}[/yellow]")
     return {}
-
-
-def parse_range_spec(range_str: str) -> set[int]:
-    """Parse comma/hyphen episode string like '1-10', '1,3,5', or '5-15'."""
-    result: set[int] = set()
-    for part in range_str.split(","):
-        part = part.strip()
-        if not part:
-            continue
-        if "-" in part:
-            start_str, end_str = part.split("-", 1)
-            start, end = int(start_str), int(end_str)
-            if start > end:
-                raise ValueError(f"Invalid inverted range: '{part}' (start {start} must be <= end {end})")
-            result.update(range(start, end + 1))
-        else:
-            result.add(int(part))
-    return result
 
 
 _ASS_EBNF = r"""

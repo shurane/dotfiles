@@ -76,7 +76,7 @@ async def check_caddy(ctx: StatusContext) -> ServiceResult:
         async def _probe_http() -> None:
             nonlocal probe_code
             try:
-                async with httpx.AsyncClient(base_url=f"https://{ctx.base_domain}", timeout=ctx.http_timeout) as client:
+                async with httpx.AsyncClient(base_url=ctx.base_url(), timeout=ctx.http_timeout) as client:
                     probe = await client.get("/")
                     probe_code = probe.status_code
             except Exception:

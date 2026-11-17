@@ -24,6 +24,3 @@ bitwarden-vault = "bitwarden_extras.cli:main"
 [tool.hatch.build.targets.wheel]
 packages = ["src/bitwarden_extras"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]

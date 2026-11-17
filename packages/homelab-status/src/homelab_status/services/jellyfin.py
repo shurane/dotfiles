@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, Any
 import anyio
 import httpx
 import humanize
+from homelab_core.services import make_jellyfin_auth_headers
 from rich.panel import Panel
 from rich.table import Table
 from whenever import SYSTEM_TZ, Instant
@@ -401,17 +402,15 @@ async def _gather_jellyfin_raw_data(ctx: StatusContext) -> JellyfinRawData:
     async def _query_jellyfin_api() -> None:
         try:
             async with httpx.AsyncClient(base_url=ctx.base_url("jellyfin"), timeout=ctx.http_timeout) as client:
-                auth_header = (
-                    'MediaBrowser Client="StatusCheck", Device="homelab-status", '
-                    'DeviceId="homelab-status-check", Version="1.0.0"'
+                login_headers = make_jellyfin_auth_headers(
+                    client="StatusCheck",
+                    device="homelab-status",
+                    device_id="homelab-status-check",
                 )
                 login_res = await client.post(
                     "/Users/AuthenticateByName",
                     json={"Username": ctx.username, "Pw": ctx.password},
-                    headers={
-                        "Authorization": auth_header,
-                        "X-Emby-Authorization": auth_header,
-                    },
+                    headers=login_headers,
                 )
                 raw.api_auth_code = login_res.status_code
                 if login_res.status_code != 200:
@@ -419,12 +418,12 @@ async def _gather_jellyfin_raw_data(ctx: StatusContext) -> JellyfinRawData:
 
                 token = login_res.json().get("AccessToken")
                 raw.api_auth_token = token
-                auth_with_tok = f'{auth_header}, Token="{token}"'
-                headers = {
-                    "Authorization": auth_with_tok,
-                    "X-Emby-Authorization": auth_with_tok,
-                    "X-Emby-Token": token,
-                }
+                headers = make_jellyfin_auth_headers(
+                    token=token,
+                    client="StatusCheck",
+                    device="homelab-status",
+                    device_id="homelab-status-check",
+                )
 
                 async def _get_version() -> None:
                     with contextlib.suppress(httpx.HTTPError, KeyError, ValueError):

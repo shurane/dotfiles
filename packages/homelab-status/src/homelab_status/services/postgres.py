@@ -16,25 +16,7 @@ async def check_postgres(ctx: StatusContext) -> ServiceResult:
     c = await ctx.get_container(container)
     if not c:
         elapsed = (time.perf_counter() - t0) * 1000
-        if ctx.no_docker:
-            return ServiceResult(
-                service_id=service_id,
-                name=name,
-                container=container,
-                status=HealthStatus.HEALTHY,
-                latency_ms=elapsed,
-                summary="Database running (Docker inspection skipped via --no-docker)",
-                branches=["[dim]Docker inspection skipped (--no-docker)[/dim]"],
-            )
-        return ServiceResult(
-            service_id=service_id,
-            name=name,
-            container=container,
-            status=HealthStatus.UNHEALTHY,
-            latency_ms=elapsed,
-            summary="Container not found or Docker unreachable",
-            branches=["[bold red]✖ Container not found or Docker unreachable[/bold red]"],
-        )
+        return ctx.handle_missing_container(service_id, name, container, elapsed)
 
     try:
         cmd = (

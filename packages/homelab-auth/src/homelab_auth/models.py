@@ -1,28 +1,30 @@
-from enum import StrEnum
+from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from homelab_core.models import HomelabAuth
+from homelab_core.services import Service
+from pydantic import BaseModel
 
+__all__ = [
+    "AUTH_SERVICES",
+    "SERVICE_NAMES",
+    "BootstrapOptions",
+    "HomelabAuth",
+    "Service",
+]
 
-class ServiceName(StrEnum):
-    QBITTORRENT = "qbittorrent"
-    QUI = "qui"
-    ARCANE = "arcane"
-    JELLYFIN = "jellyfin"
-    BOOKORBIT = "bookorbit"
+AUTH_SERVICES = (
+    Service.QBITTORRENT,
+    Service.QUI,
+    Service.ARCANE,
+    Service.JELLYFIN,
+    Service.BOOKORBIT,
+)
 
-
-SERVICE_NAMES = tuple(service.value for service in ServiceName)
-
-
-class HomelabAuth(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
-    username: str = Field(alias="HOMELAB_USERNAME", min_length=1)
-    password: str = Field(alias="HOMELAB_PASSWORD", min_length=8)
+SERVICE_NAMES = tuple(service.value for service in AUTH_SERVICES)
 
 
 class BootstrapOptions(BaseModel):
     apply: bool = False
     parallel: bool = False
     skip_backup: bool = False
-    services: tuple[ServiceName, ...]
+    services: tuple[Service, ...]

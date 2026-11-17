@@ -1,11 +1,11 @@
 """BookOrbit authentication bootstrap service."""
 
 import contextlib
-import time
 from typing import TYPE_CHECKING
 
 import bcrypt
 import httpx
+from homelab_core.services import wait_for_http
 
 from homelab_auth.compose import compose_exec, compose_up
 from homelab_auth.config import BOOKORBIT_URL
@@ -16,15 +16,8 @@ if TYPE_CHECKING:
 
 def wait_for_bookorbit(client: httpx.Client, timeout_seconds: int = 60) -> None:
     """Wait for BookOrbit healthcheck endpoint to report 200."""
-    url = f"{BOOKORBIT_URL}/api/v1/health"
-    deadline = time.monotonic() + timeout_seconds
-    while time.monotonic() < deadline:
-        with contextlib.suppress(httpx.HTTPError, ValueError):
-            response = client.get(url)
-            if response.status_code == 200:
-                return
-        time.sleep(2)
-    raise RuntimeError(f"timed out waiting for {url}")
+    wait_for_http(client, f"{BOOKORBIT_URL}/api/v1/health", timeout_seconds=float(timeout_seconds))
+
 
 
 def bookorbit_login(client: httpx.Client, username: str, password: str) -> bool:

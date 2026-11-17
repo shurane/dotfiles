@@ -23,6 +23,3 @@ weechat-to-soju = "soju_extras.importer.cli:main"
 [tool.hatch.build.targets.wheel]
 packages = ["src/soju_extras"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]

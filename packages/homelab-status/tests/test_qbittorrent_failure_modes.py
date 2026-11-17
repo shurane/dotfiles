@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
+import httpx
 import pytest
 from homelab_status.main import app
 from homelab_status.models import StatusContext, TargetConnection
@@ -266,7 +267,8 @@ async def test_run_qbittorrent_deep_check_with_mock_context() -> None:
     ctx.exec_container = _exec_c
     ctx.get_container_version = AsyncMock(return_value="v5.0.0")
 
-    report = await run_qbittorrent_deep_check(ctx)
+    with patch("httpx.AsyncClient.post", side_effect=httpx.ConnectError("Connection refused")):
+        report = await run_qbittorrent_deep_check(ctx)
     assert report.version == "v5.0.0"
 
 

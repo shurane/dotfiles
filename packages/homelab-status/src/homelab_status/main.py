@@ -27,7 +27,8 @@ from homelab_status.commands.jellyfin import jellyfin_command
 from homelab_status.commands.qbittorrent import qbittorrent_command
 from homelab_status.commands.samba import samba_command
 from homelab_status.commands.vpn import vpn_command
-from homelab_status.config import format_size, get_docker_client, load_env, render_sparkbar, resolve_target_connection
+from homelab_status.common import format_connection_badge
+from homelab_status.config import format_size, render_sparkbar
 from homelab_status.models import HealthStatus, ServiceResult, StatusContext
 from homelab_status.services import CHECK_REGISTRY, CheckFn
 
@@ -271,21 +272,19 @@ def main(
     if ctx_typer.invoked_subcommand is not None:
         return
 
-    conn = resolve_target_connection(lan_host)
-    config = load_env(env_file, conn.host)
-    docker_client = get_docker_client(docker_host, conn.host, no_docker)
-
-    ctx = StatusContext(
-        config=config,
-        username=config.username,
-        password=config.password,
-        base_domain=config.base_domain,
-        lan_host=conn.host,
-        docker_client=docker_client,
-        http_timeout=timeout,
+    ctx = StatusContext.build(
+        lan_host=lan_host,
+        env_file=env_file,
+        docker_host=docker_host,
         no_docker=no_docker,
-        connection=conn,
+        timeout=timeout,
     )
+    if ctx.config is None:
+        raise RuntimeError("Configuration not initialized")
+    if ctx.connection is None:
+        raise RuntimeError("Target connection not initialized")
+    config = ctx.config
+    conn = ctx.connection
 
     # Determine which checks to run
     if services:
@@ -305,14 +304,7 @@ def main(
         header_text = Text()
         header_text.append("🔮 Homelab Deep Health & Content Inspector\n", style="bold magenta")
 
-        if conn.route == "local":
-            route_badge = f"[bold magenta]🏠 {conn.description}[/bold magenta]"
-        elif conn.route == "tailscale":
-            route_badge = f"[bold cyan]🔒 {conn.description}[/bold cyan]"
-        elif conn.route == "lan":
-            route_badge = f"[bold green]🟢 {conn.description}[/bold green]"
-        else:
-            route_badge = f"[bold yellow]🌐 {conn.description}[/bold yellow]"
+        route_badge, _, _ = format_connection_badge(conn)
 
         ip_info = f" ({conn.ip})" if conn.ip and conn.ip != "unknown" else ""
         header_text.append(f"Target: {conn.host}{ip_info}  •  Route: ", style="dim")

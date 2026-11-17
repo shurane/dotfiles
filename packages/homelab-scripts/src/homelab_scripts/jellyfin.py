@@ -1,29 +1,25 @@
 """Jellyfin REST API client helper for library refresh and automation."""
 
+from __future__ import annotations
+
 import argparse
 import os
 import sys
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import httpx
+from homelab_core.env import load_homelab_env
+from homelab_core.services import Service, make_jellyfin_auth_headers, resolve_service_url
 from rich.console import Console
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-def find_homelab_env() -> Path | None:
-    """Locate homelab/.env dynamically by upward search stopping at repo boundary."""
-    if env_override := os.environ.get("HOMELAB_ENV"):
-        p = Path(env_override).resolve()
-        if p.is_file():
-            return p
-    current = Path(__file__).resolve()
-    for parent in current.parents:
-        if (candidate := parent / "homelab" / ".env").is_file():
-            return candidate
-        if (parent / ".git").exists() or parent == parent.parent:
-            break
-    if (fallback := Path.home() / "dotfiles/homelab/.env").is_file():
-        return fallback
-    return None
+__all__ = [
+    "get_jellyfin_config",
+    "main",
+    "refresh",
+]
 
 
 def get_jellyfin_config(env_file: Path | None = None) -> tuple[str, str] | None:
@@ -31,19 +27,14 @@ def get_jellyfin_config(env_file: Path | None = None) -> tuple[str, str] | None:
     api_key = os.environ.get("JELLYFIN_API_KEY")
     hostname_base = os.environ.get("HOSTNAME_BASE")
 
-    target_env = env_file if env_file is not None else find_homelab_env()
-    if target_env and target_env.exists():
-        for raw_line in target_env.read_text(encoding="utf-8").splitlines():
-            line = raw_line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if not api_key and line.startswith("JELLYFIN_API_KEY="):
-                api_key = line.split("=", 1)[1].strip().strip("\"'")
-            elif not hostname_base and line.startswith("HOSTNAME_BASE="):
-                hostname_base = line.split("=", 1)[1].strip().strip("\"'")
+    if not api_key or not hostname_base:
+        env = load_homelab_env(env_file)
+        api_key = api_key or env.get("JELLYFIN_API_KEY")
+        hostname_base = hostname_base or env.get("HOSTNAME_BASE")
 
     if api_key and hostname_base:
-        return f"https://jellyfin.{hostname_base}", api_key
+        base_url = resolve_service_url(Service.JELLYFIN, base_domain=hostname_base)
+        return base_url, api_key
     return None
 
 
@@ -61,16 +52,22 @@ def refresh(console: Console | None = None, *, dry_run: bool = False) -> bool:
     base_url, api_key = config
     url = f"{base_url}/Library/Refresh"
     if dry_run:
-        out.print(f"[dim][dry-run][/dim] Would trigger Jellyfin library refresh at [white]{url}[/white]")
+        out.print(
+            f"[dim][dry-run][/dim] Would trigger Jellyfin library refresh at [white]{url}[/white]"
+        )
         return True
 
-    headers = {"Authorization": f'MediaBrowser Token="{api_key}"'}
-    out.print(f"[bold cyan]Triggering Jellyfin library refresh at [white]{url}[/white]...[/bold cyan]")
+    headers = make_jellyfin_auth_headers(token=api_key, client="homelab-scripts")
+    out.print(
+        f"[bold cyan]Triggering Jellyfin library refresh at [white]{url}[/white]...[/bold cyan]"
+    )
 
     try:
         resp = httpx.post(url, headers=headers, timeout=10.0)
         if resp.status_code == 204:
-            out.print("[bold green]✔ Jellyfin library refresh triggered successfully (HTTP 204).[/bold green]")
+            out.print(
+                "[bold green]✔ Jellyfin library refresh triggered successfully (HTTP 204).[/bold green]"
+            )
             return True
         out.print(f"[bold red]✖ Jellyfin refresh failed with status {resp.status_code}[/bold red]")
     except httpx.HTTPError as exc:

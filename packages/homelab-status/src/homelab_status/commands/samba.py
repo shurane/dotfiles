@@ -12,7 +12,6 @@ import typer
 from rich.console import Console
 from whenever import Instant
 
-from homelab_status.config import get_docker_client, load_env, resolve_target_connection
 from homelab_status.models import StatusContext
 from homelab_status.services.samba import render_samba_deep_report, run_samba_deep_check
 
@@ -57,21 +56,14 @@ def samba_command(
     ),
 ) -> None:
     """Deep inspection of Samba container, port 445 connectivity, authenticated SMB, drive mounts, and locks."""
-    conn = resolve_target_connection(lan_host)
-    config = load_env(env_file, conn.host)
-    docker_client = get_docker_client(docker_host, conn.host, no_docker)
-
-    ctx = StatusContext(
-        config=config,
-        username=config.username,
-        password=config.password,
-        base_domain=config.base_domain,
-        lan_host=conn.host,
-        docker_client=docker_client,
-        http_timeout=timeout,
+    ctx = StatusContext.build(
+        lan_host=lan_host,
+        env_file=env_file,
+        docker_host=docker_host,
         no_docker=no_docker,
-        connection=conn,
+        timeout=timeout,
     )
+    conn = ctx.connection
 
     report = anyio.run(run_samba_deep_check, ctx)
 

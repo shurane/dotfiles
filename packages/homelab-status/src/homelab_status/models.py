@@ -4,13 +4,20 @@ from __future__ import annotations
 
 import contextlib
 import json
+import os
+import re
 from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import anyio
-from pydantic import BaseModel, ConfigDict, Field
+from homelab_core.docker import exec_container as core_exec_container
+from homelab_core.models import HomelabConfig
+from homelab_core.network import TargetConnection
+from homelab_core.services import ContainerName
+
+from homelab_status.config import get_docker_client, load_env, resolve_target_connection
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -18,26 +25,20 @@ if TYPE_CHECKING:
     import docker
     from docker.models.containers import Container
 
+__all__ = [
+    "ContainerName",
+    "HealthStatus",
+    "HomelabConfig",
+    "ServiceResult",
+    "StatusContext",
+    "TargetConnection",
+]
+
 
 class HealthStatus(StrEnum):
     HEALTHY = "HEALTHY"
     DEGRADED = "DEGRADED"
     UNHEALTHY = "UNHEALTHY"
-
-
-class ContainerName(StrEnum):
-    ARCANE = "homelab-arcane-1"
-    BOOKORBIT = "homelab-bookorbit-1"
-    BOOKORBIT_POSTGRES = "homelab-bookorbit-postgres-1"
-    CADDY = "homelab-caddy-1"
-    GLANCE = "homelab-glance-1"
-    GLUETUN = "homelab-gluetun-1"
-    JELLYFIN = "homelab-jellyfin-1"
-    QBITTORRENT = "homelab-qbittorrent-1"
-    QUI = "homelab-qui-1"
-    RETROARCH = "homelab-rclone-retroarch-1"
-    SAMBA = "homelab-samba-1"
-    WITHINGS_SYNC = "homelab-withings-sync-1"
 
 
 @dataclass
@@ -58,33 +59,6 @@ class ServiceResult:
         return self.status == HealthStatus.HEALTHY
 
 
-class HomelabConfig(BaseModel):
-    """Homelab configuration loaded from .env or environment with strict validation."""
-
-    model_config = ConfigDict(extra="ignore")
-
-    password: str = Field(alias="HOMELAB_PASSWORD", min_length=1)
-    base_domain: str = Field(alias="HOSTNAME_BASE", min_length=1)
-    lan_subnet: str = Field(alias="HOMELAB_LAN_SUBNET", min_length=1)
-    username: str = Field(default="username", alias="HOMELAB_USERNAME")
-    hostname: str | None = Field(default=None, alias="HOMELAB_HOSTNAME")
-    ssh_user: str | None = Field(default=None, alias="HOMELAB_SSH_USER")
-    node_name: str | None = Field(default=None, alias="HOMELAB_NODE_NAME")
-
-    @property
-    def effective_ssh_user(self) -> str:
-        """Return explicit SSH user override or fall back to homelab username."""
-        return self.ssh_user or self.username
-
-
-@dataclass
-class TargetConnection:
-    host: str
-    ip: str
-    route: str  # "local", "lan", "tailscale", "wan"
-    description: str  # "Local Host (UNIX socket)", "Direct LAN", "Tailscale MagicDNS", "WAN / Remote"
-    is_local: bool = False
-
 
 @dataclass
 class StatusContext:
@@ -101,6 +75,33 @@ class StatusContext:
     _disk_usage: list[dict[str, Any]] | None = field(default=None, init=False)
     _containers_cache: dict[str, Container] | None = field(default=None, init=False)
     _version_cache: dict[str, str] | None = field(default=None, init=False)
+
+    @classmethod
+    def build(
+        cls,
+        *,
+        lan_host: str | None = None,
+        env_file: Path | None = None,
+        docker_host: str | None = None,
+        no_docker: bool = False,
+        timeout: float = 10.0,
+    ) -> StatusContext:
+        """Construct a fully resolved StatusContext using target connection, env, and docker client."""
+        conn = resolve_target_connection(lan_host)
+        config = load_env(env_file, conn.host)
+        docker_client = get_docker_client(docker_host, conn.host, no_docker)
+
+        return cls(
+            config=config,
+            username=config.username,
+            password=config.password,
+            base_domain=config.base_domain,
+            lan_host=conn.host,
+            docker_client=docker_client,
+            http_timeout=timeout,
+            no_docker=no_docker,
+            connection=conn,
+        )
 
     def _get_version_cache(self) -> dict[str, str]:
         if self._version_cache is not None:
@@ -131,6 +132,35 @@ class StatusContext:
         if subdomain:
             return f"https://{subdomain}.{self.base_domain}"
         return f"https://{self.base_domain}"
+
+    def handle_missing_container(
+        self,
+        service_id: str,
+        name: str,
+        container: str,
+        latency_ms: float,
+    ) -> ServiceResult:
+        """Return standardized ServiceResult when target container is not found or Docker is unreachable."""
+        if self.no_docker:
+            return ServiceResult(
+                service_id=service_id,
+                name=name,
+                container=container,
+                status=HealthStatus.HEALTHY,
+                latency_ms=latency_ms,
+                summary="Container running (Docker inspection skipped via --no-docker)",
+                branches=["[dim]Docker inspection skipped (--no-docker)[/dim]"],
+            )
+        return ServiceResult(
+            service_id=service_id,
+            name=name,
+            container=container,
+            status=HealthStatus.UNHEALTHY,
+            latency_ms=latency_ms,
+            summary="Container not found or Docker unreachable",
+            branches=["[bold red]✖ Container not found or Docker unreachable[/bold red]"],
+        )
+
 
     async def get_all_containers(self) -> dict[str, Container]:
         """Fetch all running containers in one single Docker API call and cache them."""
@@ -198,13 +228,7 @@ class StatusContext:
 
         def _sync_exec() -> tuple[int, str]:
             try:
-                res = c.exec_run(cmd)
-                out = (
-                    res.output.decode("utf-8", errors="replace")
-                    if isinstance(res.output, (bytes, bytearray))
-                    else str(res.output)
-                )
-                return (res.exit_code, out)
+                return core_exec_container(c, cmd, check=False)
             except Exception as exc:
                 return (-1, str(exc))
 
@@ -232,8 +256,6 @@ class StatusContext:
         """Extract software version from container labels, environment variables, or exec."""
         if not self.docker_client:
             return None
-
-        import re
 
         cont = await self.get_container(container_name)
         if not cont:
@@ -303,8 +325,6 @@ class StatusContext:
         if self.connection and self.connection.is_local:
 
             def _local_stat() -> list[dict[str, Any]]:
-                import os
-
                 found = []
                 targets = ["/mnt/mango", "/"] if Path("/mnt/mango").exists() else ["/"]
                 for path in targets:

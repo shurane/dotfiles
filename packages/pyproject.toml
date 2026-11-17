@@ -1,11 +1,16 @@
 [tool.uv.workspace]
 members = [
+  "homelab-core",
+  "homelab-media",
   "homelab-status",
   "homelab-auth",
   "homelab-scripts",
   "bitwarden-extras",
   "soju-extras",
 ]
+
+[tool.uv.sources]
+homelab-core = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -14,6 +19,7 @@ dev = [
   "ty>=0.0.95",
   "python-xlib>=0.33",
   "types-python-xlib>=0.33.0.20261101",
+  "pytest-socket>=0.8.1",
 ]
 
 [tool.ruff]
@@ -59,6 +65,7 @@ select = [
   "SLOT",   # flake8-slots (slots on subclasses of builtins)
   "ISC",    # flake8-implicit-str-concat (collection string concatenation safety)
   "TID",    # flake8-tidy-imports (banned APIs)
+  "PLC0415", # Pylint Convention (ban inline imports outside top-level)
 ]
 ignore = [
   "B008",      # Typer uses Option(...) / Argument(...) as function defaults by design
@@ -72,6 +79,8 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/*" = ["ANN", "SLF001", "T201", "S", "ARG", "TC", "PT", "E501"]
+"soju-extras/*" = ["PLC0415"]
+"bitwarden-extras/*" = ["PLC0415"]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "datetime".msg = "Use `whenever` instead of standard library `datetime`."
@@ -109,11 +118,17 @@ redundant-final-classvar = "error"
 useless-overload-body = "error"
 
 [tool.pytest.ini_options]
-addopts = ["--import-mode=importlib"]
+addopts = [
+  "--import-mode=importlib",
+  "--disable-socket",
+  "--allow-unix-socket",
+  "--allow-hosts=127.0.0.1,localhost,::1",
+]
 pythonpath = [
   "soju-extras",
 ]
 testpaths = [
+  "homelab-core/tests",
   "homelab-status/tests",
   "homelab-auth/tests",
   "homelab-scripts/tests",

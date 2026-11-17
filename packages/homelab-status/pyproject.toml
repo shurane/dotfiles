@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "Fast, typed CLI health and status monitor for homelab services"
 requires-python = "==3.14.*"
 dependencies = [
+  "homelab-core",
   "anyio>=4.8.0",
   "docker>=7.1.0",
   "httpx>=0.28.1",
@@ -26,6 +27,3 @@ status = "homelab_status.main:app"
 [tool.hatch.build.targets.wheel]
 packages = ["src/homelab_status"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]

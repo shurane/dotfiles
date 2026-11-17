@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-from unittest.mock import AsyncMock, MagicMock
+import base64
+from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock, patch
 
+import httpx
 import pytest
-
-if TYPE_CHECKING:
-    from pathlib import Path
-
 from homelab_status.models import StatusContext, TargetConnection
 from homelab_status.services.jellyfin import (
     JellyfinRawData,
@@ -25,6 +23,7 @@ from homelab_status.services.jellyfin import (
     run_jellyfin_deep_check,
     save_device_cache,
 )
+from whenever import SYSTEM_TZ, Instant, hours, minutes, seconds
 
 
 def _make_mock_raw(
@@ -286,15 +285,14 @@ async def test_run_jellyfin_deep_check_with_mock_context() -> None:
     ctx.http_timeout = 5.0
 
     # With mocked HTTP we verify raw gathering runs without errors
-    report = await run_jellyfin_deep_check(ctx)
+    with patch("httpx.AsyncClient.post", side_effect=httpx.ConnectError("Connection refused")):
+        report = await run_jellyfin_deep_check(ctx)
     assert report.connection == ctx.connection
     assert report.memory is not None
     assert report.memory.usage_bytes == 200000000
 
 
 def test_jellyfin_connected_clients_parsing() -> None:
-    from whenever import Instant, hours, minutes
-
     now = Instant.now()
     recent_iso = (now - minutes(10)).format_iso()
     old_iso = (now - hours(48)).format_iso()
@@ -339,8 +337,6 @@ def test_jellyfin_connected_clients_parsing() -> None:
 
 
 def test_jellyfin_playback_history_and_24h_activity() -> None:
-    from whenever import Instant, hours, seconds
-
     now = Instant.now()
     d1 = (now - hours(1)).format_iso()
     d2 = (now - hours(1) - seconds(30)).format_iso()  # duplicate within 5m
@@ -402,8 +398,6 @@ def test_jellyfin_playback_history_and_24h_activity() -> None:
 
 
 def test_format_relative_time() -> None:
-    from whenever import Instant, hours, minutes
-
     now = Instant.now()
     assert _format_relative_time(now, now) == "just now"
     assert _format_relative_time(now - minutes(5), now) == "5m ago"
@@ -413,8 +407,6 @@ def test_format_relative_time() -> None:
 
 
 def test_format_playback_time() -> None:
-    from whenever import SYSTEM_TZ, Instant, hours, minutes
-
     now = Instant.now()
     local_now = now.to_tz(SYSTEM_TZ)
     expected_hm = local_now.format("ii:mm aa").lower()
@@ -449,8 +441,6 @@ def test_classify_client_route() -> None:
 
 
 def test_decode_browser_user_agent() -> None:
-    import base64
-
     # Windows 11 Firefox
     ua_ff = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) Gecko/20100101 Firefox/157.0|12345"
     id_ff = base64.b64encode(ua_ff.encode()).decode()
@@ -483,8 +473,6 @@ def test_normalize_hostname() -> None:
 
 
 def test_custom_playback_history_limit() -> None:
-    from whenever import Instant
-
     now = Instant.now()
     activity_entries = [
         {
@@ -511,8 +499,6 @@ def test_custom_playback_history_limit() -> None:
 
 
 def test_connected_clients_route_and_platform_enrichment(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    from whenever import Instant
-
     # Mock device cache to tmp_path
     monkeypatch.setattr(
         "homelab_status.services.jellyfin._get_device_cache_path",
@@ -524,7 +510,6 @@ def test_connected_clients_route_and_platform_enrichment(tmp_path: Path, monkeyp
     assert load_device_cache()["initial"]["hostname"] == "initial-host"
 
     now = Instant.now()
-    import base64
 
     ua_ff = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) Gecko/20100101 Firefox/157.0"
     dev_id_ff = base64.b64encode(ua_ff.encode()).decode()

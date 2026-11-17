@@ -9,6 +9,7 @@ description = "Collection of scripts and utilities for homelab"
 readme = "README.md"
 requires-python = "==3.14.*"
 dependencies = [
+  "homelab-core",
   "anyio>=4.8.0",
   "beautifulsoup4>=4.12.0",
   "httpx>=0.28.1",
@@ -32,6 +33,3 @@ jellyfin-scan = "homelab_scripts.jellyfin:main"
 [tool.hatch.build.targets.wheel]
 packages = ["src/homelab_scripts"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]

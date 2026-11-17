@@ -8,8 +8,8 @@ from pydantic import ValidationError
 from rich.console import Console
 
 from homelab_auth.common import build_options, format_path, load_env
-from homelab_auth.config import AUTH_ENV
-from homelab_auth.models import SERVICE_NAMES, BootstrapOptions, HomelabAuth, ServiceName
+from homelab_auth.config import HOMELAB_ENV
+from homelab_auth.models import SERVICE_NAMES, BootstrapOptions, HomelabAuth, Service
 from homelab_auth.services.arcane import apply_and_verify_arcane, check_arcane
 from homelab_auth.services.bookorbit import apply_and_verify_bookorbit, check_bookorbit
 from homelab_auth.services.jellyfin import apply_and_verify_jellyfin, check_jellyfin
@@ -37,13 +37,13 @@ def dry_run_service(name: str, task: CheckTask) -> bool:
     return False
 
 
-def check_task_definitions(auth: HomelabAuth) -> dict[ServiceName, tuple[str, CheckTask]]:
+def check_task_definitions(auth: HomelabAuth) -> dict[Service, tuple[str, CheckTask]]:
     return {
-        ServiceName.QBITTORRENT: ("qBittorrent", lambda: check_qbittorrent(auth)),
-        ServiceName.QUI: ("Qui", lambda: check_qui(auth)),
-        ServiceName.ARCANE: ("Arcane", lambda: check_arcane(auth)),
-        ServiceName.JELLYFIN: ("Jellyfin", lambda: check_jellyfin(auth)),
-        ServiceName.BOOKORBIT: ("BookOrbit", lambda: check_bookorbit(auth)),
+        Service.QBITTORRENT: ("qBittorrent", lambda: check_qbittorrent(auth)),
+        Service.QUI: ("Qui", lambda: check_qui(auth)),
+        Service.ARCANE: ("Arcane", lambda: check_arcane(auth)),
+        Service.JELLYFIN: ("Jellyfin", lambda: check_jellyfin(auth)),
+        Service.BOOKORBIT: ("BookOrbit", lambda: check_bookorbit(auth)),
     }
 
 
@@ -65,23 +65,23 @@ def run_service_sync(name: str, task: BootstrapTask) -> None:
     console.print(f"  [bold green]✓[/] [cyan]{name}[/] credentials applied and verified")
 
 
-def task_definitions(auth: HomelabAuth, options: BootstrapOptions) -> dict[ServiceName, tuple[str, BootstrapTask]]:
+def task_definitions(auth: HomelabAuth, options: BootstrapOptions) -> dict[Service, tuple[str, BootstrapTask]]:
     return {
-        ServiceName.QBITTORRENT: ("qBittorrent", lambda: apply_and_verify_qbittorrent(auth)),
-        ServiceName.QUI: ("Qui", lambda: apply_and_verify_qui(auth)),
-        ServiceName.ARCANE: ("Arcane", lambda: apply_and_verify_arcane(auth)),
-        ServiceName.JELLYFIN: ("Jellyfin", lambda: apply_and_verify_jellyfin(auth, options)),
-        ServiceName.BOOKORBIT: ("BookOrbit", lambda: apply_and_verify_bookorbit(auth)),
+        Service.QBITTORRENT: ("qBittorrent", lambda: apply_and_verify_qbittorrent(auth)),
+        Service.QUI: ("Qui", lambda: apply_and_verify_qui(auth)),
+        Service.ARCANE: ("Arcane", lambda: apply_and_verify_arcane(auth)),
+        Service.JELLYFIN: ("Jellyfin", lambda: apply_and_verify_jellyfin(auth, options)),
+        Service.BOOKORBIT: ("BookOrbit", lambda: apply_and_verify_bookorbit(auth)),
     }
 
 
 async def main_async(options: BootstrapOptions) -> int:
-    if not AUTH_ENV.exists():
-        console_err.print(f"{PREFIX} [bold red]missing auth env:[/] {AUTH_ENV}")
+    if not HOMELAB_ENV.exists():
+        console_err.print(f"{PREFIX} [bold red]missing auth env:[/] {HOMELAB_ENV}")
         return 1
 
     try:
-        auth = HomelabAuth.model_validate(load_env(AUTH_ENV))
+        auth = HomelabAuth.model_validate(load_env(HOMELAB_ENV))
     except ValidationError as error:
         console_err.print(f"{PREFIX} [bold red]Auth validation error:[/] {error}")
         return 1
@@ -90,7 +90,7 @@ async def main_async(options: BootstrapOptions) -> int:
     mode_label = "[bold yellow](DRY RUN)[/]" if is_dry_run else "[bold green](APPLY)[/]"
     services_list = ", ".join(f"[bold green]{s.value}[/]" for s in options.services)
     console.print(f"{PREFIX} {mode_label} Target Services: {services_list}")
-    console.print(f"{PREFIX} .env Path: [magenta]{format_path(AUTH_ENV)}[/]\n")
+    console.print(f"{PREFIX} .env Path: [magenta]{format_path(HOMELAB_ENV)}[/]\n")
 
     if is_dry_run:
         check_tasks = [check_task_definitions(auth)[service] for service in options.services]
