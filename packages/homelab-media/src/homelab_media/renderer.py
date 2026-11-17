@@ -107,24 +107,15 @@ def _ls_styled(
 
 
 def _format_skipped_summary(items: list[SyncAction], ls_colors: dict[str, str]) -> Text:
-    """Summarize skipped extras/auxiliary items sorted directories-first with LS_COLORS."""
-    dir_items: list[SyncAction] = []
-    named_items: list[SyncAction] = []
-    non_video_exts: set[str] = set()
-    non_video_count = 0
-
-    for sk in items:
-        if sk.reason.startswith("NON_VIDEO_EXT:"):
-            ext = sk.reason.split(":", 1)[1]
-            non_video_exts.add(ext)
-            non_video_count += 1
-        elif sk.reason.startswith("BLACKLISTED_DIR:"):
-            dir_items.append(sk)
-        else:
-            named_items.append(sk)
-
-    dir_items.sort(key=lambda s: s.source_file.name.lower())
-    named_items.sort(key=lambda s: s.source_file.name.lower())
+    """List skipped extras/auxiliary items sorted directories-first with LS_COLORS."""
+    dir_items = sorted(
+        (sk for sk in items if sk.reason.startswith("BLACKLISTED_DIR:")),
+        key=lambda s: s.source_file.name.lower(),
+    )
+    file_items = sorted(
+        (sk for sk in items if not sk.reason.startswith("BLACKLISTED_DIR:")),
+        key=lambda s: s.source_file.name.lower(),
+    )
 
     tokens: list[Text] = []
     for sk in dir_items:
@@ -132,31 +123,20 @@ def _format_skipped_summary(items: list[SyncAction], ls_colors: dict[str, str]) 
         t.append(" (dir)", style="dim")
         tokens.append(t)
 
-    for sk in named_items:
+    for sk in file_items:
         ext = Path(sk.source_file.name).suffix.lower()
-        if sk.reason.startswith("EXTRA_KEYWORD:"):
-            tag = sk.reason.split(":", 1)[1]
-        elif sk.reason == "SMALL_MOVIE_PROMO_OR_SAMPLE":
-            tag = "promo"
-        elif sk.reason == "TINY_OR_SPARSE_FILE":
-            tag = "<1 MiB"
-        elif sk.reason == "NO_EPISODE_TAG":
-            tag = "no episode"
-        else:
-            tag = sk.reason.lower()
         t = _ls_styled(sk.source_file.name, ls_colors, ext=ext)
-        t.append(f" ({tag})", style="dim")
+        if sk.reason.startswith("EXTRA_KEYWORD:"):
+            t.append(f" ({sk.reason.split(':', 1)[1]})", style="dim")
+        elif sk.reason == "SMALL_MOVIE_PROMO_OR_SAMPLE":
+            t.append(" (promo)", style="dim")
+        elif sk.reason == "TINY_OR_SPARSE_FILE":
+            t.append(" (<1 MiB)", style="dim")
+        elif sk.reason == "NO_EPISODE_TAG":
+            t.append(" (no episode)", style="dim")
+        elif not sk.reason.startswith("NON_VIDEO_EXT:"):
+            t.append(f" ({sk.reason.lower()})", style="dim")
         tokens.append(t)
-
-    if non_video_count > 0:
-        ext_list = sorted(non_video_exts)
-        ext_text = Text(f"{non_video_count}x (", style="yellow")
-        for idx, ext in enumerate(ext_list):
-            if idx > 0:
-                ext_text.append(", ", style="dim")
-            ext_text.append_text(_ls_styled(ext, ls_colors, ext=ext))
-        ext_text.append(")", style="yellow")
-        tokens.append(ext_text)
 
     out_text = Text()
     for idx, tok in enumerate(tokens):

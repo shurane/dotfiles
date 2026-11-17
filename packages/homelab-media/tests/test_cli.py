@@ -171,9 +171,10 @@ def test_render_gap_report_verbose_compacts_skipped_extras(tmp_path: Path, monke
     console = Console(file=buf, force_terminal=True, color_system="truecolor", width=160)
     render_gap_report(report, console=console, verbose=True)
     output = buf.getvalue()
-    # Directories sorted first (Screenshots before Subtitles), then files (ETRG.mp4), then extensions
+    # Directories sorted first (Screenshots before Subtitles), then individual files sorted
     idx_screens = output.index("Screenshots/")
     idx_subs = output.index("Subtitles/")
     idx_etrg = output.index("ETRG.mp4")
-    idx_exts = output.index("2x (")
-    assert idx_screens < idx_subs < idx_etrg < idx_exts
+    idx_poster = output.index("poster.png")
+    idx_readme = output.index("readme.txt")
+    assert idx_screens < idx_subs < idx_etrg < idx_poster < idx_readme
