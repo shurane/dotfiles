@@ -142,12 +142,13 @@ def render_gap_report(
     for act in report.ready_to_sync:
         grouped[(act.kind, act.torrent_name, _relative_target_folder(act))].append(act)
 
-    synced_files = report.already_synced_count
-    total_files = synced_files + len(report.ready_to_sync)
+    unsynced_files = len(report.ready_to_sync)
+    total_files = report.already_synced_count + unsynced_files
+    unsynced_color = "bold cyan" if unsynced_files > 0 else "green"
     summary_text = (
         f"qBittorrent: {qb_badge} | "
         f"Scan: [cyan]{report.scan_duration_ms:.1f} ms[/cyan] | "
-        f"Synced: [green]{synced_files}/{total_files} files[/green] | "
+        f"Unsynced: [{unsynced_color}]{unsynced_files}/{total_files} files[/{unsynced_color}] | "
         f"Review: [bold yellow]{len(report.flagged_for_review)}[/bold yellow] | "
         f"Extras skipped: [dim]{len(report.skipped_extras)}[/dim] | "
         f"Conflicts: [bold red]{len(report.conflicts)}[/bold red]"
