@@ -166,6 +166,12 @@ def _format_skipped_summary(items: list[SyncAction], ls_colors: dict[str, str]) 
     return out_text
 
 
+def _print_section_header(out: Console, title: str, *, style: str) -> None:
+    """Print a colored section header with a subtle divider underneath."""
+    out.print(f"\n[{style}]{title}[/{style}]")
+    out.print(f"[dim]{'─' * len(title)}[/dim]")
+
+
 def render_gap_report(
     report: GapReport,
     console: Console | None = None,
@@ -188,7 +194,7 @@ def render_gap_report(
     out.print(Panel(summary_text, title="homelab-media plan", border_style="blue"))
 
     if report.in_progress:
-        out.print("\n[bold]In-Progress Torrents (Protected)[/bold]")
+        _print_section_header(out, "In-Progress Torrents (Protected)", style="bold yellow")
         for item in report.in_progress:
             out.print(
                 f"[yellow]{escape(item.name)}[/yellow] / [cyan]{item.progress * 100:.1f}%[/cyan] "
@@ -202,7 +208,7 @@ def render_gap_report(
         for act in report.ready_to_sync:
             grouped[(act.kind, act.torrent_name, _relative_target_folder(act))].append(act)
 
-        out.print("\n[bold]Ready to Sync (/mnt/mango/media/...)[/bold]")
+        _print_section_header(out, "Ready to Sync (/mnt/mango/media/...)", style="bold cyan")
         for (kind, _torrent_name, rel_target), items in sorted(grouped.items(), key=lambda kv: kv[0][2]):
             total_size = _format_bytes(sum(i.file_size for i in items))
             reason = REASON_LABELS.get(items[0].reason, items[0].reason.lower())
@@ -223,7 +229,7 @@ def render_gap_report(
         out.print("[green]No pending media gaps detected.[/green]")
 
     if report.flagged_for_review:
-        out.print("\n[bold]Flagged for Review (Use --resolve ID=OPT)[/bold]")
+        _print_section_header(out, "Flagged for Review (Use --resolve ID=OPT)", style="bold yellow")
         for rev in report.flagged_for_review:
             opts = " | ".join(f"[cyan]{c.option_id}[/cyan]: {escape(c.description)}" for c in rev.candidates)
             out.print(
@@ -234,7 +240,7 @@ def render_gap_report(
             )
 
     if report.conflicts:
-        out.print("\n[bold]Conflicts (Protected - Existing Target Differs)[/bold]")
+        _print_section_header(out, "Conflicts (Protected - Existing Target Differs)", style="bold red")
         for conf in report.conflicts:
             file_uri = conf.source_file.absolute().as_uri()
             out.print(
@@ -250,7 +256,7 @@ def render_gap_report(
         for sk in report.skipped_extras:
             skipped_by_torrent[sk.torrent_name].append(sk)
 
-        out.print("\n[bold]Skipped Extras & Auxiliary Files[/bold]")
+        _print_section_header(out, "Skipped Extras & Auxiliary Files", style="bold magenta")
         for torrent_name in sorted(skipped_by_torrent, key=str.lower):
             items = skipped_by_torrent[torrent_name]
             link_path = items[0].source_file if len(items) == 1 else items[0].source_file.parent
