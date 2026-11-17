@@ -11,7 +11,8 @@ from homelab_media import cli
 from homelab_media.config import MediaConfig
 from homelab_media.models import ActionType, GapReport, MediaKind, SyncAction
 from homelab_media.remote import SSH_BASE_OPTS, dispatch_remote
-from homelab_media.renderer import _format_episode_ranges, render_gap_report
+from homelab_media.renderer import render_gap_report
+from homelab_media.ui import format_episode_ranges
 from rich.console import Console
 from typer.testing import CliRunner
 
@@ -98,7 +99,7 @@ def test_format_episode_ranges_compacts_contiguous_and_gaps() -> None:
         )
         for ep in (1, 2, 3, 5, 6, 8)
     ]
-    assert _format_episode_ranges(actions) == "S01E01-E03,E05-E06,E08"
+    assert format_episode_ranges(actions) == "S01E01-E03,E05-E06,E08"
 
 
 def test_render_gap_report_emits_osc8_torrent_link(tmp_path: Path) -> None:

@@ -167,6 +167,15 @@ def resolve_parent_folder(
     )
 
 
+def movie_target_path(media_movies_dir: Path, folder_name: str, filename: str) -> Path:
+    """Build `<root>/<Folder>/<Folder>[ - cdN].<ext>`; the single source of truth for movie targets."""
+    path = Path(filename)
+    disc_suffix = ""
+    if disc_match := CD_DISC_RE.search(path.stem):
+        disc_suffix = f" - cd{int(disc_match.group(2))}"
+    return media_movies_dir / folder_name / f"{folder_name}{disc_suffix}{path.suffix.lower()}"
+
+
 def parse_movie_target(
     torrent_name: str,
     _rel_path: str,
@@ -186,15 +195,7 @@ def parse_movie_target(
     year = int(year_raw) if isinstance(year_raw, int) else None
 
     parent = resolve_parent_folder(MediaKind.MOVIE, title, year, existing_movies)
-    ext = Path(filename).suffix.lower()
-
-    disc_suffix = ""
-    if disc_match := CD_DISC_RE.search(Path(filename).stem):
-        disc_num = int(disc_match.group(2))
-        disc_suffix = f" - cd{disc_num}"
-
-    target_filename = f"{parent.folder_name}{disc_suffix}{ext}"
-    target_path = media_movies_dir / parent.folder_name / target_filename
+    target_path = movie_target_path(media_movies_dir, parent.folder_name, filename)
     assert_safe_target(target_path, media_movies_dir)
 
     return MovieParseResult(parent=parent, target_path=target_path)

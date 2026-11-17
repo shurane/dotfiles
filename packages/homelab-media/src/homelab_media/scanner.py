@@ -26,6 +26,7 @@ from homelab_media.models import (
 from homelab_media.parser import (
     ParentResolution,
     assert_safe_target,
+    movie_target_path,
     parse_movie_target,
     parse_torrent_metadata,
     parse_tv_target,
@@ -418,10 +419,8 @@ def _scan_with_clients(
                         reason="TMDB_MATCH",
                     )
                     if item.kind == MediaKind.MOVIE:
-                        target_file = (
-                            item.media_subdir
-                            / best_match.folder_name
-                            / f"{best_match.folder_name}{target_file.suffix}"
+                        target_file = movie_target_path(
+                            item.media_subdir, best_match.folder_name, item.source_file.name
                         )
                     else:
                         target_file = (
