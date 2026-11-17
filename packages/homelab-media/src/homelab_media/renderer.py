@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 from rich.console import Console
 from rich.markup import escape
 from rich.panel import Panel
-from rich.table import Table
 
 from homelab_media.models import MediaKind
 
@@ -126,19 +125,14 @@ def render_gap_report(
     out.print(Panel(summary_text, title="homelab-media plan", border_style="blue"))
 
     if report.in_progress:
-        t_prog = Table(title="In-Progress Torrents (Protected)", show_lines=False)
-        t_prog.add_column("Torrent", style="yellow")
-        t_prog.add_column("Progress", justify="right")
-        t_prog.add_column("State")
-        t_prog.add_column("Size", justify="right")
+        out.print("\n[bold]In-Progress Torrents (Protected)[/bold]")
         for item in report.in_progress:
-            t_prog.add_row(
-                item.name,
-                f"{item.progress * 100:.1f}%",
-                item.state,
-                _format_bytes(item.size),
+            out.print(
+                f"[yellow]{escape(item.name)}[/yellow] / [cyan]{item.progress * 100:.1f}%[/cyan] "
+                f"/ [white]{escape(item.state)}[/white] / [dim]{_format_bytes(item.size)}[/dim]",
+                soft_wrap=True,
+                highlight=False,
             )
-        out.print(t_prog)
 
     if report.ready_to_sync:
         grouped: dict[tuple[MediaKind, str, str], list[SyncAction]] = defaultdict(list)
@@ -166,24 +160,26 @@ def render_gap_report(
         out.print("[green]No pending media gaps detected.[/green]")
 
     if report.flagged_for_review:
-        t_rev = Table(title="Flagged for Review (Use --resolve ID=OPT)", show_lines=True)
-        t_rev.add_column("ID", style="bold yellow")
-        t_rev.add_column("Torrent")
-        t_rev.add_column("Issue")
-        t_rev.add_column("Candidates")
+        out.print("\n[bold]Flagged for Review (Use --resolve ID=OPT)[/bold]")
         for rev in report.flagged_for_review:
-            opts = "\n".join(f"{c.option_id}: {c.description}" for c in rev.candidates)
-            t_rev.add_row(rev.id, rev.torrent_name, f"{rev.issue}\n{rev.message}", opts)
-        out.print(t_rev)
+            opts = " | ".join(f"[cyan]{c.option_id}[/cyan]: {escape(c.description)}" for c in rev.candidates)
+            out.print(
+                f"[bold yellow]{rev.id}[/bold yellow] / [white]{escape(rev.torrent_name)}[/white] "
+                f"/ [yellow]{escape(rev.issue)}[/yellow] / {opts}",
+                soft_wrap=True,
+                highlight=False,
+            )
 
     if report.conflicts:
-        t_conf = Table(title="Conflicts (Protected - Existing Target Differs)", show_lines=False)
-        t_conf.add_column("Target", style="red")
-        t_conf.add_column("Source")
-        t_conf.add_column("Reason")
+        out.print("\n[bold]Conflicts (Protected - Existing Target Differs)[/bold]")
         for conf in report.conflicts:
-            t_conf.add_row(str(conf.target_file or "-"), str(conf.source_file), conf.reason)
-        out.print(t_conf)
+            file_uri = conf.source_file.absolute().as_uri()
+            out.print(
+                f"[red]{escape(str(conf.target_file or '-'))}[/red] / [yellow]{escape(conf.reason)}[/yellow] "
+                f"/ [dim][link={file_uri}]torrent[/link][/dim]",
+                soft_wrap=True,
+                highlight=False,
+            )
 
     if verbose and report.skipped_extras:
         skipped_by_torrent: dict[str, list[SyncAction]] = defaultdict(list)
