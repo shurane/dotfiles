@@ -27,6 +27,8 @@ def dispatch_remote(config: MediaConfig, args: list[str]) -> subprocess.Complete
 
     is_tty = sys.stdout.isatty()
     tty_env = f"FORCE_COLOR=1 COLUMNS={shutil.get_terminal_size().columns} " if is_tty else ""
+    if is_tty and (ls_colors := os.environ.get("LS_COLORS")):
+        tty_env += f"LS_COLORS={shlex.quote(ls_colors)} "
     remote_cmd = (
         f"if [ ! -d {REMOTE_WORKSPACE}/homelab-media ]; then "
         f"echo 'homelab-media not found at {REMOTE_WORKSPACE}/homelab-media on {config.homelab_host}. "

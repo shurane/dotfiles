@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import os
 from collections import defaultdict
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.markup import escape
 from rich.panel import Panel
+from rich.text import Text
 
 from homelab_media.models import MediaKind
 
@@ -70,37 +73,97 @@ def _relative_target_folder(act: SyncAction) -> str:
     return f"{act.kind.value}/{folder}"
 
 
-def _format_skipped_summary(items: list[SyncAction]) -> str:
-    """Summarize skipped extras/auxiliary items for a single torrent into a compact label."""
-    named: list[str] = []
+def _parse_ls_colors() -> dict[str, str]:
+    """Parse LS_COLORS into a mapping of key ('di', '*.mkv', etc.) -> SGR ANSI code."""
+    raw = os.environ.get("LS_COLORS", "")
+    mapping: dict[str, str] = {}
+    for entry in raw.split(":"):
+        if "=" in entry:
+            key, val = entry.split("=", 1)
+            if key and val:
+                mapping[key.lower()] = val
+    return mapping
+
+
+def _ls_styled(
+    label: str,
+    ls_colors: dict[str, str],
+    *,
+    is_dir: bool = False,
+    ext: str = "",
+    fallback: str = "yellow",
+) -> Text:
+    """Style a path label using LS_COLORS (with fallback Rich style)."""
+    sgr = ""
+    if is_dir:
+        sgr = ls_colors.get("di", "")
+        fallback = "bold blue"
+    elif ext:
+        sgr = ls_colors.get(f"*{ext.lower()}", "")
+
+    if sgr and sgr not in ("0", "00"):
+        return Text.from_ansi(f"\x1b[{sgr}m{label}\x1b[0m")
+    return Text(label, style=fallback)
+
+
+def _format_skipped_summary(items: list[SyncAction], ls_colors: dict[str, str]) -> Text:
+    """Summarize skipped extras/auxiliary items sorted directories-first with LS_COLORS."""
+    dir_items: list[SyncAction] = []
+    named_items: list[SyncAction] = []
     non_video_exts: set[str] = set()
     non_video_count = 0
 
     for sk in items:
-        name = escape(sk.source_file.name)
         if sk.reason.startswith("NON_VIDEO_EXT:"):
             ext = sk.reason.split(":", 1)[1]
             non_video_exts.add(ext)
             non_video_count += 1
         elif sk.reason.startswith("BLACKLISTED_DIR:"):
-            named.append(f"{name}/ (dir)")
-        elif sk.reason.startswith("EXTRA_KEYWORD:"):
-            kw = sk.reason.split(":", 1)[1]
-            named.append(f"{name} ({kw})")
-        elif sk.reason == "SMALL_MOVIE_PROMO_OR_SAMPLE":
-            named.append(f"{name} (promo)")
-        elif sk.reason == "TINY_OR_SPARSE_FILE":
-            named.append(f"{name} (<1 MiB)")
-        elif sk.reason == "NO_EPISODE_TAG":
-            named.append(f"{name} (no episode)")
+            dir_items.append(sk)
         else:
-            named.append(f"{name} ({sk.reason.lower()})")
+            named_items.append(sk)
 
-    parts = sorted(named)
+    dir_items.sort(key=lambda s: s.source_file.name.lower())
+    named_items.sort(key=lambda s: s.source_file.name.lower())
+
+    tokens: list[Text] = []
+    for sk in dir_items:
+        t = _ls_styled(f"{sk.source_file.name}/", ls_colors, is_dir=True)
+        t.append(" (dir)", style="dim")
+        tokens.append(t)
+
+    for sk in named_items:
+        ext = Path(sk.source_file.name).suffix.lower()
+        if sk.reason.startswith("EXTRA_KEYWORD:"):
+            tag = sk.reason.split(":", 1)[1]
+        elif sk.reason == "SMALL_MOVIE_PROMO_OR_SAMPLE":
+            tag = "promo"
+        elif sk.reason == "TINY_OR_SPARSE_FILE":
+            tag = "<1 MiB"
+        elif sk.reason == "NO_EPISODE_TAG":
+            tag = "no episode"
+        else:
+            tag = sk.reason.lower()
+        t = _ls_styled(sk.source_file.name, ls_colors, ext=ext)
+        t.append(f" ({tag})", style="dim")
+        tokens.append(t)
+
     if non_video_count > 0:
-        exts_str = ", ".join(sorted(non_video_exts))
-        parts.append(f"{non_video_count}x ({exts_str})")
-    return ", ".join(parts)
+        ext_list = sorted(non_video_exts)
+        ext_text = Text(f"{non_video_count}x (", style="yellow")
+        for idx, ext in enumerate(ext_list):
+            if idx > 0:
+                ext_text.append(", ", style="dim")
+            ext_text.append_text(_ls_styled(ext, ls_colors, ext=ext))
+        ext_text.append(")", style="yellow")
+        tokens.append(ext_text)
+
+    out_text = Text()
+    for idx, tok in enumerate(tokens):
+        if idx > 0:
+            out_text.append(", ", style="dim")
+        out_text.append_text(tok)
+    return out_text
 
 
 def render_gap_report(
@@ -182,22 +245,24 @@ def render_gap_report(
             )
 
     if verbose and report.skipped_extras:
+        ls_colors = _parse_ls_colors()
         skipped_by_torrent: dict[str, list[SyncAction]] = defaultdict(list)
         for sk in report.skipped_extras:
             skipped_by_torrent[sk.torrent_name].append(sk)
 
         out.print("\n[bold]Skipped Extras & Auxiliary Files[/bold]")
-        for torrent_name in sorted(skipped_by_torrent):
+        for torrent_name in sorted(skipped_by_torrent, key=str.lower):
             items = skipped_by_torrent[torrent_name]
             link_path = items[0].source_file if len(items) == 1 else items[0].source_file.parent
             file_uri = link_path.absolute().as_uri()
-            summary = _format_skipped_summary(items)
-            out.print(
-                f"[white]{escape(torrent_name)}[/white] / [yellow]{summary}[/yellow] "
-                f"/ [dim][link={file_uri}]torrent[/link][/dim]",
-                soft_wrap=True,
-                highlight=False,
+            line = Text.assemble(
+                Text(torrent_name, style="white"),
+                Text(" / ", style="dim"),
+                _format_skipped_summary(items, ls_colors),
+                Text(" / ", style="dim"),
+                Text("torrent", style=f"dim link {file_uri}"),
             )
+            out.print(line, soft_wrap=True, highlight=False)
 
 
 def render_execution_summary(

@@ -126,7 +126,8 @@ def test_render_gap_report_emits_osc8_torrent_link(tmp_path: Path) -> None:
     assert "torrent" in output
 
 
-def test_render_gap_report_verbose_compacts_skipped_extras(tmp_path: Path) -> None:
+def test_render_gap_report_verbose_compacts_skipped_extras(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("LS_COLORS", "di=01;34:*.mp4=01;35:*.txt=00;32:*.png=01;35")
     report = GapReport(
         skipped_extras=[
             SyncAction(
@@ -135,6 +136,20 @@ def test_render_gap_report_verbose_compacts_skipped_extras(tmp_path: Path) -> No
                 kind=MediaKind.MOVIE,
                 action_type=ActionType.SKIP_EXTRA,
                 reason="SMALL_MOVIE_PROMO_OR_SAMPLE",
+            ),
+            SyncAction(
+                torrent_name="Wreck-It.Ralph.2012",
+                source_file=tmp_path / "Wreck-It.Ralph.2012" / "Subtitles",
+                kind=MediaKind.MOVIE,
+                action_type=ActionType.SKIP_EXTRA,
+                reason="BLACKLISTED_DIR:Subtitles",
+            ),
+            SyncAction(
+                torrent_name="Wreck-It.Ralph.2012",
+                source_file=tmp_path / "Wreck-It.Ralph.2012" / "Screenshots",
+                kind=MediaKind.MOVIE,
+                action_type=ActionType.SKIP_EXTRA,
+                reason="BLACKLISTED_DIR:Screenshots",
             ),
             SyncAction(
                 torrent_name="Wreck-It.Ralph.2012",
@@ -156,6 +171,9 @@ def test_render_gap_report_verbose_compacts_skipped_extras(tmp_path: Path) -> No
     console = Console(file=buf, force_terminal=True, color_system="truecolor", width=160)
     render_gap_report(report, console=console, verbose=True)
     output = buf.getvalue()
-    assert "Wreck-It.Ralph.2012" in output
-    assert "ETRG.mp4 (promo)" in output
-    assert "2x (.png, .txt)" in output
+    # Directories sorted first (Screenshots before Subtitles), then files (ETRG.mp4), then extensions
+    idx_screens = output.index("Screenshots/")
+    idx_subs = output.index("Subtitles/")
+    idx_etrg = output.index("ETRG.mp4")
+    idx_exts = output.index("2x (")
+    assert idx_screens < idx_subs < idx_etrg < idx_exts
