@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 from homelab_media.models import MediaKind, PathTraversalSecurityError
 from homelab_media.parser import (
+    _format_episode_tag,
     assert_safe_target,
     parse_movie_target,
     parse_torrent_metadata,
@@ -212,3 +213,24 @@ def test_fast_path_skips_guessit_for_foldered_movie_and_anime_episode(tmp_path: 
     )
     assert res_tv is not None
     assert res_tv.target_path == tmp_path / "Kore Kaite Shine" / "Season 01" / "S01E05.mkv"
+
+
+@pytest.mark.parametrize(
+    ("season", "ep_start", "ep_end", "expected_tag", "expected_val"),
+    [
+        (1, 5, None, "S01E05", 5),
+        (2, 3, 3, "S02E03", 3),
+        (1, 24, 25, "S01E24-E25", "24-25"),
+        (3, 10, 8, "S03E08-E10", "8-10"),
+        (1, 105, None, "S01E105", 105),
+        (1, 99, 101, "S01E99-E101", "99-101"),
+    ],
+)
+def test_format_episode_tag_edge_cases(
+    season: int,
+    ep_start: int,
+    ep_end: int | None,
+    expected_tag: str,
+    expected_val: int | str,
+) -> None:
+    assert _format_episode_tag(season, ep_start, ep_end) == (expected_tag, expected_val)
