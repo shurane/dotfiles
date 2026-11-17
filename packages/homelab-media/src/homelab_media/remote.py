@@ -6,6 +6,7 @@ import os
 import shlex
 import shutil
 import subprocess
+import sys
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -24,12 +25,13 @@ def dispatch_remote(config: MediaConfig, args: list[str]) -> subprocess.Complete
     target = f"{config.ssh_user}@{config.homelab_host}"
     quoted_args = " ".join(shlex.quote(a) for a in args)
 
+    color_env = "FORCE_COLOR=1 " if sys.stdout.isatty() else ""
     remote_cmd = (
         f"if [ ! -d {REMOTE_WORKSPACE}/homelab-media ]; then "
         f"echo 'homelab-media not found at {REMOTE_WORKSPACE}/homelab-media on {config.homelab_host}. "
         f"Sync/pull ~/dotfiles on {config.homelab_host} first.' >&2; exit 2; fi; "
         f"PATH=$HOME/.local/bin:/usr/local/bin:/usr/bin:$PATH "
-        f"HOMELAB_MEDIA_LOCAL=1 "
+        f"HOMELAB_MEDIA_LOCAL=1 {color_env}"
         f"uv run --quiet --directory {REMOTE_WORKSPACE} media {quoted_args}"
     )
 
