@@ -142,3 +142,25 @@ def test_executor_blocks_symlink_escape_via_follow_symlinks(tmp_path: Path) -> N
     assert summary.linked_count == 0
     assert len(summary.errors) == 1
     assert "escapes media root" in summary.errors[0]
+
+
+def test_tmdb_preserves_season_zero_for_specials(tmp_path: Path) -> None:
+    cfg = _cfg(tmp_path)
+    show = cfg.torrents_tv_dir / "Darker.Than.Black.S01+S02+OVAs"
+    ova = show / "Specials" / "Darker Than Black - S00E01 - OVA 1.mkv"
+    ova.parent.mkdir(parents=True)
+    with ova.open("wb") as f:
+        f.truncate(100 * 1024 * 1024)
+
+    tmdb = MagicMock()
+    tmdb.is_configured = True
+    tmdb.resolve.return_value = (
+        TmdbMatch(tmdb_id=1, title="Darker than Black", original_title="Darker than Black", year=2007),
+        [],
+    )
+    report = scan_media_gaps(cfg, tmdb_client=tmdb, use_qbittorrent=False)
+
+    assert len(report.ready_to_sync) == 1
+    assert report.ready_to_sync[0].target_file == (
+        cfg.media_tv_dir / "Darker than Black (2007)" / "Season 00" / "S00E01.mkv"
+    )

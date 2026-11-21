@@ -530,7 +530,7 @@ def _resolve_pending_tmdb(ctx: _ScanContext, pool: ThreadPoolExecutor) -> None:
                 cand.target_file = tv_target_path(
                     cand.media_subdir,
                     best_match.folder_name,
-                    cand.season_num or 1,
+                    cand.season_num if cand.season_num is not None else 1,
                     cand.target_file.name,
                 )
             assert_safe_target(cand.target_file, cand.media_subdir)
