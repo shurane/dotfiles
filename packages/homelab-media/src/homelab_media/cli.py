@@ -157,7 +157,7 @@ def sync(
 
 @app.command()
 def refresh() -> None:
-    """Trigger a Jellyfin library refresh."""
+    """Trigger a Jellyfin library refresh and identify any unmatched series/movies."""
     config = load_config()
     jf = JellyfinClient(config.jellyfin_url, config.jellyfin_api_key)
     ok, msg = jf.trigger_refresh()
@@ -165,6 +165,8 @@ def refresh() -> None:
     console.print(f"[{style}]{msg}[/{style}]")
     if not ok:
         raise typer.Exit(code=1)
+    if identified := jf.identify_unmatched():
+        console.print(f"[green]Identified {len(identified)} unmatched item(s): {', '.join(identified)}[/green]")
 
 
 @app.command()
