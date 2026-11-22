@@ -142,3 +142,40 @@ def test_jellyfin_client_missing_key_and_success(monkeypatch) -> None:
     jf = JellyfinClient("https://jf.local", "secret-token")
     ok, _ = jf.trigger_refresh()
     assert ok is True
+
+
+def test_jellyfin_identify_unmatched_applies_top_match_and_handles_502(monkeypatch) -> None:
+    applied: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/Items":
+            return httpx.Response(
+                200,
+                json={
+                    "Items": [
+                        {"Id": "1", "Name": "Already Matched", "Type": "Series", "ProviderIds": {"Tmdb": "10"}},
+                        {"Id": "2", "Name": "Darker than Black", "Type": "Series", "ProviderIds": {}, "ProductionYear": 2007},
+                        {"Id": "3", "Name": "False Memory", "Type": "Series", "ProviderIds": {}},
+                    ]
+                },
+            )
+        if request.url.path == "/Items/RemoteSearch/Series":
+            return httpx.Response(200, json=[{"Name": "Match", "ProviderIds": {"Tmdb": "99"}}])
+        if request.url.path == "/Items/RemoteSearch/Apply/2":
+            applied.append("2")
+            return httpx.Response(204)
+        if request.url.path == "/Items/RemoteSearch/Apply/3":
+            applied.append("3")
+            return httpx.Response(502)
+        return httpx.Response(404)
+
+    orig_client = httpx.Client
+    monkeypatch.setattr(
+        httpx,
+        "Client",
+        lambda **kw: orig_client(transport=httpx.MockTransport(handler), **kw),
+    )
+    jf = JellyfinClient("https://jf.local", "secret-token")
+    identified = jf.identify_unmatched()
+    assert identified == ["Darker than Black", "False Memory"]
+    assert applied == ["2", "3"]

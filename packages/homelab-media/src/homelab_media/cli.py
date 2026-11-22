@@ -148,6 +148,8 @@ def sync(
         ok, msg = jf.trigger_refresh()
         style = "green" if ok else "yellow"
         console.print(f"[{style}]{msg}[/{style}]")
+        if ok and (identified := jf.identify_unmatched()):
+            console.print(f"[green]Identified {len(identified)} unmatched item(s): {', '.join(identified)}[/green]")
 
     if summary.errors:
         raise typer.Exit(code=1)
