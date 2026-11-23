@@ -130,6 +130,26 @@ class JellyfinClient:
                     pass
                 identified.append(str(name))
 
+            # Also refresh any series that still has unnumbered episodes.
+            unnumbered_series: dict[str, str] = {}
+            for ep in self.fetch_inventory_items():
+                if ep.get("Type") == "Episode" and (
+                    ep.get("ParentIndexNumber") is None or ep.get("IndexNumber") is None
+                ):
+                    sid = ep.get("SeriesId")
+                    if sid and sid not in unnumbered_series:
+                        unnumbered_series[str(sid)] = str(ep.get("SeriesName") or sid)
+            for sid, sname in unnumbered_series.items():
+                try:
+                    r = client.post(
+                        f"/Items/{sid}/Refresh",
+                        params={"MetadataRefreshMode": "FullRefresh", "ImageRefreshMode": "FullRefresh"},
+                    )
+                    if r.is_success:
+                        identified.append(sname)
+                except httpx.HTTPError:
+                    continue
+
         return identified
 
     def fetch_inventory_items(self) -> list[dict[str, Any]]:
