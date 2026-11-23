@@ -149,10 +149,12 @@ def sync(
         ok, msg = jf.trigger_refresh()
         style = "green" if ok else "yellow"
         console.print(f"[{style}]{msg}[/{style}]")
-        if ok and (identified := jf.identify_unmatched()):
-            console.print(f"[green]Identified {len(identified)} unmatched item(s): {', '.join(identified)}[/green]")
-        if ok and (probed := jf.probe_missing_media_info()):
-            console.print(f"[green]Probed media info for {probed} item(s).[/green]")
+        if ok:
+            updated, probed = jf.reconcile_library()
+            if updated:
+                console.print(f"[green]Reconciled {len(updated)} item(s): {', '.join(updated)}[/green]")
+            if probed:
+                console.print(f"[green]Probed media info for {probed} item(s).[/green]")
 
     if summary.errors:
         raise typer.Exit(code=1)
@@ -168,9 +170,10 @@ def refresh() -> None:
     console.print(f"[{style}]{msg}[/{style}]")
     if not ok:
         raise typer.Exit(code=1)
-    if identified := jf.identify_unmatched():
-        console.print(f"[green]Identified {len(identified)} unmatched item(s): {', '.join(identified)}[/green]")
-    if probed := jf.probe_missing_media_info():
+    updated, probed = jf.reconcile_library()
+    if updated:
+        console.print(f"[green]Reconciled {len(updated)} item(s): {', '.join(updated)}[/green]")
+    if probed:
         console.print(f"[green]Probed media info for {probed} item(s).[/green]")
 
 

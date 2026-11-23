@@ -182,16 +182,19 @@ def test_jellyfin_identify_unmatched_applies_top_match_and_handles_502(monkeypat
         lambda **kw: orig_client(transport=httpx.MockTransport(handler), **kw),
     )
     jf = JellyfinClient("https://jf.local", "secret-token")
-    identified = jf.identify_unmatched()
-    assert identified == ["Darker than Black", "False Memory"]
+    updated, probed = jf.reconcile_library()
+    assert updated == ["Darker than Black", "False Memory"]
+    assert probed == 0
     assert applied == ["2", "3"]
 
 
 def test_jellyfin_probe_missing_media_info(monkeypatch) -> None:
-    probed: list[str] = []
+    probed_ids: list[str] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
         if request.url.path == "/Items":
+            if request.url.params.get("IncludeItemTypes") == "Series,Movie":
+                return httpx.Response(200, json={"Items": []})
             return httpx.Response(
                 200,
                 json={
@@ -205,7 +208,7 @@ def test_jellyfin_probe_missing_media_info(monkeypatch) -> None:
                 },
             )
         if request.url.path == "/Items/missing-1/PlaybackInfo":
-            probed.append("missing-1")
+            probed_ids.append("missing-1")
             return httpx.Response(200, json={})
         return httpx.Response(404)
 
@@ -216,5 +219,6 @@ def test_jellyfin_probe_missing_media_info(monkeypatch) -> None:
         lambda **kw: orig_client(transport=httpx.MockTransport(handler), **kw),
     )
     jf = JellyfinClient("https://jf.local", "secret-token")
-    assert jf.probe_missing_media_info() == 1
-    assert probed == ["missing-1"]
+    _updated, probed = jf.reconcile_library()
+    assert probed == 1
+    assert probed_ids == ["missing-1"]
