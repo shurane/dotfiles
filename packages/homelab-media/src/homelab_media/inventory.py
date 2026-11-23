@@ -130,7 +130,7 @@ def render_inventory_summary(conn: sqlite3.Connection, console: Console, *, limi
     for idx, (heading, style, sql, params) in enumerate(queries):
         if idx > 0:
             table.add_row("", "", "", "", "")
-        table.add_row(f"[{style}]{heading}[/{style}]", "", "", "", "")
+        table.add_row("", f"[{style}]{heading}[/{style}]", "", "", "")
         for row in conn.execute(sql, params).fetchall():
             if heading.endswith("Overall"):
                 kind, title, files, b, res = row
