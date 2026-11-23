@@ -80,17 +80,23 @@ class JellyfinClient:
                 if item.get("ProviderIds"):
                     if not item.get("ImageTags"):
                         try:
-                            r = client.post(
-                                f"/Items/{item_id}/Refresh",
-                                params={
-                                    "MetadataRefreshMode": "FullRefresh",
-                                    "ImageRefreshMode": "FullRefresh",
-                                    "ReplaceAllImages": "true",
-                                },
+                            imgs = client.get(
+                                f"/Items/{item_id}/RemoteImages",
+                                params={"Type": "Primary", "Limit": 1},
                             )
-                            if r.is_success:
-                                identified.append(str(name))
-                        except httpx.HTTPError:
+                            top_url = (
+                                imgs.json().get("Images", [{}])[0].get("Url")
+                                if imgs.is_success and imgs.json().get("Images")
+                                else None
+                            )
+                            if top_url:
+                                dl = client.post(
+                                    f"/Items/{item_id}/RemoteImages/Download",
+                                    params={"Type": "Primary", "ImageUrl": top_url},
+                                )
+                                if dl.is_success:
+                                    identified.append(str(name))
+                        except (httpx.HTTPError, ValueError):
                             pass
                     continue
 
