@@ -62,7 +62,7 @@ class JellyfinClient:
                     params={
                         "Recursive": "true",
                         "IncludeItemTypes": "Series,Movie",
-                        "Fields": "ProviderIds,ProductionYear",
+                        "Fields": "ProviderIds,ProductionYear,ImageTags",
                     },
                 )
                 resp.raise_for_status()
@@ -71,12 +71,27 @@ class JellyfinClient:
                 return identified
 
             for item in items:
-                if item.get("ProviderIds"):
-                    continue
                 item_id = item.get("Id")
                 name = item.get("Name")
                 item_type = item.get("Type")
                 if not item_id or not name or item_type not in ("Series", "Movie"):
+                    continue
+
+                if item.get("ProviderIds"):
+                    if not item.get("ImageTags"):
+                        try:
+                            r = client.post(
+                                f"/Items/{item_id}/Refresh",
+                                params={
+                                    "MetadataRefreshMode": "FullRefresh",
+                                    "ImageRefreshMode": "FullRefresh",
+                                    "ReplaceAllImages": "true",
+                                },
+                            )
+                            if r.is_success:
+                                identified.append(str(name))
+                        except httpx.HTTPError:
+                            pass
                     continue
 
                 search_info: dict[str, object] = {"Name": name}

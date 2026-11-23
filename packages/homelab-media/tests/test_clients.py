@@ -153,7 +153,13 @@ def test_jellyfin_identify_unmatched_applies_top_match_and_handles_502(monkeypat
                 200,
                 json={
                     "Items": [
-                        {"Id": "1", "Name": "Already Matched", "Type": "Series", "ProviderIds": {"Tmdb": "10"}},
+                        {
+                            "Id": "1",
+                            "Name": "Already Matched",
+                            "Type": "Series",
+                            "ProviderIds": {"Tmdb": "10"},
+                            "ImageTags": {"Primary": "abc"},
+                        },
                         {"Id": "2", "Name": "Darker than Black", "Type": "Series", "ProviderIds": {}, "ProductionYear": 2007},
                         {"Id": "3", "Name": "False Memory", "Type": "Series", "ProviderIds": {}},
                     ]
