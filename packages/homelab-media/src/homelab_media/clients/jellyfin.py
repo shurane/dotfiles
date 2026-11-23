@@ -127,3 +127,27 @@ class JellyfinClient:
             )
             resp.raise_for_status()
             return list(resp.json().get("Items", []))
+
+    def probe_missing_media_info(self) -> int:
+        """Trigger PlaybackInfo on Movie/Episode items lacking video stream metadata."""
+        if not self.api_key:
+            return 0
+
+        probed = 0
+        with httpx.Client(base_url=self.base_url, headers=self._headers(), timeout=_APPLY_TIMEOUT) as client:
+            for item in self.fetch_inventory_items():
+                sources = item.get("MediaSources") or []
+                streams = sources[0].get("MediaStreams") or [] if sources else []
+                video = next((s for s in streams if s.get("Type") == "Video"), None)
+                if video and video.get("Width"):
+                    continue
+                item_id = item.get("Id")
+                if not item_id:
+                    continue
+                try:
+                    resp = client.post(f"/Items/{item_id}/PlaybackInfo")
+                    if resp.is_success:
+                        probed += 1
+                except httpx.HTTPError:
+                    continue
+        return probed

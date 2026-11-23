@@ -179,3 +179,36 @@ def test_jellyfin_identify_unmatched_applies_top_match_and_handles_502(monkeypat
     identified = jf.identify_unmatched()
     assert identified == ["Darker than Black", "False Memory"]
     assert applied == ["2", "3"]
+
+
+def test_jellyfin_probe_missing_media_info(monkeypatch) -> None:
+    probed: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/Items":
+            return httpx.Response(
+                200,
+                json={
+                    "Items": [
+                        {
+                            "Id": "ok-1",
+                            "MediaSources": [{"MediaStreams": [{"Type": "Video", "Width": 1920}]}],
+                        },
+                        {"Id": "missing-1", "MediaSources": [{"MediaStreams": []}]},
+                    ]
+                },
+            )
+        if request.url.path == "/Items/missing-1/PlaybackInfo":
+            probed.append("missing-1")
+            return httpx.Response(200, json={})
+        return httpx.Response(404)
+
+    orig_client = httpx.Client
+    monkeypatch.setattr(
+        httpx,
+        "Client",
+        lambda **kw: orig_client(transport=httpx.MockTransport(handler), **kw),
+    )
+    jf = JellyfinClient("https://jf.local", "secret-token")
+    assert jf.probe_missing_media_info() == 1
+    assert probed == ["missing-1"]
