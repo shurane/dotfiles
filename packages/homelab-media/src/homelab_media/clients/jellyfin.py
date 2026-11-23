@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import httpx
 from homelab_core.services import make_jellyfin_auth_headers
 
@@ -108,3 +110,20 @@ class JellyfinClient:
                 identified.append(str(name))
 
         return identified
+
+    def fetch_inventory_items(self) -> list[dict[str, Any]]:
+        """Fetch all Movie and Episode items with MediaSources, SeriesName, and Path."""
+        if not self.api_key:
+            return []
+
+        with httpx.Client(base_url=self.base_url, headers=self._headers(), timeout=_APPLY_TIMEOUT) as client:
+            resp = client.get(
+                "/Items",
+                params={
+                    "Recursive": "true",
+                    "IncludeItemTypes": "Movie,Episode",
+                    "Fields": "MediaSources,SeriesName,Path",
+                },
+            )
+            resp.raise_for_status()
+            return list(resp.json().get("Items", []))

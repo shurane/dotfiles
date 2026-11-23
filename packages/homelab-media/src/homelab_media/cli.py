@@ -12,6 +12,7 @@ from rich.console import Console
 from homelab_media.clients.jellyfin import JellyfinClient
 from homelab_media.config import MediaConfig, is_local_target, load_config
 from homelab_media.executor import execute_sync
+from homelab_media.inventory import build_inventory_db, render_inventory_summary, run_sql_query
 from homelab_media.models import ActionType, GapReport, MediaKind, SyncAction
 from homelab_media.parser import resolve_target_with_folder
 from homelab_media.remote import dispatch_remote
@@ -167,6 +168,28 @@ def refresh() -> None:
         raise typer.Exit(code=1)
     if identified := jf.identify_unmatched():
         console.print(f"[green]Identified {len(identified)} unmatched item(s): {', '.join(identified)}[/green]")
+
+
+@app.command()
+def inventory(
+    sql: str | None = typer.Option(None, "--sql", help="Run a custom SQL query against the in-memory `items` table."),
+    limit: int = typer.Option(10, "--limit", "-n", help="Number of rows per summary section."),
+) -> None:
+    """Query Jellyfin library sizes and resolutions using an in-memory SQLite DB."""
+    config = load_config()
+    jf = JellyfinClient(config.jellyfin_url, config.jellyfin_api_key)
+    items = jf.fetch_inventory_items()
+    conn = build_inventory_db(items)
+    try:
+        if sql:
+            cols, rows = run_sql_query(conn, sql)
+            console.print(" | ".join(cols))
+            for row in rows:
+                console.print(" | ".join(str(v) for v in row))
+            return
+        render_inventory_summary(conn, console, limit=limit)
+    finally:
+        conn.close()
 
 
 @app.command()
