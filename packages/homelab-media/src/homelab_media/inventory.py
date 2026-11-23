@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 from rich.table import Table
 
-from homelab_media.renderer import format_bytes, print_section_header
+from homelab_media.renderer import format_bytes
 
 if TYPE_CHECKING:
     from rich.console import Console
@@ -120,20 +120,28 @@ def render_inventory_summary(conn: sqlite3.Connection, console: Console, *, limi
         ),
     ]
 
-    _col_widths = {"kind": 6, "title": 36, "resolution": 10, "files": 6, "eps": 6, "bytes": 10, "res": 7, "codec": 6}
-    for heading, style, sql, params in queries:
-        print_section_header(console, heading, style=style)
-        cur = conn.execute(sql, params)
-        cols = [d[0] for d in (cur.description or [])]
-        table = Table(box=None, show_header=True, header_style="bold dim", pad_edge=False)
-        for col in cols:
-            table.add_column(
-                "Size" if col == "bytes" else col,
-                width=_col_widths.get(col),
-                justify="right" if col in ("files", "eps", "bytes") else "left",
-            )
-        for row in cur.fetchall():
-            table.add_row(
-                *[format_bytes(val) if col == "bytes" else str(val) for col, val in zip(cols, row, strict=True)]
-            )
-        console.print(table)
+    table = Table(box=None, show_header=True, header_style="bold dim", pad_edge=False)
+    table.add_column("kind", width=8)
+    table.add_column("title", width=36)
+    table.add_column("files", width=6, justify="right")
+    table.add_column("Size", width=10, justify="right")
+    table.add_column("info", width=12)
+
+    for idx, (heading, style, sql, params) in enumerate(queries):
+        if idx > 0:
+            table.add_row("", "", "", "", "")
+        table.add_row(f"[{style}]{heading}[/{style}]", "", "", "", "")
+        for row in conn.execute(sql, params).fetchall():
+            if heading.endswith("Overall"):
+                kind, title, files, b, res = row
+                table.add_row(str(kind), str(title), str(files), format_bytes(b), str(res))
+            elif heading.endswith("Shows"):
+                title, eps, b, res = row
+                table.add_row("tv", str(title), str(eps), format_bytes(b), str(res))
+            elif heading.endswith("Movies"):
+                title, b, res, codec = row
+                table.add_row("movie", str(title), "1", format_bytes(b), f"{res} {codec}".strip())
+            else:
+                res, files, b = row
+                table.add_row("res", str(res), str(files), format_bytes(b), "")
+    console.print(table)
