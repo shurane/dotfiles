@@ -130,20 +130,36 @@ class JellyfinClient:
                     pass
                 identified.append(str(name))
 
-            # Also refresh any series that still has unnumbered episodes.
-            unnumbered_series: dict[str, str] = {}
+            # Also refresh any series with unnumbered episodes or missing/duplicate episode thumbnails.
+            needs_refresh: dict[str, str] = {}
+            thumbs_by_series: dict[str, list[str | None]] = {}
+            series_names: dict[str, str] = {}
             for ep in self.fetch_inventory_items():
-                if ep.get("Type") == "Episode" and (
-                    ep.get("ParentIndexNumber") is None or ep.get("IndexNumber") is None
-                ):
-                    sid = ep.get("SeriesId")
-                    if sid and sid not in unnumbered_series:
-                        unnumbered_series[str(sid)] = str(ep.get("SeriesName") or sid)
-            for sid, sname in unnumbered_series.items():
+                if ep.get("Type") != "Episode":
+                    continue
+                sid = ep.get("SeriesId")
+                if not sid:
+                    continue
+                sid_str = str(sid)
+                sname = str(ep.get("SeriesName") or sid_str)
+                series_names[sid_str] = sname
+                if ep.get("ParentIndexNumber") is None or ep.get("IndexNumber") is None:
+                    needs_refresh[sid_str] = sname
+                thumbs_by_series.setdefault(sid_str, []).append((ep.get("ImageTags") or {}).get("Primary"))
+
+            for sid_str, tags in thumbs_by_series.items():
+                if len(tags) > 1 and len({t for t in tags if t}) < len(tags):
+                    needs_refresh.setdefault(sid_str, series_names[sid_str])
+
+            for sid, sname in needs_refresh.items():
                 try:
                     r = client.post(
                         f"/Items/{sid}/Refresh",
-                        params={"MetadataRefreshMode": "FullRefresh", "ImageRefreshMode": "FullRefresh"},
+                        params={
+                            "MetadataRefreshMode": "FullRefresh",
+                            "ImageRefreshMode": "FullRefresh",
+                            "ReplaceAllImages": "true",
+                        },
                     )
                     if r.is_success:
                         identified.append(sname)
