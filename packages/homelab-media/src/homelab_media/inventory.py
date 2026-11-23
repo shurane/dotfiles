@@ -5,7 +5,7 @@ from __future__ import annotations
 import sqlite3
 from typing import TYPE_CHECKING, Any
 
-from rich.markup import escape
+from rich.table import Table
 
 from homelab_media.renderer import format_bytes, print_section_header
 
@@ -120,13 +120,20 @@ def render_inventory_summary(conn: sqlite3.Connection, console: Console, *, limi
         ),
     ]
 
+    _col_widths = {"kind": 6, "title": 36, "resolution": 10, "files": 6, "eps": 6, "bytes": 10, "res": 7, "codec": 6}
     for heading, style, sql, params in queries:
         print_section_header(console, heading, style=style)
         cur = conn.execute(sql, params)
         cols = [d[0] for d in (cur.description or [])]
+        table = Table(box=None, show_header=True, header_style="bold dim", pad_edge=False)
+        for col in cols:
+            table.add_column(
+                "Size" if col == "bytes" else col,
+                width=_col_widths.get(col),
+                justify="right" if col in ("files", "eps", "bytes") else "left",
+            )
         for row in cur.fetchall():
-            parts = [
-                f"[white]{format_bytes(val)}[/white]" if col == "bytes" else escape(str(val))
-                for col, val in zip(cols, row, strict=True)
-            ]
-            console.print(" / ".join(parts), soft_wrap=True, highlight=False)
+            table.add_row(
+                *[format_bytes(val) if col == "bytes" else str(val) for col, val in zip(cols, row, strict=True)]
+            )
+        console.print(table)
